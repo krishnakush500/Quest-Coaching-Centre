@@ -138,6 +138,75 @@
     /* Footer */
     .footer { background:#1a237e; color:white; text-align:center; padding:15px; font-size:0.9rem; }
     
+    /* Developer Contact Section - NEW */
+    .developer-contact {
+      background: #f8f9fa;
+      padding: 20px;
+      text-align: center;
+      border-top: 2px solid #1a237e;
+      margin-top: 20px;
+      border-radius: 0 0 15px 15px;
+    }
+    .developer-contact h3 {
+      color: #1a237e;
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+    }
+    .developer-contact p {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+    }
+    .contact-info {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+    .contact-item {
+      background: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.3s;
+    }
+    .contact-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    }
+    .contact-item i {
+      color: #1a237e;
+      font-size: 1.1rem;
+    }
+    
+    /* PDF Generation Fix Styles */
+    .pdf-clone-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      z-index: 10000;
+      overflow: auto;
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+    }
+    
+    .pdf-clone {
+      width: 100%;
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background: white;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    
     /* Media Queries for Mobile */
     @media (max-width: 768px) {
       .school-name { font-size:1.6rem; }
@@ -158,6 +227,21 @@
       .action-buttons button { width:100%; justify-content:center; }
       
       .promo-text { font-size:0.85rem; }
+      
+      /* Developer contact mobile */
+      .contact-info {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .contact-item {
+        padding: 10px 15px;
+      }
+      
+      /* Adjust PDF clone for mobile */
+      .pdf-clone {
+        padding: 15px;
+        margin: 10px;
+      }
     }
     
     @media (max-width: 480px) {
@@ -482,11 +566,33 @@
       </div>
     </div>
 
+    <!-- Developer Contact Section - NEW -->
+    <div class="developer-contact">
+      <h3><i class="fas fa-laptop-code"></i> Website Development Contact</h3>
+      <p>This website was developed by:</p>
+      <div class="contact-info">
+        <div class="contact-item">
+          <i class="fas fa-phone"></i>
+          <span>Phone: 8580594404</span>
+        </div>
+        <div class="contact-item">
+          <i class="fas fa-envelope"></i>
+          <span>Email: kk5674010@gmail.com</span>
+        </div>
+      </div>
+      <p style="margin-top: 15px; color: #666; font-size: 0.9rem;">
+        If you want a similar website for your coaching centre or business, feel free to contact me.
+      </p>
+    </div>
+
     <!-- Footer -->
     <div class="footer">
       <p>&copy; 2023 QUEST COACHING CENTRE. All Rights Reserved.</p>
     </div>
   </div>
+
+  <!-- PDF Clone Container (Hidden) -->
+  <div id="pdf-clone-container" class="pdf-clone-container"></div>
 
   <!-- Firebase Configuration and JavaScript -->
   <script>
@@ -790,36 +896,179 @@
       resultCard.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // Download result as PDF
-    function downloadResultAsPDF() {
+    // Create clone for PDF generation
+    function createPDFClone() {
       const resultCard = document.getElementById('result-card');
+      const cloneContainer = document.getElementById('pdf-clone-container');
       
-      // Temporarily hide the action buttons for PDF
-      const actionButtons = document.querySelector('.action-buttons');
-      actionButtons.style.display = 'none';
+      // Clear previous clone
+      cloneContainer.innerHTML = '';
       
-      const options = {
-        margin: [10, 10, 10, 10],
-        filename: `Result_${currentStudentResult?.rollNo || 'unknown'}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-          scale: 2,
-          useCORS: true,
-          letterRendering: true
-        },
-        jsPDF: { 
-          unit: 'mm', 
-          format: 'a4', 
-          orientation: 'portrait',
-          compress: true
-        },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      // Create a deep clone of the result card
+      const clone = resultCard.cloneNode(true);
+      clone.classList.add('pdf-clone');
+      clone.style.display = 'block';
+      clone.style.width = '100%';
+      clone.style.maxWidth = '800px';
+      clone.style.margin = '20px auto';
+      clone.style.padding = '20px';
+      clone.style.background = 'white';
+      clone.style.boxShadow = '0 0 20px rgba(0,0,0,0.1)';
+      clone.style.position = 'relative';
+      clone.style.left = '0';
+      clone.style.top = '0';
+      clone.style.transform = 'none';
+      clone.style.zIndex = '10001';
+      
+      // Remove action buttons from clone
+      const actionButtons = clone.querySelector('.action-buttons');
+      if (actionButtons) {
+        actionButtons.remove();
+      }
+      
+      // Show the clone container and add the clone
+      cloneContainer.appendChild(clone);
+      cloneContainer.style.visibility = 'visible';
+      cloneContainer.style.opacity = '0';
+      cloneContainer.style.pointerEvents = 'none';
+      
+      return clone;
+    }
+
+    // Preload all images in the result card
+    function preloadImages(callback) {
+      const images = document.querySelectorAll('#result-card img');
+      let loadedCount = 0;
+      const totalImages = images.length;
+      
+      if (totalImages === 0) {
+        callback();
+        return;
+      }
+      
+      const onImageLoad = () => {
+        loadedCount++;
+        if (loadedCount === totalImages) {
+          callback();
+        }
       };
       
-      html2pdf().set(options).from(resultCard).save().then(() => {
-        // Show buttons again after PDF generation
-        actionButtons.style.display = 'flex';
+      images.forEach(img => {
+        if (img.complete) {
+          onImageLoad();
+        } else {
+          img.onload = onImageLoad;
+          img.onerror = onImageLoad; // Also continue if image fails to load
+        }
       });
+    }
+
+    // Download result as PDF - FIXED VERSION
+    function downloadResultAsPDF() {
+      // Disable the download button to prevent multiple clicks
+      const downloadBtn = document.querySelector('.download-btn');
+      const originalText = downloadBtn.innerHTML;
+      downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+      downloadBtn.disabled = true;
+      
+      // Create a clone for PDF generation
+      const clone = createPDFClone();
+      const cloneContainer = document.getElementById('pdf-clone-container');
+      
+      // Show the clone container (but keep it invisible)
+      cloneContainer.style.visibility = 'visible';
+      cloneContainer.style.opacity = '0';
+      
+      // Wait a bit for DOM to settle
+      setTimeout(() => {
+        // Preload images before generating PDF
+        preloadImages(() => {
+          // Generate PDF with optimized settings
+          const options = {
+            margin: [10, 10, 10, 10],
+            filename: `Result_${currentStudentResult?.rollNo || 'unknown'}.pdf`,
+            image: { 
+              type: 'jpeg', 
+              quality: 0.98 
+            },
+            html2canvas: { 
+              scale: 2,
+              useCORS: true,
+              letterRendering: true,
+              scrollX: 0,
+              scrollY: 0,
+              windowWidth: clone.scrollWidth,
+              windowHeight: clone.scrollHeight,
+              backgroundColor: '#ffffff',
+              logging: false,
+              onclone: function(clonedDoc) {
+                // Ensure all images in clone are visible
+                const clonedImages = clonedDoc.querySelectorAll('img');
+                clonedImages.forEach(img => {
+                  img.style.display = 'block';
+                  img.style.maxWidth = '100%';
+                  img.style.height = 'auto';
+                });
+              }
+            },
+            jsPDF: { 
+              unit: 'mm', 
+              format: 'a4', 
+              orientation: 'portrait',
+              compress: true
+            },
+            pagebreak: { 
+              mode: ['avoid-all', 'css', 'legacy'],
+              before: '.page-break-before',
+              after: '.page-break-after',
+              avoid: ['.no-break', 'tr', 'td']
+            }
+          };
+          
+          // Generate and save PDF
+          html2pdf().set(options).from(clone).save().then(() => {
+            // Cleanup: hide the clone container
+            cloneContainer.style.visibility = 'hidden';
+            cloneContainer.innerHTML = '';
+            
+            // Re-enable the download button
+            downloadBtn.innerHTML = originalText;
+            downloadBtn.disabled = false;
+            
+            // Show success message
+            alert('PDF downloaded successfully!');
+          }).catch(error => {
+            console.error('PDF generation error:', error);
+            cloneContainer.style.visibility = 'hidden';
+            cloneContainer.innerHTML = '';
+            
+            // Re-enable the download button
+            downloadBtn.innerHTML = originalText;
+            downloadBtn.disabled = false;
+            
+            // Fallback: try simple method
+            alert('Generating PDF... Please wait.');
+            try {
+              const fallbackOptions = {
+                margin: 10,
+                filename: `Result_${currentStudentResult?.rollNo || 'unknown'}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+              };
+              
+              html2pdf().set(fallbackOptions).from(resultCard).save().then(() => {
+                downloadBtn.innerHTML = originalText;
+                downloadBtn.disabled = false;
+              });
+            } catch (fallbackError) {
+              alert('Error generating PDF. Please try again or take a screenshot.');
+              downloadBtn.innerHTML = originalText;
+              downloadBtn.disabled = false;
+            }
+          });
+        });
+      }, 500);
     }
 
     // Initialize on page load
