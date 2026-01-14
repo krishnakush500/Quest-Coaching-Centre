@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quest Coaching Centre - Admin Panel</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .section {
+            display: none;
+        }
+        .active {
+            display: block;
+        }
+        .subject-box {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .student-row {
+            transition: all 0.3s;
+        }
+        .student-row:hover {
+            background-color: #f8f9fa;
+        }
+        .nav-btn {
+            margin: 5px;
+        }
+        .success-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .coaching-name {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #0d6efd;
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .help-step {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-left: 4px solid #0d6efd;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .language-switch {
+            margin: 10px 0;
+        }
+        .simple-instruction {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        .simple-instruction:before {
+            content: "• ";
+            color: #0d6efd;
+            font-weight: bold;
+        }
+        /* Fixed Help Button Position */
+        .fixed-help-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        /* Published Success Toast */
+        .published-toast {
+            background-color: #198754 !important;
+        }
+        /* Save Changes Button Style */
+        .save-changes-btn {
+            background-color: #20c997;
+            border-color: #20c997;
+        }
+        .save-changes-btn:hover {
+            background-color: #1ba87e;
+            border-color: #1ba87e;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container mt-4">
+        <!-- Fixed Help Button -->
+        <button class="btn btn-primary fixed-help-btn" id="helpButton" title="Help / मदद">
+            ?
+        </button>
+
+        <!-- Teacher Dashboard (Directly show without login) -->
+        <div id="dashboardSection" class="section active">
+            <div class="row">
+                <div class="col-12">
+                    <!-- Coaching Centre Name -->
+                    <div class="coaching-name">
+                        QUEST COACHING CENTRE
+                    </div>
+                    
+                    <!-- Dashboard Cards -->
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">Create Result</h5>
+                                    <p class="card-text">Create a new exam result</p>
+                                    <button id="createResultBtn" class="btn btn-primary">Go</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">Draft Results</h5>
+                                    <p class="card-text">View and edit draft results</p>
+                                    <button id="draftResultsBtn" class="btn btn-warning">Go</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h5 class="card-title">Old Results</h5>
+                                    <p class="card-text">View published results</p>
+                                    <button id="oldResultsBtn" class="btn btn-info">Go</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Result Section -->
+        <div id="createResultSection" class="section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Create Result</h2>
+                <div>
+                    <button id="backToDashboardBtn" class="btn btn-secondary">Back to Dashboard</button>
+                </div>
+            </div>
+            
+            <!-- Step 1: Exam Setup -->
+            <div id="examSetupStep">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Step 1: Exam Setup</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="examName" class="form-label">Exam Name</label>
+                            <input type="text" class="form-control" id="examName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subjectCount" class="form-label">Number of Subjects</label>
+                            <input type="number" class="form-control" id="subjectCount" min="1" required>
+                        </div>
+                        <button id="generateSubjectFieldsBtn" class="btn btn-primary">Generate Subject Fields</button>
+                    </div>
+                </div>
+                
+                <div id="subjectFields" class="mb-4"></div>
+                
+                <div id="step1NextBtn" class="d-none">
+                    <button id="nextToStudentEntryBtn" class="btn btn-success">Next</button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Student Marks Entry -->
+            <div id="studentEntryStep" class="d-none">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4>Step 2: Student Marks Entry</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="rollNo" class="form-label">Roll No</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="rollNo" min="1" value="1">
+                                    <button class="btn btn-outline-secondary" type="button" id="incrementRollBtn">+</button>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="studentName" class="form-label">Student Name</label>
+                                <input type="text" class="form-control" id="studentName" required>
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                <label for="fatherName" class="form-label">Father Name (Optional)</label>
+                                <input type="text" class="form-control" id="fatherName">
+                            </div>
+                        </div>
+                        
+                        <div id="marksFields" class="mb-3"></div>
+                        
+                        <div class="d-flex gap-2">
+                            <button id="addStudentBtn" class="btn btn-primary">Add Student</button>
+                            <button id="updateStudentBtn" class="btn btn-warning d-none">Update Student</button>
+                            <button id="cancelEditBtn" class="btn btn-secondary d-none">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Students List</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Roll No</th>
+                                        <th>Name</th>
+                                        <th>Father Name</th>
+                                        <th>Marks</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentsTableBody">
+                                    <!-- Student rows will be added here dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="d-flex gap-2 mt-3">
+                            <button id="saveDraftBtn" class="btn btn-warning">Save as Draft</button>
+                            <button id="saveChangesBtn" class="btn save-changes-btn d-none">Save Changes</button>
+                            <button id="publishResultBtn" class="btn btn-success">Publish Result</button>
+                            <button id="dontSaveBtn" class="btn btn-secondary d-none">Don't Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Draft Results Section -->
+        <div id="draftResultsSection" class="section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Draft Results</h2>
+                <button id="backToDashboardBtn2" class="btn btn-secondary">Back to Dashboard</button>
+            </div>
+            
+            <div id="draftResultsList" class="row">
+                <!-- Draft results will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Old Results Section -->
+        <div id="oldResultsSection" class="section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Published Results</h2>
+                <button id="backToDashboardBtn3" class="btn btn-secondary">Back to Dashboard</button>
+            </div>
+            
+            <div id="oldResultsList" class="row">
+                <!-- Old results will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="helpModalLabel">How to Use - मदद</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Language Switch -->
+                    <div class="language-switch text-center mb-3">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary active" id="englishHelpBtn">English</button>
+                            <button type="button" class="btn btn-outline-primary" id="hindiHelpBtn">हिंदी</button>
+                        </div>
+                    </div>
+                    
+                    <!-- English Instructions -->
+                    <div id="englishInstructions">
+                        <h6 class="text-primary">Step 1: Make New Result</h6>
+                        <div class="help-step">
+                            <div class="simple-instruction">Click "Create Result" button</div>
+                            <div class="simple-instruction">Type exam name (like "Final Exam")</div>
+                            <div class="simple-instruction">Type how many subjects (like 5, 6, 7)</div>
+                            <div class="simple-instruction">Click "Generate Subject Fields" button</div>
+                            <div class="simple-instruction">Type subject names (like Math, Science)</div>
+                            <div class="simple-instruction">Type total marks for each subject</div>
+                            <div class="simple-instruction">Click "Next" button</div>
+                        </div>
+                        
+                        <h6 class="text-primary mt-4">Step 2: Add Students</h6>
+                        <div class="help-step">
+                            <div class="simple-instruction">Roll number will start from 1</div>
+                            <div class="simple-instruction">Type student name</div>
+                            <div class="simple-instruction">Type father name (if you want)</div>
+                            <div class="simple-instruction">Type marks for each subject</div>
+                            <div class="simple-instruction">Click "Add Student" button</div>
+                            <div class="simple-instruction">For next student, click "+" button for roll number</div>
+                            <div class="simple-instruction">Repeat for all students</div>
+                        </div>
+                        
+                        <h6 class="text-primary mt-4">Step 3: Save or Publish</h6>
+                        <div class="help-step">
+                            <div class="simple-instruction">"Save as Draft": Save for later changes</div>
+                            <div class="simple-instruction">"Publish Result": Make result final</div>
+                            <div class="simple-instruction">Before publish, you can edit/delete students</div>
+                            <div class="simple-instruction">To edit student: Click "Edit" button</div>
+                            <div class="simple-instruction">To delete student: Click "Delete" button</div>
+                        </div>
+                        
+                        <h6 class="text-primary mt-4">Step 4: Manage Results</h6>
+                        <div class="help-step">
+                            <div class="simple-instruction">"Draft Results": See saved results for editing</div>
+                            <div class="simple-instruction">"Old Results": See published results</div>
+                            <div class="simple-instruction">From drafts: You can edit or delete</div>
+                            <div class="simple-instruction">From published: You can view, edit or delete</div>
+                            <div class="simple-instruction">"View" button: See full result</div>
+                            <div class="simple-instruction">"Edit" button: Make changes to result</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hindi Instructions -->
+                    <div id="hindiInstructions" style="display: none;">
+                        <h6 class="text-primary">चरण 1: नया रिजल्ट बनाएं</h6>
+                        <div class="help-step">
+                            <div class="simple-instruction">"Create Result" बटन पर क्लिक करें</div>
+                            <div class="simple-instruction">परीक्षा का नाम टाइप करें (जैसे "फाइनल एग्जाम")</div>
+                            <div class="simple-instruction">कितने विषय हैं टाइप करें (जैसे 5, 6, 7)</div>
+                            <div class="simple-instruction">"Generate Subject Fields" बटन पर क्लिक करें</div>
+                            <div class="simple-instruction">विषयों के नाम टाइप करें (जैसे गणित, विज्ञान)</div>
+                            <div class="simple-instruction">हर विषय के कुल अंक टाइप करें</div>
+                            <div class="simple-instruction">"Next" बटन पर क्लिक करें</div>
+                        </div>
+                        
+                        <h6 class="text-primary mt-4">चरण 2: छात्र जोड़ें</h6>
+                        <div class="help-step">
+                            <div class="simple-instruction">रोल नंबर 1 से शुरू होगा</div>
+                            <div class="simple-instruction">छात्र का नाम टाइप करें</div>
+                            <div class="simple-instruction">पिता का नाम टाइप करें (अगर चाहें)</div>
+                            <div class="simple-instruction">हर विषय के अंक टाइप करें</div>
+                            <div class="simple-instruction">"Add Student" बटन पर क्लिक करें</div>
+                            <div class="simple-instruction">अगले छात्र के लिए, रोल नंबर के "+" बटन पर क्लिक करें</div>
+                            <div class="simple-instruction">सभी छात्रों के लिए दोहराएं</div>
+                        </div>
+                        
+                        <h6 class="text-primary mt-4">चरण 3: सेव या प्रकाशित करें</h6>
+                        <div class="help-step">
+                            <div class="simple-instruction">"Save as Draft": बाद में बदलाव के लिए सेव करें</div>
+                            <div class="simple-instruction">"Publish Result": रिजल्ट को अंतिम बनाएं</div>
+                            <div class="simple-instruction">प्रकाशित करने से पहले, छात्रों को एडिट/डिलीट कर सकते हैं</div>
+                            <div class="simple-instruction">छात्र एडिट करने के लिए: "Edit" बटन पर क्लिक करें</div>
+                            <div class="simple-instruction">छात्र डिलीट करने के लिए: "Delete" बटन पर क्लिक करें</div>
+                        </div>
+                        
+                        <h6 class="text-primary mt-4">चरण 4: रिजल्ट प्रबंधित करें</h6>
+                        <div class="help-step">
+                            <div class="simple-instruction">"Draft Results": एडिटिंग के लिए सेव किए रिजल्ट देखें</div>
+                            <div class="simple-instruction">"Old Results": प्रकाशित रिजल्ट देखें</div>
+                            <div class="simple-instruction">ड्राफ्ट से: आप एडिट या डिलीट कर सकते हैं</div>
+                            <div class="simple-instruction">प्रकाशित से: आप देख, एडिट या डिलीट कर सकते हैं</div>
+                            <div class="simple-instruction">"View" बटन: पूरा रिजल्ट देखें</div>
+                            <div class="simple-instruction">"Edit" बटन: रिजल्ट में बदलाव करें</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result View Modal -->
+    <div class="modal fade" id="resultModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resultModalTitle">Result Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="resultDetails">
+                        <!-- Result details will be loaded here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal for Editing Published Result -->
+    <div class="modal fade" id="editPublishedConfirmModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Edit</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>You are editing a published result. What would you like to do?</p>
+                    <div class="alert alert-info">
+                        <strong>Note:</strong> 
+                        <ul class="mb-0">
+                            <li><strong>Save Changes:</strong> Update the existing result directly</li>
+                            <li><strong>Don't Save:</strong> Go back without saving changes</li>
+                            <li><strong>Save as Draft:</strong> Save changes as a new draft</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="dontSaveConfirmBtn" data-bs-dismiss="modal">Don't Save</button>
+                    <button type="button" class="btn btn-warning" id="saveDraftConfirmBtn" data-bs-dismiss="modal">Save as Draft</button>
+                    <button type="button" class="btn save-changes-btn" id="saveChangesConfirmBtn" data-bs-dismiss="modal">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Message Toasts -->
+    <div id="successToast" class="toast align-items-center text-bg-success border-0 success-message" role="alert">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMessage">
+                Successfully Saved!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+
+    <!-- Published Success Toast -->
+    <div id="publishedToast" class="toast align-items-center text-bg-success border-0 success-message published-toast" role="alert" style="display: none;">
+        <div class="d-flex">
+            <div class="toast-body">
+                Result Published Successfully! ✓
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            getDocs, 
+            doc, 
+            updateDoc, 
+            deleteDoc, 
+            query, 
+            orderBy,
+            serverTimestamp,
+            where
+        } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+        // Firebase configuration - UPDATED WITH NEW CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
+            authDomain: "quest-coaching.firebaseapp.com",
+            databaseURL: "https://quest-coaching-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "quest-coaching",
+            storageBucket: "quest-coaching.firebasestorage.app",
+            messagingSenderId: "131948734089",
+            appId: "1:131948734089:web:f4ba25110c8b1298360858"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // DOM Elements
+        const dashboardSection = document.getElementById('dashboardSection');
+        const createResultSection = document.getElementById('createResultSection');
+        const draftResultsSection = document.getElementById('draftResultsSection');
+        const oldResultsSection = document.getElementById('oldResultsSection');
+        
+        const createResultBtn = document.getElementById('createResultBtn');
+        const draftResultsBtn = document.getElementById('draftResultsBtn');
+        const oldResultsBtn = document.getElementById('oldResultsBtn');
+        
+        const backToDashboardBtn = document.getElementById('backToDashboardBtn');
+        const backToDashboardBtn2 = document.getElementById('backToDashboardBtn2');
+        const backToDashboardBtn3 = document.getElementById('backToDashboardBtn3');
+        
+        // Help Elements
+        const helpButton = document.getElementById('helpButton');
+        const helpModal = new bootstrap.Modal(document.getElementById('helpModal'));
+        const englishHelpBtn = document.getElementById('englishHelpBtn');
+        const hindiHelpBtn = document.getElementById('hindiHelpBtn');
+        const englishInstructions = document.getElementById('englishInstructions');
+        const hindiInstructions = document.getElementById('hindiInstructions');
+        
+        // Create Result Elements
+        const examSetupStep = document.getElementById('examSetupStep');
+        const studentEntryStep = document.getElementById('studentEntryStep');
+        const examNameInput = document.getElementById('examName');
+        const subjectCountInput = document.getElementById('subjectCount');
+        const generateSubjectFieldsBtn = document.getElementById('generateSubjectFieldsBtn');
+        const subjectFields = document.getElementById('subjectFields');
+        const step1NextBtn = document.getElementById('step1NextBtn');
+        const nextToStudentEntryBtn = document.getElementById('nextToStudentEntryBtn');
+        
+        const rollNoInput = document.getElementById('rollNo');
+        const incrementRollBtn = document.getElementById('incrementRollBtn');
+        const studentNameInput = document.getElementById('studentName');
+        const fatherNameInput = document.getElementById('fatherName');
+        const marksFields = document.getElementById('marksFields');
+        const addStudentBtn = document.getElementById('addStudentBtn');
+        const updateStudentBtn = document.getElementById('updateStudentBtn');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const studentsTableBody = document.getElementById('studentsTableBody');
+        const saveDraftBtn = document.getElementById('saveDraftBtn');
+        const saveChangesBtn = document.getElementById('saveChangesBtn');
+        const publishResultBtn = document.getElementById('publishResultBtn');
+        const dontSaveBtn = document.getElementById('dontSaveBtn');
+        
+        // Draft and Old Results Elements
+        const draftResultsList = document.getElementById('draftResultsList');
+        const oldResultsList = document.getElementById('oldResultsList');
+        
+        // Modal Elements
+        const resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+        const resultModalTitle = document.getElementById('resultModalTitle');
+        const resultDetails = document.getElementById('resultDetails');
+        
+        // Confirmation Modal Elements
+        const editPublishedConfirmModal = new bootstrap.Modal(document.getElementById('editPublishedConfirmModal'));
+        const dontSaveConfirmBtn = document.getElementById('dontSaveConfirmBtn');
+        const saveDraftConfirmBtn = document.getElementById('saveDraftConfirmBtn');
+        const saveChangesConfirmBtn = document.getElementById('saveChangesConfirmBtn');
+        
+        // Toast Elements
+        const successToast = new bootstrap.Toast(document.getElementById('successToast'));
+        const publishedToast = new bootstrap.Toast(document.getElementById('publishedToast'));
+        const toastMessage = document.getElementById('toastMessage');
+        
+        // App State
+        let subjects = [];
+        let students = [];
+        let editingStudentIndex = null;
+        let editingDraftId = null;
+        let isEditingPublishedResult = false;
+        let editingPublishedResultId = null;
+        let hasChanges = false; // Track if there are unsaved changes
+
+        // Directly show dashboard (no login required)
+        showSection(dashboardSection);
+
+        // Vibration function
+        function vibrateButton() {
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        // Add click vibration to all buttons
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                vibrateButton();
+            }
+        });
+
+        // Help Button Click Handler
+        helpButton.addEventListener('click', () => {
+            helpModal.show();
+        });
+
+        // Language Switch Handlers (Help Modal)
+        englishHelpBtn.addEventListener('click', () => {
+            englishInstructions.style.display = 'block';
+            hindiInstructions.style.display = 'none';
+            englishHelpBtn.classList.add('active');
+            hindiHelpBtn.classList.remove('active');
+        });
+        
+        hindiHelpBtn.addEventListener('click', () => {
+            englishInstructions.style.display = 'none';
+            hindiInstructions.style.display = 'block';
+            englishHelpBtn.classList.remove('active');
+            hindiHelpBtn.classList.add('active');
+        });
+
+        // Navigation Handlers
+        createResultBtn.addEventListener('click', () => {
+            resetCreateResultForm();
+            showSection(createResultSection);
+        });
+        
+        draftResultsBtn.addEventListener('click', () => {
+            loadDraftResults();
+            showSection(draftResultsSection);
+        });
+        
+        oldResultsBtn.addEventListener('click', () => {
+            loadOldResults();
+            showSection(oldResultsSection);
+        });
+        
+        // Handle back to dashboard with confirmation for edited published results
+        backToDashboardBtn.addEventListener('click', () => {
+            if (isEditingPublishedResult && hasChanges) {
+                // Show confirmation modal before going back
+                editPublishedConfirmModal.show();
+            } else {
+                // No changes or not editing published result, just go back
+                resetCreateResultForm();
+                showSection(dashboardSection);
+            }
+        });
+        
+        backToDashboardBtn2.addEventListener('click', () => {
+            showSection(dashboardSection);
+        });
+        
+        backToDashboardBtn3.addEventListener('click', () => {
+            showSection(dashboardSection);
+        });
+
+        // Confirmation Modal Button Handlers
+        dontSaveConfirmBtn.addEventListener('click', () => {
+            // User chose "Don't Save"
+            resetCreateResultForm();
+            showSection(dashboardSection);
+        });
+        
+        saveDraftConfirmBtn.addEventListener('click', () => {
+            // User chose "Save as Draft"
+            if (validateResultData()) {
+                saveEditedPublishedResultAsDraft();
+            } else {
+                showSection(dashboardSection);
+            }
+        });
+        
+        saveChangesConfirmBtn.addEventListener('click', () => {
+            // User chose "Save Changes"
+            if (validateResultData()) {
+                updateExistingPublishedResult();
+            } else {
+                showSection(dashboardSection);
+            }
+        });
+
+        // Create Result - Step 1: Generate Subject Fields
+        generateSubjectFieldsBtn.addEventListener('click', () => {
+            const subjectCount = parseInt(subjectCountInput.value);
+            if (subjectCount < 1) return;
+            
+            subjectFields.innerHTML = '';
+            subjects = [];
+            
+            for (let i = 0; i < subjectCount; i++) {
+                const subjectBox = document.createElement('div');
+                subjectBox.className = 'subject-box';
+                subjectBox.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Subject ${i+1} Name</label>
+                            <input type="text" class="form-control subject-name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Total Marks</label>
+                            <input type="number" class="form-control subject-total" min="1" required>
+                        </div>
+                    </div>
+                `;
+                subjectFields.appendChild(subjectBox);
+            }
+            
+            step1NextBtn.classList.remove('d-none');
+        });
+
+        // Create Result - Step 1: Next Button
+        nextToStudentEntryBtn.addEventListener('click', () => {
+            // Validate subject fields
+            const subjectNameInputs = document.querySelectorAll('.subject-name');
+            const subjectTotalInputs = document.querySelectorAll('.subject-total');
+            
+            subjects = [];
+            let valid = true;
+            
+            for (let i = 0; i < subjectNameInputs.length; i++) {
+                const name = subjectNameInputs[i].value.trim();
+                const total = parseInt(subjectTotalInputs[i].value);
+                
+                if (!name || isNaN(total) || total < 1) {
+                    valid = false;
+                    break;
+                }
+                
+                subjects.push({ name, total });
+            }
+            
+            if (!valid) {
+                alert('Please fill all subject fields correctly');
+                return;
+            }
+            
+            // Generate marks fields
+            generateMarksFields();
+            
+            // Show step 2
+            examSetupStep.classList.add('d-none');
+            studentEntryStep.classList.remove('d-none');
+            
+            // Set up change tracking
+            setupChangeTracking();
+        });
+
+        // Create Result - Generate Marks Fields
+        function generateMarksFields() {
+            marksFields.innerHTML = '<h5>Enter Marks</h5>';
+            
+            subjects.forEach((subject, index) => {
+                const marksField = document.createElement('div');
+                marksField.className = 'mb-2';
+                marksField.innerHTML = `
+                    <label class="form-label">${subject.name} (Max: ${subject.total})</label>
+                    <input type="number" class="form-control subject-mark" data-subject="${subject.name}" min="0" max="${subject.total}" required>
+                `;
+                marksFields.appendChild(marksField);
+            });
+        }
+
+        // Create Result - Increment Roll No
+        incrementRollBtn.addEventListener('click', () => {
+            rollNoInput.value = parseInt(rollNoInput.value) + 1;
+        });
+
+        // Create Result - Add Student
+        addStudentBtn.addEventListener('click', () => {
+            const rollNo = parseInt(rollNoInput.value);
+            const name = studentNameInput.value.trim();
+            const fatherName = fatherNameInput.value.trim();
+            
+            if (!name) {
+                alert('Please enter student name');
+                return;
+            }
+            
+            // Validate marks
+            const markInputs = document.querySelectorAll('.subject-mark');
+            const marks = {};
+            let valid = true;
+            
+            markInputs.forEach(input => {
+                const subjectName = input.getAttribute('data-subject');
+                const mark = parseInt(input.value);
+                
+                if (isNaN(mark) || mark < 0) {
+                    valid = false;
+                    return;
+                }
+                
+                // Check if mark exceeds subject total
+                const subject = subjects.find(s => s.name === subjectName);
+                if (mark > subject.total) {
+                    alert(`Marks for ${subjectName} cannot exceed ${subject.total}`);
+                    valid = false;
+                    return;
+                }
+                
+                marks[subjectName] = mark;
+            });
+            
+            if (!valid) return;
+            
+            // Add student to list
+            students.push({
+                rollNo,
+                name,
+                fatherName,
+                marks
+            });
+            
+            // Update table
+            updateStudentsTable();
+            
+            // Clear form and increment roll no
+            studentNameInput.value = '';
+            fatherNameInput.value = '';
+            markInputs.forEach(input => input.value = '');
+            rollNoInput.value = rollNo + 1;
+            
+            // Mark as having changes
+            hasChanges = true;
+            updateButtonVisibility();
+
+            showToast('Student added successfully!');
+        });
+
+        // Create Result - Update Students Table
+        function updateStudentsTable() {
+            studentsTableBody.innerHTML = '';
+            
+            students.forEach((student, index) => {
+                const row = document.createElement('tr');
+                row.className = 'student-row';
+                
+                let marksHtml = '';
+                subjects.forEach(subject => {
+                    marksHtml += `<div>${subject.name}: ${student.marks[subject.name] || 0}/${subject.total}</div>`;
+                });
+                
+                row.innerHTML = `
+                    <td>${student.rollNo}</td>
+                    <td>${student.name}</td>
+                    <td>${student.fatherName || '-'}</td>
+                    <td>${marksHtml}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning edit-student" data-index="${index}">Edit</button>
+                        <button class="btn btn-sm btn-danger delete-student" data-index="${index}">Delete</button>
+                    </td>
+                `;
+                
+                studentsTableBody.appendChild(row);
+            });
+            
+            // Add event listeners for edit and delete buttons
+            document.querySelectorAll('.edit-student').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.getAttribute('data-index'));
+                    editStudent(index);
+                });
+            });
+            
+            document.querySelectorAll('.delete-student').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.getAttribute('data-index'));
+                    deleteStudent(index);
+                });
+            });
+        }
+
+        // Create Result - Edit Student
+        function editStudent(index) {
+            const student = students[index];
+            editingStudentIndex = index;
+            
+            // Fill form with student data
+            rollNoInput.value = student.rollNo;
+            studentNameInput.value = student.name;
+            fatherNameInput.value = student.fatherName || '';
+            
+            // Fill marks
+            const markInputs = document.querySelectorAll('.subject-mark');
+            markInputs.forEach(input => {
+                const subjectName = input.getAttribute('data-subject');
+                input.value = student.marks[subjectName] || 0;
+            });
+            
+            // Show update and cancel buttons
+            addStudentBtn.classList.add('d-none');
+            updateStudentBtn.classList.remove('d-none');
+            cancelEditBtn.classList.remove('d-none');
+
+            showToast('Student edit mode activated!');
+        }
+
+        // Create Result - Update Student
+        updateStudentBtn.addEventListener('click', () => {
+            if (editingStudentIndex === null) return;
+            
+            const rollNo = parseInt(rollNoInput.value);
+            const name = studentNameInput.value.trim();
+            const fatherName = fatherNameInput.value.trim();
+            
+            if (!name) {
+                alert('Please enter student name');
+                return;
+            }
+            
+            // Validate marks
+            const markInputs = document.querySelectorAll('.subject-mark');
+            const marks = {};
+            let valid = true;
+            
+            markInputs.forEach(input => {
+                const subjectName = input.getAttribute('data-subject');
+                const mark = parseInt(input.value);
+                
+                if (isNaN(mark) || mark < 0) {
+                    valid = false;
+                    return;
+                }
+                
+                // Check if mark exceeds subject total
+                const subject = subjects.find(s => s.name === subjectName);
+                if (mark > subject.total) {
+                    alert(`Marks for ${subjectName} cannot exceed ${subject.total}`);
+                    valid = false;
+                    return;
+                }
+                
+                marks[subjectName] = mark;
+            });
+            
+            if (!valid) return;
+            
+            // Update student
+            students[editingStudentIndex] = {
+                rollNo,
+                name,
+                fatherName,
+                marks
+            };
+            
+            // Update table
+            updateStudentsTable();
+            
+            // Reset form
+            cancelEdit();
+            
+            // Mark as having changes
+            hasChanges = true;
+            updateButtonVisibility();
+
+            showToast('Student updated successfully!');
+        });
+
+        // Create Result - Cancel Edit
+        cancelEditBtn.addEventListener('click', cancelEdit);
+
+        function cancelEdit() {
+            editingStudentIndex = null;
+            
+            // Clear form
+            studentNameInput.value = '';
+            fatherNameInput.value = '';
+            const markInputs = document.querySelectorAll('.subject-mark');
+            markInputs.forEach(input => input.value = '');
+            
+            // Show add button, hide update and cancel
+            addStudentBtn.classList.remove('d-none');
+            updateStudentBtn.classList.add('d-none');
+            cancelEditBtn.classList.add('d-none');
+
+            showToast('Edit cancelled!');
+        }
+
+        // Create Result - Delete Student
+        function deleteStudent(index) {
+            if (confirm('Are you sure you want to delete this student?')) {
+                students.splice(index, 1);
+                updateStudentsTable();
+                
+                // Mark as having changes
+                hasChanges = true;
+                updateButtonVisibility();
+                
+                showToast('Student deleted successfully!');
+            }
+        }
+
+        // Setup change tracking for inputs
+        function setupChangeTracking() {
+            // Track changes in form inputs
+            const trackedInputs = [
+                examNameInput,
+                ...document.querySelectorAll('.subject-name'),
+                ...document.querySelectorAll('.subject-total'),
+                ...document.querySelectorAll('.subject-mark'),
+                studentNameInput,
+                fatherNameInput
+            ];
+            
+            trackedInputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    hasChanges = true;
+                    updateButtonVisibility();
+                });
+            });
+        }
+
+        // Update button visibility based on editing mode
+        function updateButtonVisibility() {
+            if (isEditingPublishedResult) {
+                // When editing published result, show Save Changes and Don't Save buttons
+                saveDraftBtn.classList.add('d-none');
+                publishResultBtn.classList.add('d-none');
+                saveChangesBtn.classList.remove('d-none');
+                dontSaveBtn.classList.remove('d-none');
+            } else {
+                // When creating new result or editing draft
+                saveDraftBtn.classList.remove('d-none');
+                publishResultBtn.classList.remove('d-none');
+                saveChangesBtn.classList.add('d-none');
+                dontSaveBtn.classList.add('d-none');
+            }
+        }
+
+        // Create Result - Save as Draft
+        saveDraftBtn.addEventListener('click', async () => {
+            if (!validateResultData()) return;
+            
+            try {
+                const resultData = {
+                    examName: examNameInput.value,
+                    subjects,
+                    students,
+                    createdAt: serverTimestamp()
+                };
+                
+                if (editingDraftId) {
+                    // Update existing draft
+                    const draftRef = doc(db, "draft_results", editingDraftId);
+                    await updateDoc(draftRef, resultData);
+                    showToast('Draft updated successfully!');
+                } else {
+                    // Create new draft
+                    await addDoc(collection(db, "draft_results"), resultData);
+                    showToast('Draft saved successfully!');
+                }
+                
+                // Reset form
+                resetCreateResultForm();
+                showSection(dashboardSection);
+            } catch (error) {
+                console.error('Error saving draft:', error);
+                alert('Error saving draft: ' + error.message);
+            }
+        });
+
+        // Save Changes button for editing published results
+        saveChangesBtn.addEventListener('click', () => {
+            if (validateResultData()) {
+                updateExistingPublishedResult();
+            }
+        });
+
+        // Don't Save button handler
+        dontSaveBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to discard all changes?')) {
+                resetCreateResultForm();
+                showSection(dashboardSection);
+            }
+        });
+
+        // Update existing published result
+        async function updateExistingPublishedResult() {
+            if (!validateResultData()) return;
+            
+            try {
+                const resultData = {
+                    examName: examNameInput.value,
+                    subjects,
+                    students,
+                    updatedAt: serverTimestamp()
+                };
+                
+                // Update the existing published result
+                const resultRef = doc(db, "results", editingPublishedResultId);
+                await updateDoc(resultRef, resultData);
+                
+                showToast('Result updated successfully!');
+                
+                // Reset form and go back to dashboard
+                resetCreateResultForm();
+                showSection(dashboardSection);
+            } catch (error) {
+                console.error('Error updating result:', error);
+                alert('Error updating result: ' + error.message);
+            }
+        }
+
+        // Save edited published result as draft
+        async function saveEditedPublishedResultAsDraft() {
+            try {
+                const resultData = {
+                    examName: examNameInput.value,
+                    subjects,
+                    students,
+                    createdAt: serverTimestamp(),
+                    originalResultId: editingPublishedResultId // Track which result this draft came from
+                };
+                
+                await addDoc(collection(db, "draft_results"), resultData);
+                showToast('Changes saved as draft!');
+                
+                resetCreateResultForm();
+                showSection(dashboardSection);
+            } catch (error) {
+                console.error('Error saving draft:', error);
+                alert('Error saving draft: ' + error.message);
+            }
+        }
+
+        // Create Result - Publish Result (for new results only)
+        publishResultBtn.addEventListener('click', async () => {
+            if (!validateResultData()) return;
+            
+            // Check if we're editing a published result (shouldn't happen with this button)
+            if (isEditingPublishedResult) {
+                alert('Please use "Save Changes" button to update published results.');
+                return;
+            }
+            
+            try {
+                const resultData = {
+                    examName: examNameInput.value,
+                    subjects,
+                    students,
+                    createdAt: serverTimestamp()
+                };
+                
+                await addDoc(collection(db, "results"), resultData);
+                
+                // If we were editing a draft, delete it
+                if (editingDraftId) {
+                    await deleteDoc(doc(db, "draft_results", editingDraftId));
+                }
+                
+                // Show published success toast
+                publishedToast.show();
+                
+                // Reset form
+                resetCreateResultForm();
+                showSection(dashboardSection);
+            } catch (error) {
+                console.error('Error publishing result:', error);
+                alert('Error publishing result: ' + error.message);
+            }
+        });
+
+        // Validate Result Data
+        function validateResultData() {
+            if (!examNameInput.value.trim()) {
+                alert('Please enter exam name');
+                return false;
+            }
+            
+            if (students.length === 0) {
+                alert('Please add at least one student');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Reset Create Result Form
+        function resetCreateResultForm() {
+            examNameInput.value = '';
+            subjectCountInput.value = '';
+            subjectFields.innerHTML = '';
+            step1NextBtn.classList.add('d-none');
+            examSetupStep.classList.remove('d-none');
+            studentEntryStep.classList.add('d-none');
+            students = [];
+            studentsTableBody.innerHTML = '';
+            editingDraftId = null;
+            isEditingPublishedResult = false;
+            editingPublishedResultId = null;
+            hasChanges = false;
+            cancelEdit();
+            updateButtonVisibility();
+        }
+
+        // Load Draft Results
+        async function loadDraftResults() {
+            try {
+                const q = query(collection(db, "draft_results"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                
+                draftResultsList.innerHTML = '';
+                
+                if (querySnapshot.empty) {
+                    draftResultsList.innerHTML = '<div class="col-12"><p class="text-center">No draft results found.</p></div>';
+                    return;
+                }
+                
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const draftCard = document.createElement('div');
+                    draftCard.className = 'col-md-6 col-lg-4 mb-3';
+                    draftCard.innerHTML = `
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">${data.examName}</h5>
+                                <p class="card-text">Subjects: ${data.subjects.length}</p>
+                                <p class="card-text">Students: ${data.students.length}</p>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-primary edit-draft" data-id="${doc.id}">Edit</button>
+                                    <button class="btn btn-sm btn-danger delete-draft" data-id="${doc.id}">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    draftResultsList.appendChild(draftCard);
+                });
+                
+                // Add event listeners
+                document.querySelectorAll('.edit-draft').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const draftId = e.target.getAttribute('data-id');
+                        editDraft(draftId);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-draft').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const draftId = e.target.getAttribute('data-id');
+                        deleteDraft(draftId);
+                    });
+                });
+            } catch (error) {
+                console.error('Error loading draft results:', error);
+                alert('Error loading draft results: ' + error.message);
+            }
+        }
+
+        // Edit Draft
+        async function editDraft(draftId) {
+            try {
+                const draftDoc = await getDocs(query(collection(db, "draft_results"), where("__name__", "==", draftId)));
+                
+                if (draftDoc.empty) {
+                    alert('Draft not found');
+                    return;
+                }
+                
+                const data = draftDoc.docs[0].data();
+                
+                // Set form values
+                examNameInput.value = data.examName;
+                subjectCountInput.value = data.subjects.length;
+                
+                // Generate subject fields
+                generateSubjectFieldsBtn.click();
+                
+                // Wait a bit for DOM to update, then set subject values
+                setTimeout(() => {
+                    const subjectNameInputs = document.querySelectorAll('.subject-name');
+                    const subjectTotalInputs = document.querySelectorAll('.subject-total');
+                    
+                    data.subjects.forEach((subject, index) => {
+                        if (subjectNameInputs[index]) {
+                            subjectNameInputs[index].value = subject.name;
+                        }
+                        if (subjectTotalInputs[index]) {
+                            subjectTotalInputs[index].value = subject.total;
+                        }
+                    });
+                    
+                    // Proceed to step 2
+                    nextToStudentEntryBtn.click();
+                    
+                    // Set students data
+                    students = data.students;
+                    updateStudentsTable();
+                    
+                    // Set editing draft ID
+                    editingDraftId = draftId;
+                    isEditingPublishedResult = false;
+                    hasChanges = false;
+                    
+                    // Update button visibility
+                    updateButtonVisibility();
+                    
+                    // Show create result section
+                    showSection(createResultSection);
+                }, 100);
+
+                showToast('Draft loaded for editing!');
+            } catch (error) {
+                console.error('Error loading draft:', error);
+                alert('Error loading draft: ' + error.message);
+            }
+        }
+
+        // Delete Draft
+        async function deleteDraft(draftId) {
+            if (!confirm('Are you sure you want to delete this draft?')) return;
+            
+            try {
+                await deleteDoc(doc(db, "draft_results", draftId));
+                showToast('Draft deleted successfully!');
+                loadDraftResults();
+            } catch (error) {
+                console.error('Error deleting draft:', error);
+                alert('Error deleting draft: ' + error.message);
+            }
+        }
+
+        // Load Old Results
+        async function loadOldResults() {
+            try {
+                const q = query(collection(db, "results"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+                
+                oldResultsList.innerHTML = '';
+                
+                if (querySnapshot.empty) {
+                    oldResultsList.innerHTML = '<div class="col-12"><p class="text-center">No published results found.</p></div>';
+                    return;
+                }
+                
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const date = data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : 'Unknown date';
+                    
+                    const resultCard = document.createElement('div');
+                    resultCard.className = 'col-md-6 col-lg-4 mb-3';
+                    resultCard.innerHTML = `
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">${data.examName}</h5>
+                                <p class="card-text">Date: ${date}</p>
+                                <p class="card-text">Subjects: ${data.subjects.length}</p>
+                                <p class="card-text">Students: ${data.students.length}</p>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-primary view-result" data-id="${doc.id}">View</button>
+                                    <button class="btn btn-sm btn-warning edit-result" data-id="${doc.id}">Edit</button>
+                                    <button class="btn btn-sm btn-danger delete-result" data-id="${doc.id}">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    oldResultsList.appendChild(resultCard);
+                });
+                
+                // Add event listeners
+                document.querySelectorAll('.view-result').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const resultId = e.target.getAttribute('data-id');
+                        viewResult(resultId);
+                    });
+                });
+
+                // Add event listeners for edit and delete buttons
+                document.querySelectorAll('.edit-result').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const resultId = e.target.getAttribute('data-id');
+                        editResult(resultId);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-result').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const resultId = e.target.getAttribute('data-id');
+                        deleteResult(resultId);
+                    });
+                });
+            } catch (error) {
+                console.error('Error loading old results:', error);
+                alert('Error loading old results: ' + error.message);
+            }
+        }
+
+        // Edit Result (Published Result)
+        async function editResult(resultId) {
+            try {
+                const resultDoc = await getDocs(query(collection(db, "results"), where("__name__", "==", resultId)));
+                
+                if (resultDoc.empty) {
+                    alert('Result not found');
+                    return;
+                }
+                
+                const data = resultDoc.docs[0].data();
+                const docId = resultDoc.docs[0].id;
+                
+                // Set form values
+                examNameInput.value = data.examName;
+                subjectCountInput.value = data.subjects.length;
+                
+                // Generate subject fields
+                generateSubjectFieldsBtn.click();
+                
+                // Wait a bit for DOM to update, then set subject values
+                setTimeout(() => {
+                    const subjectNameInputs = document.querySelectorAll('.subject-name');
+                    const subjectTotalInputs = document.querySelectorAll('.subject-total');
+                    
+                    data.subjects.forEach((subject, index) => {
+                        if (subjectNameInputs[index]) {
+                            subjectNameInputs[index].value = subject.name;
+                        }
+                        if (subjectTotalInputs[index]) {
+                            subjectTotalInputs[index].value = subject.total;
+                        }
+                    });
+                    
+                    // Proceed to step 2
+                    nextToStudentEntryBtn.click();
+                    
+                    // Set students data
+                    students = data.students;
+                    updateStudentsTable();
+                    
+                    // Set editing flags
+                    editingDraftId = null;
+                    isEditingPublishedResult = true;
+                    editingPublishedResultId = docId;
+                    hasChanges = false;
+                    
+                    // Update button visibility
+                    updateButtonVisibility();
+                    
+                    // Show create result section
+                    showSection(createResultSection);
+
+                }, 100);
+
+                showToast('Result loaded for editing!');
+            } catch (error) {
+                console.error('Error loading result:', error);
+                alert('Error loading result: ' + error.message);
+            }
+        }
+
+        // Delete Result (Published Result)
+        async function deleteResult(resultId) {
+            if (!confirm('Are you sure you want to delete this published result?')) return;
+            
+            try {
+                await deleteResultFromDB(resultId);
+                showToast('Result deleted successfully!');
+                loadOldResults();
+            } catch (error) {
+                console.error('Error deleting result:', error);
+                alert('Error deleting result: ' + error.message);
+            }
+        }
+
+        // Delete Result from Database
+        async function deleteResultFromDB(resultId) {
+            await deleteDoc(doc(db, "results", resultId));
+        }
+
+        // View Result
+        async function viewResult(resultId) {
+            try {
+                const resultDoc = await getDocs(query(collection(db, "results"), where("__name__", "==", resultId)));
+                
+                if (resultDoc.empty) {
+                    alert('Result not found');
+                    return;
+                }
+                
+                const data = resultDoc.docs[0].data();
+                const date = data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : 'Unknown date';
+                
+                resultModalTitle.textContent = data.examName;
+                
+                let resultHtml = `
+                    <p><strong>Date:</strong> ${date}</p>
+                    <p><strong>Subjects:</strong> ${data.subjects.map(s => `${s.name} (${s.total})`).join(', ')}</p>
+                    <p><strong>Total Students:</strong> ${data.students.length}</p>
+                    
+                    <h5 class="mt-4">Student Results</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Roll No</th>
+                                    <th>Name</th>
+                                    <th>Father Name</th>
+                `;
+                
+                // Add subject columns
+                data.subjects.forEach(subject => {
+                    resultHtml += `<th>${subject.name}</th>`;
+                });
+                
+                // Add total column
+                resultHtml += `<th>Total</th>`;
+                resultHtml += `<th>Percentage</th>`;
+                
+                resultHtml += `
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                // Add student rows
+                data.students.forEach(student => {
+                    let totalMarks = 0;
+                    let totalMaxMarks = 0;
+                    
+                    resultHtml += `
+                        <tr>
+                            <td>${student.rollNo}</td>
+                            <td>${student.name}</td>
+                            <td>${student.fatherName || '-'}</td>
+                    `;
+                    
+                    // Add marks for each subject
+                    data.subjects.forEach(subject => {
+                        const mark = student.marks[subject.name] || 0;
+                        totalMarks += mark;
+                        totalMaxMarks += subject.total;
+                        
+                        resultHtml += `<td>${mark}/${subject.total}</td>`;
+                    });
+                    
+                    const percentage = totalMaxMarks > 0 ? ((totalMarks / totalMaxMarks) * 100).toFixed(2) : 0;
+                    
+                    resultHtml += `
+                            <td>${totalMarks}/${totalMaxMarks}</td>
+                            <td>${percentage}%</td>
+                        </tr>
+                    `;
+                });
+                
+                resultHtml += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+                resultDetails.innerHTML = resultHtml;
+                resultModal.show();
+            } catch (error) {
+                console.error('Error loading result:', error);
+                alert('Error loading result: ' + error.message);
+            }
+        }
+
+        // Helper Functions
+        function showSection(section) {
+            // Hide all sections
+            dashboardSection.classList.remove('active');
+            createResultSection.classList.remove('active');
+            draftResultsSection.classList.remove('active');
+            oldResultsSection.classList.remove('active');
+            
+            // Show the requested section
+            section.classList.add('active');
+        }
+
+        function showToast(message) {
+            toastMessage.textContent = message;
+            successToast.show();
+        }
+    </script>
+</body>
+</html>
