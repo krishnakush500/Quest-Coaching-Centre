@@ -23,11 +23,13 @@
     .school-name { font-size:2rem; font-weight:700; line-height:1.2; }
     .location { font-size:1rem; margin-bottom:15px; }
     .director-info { display:flex; align-items:center; justify-content:center; margin-top:20px; flex-wrap:wrap; }
-    .director-photo { width:100px; height:100px; border-radius:50%; border:4px solid white; overflow:hidden; margin-right:15px; }
+    .director-photo { width:100px; height:100px; border-radius:50%; border:4px solid white; overflow:hidden; margin-right:15px; cursor:pointer; transition:transform 0.3s; }
+    .director-photo:hover { transform:scale(1.05); box-shadow:0 0 15px rgba(255,255,255,0.5); }
     .director-photo img{width:100%;height:100%;object-fit:cover;}
     .director-details{text-align:left;}
     .director-details h2{font-size:1rem; margin-bottom:5px;}
-    .director-details h3{font-size:1.1rem; margin-bottom:5px;}
+    .director-details h3{font-size:1.1rem; margin-bottom:5px; cursor:pointer; transition:color 0.3s; }
+    .director-details h3:hover { color:#ffc107; }
     .director-details p{font-size:0.9rem;}
 
     /* Moving Admission Text */
@@ -76,6 +78,23 @@
     .exam-name { font-size:1rem; color:#1a237e; font-weight:600; margin-bottom:8px; }
     .exam-date { font-size:0.8rem; color:#666; margin-bottom:5px; }
     
+    /* Show More/Less Button */
+    .show-more-btn {
+      display:block;
+      margin:20px auto;
+      padding:10px 25px;
+      background:#1a237e;
+      color:white;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      font-size:1rem;
+      transition:background 0.3s;
+    }
+    .show-more-btn:hover {
+      background:#283593;
+    }
+    
     /* NEW Sticker */
     .new-sticker {
       position:absolute;
@@ -123,10 +142,88 @@
     .total-marks { background:#e8f5e8 !important; font-weight:600; color:#1a237e; }
     .percentage-display { text-align:center; font-size:1.2rem; color:#1a237e; font-weight:700; padding:12px; background:#f0f7ff; border-radius:10px; margin-top:15px; }
     .division-display { text-align:center; font-size:1.4rem; color:#1a237e; font-weight:700; padding:12px; margin-top:12px; border-radius:10px; }
-    .coaching-mention { text-align:center; margin-top:15px; padding-top:12px; border-top:1px solid #ddd; color:#666; font-style:italic; font-size:0.9rem; }
     
-    .action-buttons { display:flex; justify-content:center; gap:10px; margin-top:20px; padding-top:15px; border-top:1px solid #ddd; flex-wrap:wrap; }
-    .action-buttons button { padding:10px 15px; font-size:0.9rem; border:none; border-radius:8px; cursor:pointer; transition:all 0.3s; display:flex; align-items:center; gap:5px; }
+    /* Exam Toppers Section in Result Card - NOW AFTER ACTION BUTTONS */
+    .exam-toppers-section {
+      margin-top: 15px;
+      padding: 15px;
+      background: #f9f9f9;
+      border-radius: 10px;
+      border-left: 4px solid #1a237e;
+      border-top: 2px solid #ddd;
+    }
+    .exam-toppers-title {
+      font-size: 1.1rem;
+      color: #b21f1f;
+      margin-bottom: 15px;
+      text-align: center;
+      font-weight: 600;
+    }
+    .exam-toppers-list {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .exam-topper-card {
+      background: white;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      min-width: 120px;
+    }
+    .exam-topper-rank {
+      background: #1a237e;
+      color: white;
+      padding: 5px;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .exam-topper-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    .exam-topper-score {
+      font-size: 0.9rem;
+      color: #1a237e;
+      font-weight: 700;
+    }
+    
+    .coaching-mention { 
+      text-align:center; 
+      margin-top: 25px; 
+      padding-top: 15px; 
+      border-top: 2px solid #ddd; 
+      color:#666; 
+      font-style:italic; 
+      font-size:0.9rem; 
+    }
+    
+    .action-buttons { 
+      display:flex; 
+      justify-content:center; 
+      gap:10px; 
+      margin-top: 25px; 
+      padding-top:15px; 
+      border-top:1px solid #ddd; 
+      flex-wrap:wrap; 
+    }
+    .action-buttons button { 
+      padding:10px 15px; 
+      font-size:0.9rem; 
+      border:none; 
+      border-radius:8px; 
+      cursor:pointer; 
+      transition:all 0.3s; 
+      display:flex; 
+      align-items:center; 
+      gap:5px; 
+    }
     .download-btn { background:#28a745; color:white; }
     .download-btn:hover { background:#218838; }
     .back-btn { background:#6c757d; color:white; }
@@ -138,7 +235,7 @@
     /* Footer */
     .footer { background:#1a237e; color:white; text-align:center; padding:15px; font-size:0.9rem; }
     
-    /* Developer Contact Section - NEW */
+    /* Developer Contact Section */
     .developer-contact {
       background: #f8f9fa;
       padding: 20px;
@@ -228,6 +325,14 @@
       
       .promo-text { font-size:0.85rem; }
       
+      .exam-toppers-list {
+        gap:10px;
+      }
+      .exam-topper-card {
+        min-width:100px;
+        padding:8px;
+      }
+      
       /* Developer contact mobile */
       .contact-info {
         flex-direction: column;
@@ -253,6 +358,13 @@
       .topper-card { width:100px; padding:5px; }
       .topper-photo { width:50px; height:50px; }
       .topper-percentage { font-size:0.8rem; }
+      .exam-toppers-list {
+        flex-direction:column;
+        align-items:center;
+      }
+      .exam-topper-card {
+        width:80%;
+      }
     }
 
   </style>
@@ -264,10 +376,10 @@
       <h1 class="school-name">QUEST COACHING CENTRE</h1>
       <p class="location">In Front of S.S. Girls High School, Gopalganj</p>
       <div class="director-info">
-        <div class="director-photo"><img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg"></div>
+        <div class="director-photo" onclick="openAdminPanel()"><img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg"></div>
         <div class="director-details">
           <h2>CEO & FOUNDER</h2>
-          <h3>MR. RAVI SIR</h3>
+          <h3 onclick="openAdminPanel()">MR. RAVI SIR</h3>
           <p><i class="fas fa-phone"></i> Call: +91 9708442525</p>
         </div>
       </div>
@@ -293,6 +405,10 @@
       </div>
       
       <div class="results-list" id="results-list" style="display:none;"></div>
+      
+      <button class="show-more-btn" id="show-more-btn" style="display:none;" onclick="toggleShowMore()">
+        Show More Results
+      </button>
       
       <div class="roll-input-section" id="roll-input-section">
         <h3 id="selected-exam-name">Enter your Roll Number</h3>
@@ -359,6 +475,14 @@
           <button class="back-btn" onclick="goBackToResults()">
             <i class="fas fa-arrow-left"></i> Back to Results
           </button>
+        </div>
+        
+        <!-- Exam Toppers Section - NOW AFTER ACTION BUTTONS -->
+        <div class="exam-toppers-section" id="exam-toppers-section" style="display:none;">
+          <h3 class="exam-toppers-title">🏆 Top 3 Performers of This Exam</h3>
+          <div class="exam-toppers-list" id="exam-toppers-list">
+            <!-- Top 3 toppers will be populated here -->
+          </div>
         </div>
       </div>
     </div>
@@ -566,7 +690,7 @@
       </div>
     </div>
 
-    <!-- Developer Contact Section - NEW -->
+    <!-- Developer Contact Section -->
     <div class="developer-contact">
       <h3><i class="fas fa-laptop-code"></i> Website Development Contact</h3>
       <p>This website was developed by:</p>
@@ -618,6 +742,7 @@
     let currentStudentResult = null;
     let newResults = []; // Track which results are "new"
     let viewedResults = []; // Track which results have been viewed
+    let showAllResults = false; // Track if we're showing all results or just latest 4
 
     // Load viewed results from localStorage
     function loadViewedResults() {
@@ -687,10 +812,11 @@
       }
     }
 
-    // Display results list
+    // Display results list (show only latest 4 initially)
     function displayResultsList() {
       const resultsList = document.getElementById("results-list");
       const loading = document.getElementById("loading-results");
+      const showMoreBtn = document.getElementById("show-more-btn");
       
       if (allResults.length === 0) {
         loading.innerHTML = '<div class="error">No results available at the moment.</div>';
@@ -700,8 +826,11 @@
       loading.style.display = "none";
       resultsList.style.display = "grid";
       
+      // Determine which results to show
+      const resultsToShow = showAllResults ? allResults : allResults.slice(0, 4);
+      
       let html = "";
-      allResults.forEach((result, index) => {
+      resultsToShow.forEach((result, index) => {
         const newSticker = result.isNew ? '<div class="new-sticker">NEW</div>' : '';
         html += `
           <div class="result-item" onclick="selectExam('${result.id}', ${index})" id="result-item-${index}">
@@ -713,12 +842,126 @@
       });
       
       resultsList.innerHTML = html;
+      
+      // Show or hide "Show More" button
+      if (allResults.length > 4) {
+        showMoreBtn.style.display = "block";
+        showMoreBtn.textContent = showAllResults ? "Show Less" : "Show More Results";
+      } else {
+        showMoreBtn.style.display = "none";
+      }
+    }
+
+    // Toggle between showing all results and latest 4 only
+    function toggleShowMore() {
+      showAllResults = !showAllResults;
+      displayResultsList();
+    }
+
+    // Open Admin Panel (password protected)
+    function openAdminPanel() {
+      const password = prompt("Enter Admin Password:");
+      if (password === "456467") {
+        // Create admin.html if it doesn't exist
+        const adminHTML = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - QUEST COACHING CENTRE</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background:#f5f5f5; min-height:100vh; padding:20px; }
+    .container { width:100%; max-width:1200px; margin:0 auto; background:white; border-radius:15px; box-shadow:0 15px 30px rgba(0,0,0,0.2); overflow:hidden; }
+    
+    .header { background:linear-gradient(to right,#1a237e,#283593,#303f9f); color:white; padding:25px; text-align:center; }
+    .header h1 { font-size:2rem; margin-bottom:10px; }
+    .header p { font-size:1rem; }
+    
+    .admin-content { padding:20px; }
+    
+    .back-btn { 
+      display:inline-block; 
+      margin-bottom:20px; 
+      padding:10px 20px; 
+      background:#1a237e; 
+      color:white; 
+      text-decoration:none; 
+      border-radius:5px; 
+      transition:background 0.3s; 
+    }
+    .back-btn:hover { background:#283593; }
+    
+    .admin-message { 
+      text-align:center; 
+      padding:40px; 
+      background:#f9f9f9; 
+      border-radius:10px; 
+      margin-top:20px; 
+    }
+    .admin-message h2 { color:#1a237e; margin-bottom:15px; }
+    .admin-message p { color:#666; line-height:1.6; margin-bottom:10px; }
+    
+    .contact-info {
+      background:#e8f4ff;
+      padding:20px;
+      border-radius:10px;
+      margin-top:30px;
+    }
+    .contact-info h3 { color:#1a237e; margin-bottom:15px; }
+    .contact-info p { color:#333; margin-bottom:8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>QUEST COACHING CENTRE</h1>
+      <p>Admin Panel</p>
+    </div>
+    
+    <div class="admin-content">
+      <a href="index.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Back to Results Portal
+      </a>
+      
+      <div class="admin-message">
+        <h2>Welcome to Admin Panel</h2>
+        <p>This is the admin panel for QUEST COACHING CENTRE result portal.</p>
+        <p>To manage results (add, edit, delete), you need to access Firebase Firestore directly.</p>
+        <p>Firebase Project: <strong>quest-coaching</strong></p>
+        <p>Collection: <strong>results</strong></p>
+        
+        <div class="contact-info">
+          <h3>For Technical Support</h3>
+          <p><i class="fas fa-phone"></i> Phone: 8580594404</p>
+          <p><i class="fas fa-envelope"></i> Email: kk5674010@gmail.com</p>
+          <p>Contact the developer for any modifications or additional features.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+        
+        // Open admin panel in new window
+        const adminWindow = window.open();
+        adminWindow.document.write(adminHTML);
+        adminWindow.document.close();
+      } else if (password) {
+        alert("Incorrect Password!");
+      }
     }
 
     // Select an exam
     function selectExam(examId, index) {
       selectedExamId = examId;
-      selectedExamData = allResults[index].data;
+      // Find the selected exam data
+      const selectedResult = allResults.find(result => result.id === examId);
+      if (selectedResult) {
+        selectedExamData = selectedResult.data;
+      }
       
       // Mark this result as viewed (remove NEW sticker)
       markResultAsViewed(examId);
@@ -736,12 +979,15 @@
       document.querySelectorAll('.result-item').forEach(item => {
         item.classList.remove('active');
       });
-      document.getElementById(`result-item-${index}`).classList.add('active');
+      if (resultItem) {
+        resultItem.classList.add('active');
+      }
       
       // Show roll number input section
       document.getElementById('selected-exam-name').textContent = 
         `Enter your Roll Number for: ${selectedExamData.examName}`;
       document.getElementById('results-list').style.display = 'none';
+      document.getElementById('show-more-btn').style.display = 'none';
       document.getElementById('roll-input-section').style.display = 'block';
       document.getElementById('result-card').style.display = 'none';
       
@@ -757,6 +1003,12 @@
       selectedExamId = null;
       selectedExamData = null;
       currentStudentResult = null;
+      
+      // Show/hide show more button
+      const showMoreBtn = document.getElementById('show-more-btn');
+      if (allResults.length > 4) {
+        showMoreBtn.style.display = 'block';
+      }
       
       // Remove active class
       document.querySelectorAll('.result-item').forEach(item => {
@@ -793,6 +1045,93 @@
       }
     }
 
+    // Calculate top 3 performers for the exam
+    function calculateTopPerformers() {
+      if (!selectedExamData || !selectedExamData.students) {
+        return [];
+      }
+      
+      const studentsWithScores = selectedExamData.students.map(student => {
+        let totalObtained = 0;
+        let totalPossible = 0;
+        
+        if (student.marks && selectedExamData.subjects) {
+          selectedExamData.subjects.forEach(subject => {
+            const subjectTotal = subject.total || 100;
+            const marksObtained = student.marks[subject.name] || 0;
+            totalObtained += marksObtained;
+            totalPossible += subjectTotal;
+          });
+        }
+        
+        const percentage = totalPossible > 0 ? (totalObtained / totalPossible) * 100 : 0;
+        
+        return {
+          name: student.name,
+          rollNo: student.rollNo,
+          totalObtained: totalObtained,
+          percentage: percentage
+        };
+      });
+      
+      // Sort by percentage (highest first)
+      studentsWithScores.sort((a, b) => b.percentage - a.percentage);
+      
+      // Group students by rank (handle ties)
+      const rankedStudents = [];
+      let currentRank = 1;
+      let previousPercentage = null;
+      let skipCount = 0;
+      
+      for (let i = 0; i < studentsWithScores.length && rankedStudents.length < 3; i++) {
+        const student = studentsWithScores[i];
+        
+        if (student.percentage !== previousPercentage) {
+          currentRank = i + 1;
+        }
+        
+        if (currentRank <= 3) {
+          rankedStudents.push({
+            ...student,
+            rank: currentRank
+          });
+        }
+        
+        previousPercentage = student.percentage;
+      }
+      
+      return rankedStudents;
+    }
+
+    // Display top performers in the result card (AFTER ACTION BUTTONS)
+    function displayTopPerformers(topPerformers) {
+      const toppersSection = document.getElementById('exam-toppers-section');
+      const toppersList = document.getElementById('exam-toppers-list');
+      
+      if (topPerformers.length === 0) {
+        toppersSection.style.display = 'none';
+        return;
+      }
+      
+      let html = '';
+      topPerformers.forEach(performer => {
+        const rankText = performer.rank === 1 ? '1st' : 
+                        performer.rank === 2 ? '2nd' : 
+                        performer.rank === 3 ? '3rd' : `${performer.rank}th`;
+        
+        html += `
+          <div class="exam-topper-card">
+            <div class="exam-topper-rank">${rankText} Rank</div>
+            <div class="exam-topper-name">${performer.name}</div>
+            <div class="exam-topper-score">${performer.percentage.toFixed(2)}%</div>
+          </div>
+        `;
+      });
+      
+      toppersList.innerHTML = html;
+      toppersSection.style.display = 'block';
+    }
+
     // Fetch student result
     function fetchStudentResult() {
       const rollInput = document.getElementById('roll-input').value.trim();
@@ -815,12 +1154,15 @@
         return;
       }
       
-      // Display result
-      displayStudentResult(student);
+      // Calculate top performers for this exam
+      const topPerformers = calculateTopPerformers();
+      
+      // Display result with top performers
+      displayStudentResult(student, topPerformers);
     }
 
     // Display student result
-    function displayStudentResult(student) {
+    function displayStudentResult(student, topPerformers) {
       currentStudentResult = student;
       
       // Hide input section, show result card
@@ -892,11 +1234,14 @@
       
       marksTable.innerHTML = html;
       
+      // Display top performers (AFTER ACTION BUTTONS)
+      displayTopPerformers(topPerformers);
+      
       // Scroll to result
       resultCard.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // Create clone for PDF generation
+    // Create clone for PDF generation (WITHOUT TOP PERFORMERS SECTION)
     function createPDFClone() {
       const resultCard = document.getElementById('result-card');
       const cloneContainer = document.getElementById('pdf-clone-container');
@@ -924,6 +1269,12 @@
       const actionButtons = clone.querySelector('.action-buttons');
       if (actionButtons) {
         actionButtons.remove();
+      }
+      
+      // Remove exam toppers section from clone (so it doesn't appear in PDF)
+      const examToppersSection = clone.querySelector('.exam-toppers-section');
+      if (examToppersSection) {
+        examToppersSection.remove();
       }
       
       // Show the clone container and add the clone
@@ -963,7 +1314,7 @@
       });
     }
 
-    // Download result as PDF - FIXED VERSION
+    // Download result as PDF
     function downloadResultAsPDF() {
       // Disable the download button to prevent multiple clicks
       const downloadBtn = document.querySelector('.download-btn');
@@ -971,7 +1322,7 @@
       downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
       downloadBtn.disabled = true;
       
-      // Create a clone for PDF generation
+      // Create a clone for PDF generation (without top performers)
       const clone = createPDFClone();
       const cloneContainer = document.getElementById('pdf-clone-container');
       
