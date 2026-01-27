@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Exam Results - QUEST COACHING CENTRE</title>
+  <title>QUEST COACHING CENTRE</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Firebase SDK -->
@@ -53,97 +53,296 @@
       0% { transform: translateX(100%); }
       100% { transform: translateX(-100%); }
     }
-    
-    /* Toppers */
-    .toppers-section{padding:20px;background:#f5f5f5;text-align:center;}
-    .promo-text{font-size:0.95rem;line-height:1.6;color:#1a237e;font-weight:600;margin-bottom:20px;white-space:pre-line;text-align:left;padding:0 10px;}
-    .toppers-title{font-size:1.4rem;color:#b21f1f;margin:20px 0;text-align:center;}
-    .all-toppers{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;}
-    .topper-card{background:white;border-radius:8px;box-shadow:0 5px 10px rgba(0,0,0,0.1);overflow:hidden;text-align:center;transition:transform .3s;width:140px;padding:8px;}
-    .topper-card:hover{transform:translateY(-5px);}
-    .topper-rank{background:#1a237e;color:white;padding:5px;font-weight:600;font-size:0.8rem;}
-    .topper-photo{width:60px;height:60px;border-radius:50%;margin:10px auto;border:2px solid #1a237e;overflow:hidden;}
-    .topper-photo img{width:100%;height:100%;object-fit:cover;}
-    .topper-name{font-size:0.8rem;color:#333;margin-top:5px;height:35px;display:flex;align-items:center;justify-content:center;line-height:1.1;}
-    .topper-percentage{font-size:0.9rem;color:#1a237e;font-weight:700;margin:6px 0;}
 
-    /* Firebase Results Section */
-    .results-section { padding:20px; background:#f9f9f9; }
-    .section-title { font-size:1.5rem; color:#1a237e; text-align:center; margin-bottom:20px; padding-bottom:10px; border-bottom:2px solid #1a237e; }
-    
-    .results-list { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:15px; margin-bottom:25px; }
-    .result-item { background:white; padding:15px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.1); cursor:pointer; transition:all 0.3s; border-left:4px solid #1a237e; position:relative; }
-    .result-item:hover { transform:translateY(-5px); box-shadow:0 8px 20px rgba(0,0,0,0.15); }
-    .result-item.active { border-left-color:#ffc107; background:#fffae6; }
-    .exam-name { font-size:1rem; color:#1a237e; font-weight:600; margin-bottom:8px; }
-    .exam-date { font-size:0.8rem; color:#666; margin-bottom:5px; }
-    
-    /* Show More/Less Button */
-    .show-more-btn {
-      display:block;
-      margin:20px auto;
-      padding:10px 25px;
-      background:#1a237e;
-      color:white;
-      border:none;
-      border-radius:8px;
-      cursor:pointer;
-      font-size:1rem;
-      transition:background 0.3s;
+    /* Main Tabs Navigation */
+    .main-tabs {
+      display: flex;
+      background: white;
+      border-bottom: 2px solid #1a237e;
+      position: relative;
+      z-index: 10;
     }
-    .show-more-btn:hover {
-      background:#283593;
+    .tab-btn {
+      flex: 1;
+      padding: 18px 20px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border-bottom: 3px solid transparent;
+    }
+    .tab-btn:hover {
+      background: #f5f5f5;
+      color: #1a237e;
+    }
+    .tab-btn.active {
+      color: #1a237e;
+      border-bottom: 3px solid #1a237e;
+      background: #f0f7ff;
+    }
+    .tab-btn i {
+      font-size: 1.2rem;
+    }
+
+    /* Content Sections */
+    .tab-content {
+      display: none;
+      padding: 0;
+      min-height: 400px;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Results Section */
+    .results-section {
+      padding: 25px 20px;
+      background: #f9f9f9;
+      min-height: 500px;
+    }
+    .section-title {
+      font-size: 1.5rem;
+      color: #1a237e;
+      text-align: center;
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #1a237e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .section-title i {
+      color: #ffc107;
+    }
+    .results-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    .result-item {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: all 0.3s;
+      border-left: 4px solid #1a237e;
+      position: relative;
+    }
+    .result-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    .result-item.active {
+      border-left-color: #ffc107;
+      background: #fffae6;
+    }
+    .exam-name {
+      font-size: 1rem;
+      color: #1a237e;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .exam-date {
+      font-size: 0.8rem;
+      color: #666;
+      margin-bottom: 5px;
     }
     
     /* NEW Sticker */
     .new-sticker {
-      position:absolute;
-      top:-8px;
-      right:-8px;
-      background:#ff4757;
-      color:white;
-      font-size:0.7rem;
-      font-weight:bold;
-      padding:4px 8px;
-      border-radius:10px;
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #ff4757;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 10px;
       animation: blink 1s infinite;
-      z-index:10;
+      z-index: 10;
     }
     @keyframes blink {
-      0%, 100% { opacity:1; }
-      50% { opacity:0.7; }
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
     }
     
-    .roll-input-section { background:white; padding:20px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.1); margin-top:20px; text-align:center; display:none; }
-    .roll-input-section h3 { color:#1a237e; margin-bottom:15px; font-size:1.1rem; }
-    .input-group { display:flex; justify-content:center; gap:8px; flex-wrap:wrap; }
-    .input-group input { padding:10px 12px; font-size:0.95rem; border-radius:5px; border:1px solid #ccc; width:100%; max-width:250px; }
-    .result-btn { padding:10px 20px; background:#1a237e; color:white; font-size:0.95rem; border:none; border-radius:8px; cursor:pointer; transition:background 0.3s; }
-    .result-btn:hover { background:#283593; }
-    
+    .roll-input-section {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      margin-top: 20px;
+      text-align: center;
+      display: none;
+    }
+    .roll-input-section h3 {
+      color: #1a237e;
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+    }
+    .input-group {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .input-group input {
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 100%;
+      max-width: 250px;
+    }
+    .result-btn {
+      padding: 10px 20px;
+      background: #1a237e;
+      color: white;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .result-btn:hover {
+      background: #283593;
+    }
+
+    /* Show More/Less Button */
+    .show-more-btn {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 25px;
+      background: #1a237e;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s;
+    }
+    .show-more-btn:hover {
+      background: #283593;
+    }
+
     /* Result Card - Mobile Optimized */
-    .result-card { display:none; width:95%; max-width:700px; margin:20px auto; background:white; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.2); padding:20px; position:relative; overflow-x:auto; }
-    .result-card-header { text-align:center; margin-bottom:20px; padding-bottom:10px; border-bottom:2px solid #1a237e; }
-    .result-card-header h2 { color:#1a237e; margin-bottom:5px; font-size:1.3rem; }
-    .result-card-header h3 { color:#b21f1f; margin-bottom:5px; font-size:1.1rem; }
-    .result-card-header p { color:#666; font-size:0.85rem; }
+    .result-card {
+      display: none;
+      width: 95%;
+      max-width: 700px;
+      margin: 20px auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      padding: 20px;
+      position: relative;
+      overflow-x: auto;
+    }
+    .result-card-header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #1a237e;
+    }
+    .result-card-header h2 {
+      color: #1a237e;
+      margin-bottom: 5px;
+      font-size: 1.3rem;
+    }
+    .result-card-header h3 {
+      color: #b21f1f;
+      margin-bottom: 5px;
+      font-size: 1.1rem;
+    }
+    .result-card-header p {
+      color: #666;
+      font-size: 0.85rem;
+    }
     
-    .student-info { margin-bottom:20px; }
-    .info-row { display:flex; flex-direction:column; margin-bottom:8px; padding:8px 12px; background:#f5f5f5; border-radius:5px; }
-    .info-label { font-weight:600; color:#1a237e; font-size:0.9rem; margin-bottom:3px; }
-    .info-value { color:#333; font-size:0.95rem; }
+    .student-info {
+      margin-bottom: 20px;
+    }
+    .info-row {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 8px;
+      padding: 8px 12px;
+      background: #f5f5f5;
+      border-radius: 5px;
+    }
+    .info-label {
+      font-weight: 600;
+      color: #1a237e;
+      font-size: 0.9rem;
+      margin-bottom: 3px;
+    }
+    .info-value {
+      color: #333;
+      font-size: 0.95rem;
+    }
     
-    .marks-table { width:100%; border-collapse:collapse; margin-bottom:20px; min-width:500px; }
-    .marks-table th { background:#1a237e; color:white; padding:10px; text-align:left; font-size:0.9rem; }
-    .marks-table td { padding:10px; border-bottom:1px solid #ddd; font-size:0.9rem; }
-    .marks-table tr:nth-child(even) { background:#f9f9f9; }
-    .marks-table tr:hover { background:#f0f0f0; }
+    .marks-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      min-width: 500px;
+    }
+    .marks-table th {
+      background: #1a237e;
+      color: white;
+      padding: 10px;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+    .marks-table td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      font-size: 0.9rem;
+    }
+    .marks-table tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+    .marks-table tr:hover {
+      background: #f0f0f0;
+    }
     
-    .total-marks { background:#e8f5e8 !important; font-weight:600; color:#1a237e; }
-    .percentage-display { text-align:center; font-size:1.2rem; color:#1a237e; font-weight:700; padding:12px; background:#f0f7ff; border-radius:10px; margin-top:15px; }
-    .division-display { text-align:center; font-size:1.4rem; color:#1a237e; font-weight:700; padding:12px; margin-top:12px; border-radius:10px; }
+    .total-marks {
+      background: #e8f5e8 !important;
+      font-weight: 600;
+      color: #1a237e;
+    }
+    .percentage-display {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #1a237e;
+      font-weight: 700;
+      padding: 12px;
+      background: #f0f7ff;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
+    .division-display {
+      text-align: center;
+      font-size: 1.4rem;
+      color: #1a237e;
+      font-weight: 700;
+      padding: 12px;
+      margin-top: 12px;
+      border-radius: 10px;
+    }
     
-    /* Exam Toppers Section in Result Card - NOW AFTER ACTION BUTTONS */
+    /* Exam Toppers Section in Result Card */
     .exam-toppers-section {
       margin-top: 15px;
       padding: 15px;
@@ -195,45 +394,267 @@
     }
     
     .coaching-mention { 
-      text-align:center; 
+      text-align: center; 
       margin-top: 25px; 
       padding-top: 15px; 
       border-top: 2px solid #ddd; 
-      color:#666; 
-      font-style:italic; 
-      font-size:0.9rem; 
+      color: #666; 
+      font-style: italic; 
+      font-size: 0.9rem; 
     }
     
     .action-buttons { 
-      display:flex; 
-      justify-content:center; 
-      gap:10px; 
+      display: flex; 
+      justify-content: center; 
+      gap: 10px; 
       margin-top: 25px; 
-      padding-top:15px; 
-      border-top:1px solid #ddd; 
-      flex-wrap:wrap; 
+      padding-top: 15px; 
+      border-top: 1px solid #ddd; 
+      flex-wrap: wrap; 
     }
     .action-buttons button { 
-      padding:10px 15px; 
-      font-size:0.9rem; 
-      border:none; 
-      border-radius:8px; 
-      cursor:pointer; 
-      transition:all 0.3s; 
-      display:flex; 
-      align-items:center; 
-      gap:5px; 
+      padding: 10px 15px; 
+      font-size: 0.9rem; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      transition: all 0.3s; 
+      display: flex; 
+      align-items: center; 
+      gap: 5px; 
     }
-    .download-btn { background:#28a745; color:white; }
-    .download-btn:hover { background:#218838; }
-    .back-btn { background:#6c757d; color:white; }
-    .back-btn:hover { background:#5a6268; }
+    .download-btn {
+      background: #28a745;
+      color: white;
+    }
+    .download-btn:hover {
+      background: #218838;
+    }
+    .back-btn {
+      background: #6c757d;
+      color: white;
+    }
+    .back-btn:hover {
+      background: #5a6268;
+    }
     
-    .loading { text-align:center; padding:20px; font-size:1rem; color:#1a237e; }
-    .error { text-align:center; padding:15px; background:#ffe6e6; color:#b30000; border-radius:5px; margin:15px 0; }
+    .loading {
+      text-align: center;
+      padding: 40px 20px;
+      font-size: 1rem;
+      color: #1a237e;
+    }
+    .error {
+      text-align: center;
+      padding: 15px;
+      background: #ffe6e6;
+      color: #b30000;
+      border-radius: 5px;
+      margin: 15px 0;
+    }
+
+    /* Tests Section */
+    .tests-section {
+      padding: 25px 20px;
+      background: #f9f9f9;
+      min-height: 500px;
+    }
+    .tests-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .test-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      border-left: 5px solid #1a237e;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .test-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+    }
+    .test-card.new-test {
+      border-left-color: #ff4757;
+    }
+    .test-card h3 {
+      color: #1a237e;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .test-card h3 i {
+      color: #ffc107;
+    }
+    .test-description {
+      color: #555;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+    .test-details {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .test-detail {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #666;
+      font-size: 0.85rem;
+    }
+    .test-detail i {
+      color: #1a237e;
+      font-size: 0.9rem;
+    }
+    .test-btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(to right, #1a237e, #283593);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+      text-decoration: none;
+    }
+    .test-btn:hover {
+      background: linear-gradient(to right, #283593, #303f9f);
+      transform: scale(1.02);
+    }
+    .test-btn i {
+      margin-right: 8px;
+    }
+    .no-tests-message {
+      text-align: center;
+      padding: 60px 40px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      color: #666;
+      margin-top: 20px;
+    }
+    .no-tests-message i {
+      font-size: 3rem;
+      color: #ddd;
+      margin-bottom: 15px;
+      display: block;
+    }
+    .live-badge {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: #ff4757;
+      color: white;
+      padding: 5px 15px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      border-radius: 20px;
+      transform: rotate(10deg);
+      box-shadow: 0 3px 10px rgba(255,71,87,0.3);
+      z-index: 10;
+    }
+
+    /* Toppers Section - ALL 30 TOPPERS */
+    .toppers-section {
+      padding: 20px;
+      background: #f5f5f5;
+      text-align: center;
+    }
+    .promo-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #1a237e;
+      font-weight: 600;
+      margin-bottom: 20px;
+      white-space: pre-line;
+      text-align: left;
+      padding: 0 10px;
+    }
+    .toppers-title {
+      font-size: 1.4rem;
+      color: #b21f1f;
+      margin: 20px 0;
+      text-align: center;
+    }
+    .all-toppers {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .topper-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+      text-align: center;
+      transition: transform .3s;
+      width: 140px;
+      padding: 8px;
+    }
+    .topper-card:hover {
+      transform: translateY(-5px);
+    }
+    .topper-rank {
+      background: #1a237e;
+      color: white;
+      padding: 5px;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+    .topper-photo {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      margin: 10px auto;
+      border: 2px solid #1a237e;
+      overflow: hidden;
+    }
+    .topper-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .topper-name {
+      font-size: 0.8rem;
+      color: #333;
+      margin-top: 5px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.1;
+    }
+    .topper-percentage {
+      font-size: 0.9rem;
+      color: #1a237e;
+      font-weight: 700;
+      margin: 6px 0;
+    }
     
     /* Footer */
-    .footer { background:#1a237e; color:white; text-align:center; padding:15px; font-size:0.9rem; }
+    .footer {
+      background: #1a237e;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-size: 0.9rem;
+    }
     
     /* Developer Contact Section */
     .developer-contact {
@@ -306,31 +727,69 @@
     
     /* Media Queries for Mobile */
     @media (max-width: 768px) {
-      .school-name { font-size:1.6rem; }
-      .header { padding:15px; }
-      .director-info { flex-direction:column; text-align:center; }
-      .director-photo { margin-right:0; margin-bottom:10px; }
-      .director-details { text-align:center; }
+      .school-name {
+        font-size: 1.6rem;
+      }
+      .header {
+        padding: 15px;
+      }
+      .director-info {
+        flex-direction: column;
+        text-align: center;
+      }
+      .director-photo {
+        margin-right: 0;
+        margin-bottom: 10px;
+      }
+      .director-details {
+        text-align: center;
+      }
       
-      .results-list { grid-template-columns:1fr; }
+      .tab-btn {
+        padding: 15px 10px;
+        font-size: 1rem;
+      }
       
-      .topper-card { width:120px; }
-      .topper-name { font-size:0.75rem; height:30px; }
+      .tests-list,
+      .results-list {
+        grid-template-columns: 1fr;
+      }
       
-      .marks-table { font-size:0.85rem; min-width:450px; }
-      .marks-table th, .marks-table td { padding:8px; }
+      .topper-card {
+        width: 120px;
+      }
+      .topper-name {
+        font-size: 0.75rem;
+        height: 30px;
+      }
       
-      .action-buttons { flex-direction:column; }
-      .action-buttons button { width:100%; justify-content:center; }
+      .marks-table {
+        font-size: 0.85rem;
+        min-width: 450px;
+      }
+      .marks-table th,
+      .marks-table td {
+        padding: 8px;
+      }
       
-      .promo-text { font-size:0.85rem; }
+      .action-buttons {
+        flex-direction: column;
+      }
+      .action-buttons button {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .promo-text {
+        font-size: 0.85rem;
+      }
       
       .exam-toppers-list {
-        gap:10px;
+        gap: 10px;
       }
       .exam-topper-card {
-        min-width:100px;
-        padding:8px;
+        min-width: 100px;
+        padding: 8px;
       }
       
       /* Developer contact mobile */
@@ -350,23 +809,46 @@
     }
     
     @media (max-width: 480px) {
-      .school-name { font-size:1.4rem; }
-      .section-title { font-size:1.3rem; }
-      .result-card { padding:15px; }
-      .marks-table { min-width:350px; }
-      .marks-table th, .marks-table td { padding:6px; font-size:0.8rem; }
-      .topper-card { width:100px; padding:5px; }
-      .topper-photo { width:50px; height:50px; }
-      .topper-percentage { font-size:0.8rem; }
+      .school-name {
+        font-size: 1.4rem;
+      }
+      .section-title {
+        font-size: 1.3rem;
+      }
+      .tab-btn {
+        padding: 12px 8px;
+        font-size: 0.9rem;
+      }
+      .result-card {
+        padding: 15px;
+      }
+      .marks-table {
+        min-width: 350px;
+      }
+      .marks-table th,
+      .marks-table td {
+        padding: 6px;
+        font-size: 0.8rem;
+      }
+      .topper-card {
+        width: 100px;
+        padding: 5px;
+      }
+      .topper-photo {
+        width: 50px;
+        height: 50px;
+      }
+      .topper-percentage {
+        font-size: 0.8rem;
+      }
       .exam-toppers-list {
-        flex-direction:column;
-        align-items:center;
+        flex-direction: column;
+        align-items: center;
       }
       .exam-topper-card {
-        width:80%;
+        width: 80%;
       }
     }
-
   </style>
 </head>
 <body>
@@ -376,7 +858,9 @@
       <h1 class="school-name">QUEST COACHING CENTRE</h1>
       <p class="location">In Front of S.S. Girls High School, Gopalganj</p>
       <div class="director-info">
-        <div class="director-photo" onclick="openAdminPanel()"><img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg"></div>
+        <div class="director-photo" onclick="openAdminPanel()">
+          <img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg">
+        </div>
         <div class="director-details">
           <h2>CEO & FOUNDER</h2>
           <h3 onclick="openAdminPanel()">MR. RAVI SIR</h3>
@@ -396,93 +880,126 @@
       </div>
     </div>
 
-    <!-- Firebase Results Section -->
-    <div class="results-section">
-      <h2 class="section-title">📊 Check Your Results</h2>
-      
-      <div class="loading" id="loading-results">
-        <i class="fas fa-spinner fa-spin"></i> Loading available results...
-      </div>
-      
-      <div class="results-list" id="results-list" style="display:none;"></div>
-      
-      <button class="show-more-btn" id="show-more-btn" style="display:none;" onclick="toggleShowMore()">
-        Show More Results
+    <!-- Main Tabs Navigation -->
+    <div class="main-tabs">
+      <!-- CHANGED ORDER: Check Results first (left side) -->
+      <button class="tab-btn active" id="results-tab" onclick="switchTab('results')">
+        <i class="fas fa-chart-line"></i> Check Results
       </button>
-      
-      <div class="roll-input-section" id="roll-input-section">
-        <h3 id="selected-exam-name">Enter your Roll Number</h3>
-        <div class="input-group">
-          <input type="number" id="roll-input" placeholder="Enter Roll Number">
-          <button class="result-btn" onclick="fetchStudentResult()">📑 Get Result</button>
-          <button class="result-btn" onclick="goBackToResults()" style="background:#666;">⬅ Back</button>
+      <button class="tab-btn" id="tests-tab" onclick="switchTab('tests')">
+        <i class="fas fa-laptop-code"></i> Online Tests
+      </button>
+    </div>
+
+    <!-- Results Tab Content (Now FIRST tab) -->
+    <div class="tab-content active" id="results-content">
+      <div class="results-section">
+        <div class="loading" id="loading-results">
+          <i class="fas fa-spinner fa-spin"></i> Loading available results...
+        </div>
+        
+        <div class="results-list" id="results-list" style="display:none;"></div>
+        
+        <button class="show-more-btn" id="show-more-btn" style="display:none;" onclick="toggleShowMore()">
+          Show More Results
+        </button>
+        
+        <div class="roll-input-section" id="roll-input-section">
+          <h3 id="selected-exam-name">Enter your Roll Number</h3>
+          <div class="input-group">
+            <input type="number" id="roll-input" placeholder="Enter Roll Number">
+            <button class="result-btn" onclick="fetchStudentResult()">📑 Get Result</button>
+            <button class="result-btn" onclick="goBackToResults()" style="background:#666;">⬅ Back</button>
+          </div>
+        </div>
+        
+        <div class="result-card" id="result-card">
+          <div class="result-card-header">
+            <h2>QUEST COACHING CENTRE GOPALGANJ</h2>
+            <h3 id="result-exam-name">Exam Name</h3>
+            <p>Under the guidance of <strong>MR. RAVI SIR</strong></p>
+          </div>
+          
+          <div class="student-info">
+            <div class="info-row">
+              <span class="info-label">Student Name:</span>
+              <span class="info-value" id="result-student-name">-</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Father's Name:</span>
+              <span class="info-value" id="result-father-name">-</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Roll Number:</span>
+              <span class="info-value" id="result-roll-no">-</span>
+            </div>
+          </div>
+          
+          <table class="marks-table">
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Marks Obtained</th>
+                <th>Total Marks</th>
+                <th>Percentage</th>
+              </tr>
+            </thead>
+            <tbody id="marks-table-body">
+              <!-- Marks will be populated here -->
+            </tbody>
+          </table>
+          
+          <div class="percentage-display" id="total-percentage">
+            Total Percentage: 0%
+          </div>
+          
+          <div class="division-display" id="division-display">
+            Division: -
+          </div>
+          
+          <div class="coaching-mention">
+            <p>This result is published by QUEST COACHING CENTRE, Gopalganj | Director: MR. RAVI SIR</p>
+            <p>For any queries, contact: +91 9708442525</p>
+          </div>
+          
+          <div class="action-buttons">
+            <button class="download-btn" onclick="downloadResultAsPDF()">
+              <i class="fas fa-download"></i> Download Result PDF
+            </button>
+            <button class="back-btn" onclick="goBackToResults()">
+              <i class="fas fa-arrow-left"></i> Back to Results
+            </button>
+          </div>
+          
+          <!-- Exam Toppers Section -->
+          <div class="exam-toppers-section" id="exam-toppers-section" style="display:none;">
+            <h3 class="exam-toppers-title">🏆 Top 3 Performers of This Exam</h3>
+            <div class="exam-toppers-list" id="exam-toppers-list">
+              <!-- Top 3 toppers will be populated here -->
+            </div>
+          </div>
         </div>
       </div>
-      
-      <div class="result-card" id="result-card">
-        <div class="result-card-header">
-          <h2>QUEST COACHING CENTRE GOPALGANJ</h2>
-          <h3 id="result-exam-name">Exam Name</h3>
-          <p>Under the guidance of <strong>MR. RAVI SIR</strong></p>
+    </div>
+
+    <!-- Tests Tab Content (Now SECOND tab) -->
+    <div class="tab-content" id="tests-content">
+      <div class="tests-section">
+        <h2 class="section-title">
+          <i class="fas fa-laptop-code"></i> Online Live Tests
+        </h2>
+        
+        <div class="loading" id="loading-tests">
+          <i class="fas fa-spinner fa-spin"></i> Loading available tests...
         </div>
         
-        <div class="student-info">
-          <div class="info-row">
-            <span class="info-label">Student Name:</span>
-            <span class="info-value" id="result-student-name">-</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Father's Name:</span>
-            <span class="info-value" id="result-father-name">-</span>
-          </div>
-          <div class="info-row">
-            <span class="info-label">Roll Number:</span>
-            <span class="info-value" id="result-roll-no">-</span>
-          </div>
-        </div>
+        <div class="tests-list" id="tests-list" style="display:none;"></div>
         
-        <table class="marks-table">
-          <thead>
-            <tr>
-              <th>Subject</th>
-              <th>Marks Obtained</th>
-              <th>Total Marks</th>
-              <th>Percentage</th>
-            </tr>
-          </thead>
-          <tbody id="marks-table-body">
-            <!-- Marks will be populated here -->
-          </tbody>
-        </table>
-        
-        <div class="percentage-display" id="total-percentage">
-          Total Percentage: 0%
-        </div>
-        
-        <div class="division-display" id="division-display">
-          Division: -
-        </div>
-        
-        <div class="coaching-mention">
-          <p>This result is published by QUEST COACHING CENTRE, Gopalganj | Director: MR. RAVI SIR</p>
-          <p>For any queries, contact: +91 9708442525</p>
-        </div>
-        
-        <div class="action-buttons">
-          <button class="download-btn" onclick="downloadResultAsPDF()">
-            <i class="fas fa-download"></i> Download Result PDF
-          </button>
-          <button class="back-btn" onclick="goBackToResults()">
-            <i class="fas fa-arrow-left"></i> Back to Results
-          </button>
-        </div>
-        
-        <!-- Exam Toppers Section - NOW AFTER ACTION BUTTONS -->
-        <div class="exam-toppers-section" id="exam-toppers-section" style="display:none;">
-          <h3 class="exam-toppers-title">🏆 Top 3 Performers of This Exam</h3>
-          <div class="exam-toppers-list" id="exam-toppers-list">
-            <!-- Top 3 toppers will be populated here -->
-          </div>
+        <div class="no-tests-message" id="no-tests-message" style="display:none;">
+          <i class="fas fa-file-alt"></i>
+          <h3>No Tests Available</h3>
+          <p>There are no online tests available at the moment.</p>
+          <p>Please check back later or contact your teacher.</p>
         </div>
       </div>
     </div>
@@ -740,9 +1257,34 @@
     let selectedExamId = null;
     let selectedExamData = null;
     let currentStudentResult = null;
-    let newResults = []; // Track which results are "new"
-    let viewedResults = []; // Track which results have been viewed
-    let showAllResults = false; // Track if we're showing all results or just latest 4
+    let newResults = [];
+    let viewedResults = [];
+    let showAllResults = false;
+    let onlineTests = [];
+    let currentTab = 'results'; // CHANGED: Default to results tab
+
+    // Switch between tabs
+    function switchTab(tabName) {
+      currentTab = tabName;
+      
+      // Update active tab button
+      document.getElementById('results-tab').classList.toggle('active', tabName === 'results');
+      document.getElementById('tests-tab').classList.toggle('active', tabName === 'tests');
+      
+      // Show active tab content
+      document.getElementById('results-content').classList.toggle('active', tabName === 'results');
+      document.getElementById('tests-content').classList.toggle('active', tabName === 'tests');
+      
+      // If switching to results tab and results aren't loaded yet, load them
+      if (tabName === 'results' && allResults.length === 0) {
+        fetchAllResults();
+      }
+      
+      // If switching to tests tab and tests aren't loaded yet, load them
+      if (tabName === 'tests' && onlineTests.length === 0) {
+        fetchOnlineTests();
+      }
+    }
 
     // Load viewed results from localStorage
     function loadViewedResults() {
@@ -771,11 +1313,11 @@
     // Fetch all results from Firestore
     async function fetchAllResults() {
       try {
-        loadViewedResults(); // Load previously viewed results
+        loadViewedResults();
         
         const querySnapshot = await db.collection("results").get();
         allResults = [];
-        newResults = []; // Reset new results array
+        newResults = [];
         
         querySnapshot.forEach((doc) => {
           const data = doc.data();
@@ -810,6 +1352,88 @@
         document.getElementById("loading-results").innerHTML = 
           '<div class="error">Error loading results. Please try again later.</div>';
       }
+    }
+
+    // Fetch online tests from Firestore
+    async function fetchOnlineTests() {
+      try {
+        const loadingTests = document.getElementById("loading-tests");
+        const testsList = document.getElementById("tests-list");
+        const noTestsMessage = document.getElementById("no-tests-message");
+        
+        const querySnapshot = await db.collection("online_tests").get();
+        onlineTests = [];
+        
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          onlineTests.push({
+            id: doc.id,
+            title: data.title || "Untitled Test",
+            description: data.description || "No description available",
+            duration: data.duration || 60,
+            totalQuestions: data.totalQuestions || 0,
+            subject: data.subject || "General",
+            testLink: data.testLink || "#",
+            createdAt: data.createdAt ? new Date(data.createdAt.toDate()) : new Date(),
+            isActive: data.isActive !== false,
+            showLiveBadge: data.showLiveBadge || false
+          });
+        });
+        
+        // Hide loading
+        loadingTests.style.display = "none";
+        
+        // Display tests if available
+        if (onlineTests.length > 0) {
+          testsList.style.display = "grid";
+          displayOnlineTests();
+        } else {
+          noTestsMessage.style.display = "block";
+        }
+        
+      } catch (error) {
+        console.error("Error fetching online tests:", error);
+        document.getElementById("loading-tests").innerHTML = 
+          '<div class="error">Error loading online tests. Please try again later.</div>';
+      }
+    }
+
+    // Display online tests
+    function displayOnlineTests() {
+      const testsList = document.getElementById("tests-list");
+      
+      let html = "";
+      onlineTests.forEach((test, index) => {
+        // Check if test is new (created in last 7 days)
+        const isNewTest = (new Date() - test.createdAt) < (7 * 24 * 60 * 60 * 1000);
+        
+        html += `
+          <div class="test-card ${isNewTest ? 'new-test' : ''}">
+            ${test.showLiveBadge ? '<div class="live-badge">LIVE</div>' : ''}
+            <h3><i class="fas fa-file-alt"></i> ${test.title}</h3>
+            <p class="test-description">${test.description}</p>
+            <div class="test-details">
+              <div class="test-detail">
+                <i class="fas fa-clock"></i>
+                <span>Duration: ${test.duration} mins</span>
+              </div>
+              <div class="test-detail">
+                <i class="fas fa-question-circle"></i>
+                <span>Questions: ${test.totalQuestions}</span>
+              </div>
+              <div class="test-detail">
+                <i class="fas fa-book"></i>
+                <span>Subject: ${test.subject}</span>
+              </div>
+            </div>
+            <a href="${test.testLink}" target="_blank" class="test-btn">
+              <i class="fas fa-play-circle"></i> Take Test
+            </a>
+          </div>
+        `;
+      });
+      
+      testsList.innerHTML = html;
     }
 
     // Display results list (show only latest 4 initially)
@@ -862,7 +1486,6 @@
     function openAdminPanel() {
       const password = prompt("Enter Admin Password:");
       if (password === "456467") {
-        // Create admin.html if it doesn't exist
         const adminHTML = `
 <!DOCTYPE html>
 <html lang="en">
@@ -1103,7 +1726,7 @@
       return rankedStudents;
     }
 
-    // Display top performers in the result card (AFTER ACTION BUTTONS)
+    // Display top performers in the result card
     function displayTopPerformers(topPerformers) {
       const toppersSection = document.getElementById('exam-toppers-section');
       const toppersList = document.getElementById('exam-toppers-list');
@@ -1234,7 +1857,7 @@
       
       marksTable.innerHTML = html;
       
-      // Display top performers (AFTER ACTION BUTTONS)
+      // Display top performers
       displayTopPerformers(topPerformers);
       
       // Scroll to result
@@ -1309,7 +1932,7 @@
           onImageLoad();
         } else {
           img.onload = onImageLoad;
-          img.onerror = onImageLoad; // Also continue if image fails to load
+          img.onerror = onImageLoad;
         }
       });
     }
@@ -1423,7 +2046,10 @@
     }
 
     // Initialize on page load
-    document.addEventListener('DOMContentLoaded', fetchAllResults);
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load results initially (since it's now the default tab)
+      fetchAllResults();
+    });
   </script>
 </body>
 </html>
