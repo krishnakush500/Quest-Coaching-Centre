@@ -15,29 +15,92 @@
   
   <style>
     * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background:#f5f5f5; min-height:100vh; padding:20px; }
-    .container { width:100%; max-width:1200px; margin:0 auto; background:rgba(255,255,255,0.95); border-radius:15px; box-shadow:0 15px 30px rgba(0,0,0,0.2); overflow:hidden; }
+    body { 
+      background:linear-gradient(to bottom, #f5f5f5, #e0e7ff); 
+      min-height:100vh; 
+      padding:0; /* Changed from 20px to 0 */
+    }
+    .container { 
+      width:100%; 
+      max-width:1200px; 
+      margin:0 auto; /* Changed from margin:0 auto; */
+      background:rgba(255,255,255,0.98); 
+      border-radius:0; /* Changed from 15px to 0 for mobile */
+      box-shadow:0 5px 20px rgba(0,0,0,0.1); 
+      overflow:hidden; 
+      min-height:100vh;
+    }
 
     /* Header */
-    .header { background:linear-gradient(to right,#1a237e,#283593,#303f9f); color:white; padding:25px; text-align:center; position:relative; overflow:hidden; }
-    .school-name { font-size:2rem; font-weight:700; line-height:1.2; }
-    .location { font-size:1rem; margin-bottom:15px; }
-    .director-info { display:flex; align-items:center; justify-content:center; margin-top:20px; flex-wrap:wrap; }
-    .director-photo { width:100px; height:100px; border-radius:50%; border:4px solid white; overflow:hidden; margin-right:15px; cursor:pointer; transition:transform 0.3s; }
-    .director-photo:hover { transform:scale(1.05); box-shadow:0 0 15px rgba(255,255,255,0.5); }
-    .director-photo img{width:100%;height:100%;object-fit:cover;}
-    .director-details{text-align:left;}
-    .director-details h2{font-size:1rem; margin-bottom:5px;}
-    .director-details h3{font-size:1.1rem; margin-bottom:5px; cursor:pointer; transition:color 0.3s; }
-    .director-details h3:hover { color:#ffc107; }
-    .director-details p{font-size:0.9rem;}
+    .header { 
+      background:linear-gradient(to right,#1a237e,#283593,#303f9f); 
+      color:white; 
+      padding:20px 15px; /* Reduced padding for mobile */
+      text-align:center; 
+      position:relative; 
+      overflow:hidden; 
+    }
+    .school-name { 
+      font-size:1.8rem; /* Slightly reduced for mobile */
+      font-weight:700; 
+      line-height:1.2; 
+    }
+    .location { 
+      font-size:0.95rem; 
+      margin-bottom:10px; 
+    }
+    .director-info { 
+      display:flex; 
+      align-items:center; 
+      justify-content:center; 
+      margin-top:15px; 
+      flex-wrap:wrap; 
+    }
+    .director-photo { 
+      width:90px; /* Slightly smaller for mobile */
+      height:90px; 
+      border-radius:50%; 
+      border:3px solid white; /* Thinner border */
+      overflow:hidden; 
+      margin-right:12px; 
+      cursor:pointer; 
+      transition:transform 0.3s; 
+    }
+    .director-photo:hover { 
+      transform:scale(1.05); 
+      box-shadow:0 0 15px rgba(255,255,255,0.5); 
+    }
+    .director-photo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+    .director-details{
+      text-align:left;
+    }
+    .director-details h2{
+      font-size:0.95rem; 
+      margin-bottom:4px;
+    }
+    .director-details h3{
+      font-size:1rem; 
+      margin-bottom:4px; 
+      cursor:pointer; 
+      transition:color 0.3s; 
+    }
+    .director-details h3:hover { 
+      color:#ffc107; 
+    }
+    .director-details p{
+      font-size:0.85rem;
+    }
 
     /* Moving Admission Text */
     .marquee-container {
       background:#ffc107;
       overflow:hidden;
       position:relative;
-      height:50px;
+      height:45px; /* Slightly reduced height */
       display:flex;
       align-items:center;
     }
@@ -46,7 +109,7 @@
       animation: marquee 20s linear infinite;
       white-space:nowrap;
       font-weight:600;
-      font-size:1.1rem;
+      font-size:1rem; /* Slightly smaller font */
       color:#333;
     }
     @keyframes marquee {
@@ -64,8 +127,8 @@
     }
     .tab-btn {
       flex: 1;
-      padding: 18px 20px;
-      font-size: 1.1rem;
+      padding: 16px 10px; /* Reduced padding */
+      font-size: 1rem; /* Slightly smaller */
       font-weight: 600;
       border: none;
       background: transparent;
@@ -75,7 +138,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 8px; /* Reduced gap */
       border-bottom: 3px solid transparent;
     }
     .tab-btn:hover {
@@ -88,7 +151,7 @@
       background: #f0f7ff;
     }
     .tab-btn i {
-      font-size: 1.2rem;
+      font-size: 1.1rem; /* Slightly smaller */
     }
 
     /* Content Sections */
@@ -103,72 +166,72 @@
 
     /* Results Section */
     .results-section {
-      padding: 25px 20px;
+      padding: 20px 15px; /* Reduced padding */
       background: #f9f9f9;
       min-height: 500px;
     }
     .section-title {
-      font-size: 1.5rem;
+      font-size: 1.4rem; /* Slightly smaller */
       color: #1a237e;
       text-align: center;
-      margin-bottom: 25px;
-      padding-bottom: 10px;
+      margin-bottom: 20px; /* Reduced margin */
+      padding-bottom: 8px;
       border-bottom: 2px solid #1a237e;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 8px; /* Reduced gap */
     }
     .section-title i {
       color: #ffc107;
     }
     .results-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 15px;
-      margin-bottom: 25px;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Smaller min-width */
+      gap: 12px; /* Reduced gap */
+      margin-bottom: 20px;
     }
     .result-item {
       background: white;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      padding: 12px; /* Reduced padding */
+      border-radius: 8px; /* Slightly smaller */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Lighter shadow */
       cursor: pointer;
       transition: all 0.3s;
       border-left: 4px solid #1a237e;
       position: relative;
     }
     .result-item:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      transform: translateY(-3px); /* Less movement */
+      box-shadow: 0 6px 15px rgba(0,0,0,0.12);
     }
     .result-item.active {
       border-left-color: #ffc107;
       background: #fffae6;
     }
     .exam-name {
-      font-size: 1rem;
+      font-size: 0.95rem; /* Slightly smaller */
       color: #1a237e;
       font-weight: 600;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     .exam-date {
-      font-size: 0.8rem;
+      font-size: 0.75rem; /* Slightly smaller */
       color: #666;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
     }
     
     /* NEW Sticker */
     .new-sticker {
       position: absolute;
-      top: -8px;
-      right: -8px;
+      top: -6px; /* Adjusted position */
+      right: -6px;
       background: #ff4757;
       color: white;
-      font-size: 0.7rem;
+      font-size: 0.65rem; /* Slightly smaller */
       font-weight: bold;
-      padding: 4px 8px;
-      border-radius: 10px;
+      padding: 3px 7px; /* Reduced padding */
+      border-radius: 8px; /* Slightly smaller */
       animation: blink 1s infinite;
       z-index: 10;
     }
@@ -179,39 +242,39 @@
     
     .roll-input-section {
       background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      margin-top: 20px;
+      padding: 15px; /* Reduced padding */
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-top: 15px;
       text-align: center;
       display: none;
     }
     .roll-input-section h3 {
       color: #1a237e;
-      margin-bottom: 15px;
-      font-size: 1.1rem;
+      margin-bottom: 12px;
+      font-size: 1rem; /* Smaller font */
     }
     .input-group {
       display: flex;
       justify-content: center;
-      gap: 8px;
+      gap: 6px; /* Reduced gap */
       flex-wrap: wrap;
     }
     .input-group input {
-      padding: 10px 12px;
-      font-size: 0.95rem;
+      padding: 8px 10px; /* Reduced padding */
+      font-size: 0.9rem; /* Smaller font */
       border-radius: 5px;
       border: 1px solid #ccc;
       width: 100%;
-      max-width: 250px;
+      max-width: 220px; /* Slightly smaller max-width */
     }
     .result-btn {
-      padding: 10px 20px;
+      padding: 8px 16px; /* Reduced padding */
       background: #1a237e;
       color: white;
-      font-size: 0.95rem;
+      font-size: 0.9rem; /* Smaller font */
       border: none;
-      border-radius: 8px;
+      border-radius: 6px; /* Slightly smaller */
       cursor: pointer;
       transition: background 0.3s;
     }
@@ -222,14 +285,14 @@
     /* Show More/Less Button */
     .show-more-btn {
       display: block;
-      margin: 20px auto;
-      padding: 10px 25px;
+      margin: 15px auto; /* Reduced margin */
+      padding: 8px 20px; /* Reduced padding */
       background: #1a237e;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px; /* Slightly smaller */
       cursor: pointer;
-      font-size: 1rem;
+      font-size: 0.95rem; /* Slightly smaller */
       transition: background 0.3s;
     }
     .show-more-btn:hover {
@@ -241,74 +304,74 @@
       display: none;
       width: 95%;
       max-width: 700px;
-      margin: 20px auto;
+      margin: 15px auto; /* Reduced margin */
       background: white;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      padding: 20px;
+      border-radius: 12px; /* Slightly smaller */
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15); /* Lighter shadow */
+      padding: 15px; /* Reduced padding */
       position: relative;
       overflow-x: auto;
     }
     .result-card-header {
       text-align: center;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
+      margin-bottom: 15px; /* Reduced margin */
+      padding-bottom: 8px;
       border-bottom: 2px solid #1a237e;
     }
     .result-card-header h2 {
       color: #1a237e;
-      margin-bottom: 5px;
-      font-size: 1.3rem;
+      margin-bottom: 4px;
+      font-size: 1.2rem; /* Smaller font */
     }
     .result-card-header h3 {
       color: #b21f1f;
-      margin-bottom: 5px;
-      font-size: 1.1rem;
+      margin-bottom: 4px;
+      font-size: 1rem; /* Smaller font */
     }
     .result-card-header p {
       color: #666;
-      font-size: 0.85rem;
+      font-size: 0.8rem; /* Smaller font */
     }
     
     .student-info {
-      margin-bottom: 20px;
+      margin-bottom: 15px; /* Reduced margin */
     }
     .info-row {
       display: flex;
       flex-direction: column;
-      margin-bottom: 8px;
-      padding: 8px 12px;
+      margin-bottom: 6px; /* Reduced margin */
+      padding: 6px 10px; /* Reduced padding */
       background: #f5f5f5;
       border-radius: 5px;
     }
     .info-label {
       font-weight: 600;
       color: #1a237e;
-      font-size: 0.9rem;
-      margin-bottom: 3px;
+      font-size: 0.85rem; /* Smaller font */
+      margin-bottom: 2px;
     }
     .info-value {
       color: #333;
-      font-size: 0.95rem;
+      font-size: 0.9rem; /* Smaller font */
     }
     
     .marks-table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 20px;
-      min-width: 500px;
+      margin-bottom: 15px; /* Reduced margin */
+      min-width: 450px; /* Smaller min-width */
     }
     .marks-table th {
       background: #1a237e;
       color: white;
-      padding: 10px;
+      padding: 8px; /* Reduced padding */
       text-align: left;
-      font-size: 0.9rem;
+      font-size: 0.85rem; /* Smaller font */
     }
     .marks-table td {
-      padding: 10px;
+      padding: 8px; /* Reduced padding */
       border-bottom: 1px solid #ddd;
-      font-size: 0.9rem;
+      font-size: 0.85rem; /* Smaller font */
     }
     .marks-table tr:nth-child(even) {
       background: #f9f9f9;
@@ -324,104 +387,104 @@
     }
     .percentage-display {
       text-align: center;
-      font-size: 1.2rem;
+      font-size: 1.1rem; /* Smaller font */
       color: #1a237e;
       font-weight: 700;
-      padding: 12px;
+      padding: 10px; /* Reduced padding */
       background: #f0f7ff;
-      border-radius: 10px;
-      margin-top: 15px;
+      border-radius: 8px; /* Slightly smaller */
+      margin-top: 12px; /* Reduced margin */
     }
     .division-display {
       text-align: center;
-      font-size: 1.4rem;
+      font-size: 1.2rem; /* Smaller font */
       color: #1a237e;
       font-weight: 700;
-      padding: 12px;
-      margin-top: 12px;
-      border-radius: 10px;
+      padding: 10px; /* Reduced padding */
+      margin-top: 10px; /* Reduced margin */
+      border-radius: 8px; /* Slightly smaller */
     }
     
     /* Exam Toppers Section in Result Card */
     .exam-toppers-section {
-      margin-top: 15px;
-      padding: 15px;
+      margin-top: 12px; /* Reduced margin */
+      padding: 12px; /* Reduced padding */
       background: #f9f9f9;
-      border-radius: 10px;
+      border-radius: 8px; /* Slightly smaller */
       border-left: 4px solid #1a237e;
       border-top: 2px solid #ddd;
     }
     .exam-toppers-title {
-      font-size: 1.1rem;
+      font-size: 1rem; /* Smaller font */
       color: #b21f1f;
-      margin-bottom: 15px;
+      margin-bottom: 12px; /* Reduced margin */
       text-align: center;
       font-weight: 600;
     }
     .exam-toppers-list {
       display: flex;
       justify-content: center;
-      gap: 15px;
+      gap: 12px; /* Reduced gap */
       flex-wrap: wrap;
     }
     .exam-topper-card {
       background: white;
-      border-radius: 8px;
-      padding: 10px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      border-radius: 6px; /* Slightly smaller */
+      padding: 8px; /* Reduced padding */
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Lighter shadow */
       text-align: center;
-      min-width: 120px;
+      min-width: 110px; /* Smaller min-width */
     }
     .exam-topper-rank {
       background: #1a237e;
       color: white;
-      padding: 5px;
-      border-radius: 5px;
-      font-size: 0.8rem;
+      padding: 4px; /* Reduced padding */
+      border-radius: 4px; /* Slightly smaller */
+      font-size: 0.75rem; /* Smaller font */
       font-weight: 600;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     .exam-topper-name {
-      font-size: 0.9rem;
+      font-size: 0.85rem; /* Smaller font */
       font-weight: 600;
       color: #333;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
     }
     .exam-topper-score {
-      font-size: 0.9rem;
+      font-size: 0.85rem; /* Smaller font */
       color: #1a237e;
       font-weight: 700;
     }
     
     .coaching-mention { 
       text-align: center; 
-      margin-top: 25px; 
-      padding-top: 15px; 
+      margin-top: 20px; /* Reduced margin */
+      padding-top: 12px; /* Reduced padding */
       border-top: 2px solid #ddd; 
       color: #666; 
       font-style: italic; 
-      font-size: 0.9rem; 
+      font-size: 0.85rem; /* Smaller font */
     }
     
     .action-buttons { 
       display: flex; 
       justify-content: center; 
-      gap: 10px; 
-      margin-top: 25px; 
-      padding-top: 15px; 
+      gap: 8px; /* Reduced gap */
+      margin-top: 20px; /* Reduced margin */
+      padding-top: 12px; /* Reduced padding */
       border-top: 1px solid #ddd; 
       flex-wrap: wrap; 
     }
     .action-buttons button { 
-      padding: 10px 15px; 
-      font-size: 0.9rem; 
+      padding: 8px 12px; /* Reduced padding */
+      font-size: 0.85rem; /* Smaller font */
       border: none; 
-      border-radius: 8px; 
+      border-radius: 6px; /* Slightly smaller */
       cursor: pointer; 
       transition: all 0.3s; 
       display: flex; 
       align-items: center; 
-      gap: 5px; 
+      gap: 4px; /* Reduced gap */
     }
     .download-btn {
       background: #28a745;
@@ -440,92 +503,92 @@
     
     .loading {
       text-align: center;
-      padding: 40px 20px;
-      font-size: 1rem;
+      padding: 30px 15px; /* Reduced padding */
+      font-size: 0.95rem; /* Smaller font */
       color: #1a237e;
     }
     .error {
       text-align: center;
-      padding: 15px;
+      padding: 12px; /* Reduced padding */
       background: #ffe6e6;
       color: #b30000;
       border-radius: 5px;
-      margin: 15px 0;
+      margin: 12px 0; /* Reduced margin */
     }
 
     /* Tests Section */
     .tests-section {
-      padding: 25px 20px;
+      padding: 20px 15px; /* Reduced padding */
       background: #f9f9f9;
       min-height: 500px;
     }
     .tests-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
-      margin-top: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Smaller min-width */
+      gap: 15px; /* Reduced gap */
+      margin-top: 15px;
     }
     .test-card {
       background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      border-radius: 10px; /* Slightly smaller */
+      padding: 15px; /* Reduced padding */
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1); /* Lighter shadow */
       border-left: 5px solid #1a237e;
       transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
     }
     .test-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+      transform: translateY(-3px); /* Less movement */
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
     }
     .test-card.new-test {
       border-left-color: #ff4757;
     }
     .test-card h3 {
       color: #1a237e;
-      font-size: 1.2rem;
-      margin-bottom: 10px;
+      font-size: 1.1rem; /* Smaller font */
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px; /* Reduced gap */
     }
     .test-card h3 i {
       color: #ffc107;
     }
     .test-description {
       color: #555;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      margin-bottom: 15px;
+      font-size: 0.85rem; /* Smaller font */
+      line-height: 1.4;
+      margin-bottom: 12px;
     }
     .test-details {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px; /* Reduced gap */
     }
     .test-detail {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px; /* Reduced gap */
       color: #666;
-      font-size: 0.85rem;
+      font-size: 0.8rem; /* Smaller font */
     }
     .test-detail i {
       color: #1a237e;
-      font-size: 0.9rem;
+      font-size: 0.85rem; /* Smaller font */
     }
     .test-btn {
       display: block;
       width: 100%;
-      padding: 12px;
+      padding: 10px; /* Reduced padding */
       background: linear-gradient(to right, #1a237e, #283593);
       color: white;
       border: none;
-      border-radius: 8px;
-      font-size: 1rem;
+      border-radius: 6px; /* Slightly smaller */
+      font-size: 0.95rem; /* Smaller font */
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s;
@@ -537,91 +600,91 @@
       transform: scale(1.02);
     }
     .test-btn i {
-      margin-right: 8px;
+      margin-right: 6px; /* Reduced margin */
     }
     .no-tests-message {
       text-align: center;
-      padding: 60px 40px;
+      padding: 50px 30px; /* Reduced padding */
       background: white;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      border-radius: 8px; /* Slightly smaller */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       color: #666;
-      margin-top: 20px;
+      margin-top: 15px;
     }
     .no-tests-message i {
-      font-size: 3rem;
+      font-size: 2.5rem; /* Smaller icon */
       color: #ddd;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       display: block;
     }
     .live-badge {
       position: absolute;
-      top: -10px;
-      right: -10px;
+      top: -8px; /* Adjusted position */
+      right: -8px;
       background: #ff4757;
       color: white;
-      padding: 5px 15px;
-      font-size: 0.8rem;
+      padding: 4px 12px; /* Reduced padding */
+      font-size: 0.75rem; /* Smaller font */
       font-weight: bold;
-      border-radius: 20px;
+      border-radius: 15px; /* Slightly smaller */
       transform: rotate(10deg);
-      box-shadow: 0 3px 10px rgba(255,71,87,0.3);
+      box-shadow: 0 2px 8px rgba(255,71,87,0.3);
       z-index: 10;
     }
 
     /* Toppers Section - ALL 30 TOPPERS */
     .toppers-section {
-      padding: 20px;
+      padding: 15px; /* Reduced padding */
       background: #f5f5f5;
       text-align: center;
     }
     .promo-text {
-      font-size: 0.95rem;
-      line-height: 1.6;
+      font-size: 0.9rem; /* Slightly smaller */
+      line-height: 1.5;
       color: #1a237e;
       font-weight: 600;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       white-space: pre-line;
       text-align: left;
-      padding: 0 10px;
+      padding: 0 8px; /* Reduced padding */
     }
     .toppers-title {
-      font-size: 1.4rem;
+      font-size: 1.3rem; /* Smaller font */
       color: #b21f1f;
-      margin: 20px 0;
+      margin: 15px 0; /* Reduced margin */
       text-align: center;
     }
     .all-toppers {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px; /* Reduced gap */
     }
     .topper-card {
       background: white;
-      border-radius: 8px;
-      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+      border-radius: 6px; /* Slightly smaller */
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Lighter shadow */
       overflow: hidden;
       text-align: center;
       transition: transform .3s;
-      width: 140px;
-      padding: 8px;
+      width: 130px; /* Smaller width */
+      padding: 6px; /* Reduced padding */
     }
     .topper-card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-3px); /* Less movement */
     }
     .topper-rank {
       background: #1a237e;
       color: white;
-      padding: 5px;
+      padding: 4px; /* Reduced padding */
       font-weight: 600;
-      font-size: 0.8rem;
+      font-size: 0.75rem; /* Smaller font */
     }
     .topper-photo {
-      width: 60px;
-      height: 60px;
+      width: 55px; /* Smaller photo */
+      height: 55px;
       border-radius: 50%;
-      margin: 10px auto;
+      margin: 8px auto; /* Reduced margin */
       border: 2px solid #1a237e;
       overflow: hidden;
     }
@@ -631,20 +694,20 @@
       object-fit: cover;
     }
     .topper-name {
-      font-size: 0.8rem;
+      font-size: 0.75rem; /* Smaller font */
       color: #333;
-      margin-top: 5px;
-      height: 35px;
+      margin-top: 4px;
+      height: 32px; /* Slightly smaller height */
       display: flex;
       align-items: center;
       justify-content: center;
       line-height: 1.1;
     }
     .topper-percentage {
-      font-size: 0.9rem;
+      font-size: 0.85rem; /* Smaller font */
       color: #1a237e;
       font-weight: 700;
-      margin: 6px 0;
+      margin: 5px 0; /* Reduced margin */
     }
     
     /* Footer */
@@ -652,53 +715,53 @@
       background: #1a237e;
       color: white;
       text-align: center;
-      padding: 15px;
-      font-size: 0.9rem;
+      padding: 12px; /* Reduced padding */
+      font-size: 0.85rem; /* Smaller font */
+      border-top: 1px solid rgba(255,255,255,0.1);
     }
     
     /* Developer Contact Section */
     .developer-contact {
       background: #f8f9fa;
-      padding: 20px;
+      padding: 15px; /* Reduced padding */
       text-align: center;
       border-top: 2px solid #1a237e;
-      margin-top: 20px;
-      border-radius: 0 0 15px 15px;
+      margin-top: 15px;
     }
     .developer-contact h3 {
       color: #1a237e;
-      margin-bottom: 15px;
-      font-size: 1.2rem;
+      margin-bottom: 12px;
+      font-size: 1.1rem; /* Smaller font */
     }
     .developer-contact p {
       color: #333;
-      margin-bottom: 10px;
-      font-size: 0.95rem;
+      margin-bottom: 8px;
+      font-size: 0.9rem; /* Smaller font */
     }
     .contact-info {
       display: flex;
       justify-content: center;
-      gap: 20px;
+      gap: 15px; /* Reduced gap */
       flex-wrap: wrap;
-      margin-top: 15px;
+      margin-top: 12px;
     }
     .contact-item {
       background: white;
-      padding: 12px 20px;
-      border-radius: 8px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      padding: 10px 15px; /* Reduced padding */
+      border-radius: 6px; /* Slightly smaller */
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px; /* Reduced gap */
       transition: transform 0.3s;
     }
     .contact-item:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+      transform: translateY(-2px); /* Less movement */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     .contact-item i {
       color: #1a237e;
-      font-size: 1.1rem;
+      font-size: 1rem; /* Smaller font */
     }
     
     /* PDF Generation Fix Styles */
@@ -727,11 +790,22 @@
     
     /* Media Queries for Mobile */
     @media (max-width: 768px) {
+      body {
+        padding: 0; /* Remove body padding on mobile */
+      }
+      
+      .container {
+        border-radius: 0;
+        box-shadow: none;
+        margin: 0;
+        width: 100%;
+      }
+      
       .school-name {
-        font-size: 1.6rem;
+        font-size: 1.5rem; /* Even smaller on small mobile */
       }
       .header {
-        padding: 15px;
+        padding: 15px 10px; /* Further reduced padding */
       }
       .director-info {
         flex-direction: column;
@@ -739,15 +813,17 @@
       }
       .director-photo {
         margin-right: 0;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
+        width: 80px;
+        height: 80px;
       }
       .director-details {
         text-align: center;
       }
       
       .tab-btn {
-        padding: 15px 10px;
-        font-size: 1rem;
+        padding: 14px 8px; /* Further reduced padding */
+        font-size: 0.9rem; /* Even smaller */
       }
       
       .tests-list,
@@ -756,20 +832,20 @@
       }
       
       .topper-card {
-        width: 120px;
+        width: 110px; /* Even smaller on mobile */
       }
       .topper-name {
-        font-size: 0.75rem;
-        height: 30px;
+        font-size: 0.7rem;
+        height: 28px;
       }
       
       .marks-table {
-        font-size: 0.85rem;
-        min-width: 450px;
+        font-size: 0.8rem;
+        min-width: 400px; /* Smaller min-width */
       }
       .marks-table th,
       .marks-table td {
-        padding: 8px;
+        padding: 6px; /* Further reduced padding */
       }
       
       .action-buttons {
@@ -781,24 +857,24 @@
       }
       
       .promo-text {
-        font-size: 0.85rem;
+        font-size: 0.8rem; /* Even smaller on mobile */
       }
       
       .exam-toppers-list {
-        gap: 10px;
+        gap: 8px; /* Further reduced gap */
       }
       .exam-topper-card {
-        min-width: 100px;
-        padding: 8px;
+        min-width: 90px; /* Even smaller */
+        padding: 6px; /* Further reduced padding */
       }
       
       /* Developer contact mobile */
       .contact-info {
         flex-direction: column;
-        gap: 10px;
+        gap: 8px; /* Further reduced gap */
       }
       .contact-item {
-        padding: 10px 15px;
+        padding: 8px 12px; /* Further reduced padding */
       }
       
       /* Adjust PDF clone for mobile */
@@ -810,48 +886,69 @@
     
     @media (max-width: 480px) {
       .school-name {
-        font-size: 1.4rem;
+        font-size: 1.3rem; /* Even smaller on very small screens */
       }
       .section-title {
-        font-size: 1.3rem;
+        font-size: 1.2rem; /* Even smaller */
       }
       .tab-btn {
-        padding: 12px 8px;
-        font-size: 0.9rem;
+        padding: 12px 6px; /* Further reduced padding */
+        font-size: 0.85rem; /* Even smaller */
       }
       .result-card {
-        padding: 15px;
+        padding: 12px; /* Further reduced padding */
       }
       .marks-table {
-        min-width: 350px;
+        min-width: 320px; /* Even smaller min-width */
       }
       .marks-table th,
       .marks-table td {
-        padding: 6px;
-        font-size: 0.8rem;
+        padding: 5px; /* Further reduced padding */
+        font-size: 0.75rem; /* Even smaller font */
       }
       .topper-card {
-        width: 100px;
-        padding: 5px;
+        width: 90px; /* Even smaller */
+        padding: 4px; /* Further reduced padding */
       }
       .topper-photo {
-        width: 50px;
-        height: 50px;
+        width: 45px;
+        height: 45px;
       }
       .topper-percentage {
-        font-size: 0.8rem;
+        font-size: 0.75rem; /* Even smaller */
       }
       .exam-toppers-list {
         flex-direction: column;
         align-items: center;
       }
       .exam-topper-card {
-        width: 80%;
+        width: 90%;
+      }
+    }
+    
+    /* Extra small screens */
+    @media (max-width: 360px) {
+      .school-name {
+        font-size: 1.2rem;
+      }
+      .topper-card {
+        width: 85px;
+      }
+      .marks-table {
+        min-width: 300px;
+      }
+      .all-toppers {
+        gap: 6px;
+      }
+      .topper-name {
+        font-size: 0.7rem;
+        height: 26px;
       }
     }
   </style>
 </head>
 <body>
+  <!-- Your HTML content remains exactly the same -->
   <div class="container">
     <!-- Header -->
     <div class="header">
@@ -1235,7 +1332,7 @@
   <!-- PDF Clone Container (Hidden) -->
   <div id="pdf-clone-container" class="pdf-clone-container"></div>
 
-  <!-- Firebase Configuration and JavaScript -->
+  <!-- JavaScript remains exactly the same -->
   <script>
     // Firebase Configuration
     const firebaseConfig = {
