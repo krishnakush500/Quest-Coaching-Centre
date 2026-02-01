@@ -517,10 +517,22 @@
             justify-content: center;
         }
 
-        .pass-status {
-            background-color: rgba(46, 125, 50, 0.15);
+        .first-division {
+            background-color: rgba(46, 125, 50, 0.2);
             color: var(--primary-green);
             border: 3px solid var(--primary-green);
+        }
+
+        .second-division {
+            background-color: rgba(255, 193, 7, 0.2);
+            color: #FF8F00;
+            border: 3px solid #FF8F00;
+        }
+
+        .third-division {
+            background-color: rgba(33, 150, 243, 0.2);
+            color: #1976D2;
+            border: 3px solid #1976D2;
         }
 
         .fail-status {
@@ -1065,8 +1077,8 @@
                 </table>
                 
                 <!-- Result Status -->
-                <div id="result-status" class="result-status pass-status">
-                    <!-- Pass/Fail status will be shown here -->
+                <div id="result-status" class="result-status">
+                    <!-- Division status will be shown here -->
                 </div>
             </div>
             
@@ -1489,7 +1501,26 @@
             const marksPerQuestion = totalMarks / totalQuestions;
             const marksObtained = correct * marksPerQuestion;
             const percentage = (marksObtained / totalMarks) * 100;
-            const isPass = percentage >= 40; // 40% passing threshold
+            
+            // Determine Division
+            let division = '';
+            let statusClass = '';
+            
+            if (percentage >= 60) {
+                division = 'FIRST DIVISION';
+                statusClass = 'first-division';
+            } else if (percentage >= 45) {
+                division = 'SECOND DIVISION';
+                statusClass = 'second-division';
+            } else if (percentage >= 33) {
+                division = 'THIRD DIVISION';
+                statusClass = 'third-division';
+            } else {
+                division = 'FAIL';
+                statusClass = 'fail-status';
+            }
+            
+            const isPass = percentage >= 33;
             
             // Generate result ID
             resultId = 'RES' + Date.now() + Math.floor(Math.random() * 1000);
@@ -1503,6 +1534,7 @@
                 totalMarks,
                 marksObtained: marksObtained.toFixed(2),
                 percentage: percentage.toFixed(2),
+                division,
                 isPass
             });
             
@@ -1515,7 +1547,8 @@
                 totalMarks,
                 marksObtained: marksObtained.toFixed(2),
                 percentage: percentage.toFixed(2),
-                isPass
+                division,
+                statusClass
             });
         }
 
@@ -1533,6 +1566,7 @@
                     totalMarks: results.totalMarks,
                     marksObtained: parseFloat(results.marksObtained),
                     percentage: parseFloat(results.percentage),
+                    division: results.division,
                     isPass: results.isPass,
                     answers: studentAnswers,
                     submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1569,14 +1603,14 @@
             document.getElementById('marks-obtained').textContent = results.marksObtained;
             document.getElementById('percentage').textContent = `${results.percentage}%`;
             
-            // Set pass/fail status
+            // Set division status
             const statusElement = document.getElementById('result-status');
-            if (results.isPass) {
-                statusElement.className = 'result-status pass-status';
-                statusElement.innerHTML = '<i class="fas fa-trophy"></i> PASSED <i class="fas fa-trophy"></i>';
+            statusElement.className = `result-status ${results.statusClass}`;
+            
+            if (results.division === 'FAIL') {
+                statusElement.innerHTML = '<i class="fas fa-times-circle"></i> FAIL <i class="fas fa-times-circle"></i>';
             } else {
-                statusElement.className = 'result-status fail-status';
-                statusElement.innerHTML = '<i class="fas fa-times-circle"></i> FAILED <i class="fas fa-times-circle"></i>';
+                statusElement.innerHTML = `<i class="fas fa-trophy"></i> ${results.division} <i class="fas fa-trophy"></i>`;
             }
             
             // Show result page
