@@ -948,7 +948,6 @@
   </style>
 </head>
 <body>
-  <!-- Your HTML content remains exactly the same -->
   <div class="container">
     <!-- Header -->
     <div class="header">
@@ -983,7 +982,7 @@
       <button class="tab-btn active" id="results-tab" onclick="switchTab('results')">
         <i class="fas fa-chart-line"></i> Check Results
       </button>
-      <button class="tab-btn" id="tests-tab" onclick="switchTab('tests')">
+      <button class="tab-btn" id="tests-tab" onclick="openOnlineTest()">
         <i class="fas fa-laptop-code"></i> Online Tests
       </button>
     </div>
@@ -1332,7 +1331,6 @@
   <!-- PDF Clone Container (Hidden) -->
   <div id="pdf-clone-container" class="pdf-clone-container"></div>
 
-  <!-- JavaScript remains exactly the same -->
   <script>
     // Firebase Configuration
     const firebaseConfig = {
@@ -1360,6 +1358,12 @@
     let onlineTests = [];
     let currentTab = 'results'; // CHANGED: Default to results tab
 
+    // NEW FUNCTION: Open Online Test Page
+    function openOnlineTest() {
+      // Open the online test page in a new tab
+      window.open('onlinetest.html', '_blank');
+    }
+
     // Switch between tabs
     function switchTab(tabName) {
       currentTab = tabName;
@@ -1375,11 +1379,6 @@
       // If switching to results tab and results aren't loaded yet, load them
       if (tabName === 'results' && allResults.length === 0) {
         fetchAllResults();
-      }
-      
-      // If switching to tests tab and tests aren't loaded yet, load them
-      if (tabName === 'tests' && onlineTests.length === 0) {
-        fetchOnlineTests();
       }
     }
 
@@ -1449,88 +1448,6 @@
         document.getElementById("loading-results").innerHTML = 
           '<div class="error">Error loading results. Please try again later.</div>';
       }
-    }
-
-    // Fetch online tests from Firestore
-    async function fetchOnlineTests() {
-      try {
-        const loadingTests = document.getElementById("loading-tests");
-        const testsList = document.getElementById("tests-list");
-        const noTestsMessage = document.getElementById("no-tests-message");
-        
-        const querySnapshot = await db.collection("online_tests").get();
-        onlineTests = [];
-        
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          onlineTests.push({
-            id: doc.id,
-            title: data.title || "Untitled Test",
-            description: data.description || "No description available",
-            duration: data.duration || 60,
-            totalQuestions: data.totalQuestions || 0,
-            subject: data.subject || "General",
-            testLink: data.testLink || "#",
-            createdAt: data.createdAt ? new Date(data.createdAt.toDate()) : new Date(),
-            isActive: data.isActive !== false,
-            showLiveBadge: data.showLiveBadge || false
-          });
-        });
-        
-        // Hide loading
-        loadingTests.style.display = "none";
-        
-        // Display tests if available
-        if (onlineTests.length > 0) {
-          testsList.style.display = "grid";
-          displayOnlineTests();
-        } else {
-          noTestsMessage.style.display = "block";
-        }
-        
-      } catch (error) {
-        console.error("Error fetching online tests:", error);
-        document.getElementById("loading-tests").innerHTML = 
-          '<div class="error">Error loading online tests. Please try again later.</div>';
-      }
-    }
-
-    // Display online tests
-    function displayOnlineTests() {
-      const testsList = document.getElementById("tests-list");
-      
-      let html = "";
-      onlineTests.forEach((test, index) => {
-        // Check if test is new (created in last 7 days)
-        const isNewTest = (new Date() - test.createdAt) < (7 * 24 * 60 * 60 * 1000);
-        
-        html += `
-          <div class="test-card ${isNewTest ? 'new-test' : ''}">
-            ${test.showLiveBadge ? '<div class="live-badge">LIVE</div>' : ''}
-            <h3><i class="fas fa-file-alt"></i> ${test.title}</h3>
-            <p class="test-description">${test.description}</p>
-            <div class="test-details">
-              <div class="test-detail">
-                <i class="fas fa-clock"></i>
-                <span>Duration: ${test.duration} mins</span>
-              </div>
-              <div class="test-detail">
-                <i class="fas fa-question-circle"></i>
-                <span>Questions: ${test.totalQuestions}</span>
-              </div>
-              <div class="test-detail">
-                <i class="fas fa-book"></i>
-                <span>Subject: ${test.subject}</span>
-              </div>
-            </div>
-            <a href="${test.testLink}" target="_blank" class="test-btn">
-              <i class="fas fa-play-circle"></i> Take Test
-            </a>
-          </div>
-        `;
-      });
-      
-      testsList.innerHTML = html;
     }
 
     // Display results list (show only latest 4 initially)
