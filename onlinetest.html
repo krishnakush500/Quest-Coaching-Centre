@@ -3,22 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quest Coaching - Online Test Platform</title>
+    <title>QUEST COACHING CENTRE - Online Test Platform (Demo)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <style>
         /* ===== GLOBAL STYLES ===== */
         :root {
             --primary-green: #2E7D32;
             --light-green: #4CAF50;
             --dark-green: #1B5E20;
+            --primary-blue: #1976D2;
+            --light-blue: #2196F3;
             --primary-red: #D32F2F;
             --light-red: #EF5350;
             --dark-red: #C62828;
+            --primary-orange: #FF9800;
+            --dark-orange: #F57C00;
             --white: #FFFFFF;
             --light-gray: #F5F5F5;
             --medium-gray: #E0E0E0;
@@ -41,12 +45,13 @@
             line-height: 1.6;
             min-height: 100vh;
             padding: 0;
+            overflow-x: hidden;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 15px;
         }
 
         .page {
@@ -67,43 +72,43 @@
         .coaching-header {
             background: linear-gradient(to right, var(--primary-green), var(--dark-green));
             color: var(--white);
-            padding: 20px;
+            padding: 15px;
             border-radius: var(--border-radius);
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             box-shadow: var(--shadow);
             text-align: center;
         }
 
         .coaching-header h1 {
-            font-size: 1.8rem;
-            margin-bottom: 10px;
+            font-size: 1.6rem;
+            margin-bottom: 8px;
         }
 
         .coaching-header .details {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 20px;
-            margin-top: 15px;
+            gap: 15px;
+            margin-top: 12px;
         }
 
         .coaching-header .detail-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
+            gap: 6px;
+            font-size: 0.9rem;
         }
 
         .coaching-header .detail-item i {
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         /* ===== CARDS ===== */
         .card {
             background-color: var(--white);
             border-radius: var(--border-radius);
-            padding: 25px;
-            margin-bottom: 25px;
+            padding: 20px;
+            margin-bottom: 20px;
             box-shadow: var(--shadow);
             border-left: 5px solid var(--primary-green);
         }
@@ -120,16 +125,20 @@
 
         /* ===== BUTTONS ===== */
         .btn {
-            display: inline-block;
-            padding: 12px 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 15px;
             border-radius: 6px;
             border: none;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: center;
             text-decoration: none;
+            white-space: nowrap;
+            gap: 5px;
         }
 
         .btn-primary {
@@ -160,44 +169,53 @@
             background-color: var(--dark-red);
         }
 
+        .btn-warning {
+            background-color: var(--primary-orange);
+            color: var(--white);
+        }
+
+        .btn-warning:hover {
+            background-color: var(--dark-orange);
+        }
+
         .btn-block {
             display: block;
             width: 100%;
         }
 
         .btn-small {
-            padding: 8px 16px;
-            font-size: 0.9rem;
+            padding: 8px 12px;
+            font-size: 0.85rem;
         }
 
         /* ===== TEST LIST ===== */
         .tests-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
         }
 
         .test-title {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             color: var(--primary-green);
             margin-bottom: 10px;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
             border-bottom: 1px solid var(--medium-gray);
         }
 
         .test-details {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 15px;
         }
 
         .test-detail {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
+            gap: 6px;
+            font-size: 0.85rem;
             color: var(--dark-gray);
         }
 
@@ -207,22 +225,23 @@
 
         /* ===== FORM STYLES ===== */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .form-label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 600;
             color: var(--dark-gray);
+            font-size: 0.9rem;
         }
 
         .form-control {
             width: 100%;
-            padding: 12px 15px;
+            padding: 10px 12px;
             border: 1px solid var(--medium-gray);
             border-radius: 6px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             transition: border 0.3s ease;
         }
 
@@ -231,46 +250,56 @@
             border-color: var(--primary-green);
         }
 
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%232E7D32' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px;
+            padding-right: 35px;
+        }
+
         /* ===== TEST SCREEN ===== */
         .test-header {
             background-color: var(--white);
-            padding: 20px;
+            padding: 12px 15px;
             border-radius: var(--border-radius);
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             box-shadow: var(--shadow);
             display: flex;
-            justify-content: space-between;
-            align-items: center;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 10px;
+            align-items: center;
         }
 
         .test-info {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
+            flex: 1;
+            min-width: 200px;
         }
 
         .test-name {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             color: var(--primary-green);
             font-weight: 600;
+            margin-bottom: 4px;
+            line-height: 1.3;
         }
 
         .student-info {
             color: var(--dark-gray);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         .timer-container {
             background-color: var(--light-red);
             color: var(--white);
-            padding: 10px 20px;
+            padding: 6px 12px;
             border-radius: 6px;
             font-weight: bold;
-            font-size: 1.2rem;
-            min-width: 120px;
+            font-size: 1rem;
+            min-width: 85px;
             text-align: center;
+            flex-shrink: 0;
         }
 
         .timer-warning {
@@ -284,38 +313,105 @@
             100% { opacity: 1; }
         }
 
+        /* ===== QUESTION NAVIGATION DROPDOWN ===== */
+        .question-navigation {
+            background-color: var(--white);
+            padding: 12px 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .jump-to-container {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .jump-to-label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--dark-gray);
+            font-size: 0.85rem;
+        }
+
+        .jump-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background-color: var(--white);
+        }
+
+        .question-status {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            color: var(--dark-gray);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .answered-dot {
+            background-color: var(--primary-green);
+        }
+
+        .not-answered-dot {
+            background-color: var(--medium-gray);
+        }
+
         /* ===== QUESTION CARD ===== */
         .question-container {
             background-color: var(--white);
             border-radius: var(--border-radius);
-            padding: 25px;
-            margin-bottom: 20px;
+            padding: 18px;
+            margin-bottom: 12px;
             box-shadow: var(--shadow);
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
         }
 
         .question-number {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: var(--primary-green);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-weight: 600;
         }
 
         .question-text {
-            font-size: 1.2rem;
-            margin-bottom: 25px;
-            line-height: 1.7;
+            font-size: 1.1rem;
+            margin-bottom: 18px;
+            line-height: 1.5;
+            flex: 1;
         }
 
         .options-container {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 8px;
         }
 
         .option {
             display: flex;
             align-items: center;
-            padding: 15px;
+            padding: 10px 12px;
             border: 1px solid var(--medium-gray);
             border-radius: 6px;
             cursor: pointer;
@@ -328,34 +424,62 @@
         }
 
         .option.selected {
-            background-color: rgba(76, 175, 80, 0.1);
+            background-color: rgba(46, 125, 50, 0.1);
             border-color: var(--primary-green);
         }
 
         .option input {
-            margin-right: 15px;
-            transform: scale(1.2);
+            margin-right: 10px;
+            transform: scale(1.1);
+            flex-shrink: 0;
         }
 
         .option-label {
             font-weight: 600;
-            margin-right: 10px;
+            margin-right: 8px;
             color: var(--primary-green);
+            min-width: 18px;
+            flex-shrink: 0;
         }
 
-        /* ===== TEST NAVIGATION ===== */
-        .test-navigation {
+        .option-text {
+            flex: 1;
+            word-break: break-word;
+        }
+
+        /* ===== TEST NAVIGATION BUTTONS - SINGLE ROW ===== */
+        .test-navigation-row {
             display: flex;
             justify-content: space-between;
-            margin-top: 30px;
-            gap: 15px;
+            gap: 8px;
+            margin-top: 15px;
+            background-color: var(--white);
+            padding: 12px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .nav-btn {
+            flex: 1;
+            min-width: 0;
+            padding: 10px 8px;
+            font-size: 0.85rem;
+        }
+
+        .nav-btn i {
+            font-size: 0.9rem;
         }
 
         .question-progress {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             color: var(--dark-gray);
             font-weight: 600;
+            font-size: 0.9rem;
+            background-color: var(--white);
+            padding: 8px 12px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
         }
 
         /* ===== RESULT SCREEN ===== */
@@ -373,40 +497,49 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+        }
+
+        .result-top-actions {
+            display: flex;
             justify-content: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            padding: 10px;
+            flex-wrap: wrap;
         }
 
         .result-print-area {
             background-color: white;
             border: 2px solid var(--primary-green);
             border-radius: 10px;
-            padding: 20px;
-            margin: 0 auto;
+            padding: 18px;
+            margin: 0 auto 15px;
             width: 100%;
-            max-width: 700px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            max-width: 680px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.08);
+            flex: 1;
         }
 
         .coaching-info {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             border-bottom: 3px solid var(--primary-green);
-            padding-bottom: 15px;
+            padding-bottom: 12px;
         }
 
         .coaching-name {
             color: var(--primary-green);
-            font-size: 1.8rem;
-            margin-bottom: 8px;
+            font-size: 1.6rem;
+            margin-bottom: 6px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
         .coaching-location {
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: var(--dark-gray);
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             font-weight: 600;
         }
 
@@ -414,9 +547,9 @@
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 10px;
-            font-size: 0.9rem;
+            gap: 12px;
+            margin-top: 8px;
+            font-size: 0.85rem;
             color: var(--dark-gray);
         }
 
@@ -426,19 +559,19 @@
             gap: 5px;
         }
 
-        .ceo-info {
+        .director-info {
             background-color: rgba(46, 125, 50, 0.1);
-            padding: 10px;
+            padding: 8px 10px;
             border-radius: 5px;
-            margin-top: 10px;
+            margin-top: 8px;
             font-weight: 600;
         }
 
         .result-title {
             text-align: center;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             color: var(--primary-red);
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             padding: 8px;
             background-color: rgba(211, 47, 47, 0.1);
             border-radius: 5px;
@@ -447,18 +580,18 @@
         .student-info-result {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 18px;
             background-color: var(--light-gray);
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .student-info-item {
             display: flex;
             justify-content: space-between;
-            padding: 6px 0;
+            padding: 5px 0;
             border-bottom: 1px dashed var(--medium-gray);
         }
 
@@ -469,24 +602,24 @@
         .result-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             background-color: var(--white);
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            font-size: 0.9rem;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+            font-size: 0.85rem;
         }
 
         .result-table th {
             background-color: var(--primary-green);
             color: var(--white);
-            padding: 12px;
+            padding: 10px;
             text-align: left;
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
 
         .result-table td {
-            padding: 12px;
+            padding: 10px;
             border-bottom: 1px solid var(--medium-gray);
         }
 
@@ -506,12 +639,12 @@
 
         .result-status {
             text-align: center;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: bold;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 10px;
-            min-height: 60px;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 8px;
+            min-height: 55px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -544,60 +677,61 @@
         .result-actions {
             display: flex;
             justify-content: center;
-            gap: 12px;
-            margin-top: 20px;
-            padding-top: 20px;
+            gap: 10px;
+            padding-top: 15px;
             border-top: 2px solid var(--medium-gray);
             flex-wrap: wrap;
         }
 
         .result-footer {
             text-align: center;
-            margin-top: 20px;
-            padding: 15px;
+            margin-top: 15px;
+            padding: 12px;
             color: var(--dark-gray);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             border-top: 1px solid var(--medium-gray);
         }
 
         /* ===== LOADING & MESSAGES ===== */
         .loading {
             text-align: center;
-            padding: 40px;
-            font-size: 1.2rem;
+            padding: 30px;
+            font-size: 1.1rem;
             color: var(--dark-gray);
         }
 
         .loading i {
             color: var(--primary-green);
-            margin-right: 10px;
+            margin-right: 8px;
         }
 
         .error-message {
             background-color: rgba(211, 47, 47, 0.1);
             color: var(--primary-red);
-            padding: 15px;
+            padding: 12px;
             border-radius: var(--border-radius);
-            margin: 20px 0;
+            margin: 15px 0;
             text-align: center;
+            font-size: 0.9rem;
         }
 
         .success-message {
             background-color: rgba(46, 125, 50, 0.1);
             color: var(--primary-green);
-            padding: 15px;
+            padding: 12px;
             border-radius: var(--border-radius);
-            margin: 20px 0;
+            margin: 15px 0;
             text-align: center;
+            font-size: 0.9rem;
         }
 
         /* ===== FOOTER ===== */
         .footer {
             text-align: center;
-            margin-top: 40px;
-            padding: 20px;
+            margin-top: 30px;
+            padding: 15px;
             color: var(--dark-gray);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             border-top: 1px solid var(--medium-gray);
         }
 
@@ -630,6 +764,7 @@
                 page-break-inside: avoid;
             }
             
+            .result-top-actions,
             .result-actions,
             .result-footer {
                 display: none !important;
@@ -638,46 +773,58 @@
 
         /* ===== MOBILE RESPONSIVENESS ===== */
         @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+            
+            .coaching-header {
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+            
+            .coaching-header h1 {
+                font-size: 1.4rem;
+            }
+            
             .coaching-header .details {
                 flex-direction: column;
-                gap: 10px;
+                gap: 8px;
                 align-items: center;
             }
 
             .tests-grid {
                 grid-template-columns: 1fr;
+                gap: 12px;
+                margin-top: 12px;
             }
 
             .test-header {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: stretch;
+                padding: 10px 12px;
+                margin-bottom: 10px;
             }
 
             .timer-container {
                 align-self: center;
+                min-width: 80px;
+                padding: 6px 10px;
+                font-size: 0.95rem;
             }
 
             .student-info-result {
                 grid-template-columns: 1fr;
-                gap: 8px;
-                padding: 12px;
-            }
-
-            .test-navigation {
-                flex-direction: column;
-            }
-
-            .test-navigation .btn {
-                width: 100%;
-                margin-bottom: 10px;
+                gap: 6px;
+                padding: 10px;
+                font-size: 0.82rem;
             }
             
             .coaching-name {
-                font-size: 1.5rem;
+                font-size: 1.4rem;
             }
             
             .coaching-location {
-                font-size: 0.9rem;
+                font-size: 0.85rem;
                 margin-bottom: 10px;
             }
             
@@ -685,168 +832,264 @@
                 flex-direction: column;
                 gap: 8px;
                 align-items: center;
-                font-size: 0.85rem;
+                font-size: 0.8rem;
             }
             
-            .ceo-info {
-                font-size: 0.85rem;
-                padding: 8px;
+            .director-info {
+                font-size: 0.8rem;
+                padding: 6px 8px;
             }
             
             .result-print-area {
                 padding: 15px;
                 border-width: 1px;
-            }
-            
-            .result-table th,
-            .result-table td {
-                padding: 10px 8px;
-                font-size: 0.85rem;
-            }
-            
-            .result-actions {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .result-actions .btn {
-                width: 100%;
-                max-width: 300px;
-            }
-            
-            .result-status {
-                font-size: 1.3rem;
-                padding: 12px;
-                margin: 10px 0;
-                min-height: 50px;
-            }
-            
-            .result-container {
-                padding: 10px;
-                justify-content: flex-start;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 15px;
-            }
-
-            .card {
-                padding: 20px;
-            }
-
-            .coaching-header h1 {
-                font-size: 1.5rem;
-            }
-
-            .test-name {
-                font-size: 1.3rem;
-            }
-            
-            .coaching-name {
-                font-size: 1.3rem;
-            }
-            
-            .coaching-location {
-                font-size: 0.85rem;
-            }
-            
-            .coaching-details {
-                font-size: 0.8rem;
-            }
-            
-            .result-title {
-                font-size: 1.3rem;
-            }
-            
-            .result-print-area {
-                padding: 12px;
-                border: 1px solid var(--primary-green);
-                box-shadow: 0 0 10px rgba(0,0,0,0.05);
-            }
-            
-            .result-table {
-                font-size: 0.85rem;
-            }
-            
-            .student-info-result {
-                font-size: 0.85rem;
-            }
-        }
-        
-        /* Mobile result screen optimization - NO SCROLL */
-        @media (max-height: 800px) and (max-width: 768px) {
-            .result-print-area {
-                padding: 12px;
-                margin: 5px auto;
-                transform: scale(0.85);
-                transform-origin: top center;
-            }
-            
-            .coaching-info {
-                margin-bottom: 10px;
-                padding-bottom: 8px;
-            }
-            
-            .coaching-name {
-                font-size: 1.3rem;
-                margin-bottom: 5px;
-            }
-            
-            .coaching-location {
-                font-size: 0.8rem;
-                margin-bottom: 8px;
-            }
-            
-            .coaching-details {
-                font-size: 0.8rem;
-                gap: 8px;
-                margin-top: 5px;
-            }
-            
-            .result-title {
-                font-size: 1.1rem;
                 margin-bottom: 12px;
-                padding: 6px;
-            }
-            
-            .student-info-result {
-                padding: 10px;
-                margin-bottom: 12px;
-                font-size: 0.8rem;
             }
             
             .result-table th,
             .result-table td {
                 padding: 8px 6px;
-                font-size: 0.8rem;
+                font-size: 0.82rem;
+            }
+            
+            .result-top-actions,
+            .result-actions {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .result-top-actions .btn,
+            .result-actions .btn {
+                width: 100%;
+                max-width: 280px;
+                padding: 10px 12px;
             }
             
             .result-status {
-                font-size: 1.1rem;
+                font-size: 1.2rem;
                 padding: 10px;
                 margin: 10px 0;
-                min-height: 45px;
+                min-height: 48px;
             }
             
-            .result-actions {
-                margin-top: 15px;
-                padding-top: 15px;
+            .result-container {
+                padding: 8px;
+                justify-content: flex-start;
             }
             
-            .result-footer {
-                margin-top: 15px;
+            .question-navigation {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+                padding: 10px 12px;
+                margin-bottom: 10px;
+            }
+            
+            .question-status {
+                justify-content: center;
+            }
+            
+            .test-navigation-row {
                 padding: 10px;
+                gap: 6px;
+                margin-top: 12px;
+            }
+            
+            .nav-btn {
+                padding: 8px 6px;
+                font-size: 0.8rem;
+            }
+            
+            .nav-btn i {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .card {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+
+            .coaching-header h1 {
+                font-size: 1.3rem;
+            }
+
+            .test-name {
+                font-size: 1.1rem;
+            }
+            
+            .coaching-name {
+                font-size: 1.3rem;
+            }
+            
+            .coaching-location {
+                font-size: 0.8rem;
+            }
+            
+            .coaching-details {
                 font-size: 0.75rem;
+            }
+            
+            .result-title {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
+                padding: 6px;
+            }
+            
+            .result-print-area {
+                padding: 12px;
+                border: 1px solid var(--primary-green);
+                box-shadow: 0 0 8px rgba(0,0,0,0.05);
+            }
+            
+            .result-table {
+                font-size: 0.8rem;
+            }
+            
+            .student-info-result {
+                font-size: 0.8rem;
+            }
+            
+            .question-text {
+                font-size: 1.05rem;
+                margin-bottom: 15px;
+            }
+            
+            .option {
+                padding: 8px 10px;
+                font-size: 0.9rem;
+            }
+            
+            .question-container {
+                padding: 15px;
+                min-height: 260px;
+                margin-bottom: 10px;
+            }
+            
+            .test-navigation-row {
+                padding: 8px;
+                gap: 4px;
+            }
+            
+            .nav-btn {
+                padding: 8px 4px;
+                font-size: 0.75rem;
+            }
+            
+            .nav-btn i {
+                font-size: 0.8rem;
+            }
+            
+            .btn {
+                padding: 8px 10px;
+                font-size: 0.85rem;
             }
         }
         
-        /* Extra small mobile devices */
-        @media (max-height: 600px) {
-            .result-print-area {
-                transform: scale(0.75);
-                margin-top: -10px;
+        /* Extra small mobile devices (iPhone SE etc) */
+        @media (max-width: 375px) {
+            .test-header {
+                padding: 8px 10px;
+            }
+            
+            .test-name {
+                font-size: 1rem;
+            }
+            
+            .student-info {
+                font-size: 0.85rem;
+            }
+            
+            .timer-container {
+                min-width: 70px;
+                padding: 5px 8px;
+                font-size: 0.9rem;
+            }
+            
+            .question-navigation {
+                padding: 8px 10px;
+            }
+            
+            .jump-select {
+                padding: 7px 10px;
+                font-size: 0.85rem;
+            }
+            
+            .question-text {
+                font-size: 1rem;
+            }
+            
+            .option {
+                padding: 7px 9px;
+                font-size: 0.85rem;
+            }
+            
+            .test-navigation-row {
+                padding: 8px 6px;
+            }
+            
+            .nav-btn {
+                padding: 7px 3px;
+                font-size: 0.7rem;
+            }
+            
+            .nav-btn i {
+                font-size: 0.75rem;
+            }
+            
+            .btn-small {
+                padding: 6px 8px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Height-based adjustments for mobile */
+        @media (max-height: 700px) and (max-width: 768px) {
+            .test-header {
+                padding: 8px 10px;
+                margin-bottom: 8px;
+            }
+            
+            .question-navigation {
+                padding: 8px 10px;
+                margin-bottom: 8px;
+            }
+            
+            .question-container {
+                padding: 12px;
+                min-height: 220px;
+                margin-bottom: 8px;
+            }
+            
+            .question-text {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
+            
+            .options-container {
+                gap: 6px;
+            }
+            
+            .option {
+                padding: 8px;
+                font-size: 0.9rem;
+            }
+            
+            .test-navigation-row {
+                margin-top: 10px;
+                padding: 8px;
+            }
+            
+            .question-progress {
+                padding: 6px 10px;
+                font-size: 0.85rem;
+                margin-bottom: 8px;
             }
         }
         
@@ -857,8 +1100,13 @@
         
         /* Compact card for mobile */
         .compact-card {
-            padding: 15px;
-            margin-bottom: 15px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        
+        /* Force no scroll on test screen */
+        #page-test-screen .container {
+            padding-bottom: 5px;
         }
     </style>
 </head>
@@ -884,17 +1132,17 @@
             <div class="card compact-card">
                 <h2>Available Tests</h2>
                 <p>Select a test to begin your examination.</p>
-            </div>
-
-            <div id="tests-container" class="tests-grid">
-                <!-- Tests will be loaded here -->
-                <div class="loading">
-                    <i class="fas fa-spinner fa-spin"></i> Loading available tests...
+                <div id="loading-tests" class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Loading tests from Firebase...
                 </div>
             </div>
 
+            <div id="tests-container" class="tests-grid">
+                <!-- Tests will be loaded here from Firebase -->
+            </div>
+
             <div class="footer">
-                <p>QUEST COACHING CENTRE &copy; 2024</p>
+                <p>QUEST COACHING CENTRE &copy; 2024 | DEMO VERSION</p>
             </div>
         </div>
     </div>
@@ -953,12 +1201,31 @@
                     </div>
                 </div>
                 <div class="timer-container" id="timer">
-                    30:00
+                    15:00
+                </div>
+            </div>
+
+            <div class="question-navigation">
+                <div class="jump-to-container">
+                    <div class="jump-to-label">Jump to Question:</div>
+                    <select id="jump-to-select" class="form-control jump-select">
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                </div>
+                <div class="question-status">
+                    <div class="status-item">
+                        <div class="status-dot answered-dot"></div>
+                        <span>Answered</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-dot not-answered-dot"></div>
+                        <span>Not Answered</span>
+                    </div>
                 </div>
             </div>
 
             <div class="question-progress" id="question-progress">
-                Question 1 of 30
+                Question 1 of 5
             </div>
 
             <div class="question-container">
@@ -972,18 +1239,16 @@
                 </div>
             </div>
 
-            <div class="test-navigation">
-                <button id="prev-question" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Previous
+            <!-- SINGLE ROW NAVIGATION BUTTONS -->
+            <div class="test-navigation-row">
+                <button id="prev-question" class="btn btn-secondary nav-btn">
+                    <i class="fas fa-arrow-left"></i> Prev
                 </button>
-                <button id="next-question" class="btn btn-primary">
+                <button id="complete-test" class="btn btn-warning nav-btn">
+                    <i class="fas fa-paper-plane"></i> Complete
+                </button>
+                <button id="next-question" class="btn btn-primary nav-btn">
                     Next <i class="fas fa-arrow-right"></i>
-                </button>
-            </div>
-
-            <div style="text-align: center; margin-top: 30px;">
-                <button id="complete-test" class="btn btn-danger">
-                    <i class="fas fa-paper-plane"></i> Complete Test
                 </button>
             </div>
         </div>
@@ -992,6 +1257,17 @@
     <!-- Page 4: Result Screen -->
     <div id="page-result" class="page result-screen">
         <div class="result-container">
+            <!-- Top Action Buttons -->
+            <div class="result-top-actions">
+                <button id="download-pdf-top" class="btn btn-primary">
+                    <i class="fas fa-download"></i> Download PDF
+                </button>
+                <button id="print-result-top" class="btn btn-secondary">
+                    <i class="fas fa-print"></i> Print Result
+                </button>
+            </div>
+            
+            <!-- Result Card -->
             <div id="result-print-area" class="result-print-area">
                 <!-- Coaching Info -->
                 <div class="coaching-info">
@@ -1000,7 +1276,7 @@
                         In Front of S.S. Girls High School, Gopalganj
                     </div>
                     <div class="coaching-details">
-                        <div class="coaching-detail ceo-info">
+                        <div class="coaching-detail director-info">
                             <i class="fas fa-user-tie"></i>
                             <span>CEO & FOUNDER: MR. RAVI SIR</span>
                         </div>
@@ -1082,14 +1358,8 @@
                 </div>
             </div>
             
-            <!-- Action Buttons -->
+            <!-- Bottom Action Buttons -->
             <div class="result-actions">
-                <button id="download-pdf" class="btn btn-primary">
-                    <i class="fas fa-download"></i> Download PDF
-                </button>
-                <button id="print-result" class="btn btn-secondary">
-                    <i class="fas fa-print"></i> Print Result
-                </button>
                 <button id="new-test" class="btn btn-danger">
                     <i class="fas fa-plus"></i> Take Another Test
                 </button>
@@ -1107,15 +1377,12 @@
         const firebaseConfig = {
             apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
             authDomain: "quest-coaching.firebaseapp.com",
+            databaseURL: "https://quest-coaching-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "quest-coaching",
             storageBucket: "quest-coaching.firebasestorage.app",
             messagingSenderId: "131948734089",
             appId: "1:131948734089:web:f4ba25110c8b1298360858"
         };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
 
         // ===== GLOBAL VARIABLES =====
         let currentPage = 'test-list';
@@ -1128,6 +1395,64 @@
         let timeRemaining = 0;
         let studentDetails = {};
         let resultId = '';
+        let db = null;
+        let currentResultData = null;
+
+        // ===== FIREBASE INITIALIZATION =====
+        function initializeFirebase() {
+            try {
+                // Initialize Firebase
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                console.log("Firebase initialized successfully for QUEST COACHING");
+                return true;
+            } catch (error) {
+                console.error("Firebase initialization error:", error);
+                showError("Failed to initialize Firebase. Please check your configuration.");
+                return false;
+            }
+        }
+
+        // ===== LOAD TESTS FROM FIREBASE =====
+        async function loadTestsFromFirebase() {
+            if (!db) {
+                showError("Database not initialized");
+                return;
+            }
+
+            try {
+                const loadingDiv = document.getElementById('loading-tests');
+                loadingDiv.style.display = 'block';
+                
+                // Get all tests from 'tests' collection
+                const querySnapshot = await db.collection('tests').get();
+                
+                tests = [];
+                querySnapshot.forEach(doc => {
+                    const testData = doc.data();
+                    // Add document ID to test data
+                    tests.push({
+                        id: doc.id,
+                        ...testData
+                    });
+                });
+                
+                console.log("Loaded tests from Firebase:", tests.length);
+                
+                if (tests.length === 0) {
+                    loadingDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> No tests available in Firebase';
+                    return;
+                }
+                
+                loadingDiv.style.display = 'none';
+                displayTests();
+                
+            } catch (error) {
+                console.error("Error loading tests from Firebase:", error);
+                document.getElementById('loading-tests').innerHTML = 
+                    '<i class="fas fa-exclamation-circle"></i> Error loading tests. Please try again later.';
+            }
+        }
 
         // ===== PAGE NAVIGATION FUNCTIONS =====
         function showPage(pageId) {
@@ -1145,34 +1470,6 @@
         }
 
         // ===== PAGE 1: TEST LIST =====
-        async function loadTests() {
-            const container = document.getElementById('tests-container');
-            
-            try {
-                const snapshot = await db.collection('tests')
-                    .orderBy('createdAt', 'desc')
-                    .get();
-                
-                tests = [];
-                snapshot.forEach(doc => {
-                    tests.push({
-                        id: doc.id,
-                        ...doc.data()
-                    });
-                });
-                
-                displayTests();
-            } catch (error) {
-                console.error('Error loading tests:', error);
-                container.innerHTML = `
-                    <div class="error-message">
-                        <i class="fas fa-exclamation-triangle"></i> 
-                        Error loading tests. Please check your internet connection and try again.
-                    </div>
-                `;
-            }
-        }
-
         function displayTests() {
             const container = document.getElementById('tests-container');
             
@@ -1200,7 +1497,7 @@
                         </div>
                         <div class="test-detail">
                             <i class="fas fa-clock"></i>
-                            <span>${test.duration || 30} Minutes</span>
+                            <span>${test.duration || 15} Minutes</span>
                         </div>
                     </div>
                     <button class="btn btn-primary btn-block start-test" data-test-id="${test.id}">
@@ -1253,22 +1550,6 @@
                 return;
             }
             
-            // Check if roll number already attempted this test
-            try {
-                const resultSnapshot = await db.collection('onlinetestresults')
-                    .where('testId', '==', currentTest.id)
-                    .where('rollNumber', '==', rollNumber)
-                    .get();
-                
-                if (!resultSnapshot.empty) {
-                    errorDiv.textContent = 'This roll number has already attempted this test. Each roll number can attempt only once.';
-                    errorDiv.style.display = 'block';
-                    return;
-                }
-            } catch (error) {
-                console.error('Error checking existing attempts:', error);
-            }
-            
             // Save student details
             studentDetails = {
                 name: studentName,
@@ -1284,16 +1565,22 @@
         });
 
         // ===== PAGE 3: TEST SCREEN =====
-        async function loadTestQuestions() {
-            if (!currentTest || !currentTest.questionsText) {
-                alert('Test questions not found!');
+        function loadTestQuestions() {
+            if (!currentTest) {
+                alert('Test not found!');
                 showPage('test-list');
                 return;
             }
             
             try {
-                // Parse questions from the questionsText field
-                currentQuestions = parseQuestions(currentTest.questionsText);
+                // Parse questions from the test data
+                if (currentTest.questions && Array.isArray(currentTest.questions)) {
+                    currentQuestions = currentTest.questions;
+                } else if (currentTest.questionsText) {
+                    currentQuestions = parseQuestions(currentTest.questionsText);
+                } else {
+                    throw new Error('No questions found in test data');
+                }
                 
                 // Display test info
                 document.getElementById('current-test-name').textContent = currentTest.testName;
@@ -1301,11 +1588,14 @@
                 document.getElementById('display-roll-number').textContent = studentDetails.rollNumber;
                 
                 // Initialize timer
-                const duration = currentTest.duration || 30;
+                const duration = currentTest.duration || 15;
                 timeRemaining = duration * 60; // Convert to seconds
                 
                 // Start the timer
                 startTimer();
+                
+                // Initialize question dropdown
+                initQuestionDropdown();
                 
                 // Show first question
                 showQuestion(0);
@@ -1367,6 +1657,26 @@
             return questions;
         }
 
+        function initQuestionDropdown() {
+            const dropdown = document.getElementById('jump-to-select');
+            dropdown.innerHTML = '';
+            
+            currentQuestions.forEach((question, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `Question ${index + 1}`;
+                dropdown.appendChild(option);
+            });
+            
+            // Add event listener for dropdown change
+            dropdown.addEventListener('change', function() {
+                const questionIndex = parseInt(this.value);
+                if (!isNaN(questionIndex)) {
+                    showQuestion(questionIndex);
+                }
+            });
+        }
+
         function showQuestion(index) {
             if (index < 0 || index >= currentQuestions.length) {
                 return;
@@ -1382,12 +1692,32 @@
             document.getElementById('question-number').textContent = `Question ${index + 1}`;
             document.getElementById('question-text').textContent = question.text;
             
+            // Update dropdown selection
+            document.getElementById('jump-to-select').value = index;
+            
             // Display options
             const optionsContainer = document.getElementById('options-container');
             optionsContainer.innerHTML = '';
             
             const optionLabels = ['A', 'B', 'C', 'D'];
-            question.options.forEach((option, i) => {
+            
+            // Handle both array and object formats for options
+            let optionsArray = [];
+            if (Array.isArray(question.options)) {
+                optionsArray = question.options;
+            } else if (typeof question.options === 'object') {
+                // Convert object to array
+                optionsArray = [
+                    question.options.A || '',
+                    question.options.B || '',
+                    question.options.C || '',
+                    question.options.D || ''
+                ];
+            }
+            
+            optionsArray.forEach((option, i) => {
+                if (!option) return; // Skip empty options
+                
                 const optionId = `option-${index}-${i}`;
                 const isSelected = studentAnswers[index] === optionLabels[i];
                 
@@ -1397,7 +1727,7 @@
                     <input type="radio" id="${optionId}" name="question-${index}" value="${optionLabels[i]}"
                            ${isSelected ? 'checked' : ''}>
                     <span class="option-label">${optionLabels[i]})</span>
-                    <label for="${optionId}">${option}</label>
+                    <span class="option-text">${option}</span>
                 `;
                 
                 // Add event listener
@@ -1474,6 +1804,58 @@
             }
         });
 
+        // ===== SAVE RESULT TO FIREBASE =====
+        async function saveResultToFirebase(resultData) {
+            if (!db) {
+                console.error("Firestore not initialized");
+                return false;
+            }
+
+            try {
+                // Create a sanitized test name for collection name
+                const sanitizedTestName = currentTest.testName
+                    .replace(/[^a-zA-Z0-9]/g, '_')
+                    .toLowerCase();
+                
+                // Create result data object
+                const resultToSave = {
+                    studentName: studentDetails.name,
+                    rollNumber: studentDetails.rollNumber,
+                    testId: currentTest.id,
+                    testName: currentTest.testName,
+                    totalQuestions: resultData.totalQuestions,
+                    attempted: resultData.attempted,
+                    correctAnswers: resultData.correct,
+                    wrongAnswers: resultData.wrong,
+                    totalMarks: resultData.totalMarks,
+                    marksObtained: parseFloat(resultData.marksObtained),
+                    percentage: parseFloat(resultData.percentage),
+                    division: resultData.division,
+                    studentAnswers: studentAnswers,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    resultId: resultId,
+                    date: new Date().toISOString().split('T')[0],
+                    coachingName: "QUEST COACHING CENTRE"
+                };
+
+                // Save to Firebase - Two ways:
+                // 1. Save to main results collection
+                const mainResultRef = await db.collection('onlinetestresults').add(resultToSave);
+                
+                // 2. Also save to test-specific subcollection for better organization
+                const testSpecificRef = await db.collection('testresults')
+                    .doc(sanitizedTestName)
+                    .collection('results')
+                    .add(resultToSave);
+
+                console.log("Result saved to Firebase with IDs:", mainResultRef.id, testSpecificRef.id);
+                return true;
+            } catch (error) {
+                console.error("Error saving result to Firebase:", error);
+                return false;
+            }
+        }
+
         // ===== TEST SUBMISSION & RESULT CALCULATION =====
         async function submitTest() {
             // Clear timer
@@ -1520,26 +1902,11 @@
                 statusClass = 'fail-status';
             }
             
-            const isPass = percentage >= 33;
-            
             // Generate result ID
-            resultId = 'RES' + Date.now() + Math.floor(Math.random() * 1000);
+            resultId = 'QUEST' + Date.now().toString().slice(-8) + Math.floor(Math.random() * 100).toString().padStart(2, '0');
             
-            // Store result in Firebase - NEW COLLECTION NAME
-            await saveResultToFirebase({
-                totalQuestions,
-                attempted,
-                correct,
-                wrong,
-                totalMarks,
-                marksObtained: marksObtained.toFixed(2),
-                percentage: percentage.toFixed(2),
-                division,
-                isPass
-            });
-            
-            // Display results
-            displayResults({
+            // Prepare result data
+            currentResultData = {
                 totalQuestions,
                 attempted,
                 correct,
@@ -1549,37 +1916,17 @@
                 percentage: percentage.toFixed(2),
                 division,
                 statusClass
-            });
-        }
-
-        async function saveResultToFirebase(results) {
-            try {
-                const resultData = {
-                    studentName: studentDetails.name,
-                    rollNumber: studentDetails.rollNumber,
-                    testId: currentTest.id,
-                    testName: currentTest.testName,
-                    totalQuestions: results.totalQuestions,
-                    attempted: results.attempted,
-                    correct: results.correct,
-                    wrong: results.wrong,
-                    totalMarks: results.totalMarks,
-                    marksObtained: parseFloat(results.marksObtained),
-                    percentage: parseFloat(results.percentage),
-                    division: results.division,
-                    isPass: results.isPass,
-                    answers: studentAnswers,
-                    submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    resultId: resultId
-                };
-                
-                // SAVE TO NEW COLLECTION: onlinetestresults
-                await db.collection('onlinetestresults').add(resultData);
-                console.log('Result saved to onlinetestresults collection');
-            } catch (error) {
-                console.error('Error saving result to Firebase:', error);
-                // Continue to show result even if saving fails
+            };
+            
+            // Save result to Firebase
+            const saveSuccess = await saveResultToFirebase(currentResultData);
+            
+            if (!saveSuccess) {
+                alert("Note: Result could not be saved to server, but you can still download your result.");
             }
+            
+            // Display results
+            displayResults(currentResultData);
         }
 
         function displayResults(results) {
@@ -1615,45 +1962,14 @@
             
             // Show result page
             showPage('result');
-            
-            // Adjust result display for mobile
-            setTimeout(() => {
-                adjustResultForMobile();
-            }, 100);
-        }
-
-        function adjustResultForMobile() {
-            if (window.innerWidth <= 768) {
-                const printArea = document.getElementById('result-print-area');
-                const container = document.querySelector('.result-container');
-                const printAreaHeight = printArea.offsetHeight;
-                const viewportHeight = window.innerHeight;
-                const actionHeight = document.querySelector('.result-actions').offsetHeight;
-                const footerHeight = document.querySelector('.result-footer').offsetHeight;
-                
-                // Calculate available height for result
-                const availableHeight = viewportHeight - actionHeight - footerHeight - 40; // 40px for padding
-                
-                if (printAreaHeight > availableHeight) {
-                    // Scale down to fit
-                    const scale = availableHeight / printAreaHeight;
-                    printArea.style.transform = `scale(${Math.min(scale, 0.85)})`;
-                    printArea.style.transformOrigin = 'top center';
-                    printArea.style.marginTop = '5px';
-                } else {
-                    printArea.style.transform = 'scale(1)';
-                    printArea.style.transformOrigin = 'top center';
-                    printArea.style.marginTop = '0';
-                }
-            }
         }
 
         // ===== RESULT PAGE BUTTONS =====
-        document.getElementById('download-pdf').addEventListener('click', async function() {
+        document.getElementById('download-pdf-top').addEventListener('click', async function() {
             await downloadResultAsPDF();
         });
 
-        document.getElementById('print-result').addEventListener('click', function() {
+        document.getElementById('print-result-top').addEventListener('click', function() {
             window.print();
         });
 
@@ -1664,6 +1980,7 @@
             currentQuestionIndex = 0;
             studentAnswers = {};
             studentDetails = {};
+            currentResultData = null;
             
             // Clear form
             document.getElementById('student-form').reset();
@@ -1679,7 +1996,7 @@
             const printArea = document.getElementById('result-print-area');
             
             // Show loading
-            const downloadBtn = document.getElementById('download-pdf');
+            const downloadBtn = document.getElementById('download-pdf-top');
             const originalText = downloadBtn.innerHTML;
             downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
             downloadBtn.disabled = true;
@@ -1753,10 +2070,10 @@
                 pdf.setFontSize(10);
                 pdf.setTextColor(100, 100, 100);
                 pdf.text('This is an electronically generated result. No signature required.', 105, 287, { align: 'center' });
-                pdf.text(`Result ID: ${resultId} | Generated on: ${new Date().toLocaleDateString()}`, 105, 292, { align: 'center' });
+                pdf.text(`Result ID: ${resultId} | QUEST COACHING CENTRE | ${new Date().toLocaleDateString()}`, 105, 292, { align: 'center' });
                 
                 // Save the PDF
-                pdf.save(`Result_${studentDetails.rollNumber}_${resultId}.pdf`);
+                pdf.save(`QUEST_Result_${studentDetails.rollNumber}_${resultId}.pdf`);
                 
             } catch (error) {
                 console.error('Error generating PDF:', error);
@@ -1768,10 +2085,25 @@
             }
         }
 
+        // ===== HELPER FUNCTIONS =====
+        function showError(message) {
+            const container = document.getElementById('tests-container');
+            if (container) {
+                container.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i> ${message}
+                    </div>
+                `;
+            }
+        }
+
         // ===== INITIALIZE APP =====
         document.addEventListener('DOMContentLoaded', function() {
-            // Load tests on initial page load
-            loadTests();
+            // Initialize Firebase
+            if (initializeFirebase()) {
+                // Load tests from Firebase
+                loadTestsFromFirebase();
+            }
             
             // Set up keyboard navigation for test screen
             document.addEventListener('keydown', function(e) {
@@ -1787,21 +2119,14 @@
                         if (optionIndex < currentQuestions[currentQuestionIndex].options.length) {
                             selectOption(currentQuestionIndex, optionLabels[optionIndex]);
                         }
+                    } else if (e.key === 'Enter') {
+                        // Enter to go to next question if available
+                        if (currentQuestionIndex < currentQuestions.length - 1) {
+                            showQuestion(currentQuestionIndex + 1);
+                        }
                     }
                 }
             });
-            
-            // Handle window resize for mobile result display
-            window.addEventListener('resize', function() {
-                if (currentPage === 'result') {
-                    adjustResultForMobile();
-                }
-            });
-            
-            // Initial adjustment for result page if needed
-            if (currentPage === 'result') {
-                setTimeout(adjustResultForMobile, 500);
-            }
         });
 
         // ===== ERROR HANDLING =====
@@ -1810,7 +2135,7 @@
             
             // Show user-friendly error message
             if (currentPage === 'test-screen') {
-                alert('An error occurred during the test. Your answers have been saved locally. Please contact support.');
+                alert('An error occurred during the test. Please try again.');
             }
         });
     </script>
