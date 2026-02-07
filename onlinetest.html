@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QUEST COACHING CENTRE - Online Test Platform (Demo)</title>
+    <title>Quest Coaching Centre - Online Test Platform</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -13,16 +13,16 @@
     <style>
         /* ===== GLOBAL STYLES ===== */
         :root {
-            --primary-green: #2E7D32;
-            --light-green: #4CAF50;
-            --dark-green: #1B5E20;
-            --primary-blue: #1976D2;
-            --light-blue: #2196F3;
+            --primary-blue: #1E88E5;
+            --light-blue: #42A5F5;
+            --dark-blue: #1565C0;
             --primary-red: #D32F2F;
             --light-red: #EF5350;
             --dark-red: #C62828;
             --primary-orange: #FF9800;
             --dark-orange: #F57C00;
+            --primary-purple: #7B1FA2;
+            --light-purple: #9C27B0;
             --white: #FFFFFF;
             --light-gray: #F5F5F5;
             --medium-gray: #E0E0E0;
@@ -70,7 +70,7 @@
 
         /* ===== HEADER / COACHING DETAILS ===== */
         .coaching-header {
-            background: linear-gradient(to right, var(--primary-green), var(--dark-green));
+            background: linear-gradient(to right, var(--primary-blue), var(--dark-blue));
             color: var(--white);
             padding: 15px;
             border-radius: var(--border-radius);
@@ -82,6 +82,12 @@
         .coaching-header h1 {
             font-size: 1.6rem;
             margin-bottom: 8px;
+        }
+
+        .coaching-header .subtitle {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            opacity: 0.9;
         }
 
         .coaching-header .details {
@@ -110,7 +116,7 @@
             padding: 20px;
             margin-bottom: 20px;
             box-shadow: var(--shadow);
-            border-left: 5px solid var(--primary-green);
+            border-left: 5px solid var(--primary-blue);
         }
 
         .test-card {
@@ -120,7 +126,7 @@
 
         .test-card:hover {
             transform: translateY(-5px);
-            border-left-color: var(--light-green);
+            border-left-color: var(--light-blue);
         }
 
         /* ===== BUTTONS ===== */
@@ -142,12 +148,12 @@
         }
 
         .btn-primary {
-            background-color: var(--primary-green);
+            background-color: var(--primary-blue);
             color: var(--white);
         }
 
         .btn-primary:hover {
-            background-color: var(--dark-green);
+            background-color: var(--dark-blue);
         }
 
         .btn-secondary {
@@ -178,6 +184,15 @@
             background-color: var(--dark-orange);
         }
 
+        .btn-purple {
+            background-color: var(--primary-purple);
+            color: var(--white);
+        }
+
+        .btn-purple:hover {
+            background-color: var(--light-purple);
+        }
+
         .btn-block {
             display: block;
             width: 100%;
@@ -198,7 +213,7 @@
 
         .test-title {
             font-size: 1.3rem;
-            color: var(--primary-green);
+            color: var(--primary-blue);
             margin-bottom: 10px;
             padding-bottom: 8px;
             border-bottom: 1px solid var(--medium-gray);
@@ -220,7 +235,7 @@
         }
 
         .test-detail i {
-            color: var(--primary-green);
+            color: var(--primary-blue);
         }
 
         /* ===== FORM STYLES ===== */
@@ -247,12 +262,12 @@
 
         .form-control:focus {
             outline: none;
-            border-color: var(--primary-green);
+            border-color: var(--primary-blue);
         }
 
         select.form-control {
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%232E7D32' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%231E88E5' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 12px center;
             background-size: 14px;
@@ -279,7 +294,7 @@
 
         .test-name {
             font-size: 1.2rem;
-            color: var(--primary-green);
+            color: var(--primary-blue);
             font-weight: 600;
             margin-bottom: 4px;
             line-height: 1.3;
@@ -369,7 +384,7 @@
         }
 
         .answered-dot {
-            background-color: var(--primary-green);
+            background-color: var(--primary-blue);
         }
 
         .not-answered-dot {
@@ -390,7 +405,7 @@
 
         .question-number {
             font-size: 1rem;
-            color: var(--primary-green);
+            color: var(--primary-blue);
             margin-bottom: 8px;
             font-weight: 600;
         }
@@ -420,12 +435,12 @@
 
         .option:hover {
             background-color: var(--light-gray);
-            border-color: var(--primary-green);
+            border-color: var(--primary-blue);
         }
 
         .option.selected {
-            background-color: rgba(46, 125, 50, 0.1);
-            border-color: var(--primary-green);
+            background-color: rgba(30, 136, 229, 0.1);
+            border-color: var(--primary-blue);
         }
 
         .option input {
@@ -437,7 +452,7 @@
         .option-label {
             font-weight: 600;
             margin-right: 8px;
-            color: var(--primary-green);
+            color: var(--primary-blue);
             min-width: 18px;
             flex-shrink: 0;
         }
@@ -464,10 +479,26 @@
             min-width: 0;
             padding: 10px 8px;
             font-size: 0.85rem;
+            position: relative;
         }
 
         .nav-btn i {
             font-size: 0.9rem;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .nav-btn .spinner {
+            display: none;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .question-progress {
@@ -510,7 +541,7 @@
 
         .result-print-area {
             background-color: white;
-            border: 2px solid var(--primary-green);
+            border: 2px solid var(--primary-blue);
             border-radius: 10px;
             padding: 18px;
             margin: 0 auto 15px;
@@ -523,12 +554,12 @@
         .coaching-info {
             text-align: center;
             margin-bottom: 18px;
-            border-bottom: 3px solid var(--primary-green);
+            border-bottom: 3px solid var(--primary-blue);
             padding-bottom: 12px;
         }
 
         .coaching-name {
-            color: var(--primary-green);
+            color: var(--primary-blue);
             font-size: 1.6rem;
             margin-bottom: 6px;
             font-weight: 800;
@@ -560,7 +591,7 @@
         }
 
         .director-info {
-            background-color: rgba(46, 125, 50, 0.1);
+            background-color: rgba(30, 136, 229, 0.1);
             padding: 8px 10px;
             border-radius: 5px;
             margin-top: 8px;
@@ -611,7 +642,7 @@
         }
 
         .result-table th {
-            background-color: var(--primary-green);
+            background-color: var(--primary-blue);
             color: var(--white);
             padding: 10px;
             text-align: left;
@@ -629,7 +660,7 @@
 
         .result-table .highlight {
             font-weight: bold;
-            color: var(--primary-green);
+            color: var(--primary-blue);
         }
 
         .result-table .wrong {
@@ -651,9 +682,9 @@
         }
 
         .first-division {
-            background-color: rgba(46, 125, 50, 0.2);
-            color: var(--primary-green);
-            border: 3px solid var(--primary-green);
+            background-color: rgba(30, 136, 229, 0.2);
+            color: var(--primary-blue);
+            border: 3px solid var(--primary-blue);
         }
 
         .second-division {
@@ -701,7 +732,7 @@
         }
 
         .loading i {
-            color: var(--primary-green);
+            color: var(--primary-blue);
             margin-right: 8px;
         }
 
@@ -716,12 +747,57 @@
         }
 
         .success-message {
-            background-color: rgba(46, 125, 50, 0.1);
-            color: var(--primary-green);
+            background-color: rgba(30, 136, 229, 0.1);
+            color: var(--primary-blue);
             padding: 12px;
             border-radius: var(--border-radius);
             margin: 15px 0;
             text-align: center;
+            font-size: 0.9rem;
+        }
+
+        /* ===== SUBMISSION OVERLAY ===== */
+        .submission-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .submission-content {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .submission-spinner {
+            font-size: 3rem;
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+            animation: spin 1.5s linear infinite;
+        }
+
+        .submission-text {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .submission-subtext {
+            color: var(--dark-gray);
             font-size: 0.9rem;
         }
 
@@ -904,6 +980,19 @@
             .nav-btn i {
                 font-size: 0.85rem;
             }
+            
+            .submission-content {
+                padding: 20px;
+                max-width: 300px;
+            }
+            
+            .submission-spinner {
+                font-size: 2.5rem;
+            }
+            
+            .submission-text {
+                font-size: 1.1rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -944,7 +1033,7 @@
             
             .result-print-area {
                 padding: 12px;
-                border: 1px solid var(--primary-green);
+                border: 1px solid var(--primary-blue);
                 box-shadow: 0 0 8px rgba(0,0,0,0.05);
             }
             
@@ -989,6 +1078,24 @@
             .btn {
                 padding: 8px 10px;
                 font-size: 0.85rem;
+            }
+            
+            .submission-content {
+                padding: 15px;
+                max-width: 280px;
+            }
+            
+            .submission-spinner {
+                font-size: 2rem;
+                margin-bottom: 10px;
+            }
+            
+            .submission-text {
+                font-size: 1rem;
+            }
+            
+            .submission-subtext {
+                font-size: 0.8rem;
             }
         }
         
@@ -1116,6 +1223,7 @@
         <div class="container">
             <div class="coaching-header">
                 <h1>QUEST COACHING CENTRE</h1>
+                <div class="subtitle">क्वेस्ट कोचिंग सेंटर</div>
                 <p>In Front of S.S. Girls High School, Gopalganj</p>
                 <div class="details">
                     <div class="detail-item">
@@ -1142,7 +1250,7 @@
             </div>
 
             <div class="footer">
-                <p>QUEST COACHING CENTRE &copy; 2024 | DEMO VERSION</p>
+                <p>QUEST COACHING CENTRE &copy; 2024 | Online Test Platform</p>
             </div>
         </div>
     </div>
@@ -1152,6 +1260,7 @@
         <div class="container">
             <div class="coaching-header">
                 <h1>QUEST COACHING CENTRE</h1>
+                <div class="subtitle">क्वेस्ट कोचिंग सेंटर</div>
                 <p>In Front of S.S. Girls High School, Gopalganj</p>
                 <div class="details">
                     <div class="detail-item">
@@ -1372,6 +1481,17 @@
         </div>
     </div>
 
+    <!-- Submission Overlay -->
+    <div id="submission-overlay" class="submission-overlay" style="display: none;">
+        <div class="submission-content">
+            <div class="submission-spinner">
+                <i class="fas fa-spinner"></i>
+            </div>
+            <div class="submission-text">Submitting Test...</div>
+            <div class="submission-subtext">Please wait while we process your test and generate results</div>
+        </div>
+    </div>
+
     <script>
         // ===== FIREBASE CONFIGURATION =====
         const firebaseConfig = {
@@ -1397,6 +1517,7 @@
         let resultId = '';
         let db = null;
         let currentResultData = null;
+        let isSubmitting = false; // Flag to prevent multiple submissions
 
         // ===== FIREBASE INITIALIZATION =====
         function initializeFirebase() {
@@ -1404,7 +1525,7 @@
                 // Initialize Firebase
                 firebase.initializeApp(firebaseConfig);
                 db = firebase.firestore();
-                console.log("Firebase initialized successfully for QUEST COACHING");
+                console.log("Firebase initialized successfully");
                 return true;
             } catch (error) {
                 console.error("Firebase initialization error:", error);
@@ -1574,9 +1695,12 @@
             
             try {
                 // Parse questions from the test data
+                // Assuming questions are stored in Firebase as an array of objects
+                // Each question object should have: text, options (array), correctAnswer
                 if (currentTest.questions && Array.isArray(currentTest.questions)) {
                     currentQuestions = currentTest.questions;
                 } else if (currentTest.questionsText) {
+                    // Fallback to parsing from text format
                     currentQuestions = parseQuestions(currentTest.questionsText);
                 } else {
                     throw new Error('No questions found in test data');
@@ -1784,7 +1908,7 @@
                 `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
 
-        // Navigation buttons
+        // Navigation buttons - now all in single row
         document.getElementById('prev-question').addEventListener('click', function() {
             if (currentQuestionIndex > 0) {
                 showQuestion(currentQuestionIndex - 1);
@@ -1797,12 +1921,34 @@
             }
         });
 
-        // Complete test button
+        // Complete test button - now in the same row
         document.getElementById('complete-test').addEventListener('click', function() {
+            if (isSubmitting) {
+                return; // Prevent multiple clicks
+            }
+            
             if (confirm('Are you sure you want to complete the test? You cannot go back once submitted.')) {
                 submitTest();
             }
         });
+
+        // ===== SHOW SUBMISSION OVERLAY =====
+        function showSubmissionOverlay() {
+            const overlay = document.getElementById('submission-overlay');
+            overlay.style.display = 'flex';
+            // Disable all buttons
+            document.getElementById('complete-test').disabled = true;
+            document.getElementById('prev-question').disabled = true;
+            document.getElementById('next-question').disabled = true;
+            isSubmitting = true;
+        }
+
+        // ===== HIDE SUBMISSION OVERLAY =====
+        function hideSubmissionOverlay() {
+            const overlay = document.getElementById('submission-overlay');
+            overlay.style.display = 'none';
+            isSubmitting = false;
+        }
 
         // ===== SAVE RESULT TO FIREBASE =====
         async function saveResultToFirebase(resultData) {
@@ -1812,7 +1958,7 @@
             }
 
             try {
-                // Create a sanitized test name for collection name
+                // Create a sanitized test name for collection name (replace spaces and special characters)
                 const sanitizedTestName = currentTest.testName
                     .replace(/[^a-zA-Z0-9]/g, '_')
                     .toLowerCase();
@@ -1834,21 +1980,18 @@
                     studentAnswers: studentAnswers,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     resultId: resultId,
-                    date: new Date().toISOString().split('T')[0],
-                    coachingName: "QUEST COACHING CENTRE"
+                    coachingName: "Quest Coaching Centre",
+                    date: new Date().toISOString().split('T')[0] // YYYY-MM-DD format
                 };
 
-                // Save to Firebase - Two ways:
-                // 1. Save to main results collection
-                const mainResultRef = await db.collection('onlinetestresults').add(resultToSave);
-                
-                // 2. Also save to test-specific subcollection for better organization
-                const testSpecificRef = await db.collection('testresults')
+                // Save to Firebase
+                // Structure: questresults -> testName -> results -> individual results
+                const docRef = await db.collection('questcoachingresults')
                     .doc(sanitizedTestName)
                     .collection('results')
                     .add(resultToSave);
 
-                console.log("Result saved to Firebase with IDs:", mainResultRef.id, testSpecificRef.id);
+                console.log("Result saved to Firebase with ID:", docRef.id);
                 return true;
             } catch (error) {
                 console.error("Error saving result to Firebase:", error);
@@ -1858,75 +2001,99 @@
 
         // ===== TEST SUBMISSION & RESULT CALCULATION =====
         async function submitTest() {
+            // Prevent multiple submissions
+            if (isSubmitting) {
+                return;
+            }
+            
+            // Show submission overlay
+            showSubmissionOverlay();
+            
             // Clear timer
             if (timerInterval) {
                 clearInterval(timerInterval);
                 timerInterval = null;
             }
             
-            // Calculate results
-            const totalQuestions = currentQuestions.length;
-            let attempted = 0;
-            let correct = 0;
+            // Add a small delay to ensure overlay is visible
+            await new Promise(resolve => setTimeout(resolve, 500));
             
-            for (let i = 0; i < totalQuestions; i++) {
-                if (studentAnswers[i]) {
-                    attempted++;
-                    if (studentAnswers[i] === currentQuestions[i].correctAnswer) {
-                        correct++;
+            try {
+                // Calculate results
+                const totalQuestions = currentQuestions.length;
+                let attempted = 0;
+                let correct = 0;
+                
+                for (let i = 0; i < totalQuestions; i++) {
+                    if (studentAnswers[i]) {
+                        attempted++;
+                        if (studentAnswers[i] === currentQuestions[i].correctAnswer) {
+                            correct++;
+                        }
                     }
                 }
+                
+                const wrong = attempted - correct;
+                const totalMarks = currentTest.totalMarks || totalQuestions;
+                const marksPerQuestion = totalMarks / totalQuestions;
+                const marksObtained = correct * marksPerQuestion;
+                const percentage = (marksObtained / totalMarks) * 100;
+                
+                // Determine Division
+                let division = '';
+                let statusClass = '';
+                
+                if (percentage >= 60) {
+                    division = 'FIRST DIVISION';
+                    statusClass = 'first-division';
+                } else if (percentage >= 45) {
+                    division = 'SECOND DIVISION';
+                    statusClass = 'second-division';
+                } else if (percentage >= 33) {
+                    division = 'THIRD DIVISION';
+                    statusClass = 'third-division';
+                } else {
+                    division = 'FAIL';
+                    statusClass = 'fail-status';
+                }
+                
+                // Generate result ID
+                resultId = 'QCC' + Date.now() + Math.floor(Math.random() * 1000);
+                
+                // Prepare result data
+                currentResultData = {
+                    totalQuestions,
+                    attempted,
+                    correct,
+                    wrong,
+                    totalMarks,
+                    marksObtained: marksObtained.toFixed(2),
+                    percentage: percentage.toFixed(2),
+                    division,
+                    statusClass
+                };
+                
+                // Save result to Firebase
+                const saveSuccess = await saveResultToFirebase(currentResultData);
+                
+                // Small delay to show processing
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Hide overlay
+                hideSubmissionOverlay();
+                
+                if (!saveSuccess) {
+                    alert("Note: Result could not be saved to server, but you can still download your result.");
+                }
+                
+                // Display results
+                displayResults(currentResultData);
+                
+            } catch (error) {
+                console.error("Error submitting test:", error);
+                hideSubmissionOverlay();
+                alert("Error submitting test. Please try again.");
             }
-            
-            const wrong = attempted - correct;
-            const totalMarks = currentTest.totalMarks || totalQuestions;
-            const marksPerQuestion = totalMarks / totalQuestions;
-            const marksObtained = correct * marksPerQuestion;
-            const percentage = (marksObtained / totalMarks) * 100;
-            
-            // Determine Division
-            let division = '';
-            let statusClass = '';
-            
-            if (percentage >= 60) {
-                division = 'FIRST DIVISION';
-                statusClass = 'first-division';
-            } else if (percentage >= 45) {
-                division = 'SECOND DIVISION';
-                statusClass = 'second-division';
-            } else if (percentage >= 33) {
-                division = 'THIRD DIVISION';
-                statusClass = 'third-division';
-            } else {
-                division = 'FAIL';
-                statusClass = 'fail-status';
-            }
-            
-            // Generate result ID
-            resultId = 'QUEST' + Date.now().toString().slice(-8) + Math.floor(Math.random() * 100).toString().padStart(2, '0');
-            
-            // Prepare result data
-            currentResultData = {
-                totalQuestions,
-                attempted,
-                correct,
-                wrong,
-                totalMarks,
-                marksObtained: marksObtained.toFixed(2),
-                percentage: percentage.toFixed(2),
-                division,
-                statusClass
-            };
-            
-            // Save result to Firebase
-            const saveSuccess = await saveResultToFirebase(currentResultData);
-            
-            if (!saveSuccess) {
-                alert("Note: Result could not be saved to server, but you can still download your result.");
-            }
-            
-            // Display results
-            displayResults(currentResultData);
         }
 
         function displayResults(results) {
@@ -1981,6 +2148,7 @@
             studentAnswers = {};
             studentDetails = {};
             currentResultData = null;
+            isSubmitting = false;
             
             // Clear form
             document.getElementById('student-form').reset();
@@ -2015,7 +2183,7 @@
                 clone.style.width = '700px';
                 clone.style.padding = '30px';
                 clone.style.fontSize = '14px';
-                clone.style.border = '2px solid #2E7D32';
+                clone.style.border = '2px solid #1E88E5';
                 clone.style.borderRadius = '10px';
                 
                 // Add clone to body temporarily
@@ -2070,10 +2238,10 @@
                 pdf.setFontSize(10);
                 pdf.setTextColor(100, 100, 100);
                 pdf.text('This is an electronically generated result. No signature required.', 105, 287, { align: 'center' });
-                pdf.text(`Result ID: ${resultId} | QUEST COACHING CENTRE | ${new Date().toLocaleDateString()}`, 105, 292, { align: 'center' });
+                pdf.text(`Result ID: ${resultId} | Generated on: ${new Date().toLocaleDateString()}`, 105, 292, { align: 'center' });
                 
                 // Save the PDF
-                pdf.save(`QUEST_Result_${studentDetails.rollNumber}_${resultId}.pdf`);
+                pdf.save(`Quest_Result_${studentDetails.rollNumber}_${resultId}.pdf`);
                 
             } catch (error) {
                 console.error('Error generating PDF:', error);
