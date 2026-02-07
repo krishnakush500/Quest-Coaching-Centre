@@ -87,6 +87,20 @@
             background-color: #1ba87e;
             border-color: #1ba87e;
         }
+        /* New Dashboard Cards */
+        .dashboard-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 100%;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .dashboard-card .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -107,8 +121,8 @@
                     
                     <!-- Dashboard Cards -->
                     <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <div class="card text-center">
+                        <div class="col-md-3 mb-4">
+                            <div class="card text-center dashboard-card">
                                 <div class="card-body">
                                     <h5 class="card-title">Create Result</h5>
                                     <p class="card-text">Create a new exam result</p>
@@ -116,8 +130,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="card text-center">
+                        <div class="col-md-3 mb-4">
+                            <div class="card text-center dashboard-card">
                                 <div class="card-body">
                                     <h5 class="card-title">Draft Results</h5>
                                     <p class="card-text">View and edit draft results</p>
@@ -125,12 +139,21 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="card text-center">
+                        <div class="col-md-3 mb-4">
+                            <div class="card text-center dashboard-card">
                                 <div class="card-body">
                                     <h5 class="card-title">Old Results</h5>
                                     <p class="card-text">View published results</p>
                                     <button id="oldResultsBtn" class="btn btn-info">Go</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="card text-center dashboard-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Online Test Results</h5>
+                                    <p class="card-text">Check online test results</p>
+                                    <button id="onlineTestResultsBtn" class="btn btn-success">Open</button>
                                 </div>
                             </div>
                         </div>
@@ -326,6 +349,13 @@
                             <div class="simple-instruction">"View" button: See full result</div>
                             <div class="simple-instruction">"Edit" button: Make changes to result</div>
                         </div>
+
+                        <h6 class="text-primary mt-4">Online Test Results</h6>
+                        <div class="help-step">
+                            <div class="simple-instruction">"Online Test Results": Click to check online test results</div>
+                            <div class="simple-instruction">Opens testresult.html in new tab</div>
+                            <div class="simple-instruction">Use this for online test management</div>
+                        </div>
                     </div>
                     
                     <!-- Hindi Instructions -->
@@ -369,6 +399,13 @@
                             <div class="simple-instruction">प्रकाशित से: आप देख, एडिट या डिलीट कर सकते हैं</div>
                             <div class="simple-instruction">"View" बटन: पूरा रिजल्ट देखें</div>
                             <div class="simple-instruction">"Edit" बटन: रिजल्ट में बदलाव करें</div>
+                        </div>
+
+                        <h6 class="text-primary mt-4">ऑनलाइन टेस्ट रिजल्ट</h6>
+                        <div class="help-step">
+                            <div class="simple-instruction">"Online Test Results": ऑनलाइन टेस्ट रिजल्ट देखने के लिए क्लिक करें</div>
+                            <div class="simple-instruction">testresult.html नई टैब में खुल जाएगा</div>
+                            <div class="simple-instruction">इसे ऑनलाइन टेस्ट मैनेजमेंट के लिए उपयोग करें</div>
                         </div>
                     </div>
                 </div>
@@ -492,6 +529,7 @@
         const createResultBtn = document.getElementById('createResultBtn');
         const draftResultsBtn = document.getElementById('draftResultsBtn');
         const oldResultsBtn = document.getElementById('oldResultsBtn');
+        const onlineTestResultsBtn = document.getElementById('onlineTestResultsBtn'); // NEW
         
         const backToDashboardBtn = document.getElementById('backToDashboardBtn');
         const backToDashboardBtn2 = document.getElementById('backToDashboardBtn2');
@@ -609,6 +647,15 @@
         oldResultsBtn.addEventListener('click', () => {
             loadOldResults();
             showSection(oldResultsSection);
+        });
+        
+        // NEW: Online Test Results Button Handler
+        onlineTestResultsBtn.addEventListener('click', () => {
+            // Open testresult.html in a new tab
+            window.open('testresult.html', '_blank');
+            
+            // Optional: Show a toast notification
+            showToast('Opening Online Test Results...');
         });
         
         // Handle back to dashboard with confirmation for edited published results
