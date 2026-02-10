@@ -101,15 +101,6 @@
             flex-direction: column;
             justify-content: space-between;
         }
-        /* Online Test Button */
-        .online-test-btn {
-            background-color: #6f42c1;
-            border-color: #6f42c1;
-        }
-        .online-test-btn:hover {
-            background-color: #5e35b1;
-            border-color: #5e35b1;
-        }
     </style>
 </head>
 <body class="bg-light">
@@ -160,9 +151,9 @@
                         <div class="col-md-3 mb-4">
                             <div class="card text-center dashboard-card">
                                 <div class="card-body">
-                                    <h5 class="card-title">Online Test</h5>
-                                    <p class="card-text">Manage online tests</p>
-                                    <button id="onlineTestBtn" class="btn online-test-btn">Open</button>
+                                    <h5 class="card-title">Online Test Results</h5>
+                                    <p class="card-text">Check online test results</p>
+                                    <button id="onlineTestResultsBtn" class="btn btn-success">Open</button>
                                 </div>
                             </div>
                         </div>
@@ -290,7 +281,7 @@
         <div id="oldResultsSection" class="section">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>Published Results</h2>
-                                <button id="backToDashboardBtn3" class="btn btn-secondary">Back to Dashboard</button>
+                <button id="backToDashboardBtn3" class="btn btn-secondary">Back to Dashboard</button>
             </div>
             
             <div id="oldResultsList" class="row">
@@ -359,10 +350,10 @@
                             <div class="simple-instruction">"Edit" button: Make changes to result</div>
                         </div>
 
-                        <h6 class="text-primary mt-4">Online Test</h6>
+                        <h6 class="text-primary mt-4">Online Test Results</h6>
                         <div class="help-step">
-                            <div class="simple-instruction">"Online Test": Click to open Online Test Manager</div>
-                            <div class="simple-instruction">Opens publishtest.html in new tab</div>
+                            <div class="simple-instruction">"Online Test Results": Click to check online test results</div>
+                            <div class="simple-instruction">Opens testresult.html in new tab</div>
                             <div class="simple-instruction">Use this for online test management</div>
                         </div>
                     </div>
@@ -410,10 +401,10 @@
                             <div class="simple-instruction">"Edit" बटन: रिजल्ट में बदलाव करें</div>
                         </div>
 
-                        <h6 class="text-primary mt-4">ऑनलाइन टेस्ट</h6>
+                        <h6 class="text-primary mt-4">ऑनलाइन टेस्ट रिजल्ट</h6>
                         <div class="help-step">
-                            <div class="simple-instruction">"Online Test": ऑनलाइन टेस्ट मैनेजर खोलने के लिए क्लिक करें</div>
-                            <div class="simple-instruction">publishtest.html नई टैब में खुल जाएगा</div>
+                            <div class="simple-instruction">"Online Test Results": ऑनलाइन टेस्ट रिजल्ट देखने के लिए क्लिक करें</div>
+                            <div class="simple-instruction">testresult.html नई टैब में खुल जाएगा</div>
                             <div class="simple-instruction">इसे ऑनलाइन टेस्ट मैनेजमेंट के लिए उपयोग करें</div>
                         </div>
                     </div>
@@ -538,7 +529,7 @@
         const createResultBtn = document.getElementById('createResultBtn');
         const draftResultsBtn = document.getElementById('draftResultsBtn');
         const oldResultsBtn = document.getElementById('oldResultsBtn');
-        const onlineTestBtn = document.getElementById('onlineTestBtn'); // NEW ONLINE TEST BUTTON
+        const onlineTestResultsBtn = document.getElementById('onlineTestResultsBtn'); // NEW
         
         const backToDashboardBtn = document.getElementById('backToDashboardBtn');
         const backToDashboardBtn2 = document.getElementById('backToDashboardBtn2');
@@ -658,13 +649,13 @@
             showSection(oldResultsSection);
         });
         
-        // NEW: Online Test Button Handler
-        onlineTestBtn.addEventListener('click', () => {
-            // Open publishtest.html in a new tab
-            window.open('publishtest.html', '_blank');
+        // NEW: Online Test Results Button Handler
+        onlineTestResultsBtn.addEventListener('click', () => {
+            // Open testresult.html in a new tab
+            window.open('testresult.html', '_blank');
             
             // Optional: Show a toast notification
-            showToast('Opening Online Test Manager...');
+            showToast('Opening Online Test Results...');
         });
         
         // Handle back to dashboard with confirmation for edited published results
