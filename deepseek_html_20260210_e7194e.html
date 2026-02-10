@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STUDY POINT | Teacher Test Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-dark: #1b5e20;
+            --primary-light: #4caf50;
+            --secondary: #f1f8e9;
+            --text: #333;
+            --light-text: #666;
+            --border: #ddd;
+            --success: #4caf50;
+            --error: #f44336;
+            --warning: #ff9800;
+            --info: #2196f3;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+        
+        h1 {
+            color: var(--primary-dark);
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: var(--light-text);
+            font-size: 1.1rem;
+        }
+        
+        .help-btn {
+            background-color: var(--info);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .help-btn:hover {
+            background-color: #0d8bf2;
+            transform: translateY(-2px);
+        }
+        
+        .panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        h2 {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--secondary);
+            font-size: 1.8rem;
+        }
+        
+        h3 {
+            color: var(--primary);
+            margin: 20px 0 15px 0;
+            font-size: 1.4rem;
+        }
+        
+        .tab-container {
+            display: flex;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 25px;
+        }
+        
+        .tab {
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--light-text);
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab:hover {
+            color: var(--primary);
+        }
+        
+        .tab.active {
+            color: var(--primary-dark);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        label i {
+            color: var(--primary);
+        }
+        
+        input, textarea, select {
+            padding: 13px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+        }
+        
+        textarea {
+            min-height: 280px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+        }
+        
+        .helper-text {
+            background-color: var(--secondary);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .example {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: var(--light-text);
+            border-left: 3px solid var(--border);
+        }
+        
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-secondary {
+            background-color: var(--info);
+            margin-top: 10px;
+            width: auto;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #0d8bf2;
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+        }
+        
+        .btn-danger {
+            background-color: var(--error);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .message.show {
+            display: flex;
+        }
+        
+        .success {
+            background-color: #e8f5e9;
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+        
+        .error {
+            background-color: #ffebee;
+            color: var(--error);
+            border-left: 4px solid var(--error);
+        }
+        
+        .parse-info {
+            background-color: #e3f2fd;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #1565c0;
+            border-left: 4px solid #2196f3;
+            display: none;
+        }
+        
+        .parse-info.show {
+            display: block;
+        }
+        
+        .test-list {
+            margin-top: 20px;
+        }
+        
+        .test-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary);
+            transition: transform 0.3s;
+        }
+        
+        .test-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .test-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        
+        .test-meta {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            color: var(--light-text);
+            font-size: 0.9rem;
+        }
+        
+        .test-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-draft {
+            background-color: #f5f5f5;
+            color: #666;
+        }
+        
+        .status-active {
+            background-color: #e8f5e9;
+            color: var(--success);
+        }
+        
+        .status-scheduled {
+            background-color: #fff3e0;
+            color: var(--warning);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--light-text);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--border);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--light-text);
+            font-size: 0.9rem;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 2px solid var(--secondary);
+        }
+        
+        .modal-title {
+            font-size: 1.8rem;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--light-text);
+            padding: 5px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-close:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .modal-content {
+            padding: 25px;
+        }
+        
+        .language-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .lang-tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--light-text);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .lang-tab:hover {
+            color: var(--primary);
+        }
+        
+        .lang-tab.active {
+            color: var(--primary-dark);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .lang-content {
+            display: none;
+        }
+        
+        .lang-content.active {
+            display: block;
+        }
+        
+        .instruction-section {
+            margin-bottom: 25px;
+        }
+        
+        .instruction-section h4 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .instruction-section ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .instruction-section li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        .note-box {
+            background-color: #fff3e0;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--warning);
+            margin-top: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header-top {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .panel {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn {
+                padding: 14px 20px;
+            }
+            
+            .test-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .test-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .tab {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+            
+            .modal {
+                max-height: 95vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Help Modal -->
+    <div class="modal-overlay" id="helpModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-graduation-cap"></i> How to Use - Test Creation Guide</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div class="language-tabs">
+                    <button class="lang-tab active" data-lang="hindi">हिंदी</button>
+                    <button class="lang-tab" data-lang="english">English</button>
+                </div>
+                
+                <div id="hindi-content" class="lang-content active">
+                    <div class="instruction-section">
+                        <h4><i class="fas fa-info-circle"></i> नया टेस्ट कैसे बनाएं?</h4>
+                        <ul>
+                            <li><strong>Step 1:</strong> "Create New Test" टैब पर क्लिक करें</li>
+                            <li><strong>Step 2:</strong> टेस्ट का नाम लिखें (जैसे: Physics Midterm)</li>
+                            <li><strong>Step 3:</strong> कुल प्रश्नों की संख्या लिखें (जैसे: 30)</li>
+                            <li><strong>Step 4:</strong> कुल अंक लिखें (जैसे: 100)</li>
+                            <li><strong>Step 5:</strong> समय (मिनट में) लिखें (जैसे: 60)</li>
+                            <li><strong>Step 6:</strong> नीचे दिए गए फॉर्मेट में प्रश्न पेस्ट करें</li>
+                            <li><strong>Step 7:</strong> "Publish Test" बटन दबाएं</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="instruction-section">
+                        <h4><i class="fas fa-question-circle"></i> प्रश्न कैसे लिखें?</h4>
+                        <div class="example">
+Q1. फ्रांस की राजधानी क्या है?<br>
+(A) लंदन<br>
+(B) बर्लिन<br>
+(C) पेरिस<br>
+(D) मैड्रिड<br>
+Answer: C<br>
+<br>
+Q2. लाल ग्रह किसे कहते हैं?<br>
+(A) पृथ्वी<br>
+(B) मंगल<br>
+(C) बृहस्पति<br>
+(D) शुक्र<br>
+Answer: B
+                        </div>
+                        <p><strong>ध्यान दें:</strong> प्रत्येक प्रश्न के बाद एक खाली लाइन छोड़ें</p>
+                    </div>
+                    
+                    <div class="instruction-section">
+                        <h4><i class="fas fa-edit"></i> टेस्ट एडिट या डिलीट कैसे करें?</h4>
+                        <ul>
+                            <li><strong>Published Tests</strong> टैब पर जाएं</li>
+                            <li>सभी टेस्ट्स की लिस्ट दिखेगी</li>
+                            <li><strong>Edit</strong> बटन पर क्लिक करके टेस्ट बदल सकते हैं</li>
+                            <li><strong>Delete</strong> बटन से टेस्ट हटा सकते हैं</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="note-box">
+                        <strong><i class="fas fa-lightbulb"></i> टिप:</strong> आप एक बार में 200 प्रश्नों तक का टेस्ट बना सकते हैं। प्रश्न हमेशा नीचे दिए गए फॉर्मेट में लिखें।
+                    </div>
+                </div>
+                
+                <div id="english-content" class="lang-content">
+                    <div class="instruction-section">
+                        <h4><i class="fas fa-info-circle"></i> How to Create a New Test?</h4>
+                        <ul>
+                            <li><strong>Step 1:</strong> Click on "Create New Test" tab</li>
+                            <li><strong>Step 2:</strong> Write test name (e.g.: Physics Midterm)</li>
+                            <li><strong>Step 3:</strong> Enter total number of questions (e.g.: 30)</li>
+                            <li><strong>Step 4:</strong> Enter total marks (e.g.: 100)</li>
+                            <li><strong>Step 5:</strong> Enter time in minutes (e.g.: 60)</li>
+                            <li><strong>Step 6:</strong> Paste questions in the format shown below</li>
+                            <li><strong>Step 7:</strong> Click "Publish Test" button</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="instruction-section">
+                        <h4><i class="fas fa-question-circle"></i> How to Write Questions?</h4>
+                        <div class="example">
+Q1. What is the capital of France?<br>
+(A) London<br>
+(B) Berlin<br>
+(C) Paris<br>
+(D) Madrid<br>
+Answer: C<br>
+<br>
+Q2. Which planet is known as the Red Planet?<br>
+(A) Earth<br>
+(B) Mars<br>
+(C) Jupiter<br>
+(D) Venus<br>
+Answer: B
+                        </div>
+                        <p><strong>Note:</strong> Leave one blank line after each question</p>
+                    </div>
+                    
+                    <div class="instruction-section">
+                        <h4><i class="fas fa-edit"></i> How to Edit or Delete Tests?</h4>
+                        <ul>
+                            <li>Go to <strong>Published Tests</strong> tab</li>
+                            <li>You will see list of all tests</li>
+                            <li>Click <strong>Edit</strong> button to modify any test</li>
+                            <li>Click <strong>Delete</strong> button to remove any test</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="note-box">
+                        <strong><i class="fas fa-lightbulb"></i> Tip:</strong> You can create tests with up to 200 questions. Always write questions in the format shown above.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <div class="logo">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <div>
+                        <h1>STUDY POINT Coaching Centre</h1>
+                        <p class="subtitle">Teacher Test Management System</p>
+                    </div>
+                </div>
+                <button class="help-btn" id="openHelp">
+                    <i class="fas fa-question-circle"></i> How to Use
+                </button>
+            </div>
+        </header>
+        
+        <div class="panel">
+            <div class="tab-container">
+                <button class="tab active" data-tab="create-test">
+                    <i class="fas fa-plus-circle"></i> Create New Test
+                </button>
+                <button class="tab" data-tab="old-tests">
+                    <i class="fas fa-history"></i> Published Tests
+                </button>
+            </div>
+            
+            <!-- Create Test Tab -->
+            <div id="create-test" class="tab-content active">
+                <h2><i class="fas fa-upload"></i> Create New Test</h2>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="testName"><i class="fas fa-pen"></i> Test Name</label>
+                        <input type="text" id="testName" placeholder="e.g. Physics Midterm Exam">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="totalQuestions"><i class="fas fa-list-ol"></i> Total Questions</label>
+                        <input type="number" id="totalQuestions" placeholder="e.g. 30" min="1" max="200">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="totalMarks"><i class="fas fa-star"></i> Total Marks</label>
+                        <input type="number" id="totalMarks" placeholder="e.g. 100" min="1" max="500">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="duration"><i class="fas fa-clock"></i> Duration (minutes)</label>
+                        <input type="number" id="duration" placeholder="e.g. 60" min="1" max="300">
+                    </div>
+                </div>
+                
+                <div class="helper-text">
+                    <h4><i class="fas fa-info-circle"></i> How to format your questions:</h4>
+                    <div class="example">
+Q1. What is the capital of France?<br>
+(A) London<br>
+(B) Berlin<br>
+(C) Paris<br>
+(D) Madrid<br>
+Answer: C<br>
+<br>
+Q2. Which planet is known as the Red Planet?<br>
+(A) Earth<br>
+(B) Mars<br>
+(C) Jupiter<br>
+(D) Venus<br>
+Answer: B
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="questionsText"><i class="fas fa-question-circle"></i> Questions Text</label>
+                    <textarea id="questionsText" placeholder="Paste all your questions here..."></textarea>
+                    <div id="parseInfo" class="parse-info">
+                        Parsed: <span id="parsedCount">0</span> questions successfully
+                    </div>
+                </div>
+                
+                <button id="uploadBtn" class="btn">
+                    <i class="fas fa-cloud-upload-alt"></i> Publish Test
+                </button>
+                
+                <div id="message" class="message"></div>
+            </div>
+            
+            <!-- Old Tests Tab -->
+            <div id="old-tests" class="tab-content">
+                <h2><i class="fas fa-history"></i> Published Tests</h2>
+                
+                <div class="test-list" id="testsList">
+                    <!-- Tests will be loaded here -->
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>Loading tests...</h3>
+                        <p>Please wait while we fetch your tests</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>STUDY POINT Coaching Centre &copy; 2023 | Test Management System</p>
+            <p>All tests stored securely in Firebase</p>
+        </footer>
+    </div>
+
+    <script>
+        // STUDY POINT Coaching Centre Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBDN5ATO_LQ-3THveZDGyvLjtjjavgTIJk",
+            authDomain: "study-point-coaching-centre.firebaseapp.com",
+            projectId: "study-point-coaching-centre",
+            storageBucket: "study-point-coaching-centre.firebasestorage.app",
+            messagingSenderId: "1044456595909",
+            appId: "1:1044456595909:web:ca77701e20483dc640abac"
+        };
+        
+        let db = null;
+        let editingTestId = null;
+        
+        // DOM elements
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const helpModal = document.getElementById('helpModal');
+        const openHelpBtn = document.getElementById('openHelp');
+        const closeModalBtn = document.getElementById('closeModal');
+        const langTabs = document.querySelectorAll('.lang-tab');
+        const langContents = document.querySelectorAll('.lang-content');
+        
+        // Test inputs
+        const testNameInput = document.getElementById('testName');
+        const totalQuestionsInput = document.getElementById('totalQuestions');
+        const totalMarksInput = document.getElementById('totalMarks');
+        const durationInput = document.getElementById('duration');
+        const questionsTextInput = document.getElementById('questionsText');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const messageDiv = document.getElementById('message');
+        const parseInfoDiv = document.getElementById('parseInfo');
+        const parsedCountSpan = document.getElementById('parsedCount');
+        const testsListDiv = document.getElementById('testsList');
+        
+        // Prevent auto scroll
+        window.addEventListener('load', function() {
+            // Stop any auto scrolling
+            window.scrollTo(0, 0);
+            
+            // Initialize
+            setTimeout(initializeFirebase, 100);
+        });
+        
+        // Open Help Modal
+        openHelpBtn.addEventListener('click', function() {
+            helpModal.classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        });
+        
+        // Close Help Modal
+        closeModalBtn.addEventListener('click', function() {
+            helpModal.classList.remove('show');
+            document.body.style.overflow = 'auto'; // Enable background scrolling
+        });
+        
+        // Close modal when clicking outside
+        helpModal.addEventListener('click', function(e) {
+            if (e.target === helpModal) {
+                helpModal.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Language tabs in modal
+        langTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const lang = this.getAttribute('data-lang');
+                
+                // Update active tab
+                langTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show active content
+                langContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === `${lang}-content`) {
+                        content.classList.add('active');
+                    }
+                });
+            });
+        });
+        
+        // Tab switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Show active content
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === tabId) {
+                        content.classList.add('active');
+                    }
+                });
+                
+                // Load tests when old-tests tab is clicked
+                if (tabId === 'old-tests') {
+                    loadPublishedTests();
+                }
+                
+                // Scroll to top smoothly
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Initialize Firebase
+        function initializeFirebase() {
+            try {
+                const app = firebase.initializeApp(firebaseConfig);
+                db = app.firestore();
+                showMessage('Connected to STUDY POINT database successfully!', true);
+                
+                // Load tests on initial load
+                loadPublishedTests();
+                
+            } catch (error) {
+                console.error('Firebase initialization error:', error);
+                if (error.code === 'app/duplicate-app') {
+                    // If already initialized, get the existing app
+                    db = firebase.app().firestore();
+                    showMessage('Connected to STUDY POINT database successfully!', true);
+                    loadPublishedTests();
+                } else {
+                    showMessage('Failed to connect to database: ' + error.message, false);
+                }
+            }
+        }
+        
+        // Parse questions from text
+        function parseQuestions(text) {
+            const questions = [];
+            const lines = text.split('\n');
+            let currentQuestion = null;
+            let optionBuffer = [];
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                const questionMatch = line.match(/^(Q?\d+\.|Question\s*\d+\.?)\s*(.+)/i);
+                if (questionMatch) {
+                    if (currentQuestion && optionBuffer.length > 0) {
+                        currentQuestion.options = [...optionBuffer];
+                        questions.push(currentQuestion);
+                    }
+                    
+                    currentQuestion = {
+                        text: questionMatch[2].trim(),
+                        options: [],
+                        correctAnswer: ''
+                    };
+                    optionBuffer = [];
+                    continue;
+                }
+                
+                const optionMatch = line.match(/^\(([A-D])\)\s*(.+)/i);
+                if (optionMatch && currentQuestion) {
+                    optionBuffer.push(optionMatch[2].trim());
+                    continue;
+                }
+                
+                const answerMatch = line.match(/^Answer:\s*([A-D])/i);
+                if (answerMatch && currentQuestion) {
+                    currentQuestion.correctAnswer = answerMatch[1].toUpperCase();
+                    continue;
+                }
+                
+                if (currentQuestion && !optionMatch && !answerMatch) {
+                    if (line.match(/^[a-d]\)/i) && optionBuffer.length > 0) {
+                        const altOptionMatch = line.match(/^([a-d])\)\s*(.+)/i);
+                        if (altOptionMatch) {
+                            optionBuffer.push(altOptionMatch[2].trim());
+                        }
+                    } else if (!line.match(/^\d+\./)) {
+                        currentQuestion.text += ' ' + line;
+                    }
+                }
+            }
+            
+            if (currentQuestion && optionBuffer.length > 0) {
+                currentQuestion.options = [...optionBuffer];
+                if (currentQuestion.correctAnswer) {
+                    questions.push(currentQuestion);
+                }
+            }
+            
+            return questions;
+        }
+        
+        // Show message
+        function showMessage(text, isSuccess) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${isSuccess ? 'success' : 'error'} show`;
+            
+            // Don't auto scroll to message
+            // Only show it in place
+            
+            if (isSuccess) {
+                setTimeout(() => {
+                    messageDiv.classList.remove('show');
+                }, 5000);
+            }
+        }
+        
+        // Update parse info
+        function updateParseInfo(count) {
+            if (count > 0) {
+                parsedCountSpan.textContent = count;
+                parseInfoDiv.classList.add('show');
+            } else {
+                parseInfoDiv.classList.remove('show');
+            }
+        }
+        
+        // Validate form
+        function validateForm() {
+            if (!testNameInput.value.trim()) {
+                showMessage('Please enter a test name', false);
+                testNameInput.focus();
+                return false;
+            }
+            
+            const questionsText = questionsTextInput.value.trim();
+            if (!questionsText) {
+                showMessage('Please paste your questions', false);
+                questionsTextInput.focus();
+                return false;
+            }
+            
+            const parsedQuestions = parseQuestions(questionsText);
+            if (parsedQuestions.length === 0) {
+                showMessage('Could not parse any valid questions', false);
+                return false;
+            }
+            
+            updateParseInfo(parsedQuestions.length);
+            return parsedQuestions;
+        }
+        
+        // Upload test
+        uploadBtn.addEventListener('click', async function() {
+            const parsedQuestions = validateForm();
+            if (!parsedQuestions) return;
+            
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = '<div class="loading"></div> Publishing...';
+            
+            try {
+                const now = Date.now();
+                
+                const testData = {
+                    testName: testNameInput.value.trim(),
+                    totalQuestions: parseInt(totalQuestionsInput.value) || parsedQuestions.length,
+                    totalMarks: parseInt(totalMarksInput.value) || 100,
+                    duration: parseInt(durationInput.value) || 60,
+                    questions: parsedQuestions,
+                    status: 'active',
+                    isLive: true,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdTimestamp: now,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                if (editingTestId) {
+                    // Update existing test
+                    await db.collection('tests').doc(editingTestId).update(testData);
+                    showMessage(`Test updated successfully!`, true);
+                    editingTestId = null;
+                    uploadBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Publish Test';
+                } else {
+                    // Create new test - "tests" collection mein save karenge
+                    await db.collection('tests').add(testData);
+                    showMessage(`Test published successfully!`, true);
+                }
+                
+                // Clear form
+                resetForm();
+                
+                // Switch to old tests tab
+                document.querySelector('[data-tab="old-tests"]').click();
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                showMessage(`Failed to publish: ${error.message}`, false);
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Publish Test';
+            }
+        });
+        
+        // Load published tests from "tests" collection
+        async function loadPublishedTests() {
+            try {
+                testsListDiv.innerHTML = '<div class="empty-state"><div class="loading"></div><p>Loading tests...</p></div>';
+                
+                const snapshot = await db.collection('tests')
+                    .orderBy('createdTimestamp', 'desc')
+                    .get();
+                
+                console.log('Total tests found:', snapshot.size);
+                
+                if (snapshot.empty) {
+                    testsListDiv.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-clipboard-list"></i>
+                            <h3>No tests published yet</h3>
+                            <p>Create your first test using the "Create New Test" tab</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let testsHTML = '';
+                snapshot.forEach(doc => {
+                    const test = doc.data();
+                    const testId = doc.id;
+                    
+                    console.log('Test found:', test.testName, test);
+                    
+                    // Format date
+                    let createdDate = 'Unknown date';
+                    if (test.createdAt && test.createdAt.toDate) {
+                        createdDate = test.createdAt.toDate().toLocaleDateString('en-IN', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                        });
+                    } else if (test.createdTimestamp) {
+                        createdDate = new Date(test.createdTimestamp).toLocaleDateString('en-IN', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                        });
+                    }
+                    
+                    const statusClass = test.status === 'active' ? 'status-active' : 
+                                      test.status === 'draft' ? 'status-draft' : 'status-scheduled';
+                    
+                    // Check if test has questions array
+                    const questionCount = test.questions ? 
+                        (Array.isArray(test.questions) ? test.questions.length : 0) : 
+                        (test.totalQuestions || 0);
+                    
+                    testsHTML += `
+                        <div class="test-item" data-test-id="${testId}">
+                            <div class="test-header">
+                                <div class="test-title">${test.testName || 'Unnamed Test'}</div>
+                                <span class="status-badge ${statusClass}">${(test.status || 'active').toUpperCase()}</span>
+                            </div>
+                            <div class="test-meta">
+                                <span><i class="fas fa-question-circle"></i> ${questionCount} Questions</span>
+                                <span><i class="fas fa-star"></i> ${test.totalMarks || 100} Marks</span>
+                                <span><i class="fas fa-clock"></i> ${test.duration || 60} mins</span>
+                                <span><i class="fas fa-calendar"></i> ${createdDate}</span>
+                            </div>
+                            <div class="test-actions">
+                                <button class="btn-small btn-success edit-test" data-test-id="${testId}">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn-small btn-danger delete-test" data-test-id="${testId}">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                testsListDiv.innerHTML = testsHTML;
+                
+                // Add event listeners for edit and delete buttons
+                document.querySelectorAll('.edit-test').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const testId = this.getAttribute('data-test-id');
+                        editTest(testId);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-test').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const testId = this.getAttribute('data-test-id');
+                        deleteTest(testId);
+                    });
+                });
+                
+            } catch (error) {
+                console.error('Error loading tests:', error);
+                testsListDiv.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Error loading tests</h3>
+                        <p>${error.message}</p>
+                        <p>Please check if Firebase permissions are set correctly</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Edit test
+        async function editTest(testId) {
+            try {
+                const doc = await db.collection('tests').doc(testId).get();
+                
+                if (!doc.exists) {
+                    showMessage('Test not found', false);
+                    return;
+                }
+                
+                const test = doc.data();
+                editingTestId = testId;
+                
+                console.log('Editing test:', test);
+                
+                // Fill form with test data
+                testNameInput.value = test.testName || '';
+                totalQuestionsInput.value = test.totalQuestions || (test.questions ? test.questions.length : 0) || 0;
+                totalMarksInput.value = test.totalMarks || 100;
+                durationInput.value = test.duration || 60;
+                
+                // Convert questions to text format
+                let questionsText = '';
+                if (test.questions && Array.isArray(test.questions)) {
+                    test.questions.forEach((q, index) => {
+                        questionsText += `Q${index + 1}. ${q.text || q.question || ''}\n`;
+                        
+                        if (q.options && Array.isArray(q.options)) {
+                            q.options.forEach((option, optIndex) => {
+                                const optionLetter = String.fromCharCode(65 + optIndex);
+                                questionsText += `(${optionLetter}) ${option}\n`;
+                            });
+                        }
+                        
+                        if (q.correctAnswer) {
+                            questionsText += `Answer: ${q.correctAnswer}\n`;
+                        } else if (q.answer) {
+                            questionsText += `Answer: ${q.answer}\n`;
+                        }
+                        
+                        questionsText += '\n';
+                    });
+                }
+                
+                questionsTextInput.value = questionsText.trim();
+                
+                // Update UI
+                uploadBtn.innerHTML = '<i class="fas fa-save"></i> Update Test';
+                document.querySelector('[data-tab="create-test"]').click();
+                
+                showMessage('Test loaded for editing', true);
+                
+            } catch (error) {
+                console.error('Error loading test:', error);
+                showMessage(`Failed to load test: ${error.message}`, false);
+            }
+        }
+        
+        // Delete test
+        async function deleteTest(testId) {
+            if (!confirm('Are you sure you want to delete this test? This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                await db.collection('tests').doc(testId).delete();
+                showMessage('Test deleted successfully', true);
+                loadPublishedTests();
+            } catch (error) {
+                console.error('Error deleting test:', error);
+                showMessage(`Failed to delete: ${error.message}`, false);
+            }
+        }
+        
+        // Reset form
+        function resetForm() {
+            testNameInput.value = '';
+            totalQuestionsInput.value = '';
+            totalMarksInput.value = '';
+            durationInput.value = '';
+            questionsTextInput.value = '';
+            parseInfoDiv.classList.remove('show');
+            editingTestId = null;
+            uploadBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Publish Test';
+        }
+        
+        // Parse questions when typing
+        questionsTextInput.addEventListener('input', () => {
+            const text = questionsTextInput.value.trim();
+            if (text) {
+                const parsedQuestions = parseQuestions(text);
+                updateParseInfo(parsedQuestions.length);
+            } else {
+                parseInfoDiv.classList.remove('show');
+            }
+        });
+        
+        // Escape key to close modal
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && helpModal.classList.contains('show')) {
+                helpModal.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
+        });
+    </script>
+</body>
+</html>
