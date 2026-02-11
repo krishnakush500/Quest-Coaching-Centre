@@ -207,7 +207,7 @@
         }
         
         textarea {
-            min-height: 400px; /* Increased height for mobile */
+            min-height: 400px;
             resize: vertical;
             font-family: 'Courier New', monospace;
             line-height: 1.5;
@@ -279,6 +279,10 @@
         
         .btn-success {
             background-color: var(--success);
+        }
+        
+        .btn-info {
+            background-color: var(--info);
         }
         
         .message {
@@ -375,6 +379,7 @@
             display: flex;
             gap: 8px;
             margin-top: 12px;
+            flex-wrap: wrap;
         }
         
         .status-badge {
@@ -394,6 +399,11 @@
         .status-active {
             background-color: #e8f5e9;
             color: var(--success);
+        }
+        
+        .status-inactive {
+            background-color: #ffebee;
+            color: var(--error);
         }
         
         .status-scheduled {
@@ -436,7 +446,7 @@
             border-top: 1px solid var(--border);
         }
         
-        /* Modal Styles - FIXED */
+        /* Modal Styles */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -478,7 +488,6 @@
             }
         }
         
-        /* FIXED: Modal header sticks to top */
         .modal-header {
             display: flex;
             justify-content: space-between;
@@ -500,7 +509,6 @@
             gap: 8px;
         }
         
-        /* FIXED: Close button stays in place */
         .modal-close {
             background: none;
             border: none;
@@ -537,7 +545,7 @@
             margin-bottom: 15px;
             border-bottom: 2px solid var(--border);
             position: sticky;
-            top: 75px; /* Adjusted to be below header */
+            top: 75px;
             background: white;
             z-index: 5;
             padding-top: 10px;
@@ -606,6 +614,166 @@
             border-left: 4px solid var(--warning);
             margin-top: 12px;
             font-size: 0.95rem;
+        }
+        
+        /* Results Modal Styles */
+        .results-list {
+            margin-top: 20px;
+        }
+        
+        .result-item {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--info);
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .student-name {
+            font-weight: 600;
+            color: var(--primary-dark);
+            font-size: 1.1rem;
+        }
+        
+        .score {
+            font-weight: 600;
+            color: var(--success);
+            font-size: 1.1rem;
+        }
+        
+        .result-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .result-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .details-content {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        
+        .details-content.show {
+            display: block;
+        }
+        
+        .question-detail {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .question-detail:last-child {
+            border-bottom: none;
+        }
+        
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        
+        .options-list {
+            margin-left: 20px;
+        }
+        
+        .option {
+            margin-bottom: 4px;
+            padding: 4px 0;
+        }
+        
+        .option.correct {
+            color: var(--success);
+            font-weight: 600;
+        }
+        
+        .option.incorrect {
+            color: var(--error);
+        }
+        
+        .option.selected {
+            background-color: #fff3e0;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        
+        .result-summary {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--secondary);
+            border-radius: 8px;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .summary-item {
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+        
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .summary-label {
+            font-size: 0.85rem;
+            color: var(--light-text);
+        }
+        
+        .division-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .division-first {
+            background-color: gold;
+            color: #333;
+        }
+        
+        .division-second {
+            background-color: silver;
+            color: #333;
+        }
+        
+        .division-third {
+            background-color: #cd7f32;
+            color: white;
+        }
+        
+        .division-fail {
+            background-color: #666;
+            color: white;
         }
         
         /* Format hint inside textarea */
@@ -683,7 +851,7 @@
             }
             
             textarea {
-                min-height: 450px; /* Mobile ke liye aur bada textarea */
+                min-height: 450px;
                 font-size: 0.95rem;
             }
             
@@ -735,7 +903,7 @@
             }
             
             .language-tabs {
-                top: 65px; /* Adjusted for mobile */
+                top: 65px;
             }
             
             .test-item {
@@ -750,6 +918,17 @@
             .test-meta {
                 font-size: 0.8rem;
                 gap: 8px;
+            }
+            
+            .result-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .result-actions {
+                width: 100%;
+                justify-content: space-between;
             }
         }
         
@@ -768,7 +947,7 @@
             }
             
             textarea {
-                min-height: 500px; /* Chhote screens ke liye aur bada */
+                min-height: 500px;
             }
             
             .form-group label {
@@ -794,6 +973,10 @@
                 padding: 8px 12px;
                 font-size: 0.85rem;
             }
+            
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         @media (max-width: 360px) {
@@ -810,12 +993,20 @@
             }
             
             textarea {
-                min-height: 550px; /* Sabse chhote screens ke liye maximum height */
+                min-height: 550px;
             }
             
             .btn {
                 padding: 10px 16px;
                 font-size: 0.9rem;
+            }
+            
+            .test-actions {
+                flex-direction: column;
+            }
+            
+            .result-actions {
+                flex-direction: column;
             }
         }
     </style>
@@ -843,8 +1034,9 @@
                             <li><strong>Step 3:</strong> कुल प्रश्नों की संख्या लिखें (जैसे: 30)</li>
                             <li><strong>Step 4:</strong> कुल अंक लिखें (जैसे: 100)</li>
                             <li><strong>Step 5:</strong> समय (मिनट में) लिखें (जैसे: 60)</li>
-                            <li><strong>Step 6:</strong> नीचे दिए गए फॉर्मेट में प्रश्न पेस्ट करें</li>
-                            <li><strong>Step 7:</strong> "Publish Test" बटन दबाएं</li>
+                            <li><strong>Step 6:</strong> टेस्ट स्टेटस चुनें (Active/Inactive)</li>
+                            <li><strong>Step 7:</strong> नीचे दिए गए फॉर्मेट में प्रश्न पेस्ट करें</li>
+                            <li><strong>Step 8:</strong> "Publish Test" बटन दबाएं</li>
                         </ul>
                     </div>
                     
@@ -875,6 +1067,8 @@
                             <li><strong>Published Tests</strong> टैब पर जाएं</li>
                             <li>सभी टेस्ट्स की लिस्ट दिखेगी</li>
                             <li><strong>Edit</strong> बटन पर क्लिक करके टेस्ट बदल सकते हैं</li>
+                            <li><strong>Status Change</strong> बटन से Active/Inactive कर सकते हैं</li>
+                            <li><strong>Results</strong> बटन से स्टूडेंट्स के रिजल्ट देख सकते हैं</li>
                             <li><strong>Delete</strong> बटन से टेस्ट हटा सकते हैं</li>
                         </ul>
                     </div>
@@ -893,8 +1087,9 @@
                             <li><strong>Step 3:</strong> Enter total number of questions (e.g.: 30)</li>
                             <li><strong>Step 4:</strong> Enter total marks (e.g.: 100)</li>
                             <li><strong>Step 5:</strong> Enter time in minutes (e.g.: 60)</li>
-                            <li><strong>Step 6:</strong> Paste questions in the format shown below</li>
-                            <li><strong>Step 7:</strong> Click "Publish Test" button</li>
+                            <li><strong>Step 6:</strong> Select test status (Active/Inactive)</li>
+                            <li><strong>Step 7:</strong> Paste questions in the format shown below</li>
+                            <li><strong>Step 8:</strong> Click "Publish Test" button</li>
                         </ul>
                     </div>
                     
@@ -925,6 +1120,8 @@
                             <li>Go to <strong>Published Tests</strong> tab</li>
                             <li>You will see list of all tests</li>
                             <li>Click <strong>Edit</strong> button to modify any test</li>
+                            <li>Click <strong>Status Change</strong> to toggle Active/Inactive</li>
+                            <li>Click <strong>Results</strong> to view student results</li>
                             <li>Click <strong>Delete</strong> button to remove any test</li>
                         </ul>
                     </div>
@@ -932,6 +1129,36 @@
                     <div class="note-box">
                         <strong><i class="fas fa-lightbulb"></i> Tip:</strong> You can create tests with up to 200 questions. Always write questions in the format shown above.
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Results Modal -->
+    <div class="modal-overlay" id="resultsModal">
+        <div class="modal" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-chart-bar"></i> Test Results</h3>
+                <button class="modal-close" id="closeResultsModal">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div id="resultsContent">
+                    <!-- Results will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Result Details Modal -->
+    <div class="modal-overlay" id="resultDetailsModal">
+        <div class="modal" style="max-width: 1000px;">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-file-alt"></i> Student Result Details</h3>
+                <button class="modal-close" id="closeDetailsModal">&times;</button>
+            </div>
+            <div class="modal-content">
+                <div id="resultDetailsContent">
+                    <!-- Result details will be loaded here -->
                 </div>
             </div>
         </div>
@@ -986,6 +1213,14 @@
                     <div class="form-group">
                         <label for="duration"><i class="fas fa-clock"></i> Duration (minutes)</label>
                         <input type="number" id="duration" placeholder="e.g. 60" min="1" max="300">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="testStatus"><i class="fas fa-toggle-on"></i> Test Status</label>
+                        <select id="testStatus">
+                            <option value="active">Active (Live Immediately)</option>
+                            <option value="inactive">Inactive (Not Live)</option>
+                        </select>
                     </div>
                 </div>
                 
@@ -1063,6 +1298,9 @@ Note: Leave one blank line after each question"></textarea>
         
         let db = null;
         let editingTestId = null;
+        let currentResultsTestId = null;
+        let currentResultsData = null;
+        let currentTestName = null;
         
         // DOM elements
         const tabs = document.querySelectorAll('.tab');
@@ -1078,6 +1316,7 @@ Note: Leave one blank line after each question"></textarea>
         const totalQuestionsInput = document.getElementById('totalQuestions');
         const totalMarksInput = document.getElementById('totalMarks');
         const durationInput = document.getElementById('duration');
+        const testStatusInput = document.getElementById('testStatus');
         const questionsTextInput = document.getElementById('questionsText');
         const uploadBtn = document.getElementById('uploadBtn');
         const messageDiv = document.getElementById('message');
@@ -1085,28 +1324,35 @@ Note: Leave one blank line after each question"></textarea>
         const parsedCountSpan = document.getElementById('parsedCount');
         const testsListDiv = document.getElementById('testsList');
         
+        // Results modal elements
+        const resultsModal = document.getElementById('resultsModal');
+        const closeResultsModalBtn = document.getElementById('closeResultsModal');
+        const resultsContent = document.getElementById('resultsContent');
+        
+        // Result details modal elements
+        const resultDetailsModal = document.getElementById('resultDetailsModal');
+        const closeDetailsModalBtn = document.getElementById('closeDetailsModal');
+        const resultDetailsContent = document.getElementById('resultDetailsContent');
+        
         // Prevent auto scroll
         window.addEventListener('load', function() {
-            // Stop any auto scrolling
             window.scrollTo(0, 0);
-            
-            // Initialize
             setTimeout(initializeFirebase, 100);
         });
         
         // Open Help Modal
         openHelpBtn.addEventListener('click', function() {
             helpModal.classList.add('show');
-            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            document.body.style.overflow = 'hidden';
         });
         
         // Close Help Modal
         closeModalBtn.addEventListener('click', function() {
             helpModal.classList.remove('show');
-            document.body.style.overflow = 'auto'; // Enable background scrolling
+            document.body.style.overflow = 'auto';
         });
         
-        // Close modal when clicking outside
+        // Close modals when clicking outside
         helpModal.addEventListener('click', function(e) {
             if (e.target === helpModal) {
                 helpModal.classList.remove('show');
@@ -1114,16 +1360,39 @@ Note: Leave one blank line after each question"></textarea>
             }
         });
         
+        resultsModal.addEventListener('click', function(e) {
+            if (e.target === resultsModal) {
+                resultsModal.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        resultDetailsModal.addEventListener('click', function(e) {
+            if (e.target === resultDetailsModal) {
+                resultDetailsModal.classList.remove('show');
+                document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Close modals with buttons
+        closeResultsModalBtn.addEventListener('click', function() {
+            resultsModal.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        });
+        
+        closeDetailsModalBtn.addEventListener('click', function() {
+            resultDetailsModal.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        });
+        
         // Language tabs in modal
         langTabs.forEach(tab => {
             tab.addEventListener('click', function() {
                 const lang = this.getAttribute('data-lang');
                 
-                // Update active tab
                 langTabs.forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
                 
-                // Show active content
                 langContents.forEach(content => {
                     content.classList.remove('active');
                     if (content.id === `${lang}-content`) {
@@ -1138,11 +1407,9 @@ Note: Leave one blank line after each question"></textarea>
             tab.addEventListener('click', () => {
                 const tabId = tab.getAttribute('data-tab');
                 
-                // Update active tab
                 tabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 
-                // Show active content
                 tabContents.forEach(content => {
                     content.classList.remove('active');
                     if (content.id === tabId) {
@@ -1150,12 +1417,10 @@ Note: Leave one blank line after each question"></textarea>
                     }
                 });
                 
-                // Load tests when old-tests tab is clicked
                 if (tabId === 'old-tests') {
                     loadPublishedTests();
                 }
                 
-                // Scroll to top smoothly
                 window.scrollTo({
                     top: 0,
                     behavior: 'smooth'
@@ -1169,14 +1434,11 @@ Note: Leave one blank line after each question"></textarea>
                 const app = firebase.initializeApp(firebaseConfig);
                 db = app.firestore();
                 showMessage('Connected to QUEST COACHING database successfully!', true);
-                
-                // Load tests on initial load
                 loadPublishedTests();
                 
             } catch (error) {
                 console.error('Firebase initialization error:', error);
                 if (error.code === 'app/duplicate-app') {
-                    // If already initialized, get the existing app
                     db = firebase.app().firestore();
                     showMessage('Connected to QUEST COACHING database successfully!', true);
                     loadPublishedTests();
@@ -1247,13 +1509,19 @@ Note: Leave one blank line after each question"></textarea>
             return questions;
         }
         
+        // Sanitize test name for Firestore document ID
+        function sanitizeTestName(testName) {
+            return testName
+                .toLowerCase()
+                .replace(/[^a-z0-9]/g, '_')
+                .replace(/_+/g, '_')
+                .replace(/^_|_$/g, '');
+        }
+        
         // Show message
         function showMessage(text, isSuccess) {
             messageDiv.textContent = text;
             messageDiv.className = `message ${isSuccess ? 'success' : 'error'} show`;
-            
-            // Don't auto scroll to message
-            // Only show it in place
             
             if (isSuccess) {
                 setTimeout(() => {
@@ -1307,36 +1575,34 @@ Note: Leave one blank line after each question"></textarea>
             
             try {
                 const now = Date.now();
+                const status = testStatusInput.value;
+                const testName = testNameInput.value.trim();
                 
                 const testData = {
-                    testName: testNameInput.value.trim(),
+                    testName: testName,
                     totalQuestions: parseInt(totalQuestionsInput.value) || parsedQuestions.length,
                     totalMarks: parseInt(totalMarksInput.value) || 100,
                     duration: parseInt(durationInput.value) || 60,
+                    status: status,
+                    isLive: status === 'active',
                     questions: parsedQuestions,
-                    status: 'active',
-                    isLive: true,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     createdTimestamp: now,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    sanitizedTestName: sanitizeTestName(testName)
                 };
                 
                 if (editingTestId) {
-                    // Update existing test
                     await db.collection('tests').doc(editingTestId).update(testData);
                     showMessage(`Test updated successfully!`, true);
                     editingTestId = null;
                     uploadBtn.innerHTML = '<i class="fas fa-save"></i> Update Test';
                 } else {
-                    // Create new test - "tests" collection mein save karenge
                     await db.collection('tests').add(testData);
                     showMessage(`Test published successfully!`, true);
                 }
                 
-                // Clear form
                 resetForm();
-                
-                // Switch to old tests tab
                 document.querySelector('[data-tab="old-tests"]').click();
                 
             } catch (error) {
@@ -1348,7 +1614,7 @@ Note: Leave one blank line after each question"></textarea>
             }
         });
         
-        // Load published tests from "tests" collection
+        // Load published tests
         async function loadPublishedTests() {
             try {
                 testsListDiv.innerHTML = '<div class="empty-state"><div class="loading"></div><p>Loading tests...</p></div>';
@@ -1375,9 +1641,6 @@ Note: Leave one blank line after each question"></textarea>
                     const test = doc.data();
                     const testId = doc.id;
                     
-                    console.log('Test found:', test.testName, test);
-                    
-                    // Format date
                     let createdDate = 'Unknown date';
                     if (test.createdAt && test.createdAt.toDate) {
                         createdDate = test.createdAt.toDate().toLocaleDateString('en-IN', {
@@ -1394,18 +1657,20 @@ Note: Leave one blank line after each question"></textarea>
                     }
                     
                     const statusClass = test.status === 'active' ? 'status-active' : 
+                                      test.status === 'inactive' ? 'status-inactive' :
                                       test.status === 'draft' ? 'status-draft' : 'status-scheduled';
                     
-                    // Check if test has questions array
+                    const statusText = test.status ? test.status.toUpperCase() : 'ACTIVE';
+                    
                     const questionCount = test.questions ? 
                         (Array.isArray(test.questions) ? test.questions.length : 0) : 
                         (test.totalQuestions || 0);
                     
                     testsHTML += `
-                        <div class="test-item" data-test-id="${testId}">
+                        <div class="test-item" data-test-id="${testId}" data-test-name="${test.testName || ''}">
                             <div class="test-header">
                                 <div class="test-title">${test.testName || 'Unnamed Test'}</div>
-                                <span class="status-badge ${statusClass}">${(test.status || 'active').toUpperCase()}</span>
+                                <span class="status-badge ${statusClass}">${statusText}</span>
                             </div>
                             <div class="test-meta">
                                 <span><i class="fas fa-question-circle"></i> ${questionCount} Questions</span>
@@ -1417,6 +1682,12 @@ Note: Leave one blank line after each question"></textarea>
                                 <button class="btn-small btn-success edit-test" data-test-id="${testId}">
                                     <i class="fas fa-edit"></i> Edit
                                 </button>
+                                <button class="btn-small btn-info toggle-status" data-test-id="${testId}" data-current-status="${test.status}">
+                                    <i class="fas fa-toggle-on"></i> ${test.status === 'active' ? 'Inactive' : 'Active'}
+                                </button>
+                                <button class="btn-small btn-warning view-results" data-test-id="${testId}" data-test-name="${test.testName || ''}">
+                                    <i class="fas fa-chart-bar"></i> Results
+                                </button>
                                 <button class="btn-small btn-danger delete-test" data-test-id="${testId}">
                                     <i class="fas fa-trash"></i> Delete
                                 </button>
@@ -1427,7 +1698,7 @@ Note: Leave one blank line after each question"></textarea>
                 
                 testsListDiv.innerHTML = testsHTML;
                 
-                // Add event listeners for edit and delete buttons
+                // Add event listeners
                 document.querySelectorAll('.edit-test').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const testId = this.getAttribute('data-test-id');
@@ -1442,6 +1713,22 @@ Note: Leave one blank line after each question"></textarea>
                     });
                 });
                 
+                document.querySelectorAll('.toggle-status').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const testId = this.getAttribute('data-test-id');
+                        const currentStatus = this.getAttribute('data-current-status');
+                        toggleTestStatus(testId, currentStatus);
+                    });
+                });
+                
+                document.querySelectorAll('.view-results').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const testId = this.getAttribute('data-test-id');
+                        const testName = this.getAttribute('data-test-name');
+                        showTestResults(testId, testName);
+                    });
+                });
+                
             } catch (error) {
                 console.error('Error loading tests:', error);
                 testsListDiv.innerHTML = `
@@ -1449,7 +1736,6 @@ Note: Leave one blank line after each question"></textarea>
                         <i class="fas fa-exclamation-triangle"></i>
                         <h3>Error loading tests</h3>
                         <p>${error.message}</p>
-                        <p>Please check if Firebase permissions are set correctly</p>
                     </div>
                 `;
             }
@@ -1468,15 +1754,12 @@ Note: Leave one blank line after each question"></textarea>
                 const test = doc.data();
                 editingTestId = testId;
                 
-                console.log('Editing test:', test);
-                
-                // Fill form with test data
                 testNameInput.value = test.testName || '';
                 totalQuestionsInput.value = test.totalQuestions || (test.questions ? test.questions.length : 0) || 0;
                 totalMarksInput.value = test.totalMarks || 100;
                 durationInput.value = test.duration || 60;
+                testStatusInput.value = test.status || 'active';
                 
-                // Convert questions to text format
                 let questionsText = '';
                 if (test.questions && Array.isArray(test.questions)) {
                     test.questions.forEach((q, index) => {
@@ -1500,8 +1783,6 @@ Note: Leave one blank line after each question"></textarea>
                 }
                 
                 questionsTextInput.value = questionsText.trim();
-                
-                // Update UI
                 uploadBtn.innerHTML = '<i class="fas fa-save"></i> Update Test';
                 document.querySelector('[data-tab="create-test"]').click();
                 
@@ -1529,12 +1810,414 @@ Note: Leave one blank line after each question"></textarea>
             }
         }
         
+        // Toggle test status
+        async function toggleTestStatus(testId, currentStatus) {
+            try {
+                const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+                const isLive = newStatus === 'active';
+                
+                await db.collection('tests').doc(testId).update({
+                    status: newStatus,
+                    isLive: isLive,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                showMessage(`Test marked as ${newStatus.toUpperCase()}`, true);
+                loadPublishedTests();
+                
+            } catch (error) {
+                console.error('Error toggling status:', error);
+                showMessage(`Failed to change status: ${error.message}`, false);
+            }
+        }
+        
+        // Get division based on percentage
+        function getDivision(percentage) {
+            if (percentage >= 60) return "FIRST DIVISION";
+            if (percentage >= 45) return "SECOND DIVISION";
+            if (percentage >= 33) return "THIRD DIVISION";
+            return "FAIL";
+        }
+        
+        // Show test results - FIXED to match exact Firebase structure
+        async function showTestResults(testId, testName) {
+            try {
+                currentResultsTestId = testId;
+                currentTestName = testName;
+                
+                resultsContent.innerHTML = '<div class="empty-state"><div class="loading"></div><p>Loading results...</p></div>';
+                
+                resultsModal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+                
+                // Get test details first
+                const testDoc = await db.collection('tests').doc(testId).get();
+                if (!testDoc.exists) {
+                    resultsContent.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h3>Test not found</h3>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const testData = testDoc.data();
+                
+                // SANITIZE TEST NAME for document ID in questcoachingresults collection
+                const sanitizedName = testData.sanitizedTestName || sanitizeTestName(testData.testName || testName);
+                
+                console.log('Fetching results from:', 'questcoachingresults/' + sanitizedName + '/results');
+                
+                try {
+                    // Get results from questcoachingresults/{sanitizedTestName}/results subcollection
+                    const resultsSnapshot = await db
+                        .collection('questcoachingresults')
+                        .doc(sanitizedName)
+                        .collection('results')
+                        .orderBy('timestamp', 'desc')
+                        .get();
+                    
+                    console.log('Results found:', resultsSnapshot.size);
+                    
+                    if (resultsSnapshot.empty) {
+                        resultsContent.innerHTML = `
+                            <div class="result-summary">
+                                <h3>${testData.testName || testName || 'Test'} - Results</h3>
+                                <p>No students have taken this test yet.</p>
+                                <p style="margin-top: 10px; color: #666;"><i class="fas fa-info-circle"></i> Results are stored in: questcoachingresults/${sanitizedName}/results</p>
+                            </div>
+                            <div class="empty-state">
+                                <i class="fas fa-users-slash"></i>
+                                <h3>No results available</h3>
+                                <p>Students' results will appear here once they complete the test</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    let results = [];
+                    resultsSnapshot.forEach(doc => {
+                        results.push({
+                            id: doc.id,
+                            ...doc.data()
+                        });
+                    });
+                    
+                    currentResultsData = results;
+                    
+                    // Sort by marks obtained (descending)
+                    results.sort((a, b) => (b.marksObtained || 0) - (a.marksObtained || 0));
+                    
+                    // Calculate statistics
+                    const totalStudents = results.length;
+                    const totalScore = results.reduce((sum, r) => sum + (r.marksObtained || 0), 0);
+                    const avgScore = totalStudents > 0 ? (totalScore / totalStudents).toFixed(2) : 0;
+                    const maxScore = Math.max(...results.map(r => r.marksObtained || 0));
+                    
+                    let resultsHTML = `
+                        <div class="result-summary">
+                            <h3>${testData.testName || testName || 'Test'} - Results</h3>
+                            <div style="margin-bottom: 10px; padding: 8px; background: #e3f2fd; border-radius: 4px; font-size: 0.9rem;">
+                                <i class="fas fa-database"></i> <strong>Firestore Path:</strong> questcoachingresults/${sanitizedName}/results
+                            </div>
+                            <div class="summary-grid">
+                                <div class="summary-item">
+                                    <div class="summary-value">${totalStudents}</div>
+                                    <div class="summary-label">Students</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-value">${avgScore}</div>
+                                    <div class="summary-label">Average Score</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-value">${maxScore}</div>
+                                    <div class="summary-label">Highest Score</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-value">${testData.totalMarks || 100}</div>
+                                    <div class="summary-label">Total Marks</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="results-list">
+                    `;
+                    
+                    results.forEach((result, index) => {
+                        const studentName = result.studentName || `Student ${index + 1}`;
+                        const rollNumber = result.rollNumber || 'N/A';
+                        const marksObtained = result.marksObtained || 0;
+                        const totalMarks = result.totalMarks || testData.totalMarks || 100;
+                        const percentage = result.percentage || ((marksObtained / totalMarks) * 100).toFixed(2);
+                        const division = result.division || getDivision(percentage);
+                        
+                        let divisionClass = '';
+                        if (division.includes('FIRST')) divisionClass = 'division-first';
+                        else if (division.includes('SECOND')) divisionClass = 'division-second';
+                        else if (division.includes('THIRD')) divisionClass = 'division-third';
+                        else divisionClass = 'division-fail';
+                        
+                        const date = result.date || 
+                            (result.timestamp ? 
+                                new Date(result.timestamp.toDate ? result.timestamp.toDate() : result.timestamp).toLocaleDateString('en-IN') :
+                                'Unknown date');
+                        
+                        resultsHTML += `
+                            <div class="result-item" data-result-id="${result.id}">
+                                <div class="result-header">
+                                    <div>
+                                        <span class="student-name">${studentName}</span>
+                                        <span class="division-badge ${divisionClass}">${division}</span>
+                                    </div>
+                                    <div class="score">${marksObtained}/${totalMarks} (${percentage}%)</div>
+                                </div>
+                                <div class="result-meta">
+                                    <span><i class="fas fa-id-card"></i> Roll: ${rollNumber}</span>
+                                    <span><i class="fas fa-check-circle"></i> Correct: ${result.correctAnswers || 0}</span>
+                                    <span><i class="fas fa-times-circle"></i> Wrong: ${result.wrongAnswers || 0}</span>
+                                    <span><i class="fas fa-pencil-alt"></i> Attempted: ${result.attempted || 0}/${result.totalQuestions || 0}</span>
+                                    <span><i class="fas fa-calendar"></i> ${date}</span>
+                                </div>
+                                <div class="result-actions">
+                                    <button class="btn-small btn-info view-details" data-result-index="${index}">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </button>
+                                    <button class="btn-small btn-danger remove-student" data-result-id="${result.id}" data-sanitized-name="${sanitizedName}">
+                                        <i class="fas fa-user-times"></i> Remove Student
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    resultsHTML += `</div>`;
+                    resultsContent.innerHTML = resultsHTML;
+                    
+                    // Add event listeners for result actions
+                    document.querySelectorAll('.view-details').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const resultIndex = this.getAttribute('data-result-index');
+                            showResultDetails(resultIndex, testData);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.remove-student').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const resultId = this.getAttribute('data-result-id');
+                            const sanitizedName = this.getAttribute('data-sanitized-name');
+                            removeStudentResult(resultId, sanitizedName);
+                        });
+                    });
+                    
+                } catch (error) {
+                    console.error('Error fetching from subcollection:', error);
+                    
+                    // Fallback: Try direct collection query if subcollection doesn't exist
+                    try {
+                        const fallbackSnapshot = await db.collection('questcoachingresults')
+                            .where('testId', '==', testId)
+                            .get();
+                        
+                        console.log('Fallback results found:', fallbackSnapshot.size);
+                        
+                        if (fallbackSnapshot.empty) {
+                            throw new Error('No results found');
+                        }
+                        
+                        let results = [];
+                        fallbackSnapshot.forEach(doc => {
+                            results.push({
+                                id: doc.id,
+                                ...doc.data()
+                            });
+                        });
+                        
+                        currentResultsData = results;
+                        
+                        // Display fallback results
+                        let resultsHTML = `
+                            <div class="result-summary">
+                                <h3>${testData.testName || testName || 'Test'} - Results</h3>
+                                <div style="margin-bottom: 10px; padding: 8px; background: #fff3e0; border-radius: 4px; font-size: 0.9rem; color: #ff9800;">
+                                    <i class="fas fa-exclamation-triangle"></i> <strong>Note:</strong> Results are using old data structure. Found ${results.length} result(s).
+                                </div>
+                        `;
+                        
+                        resultsHTML += `</div>`;
+                        resultsContent.innerHTML = resultsHTML;
+                        
+                    } catch (fallbackError) {
+                        resultsContent.innerHTML = `
+                            <div class="result-summary">
+                                <h3>${testData.testName || testName || 'Test'} - Results</h3>
+                                <p>Error loading results: ${error.message}</p>
+                            </div>
+                            <div class="empty-state">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <h3>No results found</h3>
+                                <p>Path checked: questcoachingresults/${sanitizedName}/results</p>
+                                <p style="margin-top: 10px; font-size: 0.9rem; color: #666;">Error details: ${error.message}</p>
+                            </div>
+                        `;
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error loading results:', error);
+                resultsContent.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Error loading results</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Show result details
+        function showResultDetails(resultIndex, testData) {
+            if (!currentResultsData || !currentResultsData[resultIndex]) {
+                showMessage('Result data not found', false);
+                return;
+            }
+            
+            const result = currentResultsData[resultIndex];
+            
+            let detailsHTML = `
+                <div class="result-summary">
+                    <h3>${result.studentName || 'Student'} - Detailed Results</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-value">${result.marksObtained || 0}/${result.totalMarks || 100}</div>
+                            <div class="summary-label">Score</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value">${result.correctAnswers || 0}</div>
+                            <div class="summary-label">Correct</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value">${result.wrongAnswers || 0}</div>
+                            <div class="summary-label">Wrong</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value">${result.percentage || 0}%</div>
+                            <div class="summary-label">Percentage</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; padding: 10px; background: white; border-radius: 8px;">
+                        <p><strong>Roll Number:</strong> ${result.rollNumber || 'N/A'}</p>
+                        <p><strong>Test Name:</strong> ${result.testName || currentTestName || 'N/A'}</p>
+                        <p><strong>Date:</strong> ${result.date || 'N/A'}</p>
+                        <p><strong>Result ID:</strong> ${result.resultId || 'N/A'}</p>
+                    </div>
+                </div>
+                <h4>Question-wise Analysis</h4>
+            `;
+            
+            if (result.studentAnswers && typeof result.studentAnswers === 'object') {
+                const answers = result.studentAnswers;
+                
+                for (let i = 0; i < (testData.questions?.length || 0); i++) {
+                    const question = testData.questions?.[i];
+                    if (!question) continue;
+                    
+                    const selectedOption = answers[i.toString()] || 'Not answered';
+                    const correctOption = question.correctAnswer || 'Not specified';
+                    const isCorrect = selectedOption === correctOption;
+                    
+                    detailsHTML += `
+                        <div class="question-detail">
+                            <div class="question-text">Q${i + 1}. ${question.text || ''}</div>
+                            <div class="options-list">
+                    `;
+                    
+                    if (question.options && Array.isArray(question.options)) {
+                        question.options.forEach((option, optIndex) => {
+                            const optionLetter = String.fromCharCode(65 + optIndex);
+                            let optionClass = 'option';
+                            
+                            if (optionLetter === correctOption) {
+                                optionClass += ' correct';
+                            }
+                            
+                            if (optionLetter === selectedOption) {
+                                optionClass += ' selected';
+                                if (!isCorrect && optionLetter !== correctOption) {
+                                    optionClass += ' incorrect';
+                                }
+                            }
+                            
+                            detailsHTML += `<div class="${optionClass}">(${optionLetter}) ${option}</div>`;
+                        });
+                    }
+                    
+                    detailsHTML += `
+                            </div>
+                            <div style="margin-top: 10px; padding: 8px; background: #f5f5f5; border-radius: 4px; font-size: 0.9rem;">
+                                <strong>Student Selected:</strong> ${selectedOption} 
+                                <span style="margin-left: 15px;"><strong>Correct Answer:</strong> ${correctOption}</span>
+                                <span style="margin-left: 15px; color: ${isCorrect ? '#4caf50' : '#f44336'}; font-weight: 600;">
+                                    ${isCorrect ? '✓ Correct' : '✗ Incorrect'}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                detailsHTML += `
+                    <div class="empty-state">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Detailed answer data not available</p>
+                    </div>
+                `;
+            }
+            
+            resultDetailsContent.innerHTML = detailsHTML;
+            resultDetailsModal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Remove student result - FIXED to match exact Firebase structure
+        async function removeStudentResult(resultId, sanitizedName) {
+            if (!confirm('Are you sure you want to remove this student\'s result? This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                // Delete from questcoachingresults/{sanitizedName}/results/{resultId}
+                await db
+                    .collection('questcoachingresults')
+                    .doc(sanitizedName)
+                    .collection('results')
+                    .doc(resultId)
+                    .delete();
+                
+                showMessage('Student result removed successfully', true);
+                
+                // Refresh the results view
+                showTestResults(currentResultsTestId, currentTestName);
+                
+            } catch (error) {
+                console.error('Error removing result:', error);
+                
+                // Fallback: Try deleting from direct collection
+                try {
+                    await db.collection('questcoachingresults').doc(resultId).delete();
+                    showMessage('Student result removed successfully (old structure)', true);
+                    showTestResults(currentResultsTestId, currentTestName);
+                } catch (fallbackError) {
+                    showMessage(`Failed to remove result: ${error.message}`, false);
+                }
+            }
+        }
+        
         // Reset form
         function resetForm() {
             testNameInput.value = '';
             totalQuestionsInput.value = '';
             totalMarksInput.value = '';
             durationInput.value = '';
+            testStatusInput.value = 'active';
             questionsTextInput.value = '';
             parseInfoDiv.classList.remove('show');
             editingTestId = null;
@@ -1552,11 +2235,21 @@ Note: Leave one blank line after each question"></textarea>
             }
         });
         
-        // Escape key to close modal
+        // Escape key to close modals
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && helpModal.classList.contains('show')) {
-                helpModal.classList.remove('show');
-                document.body.style.overflow = 'auto';
+            if (e.key === 'Escape') {
+                if (helpModal.classList.contains('show')) {
+                    helpModal.classList.remove('show');
+                    document.body.style.overflow = 'auto';
+                }
+                if (resultsModal.classList.contains('show')) {
+                    resultsModal.classList.remove('show');
+                    document.body.style.overflow = 'auto';
+                }
+                if (resultDetailsModal.classList.contains('show')) {
+                    resultDetailsModal.classList.remove('show');
+                    document.body.style.overflow = 'auto';
+                }
             }
         });
         
