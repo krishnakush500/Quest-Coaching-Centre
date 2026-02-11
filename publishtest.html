@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STUDY POINT | Teacher Test Panel</title>
+    <title>QUEST COACHING | Teacher Test Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -47,50 +47,57 @@
         header {
             text-align: center;
             margin-bottom: 20px;
-            padding: 15px;
+            padding: 10px;
         }
         
         .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         
         .logo {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
         }
         
         .logo i {
-            font-size: 2.5rem;
+            font-size: 2rem;
             color: var(--primary);
+        }
+        
+        .logo-content {
+            display: flex;
+            flex-direction: column;
         }
         
         h1 {
             color: var(--primary-dark);
-            font-size: 2.2rem;
-            margin-bottom: 5px;
+            font-size: 1.5rem;
+            margin-bottom: 2px;
+            line-height: 1.2;
         }
         
         .subtitle {
             color: var(--light-text);
-            font-size: 1.1rem;
+            font-size: 0.9rem;
+            line-height: 1.2;
         }
         
         .help-btn {
             background-color: var(--info);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 1rem;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
             transition: all 0.3s;
         }
         
@@ -103,33 +110,34 @@
             background: white;
             border-radius: 12px;
             box-shadow: var(--shadow);
-            padding: 25px;
-            margin-bottom: 25px;
+            padding: 20px;
+            margin-bottom: 20px;
         }
         
         h2 {
             color: var(--primary-dark);
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
             border-bottom: 2px solid var(--secondary);
-            font-size: 1.8rem;
+            font-size: 1.5rem;
         }
         
         h3 {
             color: var(--primary);
-            margin: 20px 0 15px 0;
-            font-size: 1.4rem;
+            margin: 15px 0 10px 0;
+            font-size: 1.2rem;
         }
         
         .tab-container {
             display: flex;
             border-bottom: 2px solid var(--border);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            overflow-x: auto;
         }
         
         .tab {
-            padding: 14px 28px;
-            font-size: 1.1rem;
+            padding: 12px 20px;
+            font-size: 0.95rem;
             font-weight: 600;
             background: none;
             border: none;
@@ -137,6 +145,8 @@
             transition: all 0.3s;
             color: var(--light-text);
             border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
         
         .tab:hover {
@@ -158,9 +168,9 @@
         
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 18px;
-            margin-bottom: 18px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
         }
         
         .form-group {
@@ -170,11 +180,12 @@
         
         label {
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: var(--primary-dark);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            font-size: 0.95rem;
         }
         
         label i {
@@ -182,7 +193,7 @@
         }
         
         input, textarea, select {
-            padding: 13px;
+            padding: 12px;
             border: 1px solid var(--border);
             border-radius: 8px;
             font-size: 1rem;
@@ -196,47 +207,38 @@
         }
         
         textarea {
-            min-height: 280px;
+            min-height: 400px; /* Increased height for mobile */
             resize: vertical;
             font-family: 'Courier New', monospace;
             line-height: 1.5;
+            width: 100%;
         }
         
         .helper-text {
             background-color: var(--secondary);
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             border-left: 4px solid var(--primary);
-        }
-        
-        .example {
-            background-color: #f5f5f5;
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 10px;
-            font-family: 'Courier New', monospace;
             font-size: 0.9rem;
-            color: var(--light-text);
-            border-left: 3px solid var(--border);
         }
         
         .btn {
             background-color: var(--primary);
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 14px 25px;
             border-radius: 8px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             width: 100%;
-            margin-top: 20px;
+            margin-top: 15px;
         }
         
         .btn:hover {
@@ -263,8 +265,8 @@
         }
         
         .btn-small {
-            padding: 8px 16px;
-            font-size: 0.9rem;
+            padding: 7px 12px;
+            font-size: 0.85rem;
         }
         
         .btn-warning {
@@ -280,12 +282,13 @@
         }
         
         .message {
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
-            margin-top: 20px;
+            margin-top: 15px;
             display: none;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
+            font-size: 0.95rem;
         }
         
         .message.show {
@@ -306,10 +309,10 @@
         
         .parse-info {
             background-color: #e3f2fd;
-            padding: 12px;
+            padding: 10px;
             border-radius: 8px;
-            margin-top: 10px;
-            font-size: 0.9rem;
+            margin-top: 8px;
+            font-size: 0.85rem;
             color: #1565c0;
             border-left: 4px solid #2196f3;
             display: none;
@@ -320,57 +323,67 @@
         }
         
         .test-list {
-            margin-top: 20px;
+            margin-top: 15px;
         }
         
         .test-item {
             background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
             border-left: 4px solid var(--primary);
             transition: transform 0.3s;
         }
         
         .test-item:hover {
             transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
         }
         
         .test-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
+            align-items: flex-start;
+            margin-bottom: 8px;
         }
         
         .test-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: var(--primary-dark);
+            flex: 1;
+            margin-right: 10px;
         }
         
         .test-meta {
             display: flex;
-            gap: 15px;
-            margin-top: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 8px;
             color: var(--light-text);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+        }
+        
+        .test-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
         
         .test-actions {
             display: flex;
-            gap: 10px;
-            margin-top: 15px;
+            gap: 8px;
+            margin-top: 12px;
         }
         
         .status-badge {
             display: inline-block;
-            padding: 4px 12px;
+            padding: 3px 8px;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 600;
+            white-space: nowrap;
         }
         
         .status-draft {
@@ -390,13 +403,13 @@
         
         .empty-state {
             text-align: center;
-            padding: 40px;
+            padding: 30px;
             color: var(--light-text);
         }
         
         .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 15px;
+            font-size: 2.5rem;
+            margin-bottom: 12px;
             color: var(--border);
         }
         
@@ -416,14 +429,14 @@
         
         footer {
             text-align: center;
-            margin-top: 40px;
+            margin-top: 30px;
             color: var(--light-text);
-            font-size: 0.9rem;
-            padding-top: 20px;
+            font-size: 0.85rem;
+            padding-top: 15px;
             border-top: 1px solid var(--border);
         }
         
-        /* Modal Styles */
+        /* Modal Styles - FIXED */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -435,7 +448,7 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            padding: 20px;
+            padding: 15px;
         }
         
         .modal-overlay.show {
@@ -451,6 +464,7 @@
             overflow-y: auto;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             animation: modalSlideIn 0.3s ease;
+            position: relative;
         }
         
         @keyframes modalSlideIn {
@@ -464,53 +478,74 @@
             }
         }
         
+        /* FIXED: Modal header sticks to top */
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px;
+            padding: 15px;
             border-bottom: 2px solid var(--secondary);
+            background: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-radius: 12px 12px 0 0;
         }
         
         .modal-title {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             color: var(--primary-dark);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         
+        /* FIXED: Close button stays in place */
         .modal-close {
             background: none;
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
             color: var(--light-text);
-            padding: 5px;
+            padding: 6px;
             border-radius: 50%;
             width: 40px;
             height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: sticky;
+            top: 15px;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            flex-shrink: 0;
         }
         
         .modal-close:hover {
             background-color: #f5f5f5;
+            color: var(--error);
+            transform: scale(1.1);
         }
         
         .modal-content {
-            padding: 25px;
+            padding: 20px;
         }
         
         .language-tabs {
             display: flex;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             border-bottom: 2px solid var(--border);
+            position: sticky;
+            top: 75px; /* Adjusted to be below header */
+            background: white;
+            z-index: 5;
+            padding-top: 10px;
+            overflow-x: auto;
         }
         
         .lang-tab {
-            padding: 12px 24px;
+            padding: 10px 20px;
             background: none;
             border: none;
             cursor: pointer;
@@ -518,6 +553,9 @@
             color: var(--light-text);
             border-bottom: 3px solid transparent;
             transition: all 0.3s;
+            white-space: nowrap;
+            flex-shrink: 0;
+            font-size: 0.95rem;
         }
         
         .lang-tab:hover {
@@ -538,67 +576,127 @@
         }
         
         .instruction-section {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         
         .instruction-section h4 {
             color: var(--primary);
-            margin-bottom: 10px;
-            font-size: 1.2rem;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         
         .instruction-section ul {
             padding-left: 20px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         
         .instruction-section li {
-            margin-bottom: 8px;
-            line-height: 1.6;
+            margin-bottom: 6px;
+            line-height: 1.5;
+            font-size: 0.95rem;
         }
         
         .note-box {
             background-color: #fff3e0;
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
             border-left: 4px solid var(--warning);
-            margin-top: 15px;
+            margin-top: 12px;
+            font-size: 0.95rem;
         }
         
+        /* Format hint inside textarea */
+        .format-hint {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: var(--light-text);
+            font-size: 0.9rem;
+            pointer-events: none;
+            opacity: 0.7;
+            width: 90%;
+            line-height: 1.6;
+        }
+        
+        .textarea-container {
+            position: relative;
+            width: 100%;
+        }
+        
+        /* MOBILE SPECIFIC STYLES */
         @media (max-width: 768px) {
             .container {
-                padding: 15px;
+                padding: 10px;
+            }
+            
+            header {
+                margin-bottom: 15px;
+                padding: 5px;
             }
             
             .header-top {
                 flex-direction: column;
-                gap: 15px;
+                gap: 10px;
+                text-align: center;
+                margin-bottom: 5px;
+            }
+            
+            .logo {
+                flex-direction: column;
+                gap: 8px;
                 text-align: center;
             }
             
-            .panel {
-                padding: 20px;
+            .logo i {
+                font-size: 1.8rem;
             }
             
             h1 {
-                font-size: 2rem;
+                font-size: 1.3rem;
+                line-height: 1.1;
+            }
+            
+            .subtitle {
+                font-size: 0.8rem;
+                line-height: 1.1;
+            }
+            
+            .panel {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+                margin-bottom: 12px;
+                padding-bottom: 8px;
             }
             
             .form-grid {
                 grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            textarea {
+                min-height: 450px; /* Mobile ke liye aur bada textarea */
+                font-size: 0.95rem;
             }
             
             .btn {
-                padding: 14px 20px;
+                padding: 12px 20px;
+                font-size: 0.95rem;
+                margin-top: 12px;
             }
             
             .test-header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 10px;
+                gap: 8px;
             }
             
             .test-actions {
@@ -607,12 +705,117 @@
             }
             
             .tab {
-                padding: 12px 20px;
-                font-size: 1rem;
+                padding: 10px 15px;
+                font-size: 0.9rem;
             }
             
             .modal {
                 max-height: 95vh;
+                max-width: 95vw;
+            }
+            
+            .format-hint {
+                font-size: 0.8rem;
+                padding: 0 10px;
+            }
+            
+            .modal-header {
+                padding: 12px;
+            }
+            
+            .modal-title {
+                font-size: 1.2rem;
+            }
+            
+            .modal-close {
+                width: 35px;
+                height: 35px;
+                font-size: 1.4rem;
+                top: 12px;
+            }
+            
+            .language-tabs {
+                top: 65px; /* Adjusted for mobile */
+            }
+            
+            .test-item {
+                padding: 12px;
+                margin-bottom: 10px;
+            }
+            
+            .test-title {
+                font-size: 1rem;
+            }
+            
+            .test-meta {
+                font-size: 0.8rem;
+                gap: 8px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.1rem;
+            }
+            
+            .subtitle {
+                font-size: 0.75rem;
+            }
+            
+            .help-btn {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+            
+            textarea {
+                min-height: 500px; /* Chhote screens ke liye aur bada */
+            }
+            
+            .form-group label {
+                font-size: 0.9rem;
+            }
+            
+            .helper-text {
+                font-size: 0.85rem;
+                padding: 10px;
+            }
+            
+            .test-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .tab-container {
+                margin-bottom: 15px;
+            }
+            
+            .tab {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .container {
+                padding: 8px;
+            }
+            
+            .panel {
+                padding: 12px;
+            }
+            
+            h1 {
+                font-size: 1rem;
+            }
+            
+            textarea {
+                min-height: 550px; /* Sabse chhote screens ke liye maximum height */
+            }
+            
+            .btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -647,20 +850,21 @@
                     
                     <div class="instruction-section">
                         <h4><i class="fas fa-question-circle"></i> प्रश्न कैसे लिखें?</h4>
-                        <div class="example">
-Q1. फ्रांस की राजधानी क्या है?<br>
-(A) लंदन<br>
-(B) बर्लिन<br>
-(C) पेरिस<br>
-(D) मैड्रिड<br>
-Answer: C<br>
-<br>
-Q2. लाल ग्रह किसे कहते हैं?<br>
-(A) पृथ्वी<br>
-(B) मंगल<br>
-(C) बृहस्पति<br>
-(D) शुक्र<br>
-Answer: B
+                        <div class="note-box">
+                            <strong>फॉर्मेट:</strong><br>
+                            Q1. प्रश्न लिखें?<br>
+                            (A) पहला विकल्प<br>
+                            (B) दूसरा विकल्प<br>
+                            (C) तीसरा विकल्प<br>
+                            (D) चौथा विकल्प<br>
+                            Answer: A/B/C/D<br>
+                            <br>
+                            Q2. दूसरा प्रश्न?<br>
+                            (A) विकल्प 1<br>
+                            (B) विकल्प 2<br>
+                            (C) विकल्प 3<br>
+                            (D) विकल्प 4<br>
+                            Answer: B
                         </div>
                         <p><strong>ध्यान दें:</strong> प्रत्येक प्रश्न के बाद एक खाली लाइन छोड़ें</p>
                     </div>
@@ -676,7 +880,7 @@ Answer: B
                     </div>
                     
                     <div class="note-box">
-                        <strong><i class="fas fa-lightbulb"></i> टिप:</strong> आप एक बार में 200 प्रश्नों तक का टेस्ट बना सकते हैं। प्रश्न हमेशा नीचे दिए गए फॉर्मेट में लिखें।
+                        <strong><i class="fas fa-lightbulb"></i> टिप:</strong> आप एक बार में 200 प्रश्नों तक का टेस्ट बना सकते हैं। प्रश्न हमेशा ऊपर दिए गए फॉर्मेट में लिखें।
                     </div>
                 </div>
                 
@@ -696,20 +900,21 @@ Answer: B
                     
                     <div class="instruction-section">
                         <h4><i class="fas fa-question-circle"></i> How to Write Questions?</h4>
-                        <div class="example">
-Q1. What is the capital of France?<br>
-(A) London<br>
-(B) Berlin<br>
-(C) Paris<br>
-(D) Madrid<br>
-Answer: C<br>
-<br>
-Q2. Which planet is known as the Red Planet?<br>
-(A) Earth<br>
-(B) Mars<br>
-(C) Jupiter<br>
-(D) Venus<br>
-Answer: B
+                        <div class="note-box">
+                            <strong>Format:</strong><br>
+                            Q1. Write your question here?<br>
+                            (A) First option<br>
+                            (B) Second option<br>
+                            (C) Third option<br>
+                            (D) Fourth option<br>
+                            Answer: A/B/C/D<br>
+                            <br>
+                            Q2. Second question?<br>
+                            (A) Option 1<br>
+                            (B) Option 2<br>
+                            (C) Option 3<br>
+                            (D) Option 4<br>
+                            Answer: B
                         </div>
                         <p><strong>Note:</strong> Leave one blank line after each question</p>
                     </div>
@@ -737,8 +942,8 @@ Answer: B
             <div class="header-top">
                 <div class="logo">
                     <i class="fas fa-chalkboard-teacher"></i>
-                    <div>
-                        <h1>STUDY POINT Coaching Centre</h1>
+                    <div class="logo-content">
+                        <h1>QUEST COACHING CENTRE</h1>
                         <p class="subtitle">Teacher Test Management System</p>
                     </div>
                 </div>
@@ -785,27 +990,32 @@ Answer: B
                 </div>
                 
                 <div class="helper-text">
-                    <h4><i class="fas fa-info-circle"></i> How to format your questions:</h4>
-                    <div class="example">
-Q1. What is the capital of France?<br>
-(A) London<br>
-(B) Berlin<br>
-(C) Paris<br>
-(D) Madrid<br>
-Answer: C<br>
-<br>
-Q2. Which planet is known as the Red Planet?<br>
-(A) Earth<br>
-(B) Mars<br>
-(C) Jupiter<br>
-(D) Venus<br>
-Answer: B
-                    </div>
+                    <h4><i class="fas fa-info-circle"></i> Format for writing questions:</h4>
+                    <p>Write each question in this exact format. You can copy-paste from Word/Google Docs.</p>
                 </div>
                 
                 <div class="form-group">
                     <label for="questionsText"><i class="fas fa-question-circle"></i> Questions Text</label>
-                    <textarea id="questionsText" placeholder="Paste all your questions here..."></textarea>
+                    <div class="textarea-container">
+                        <textarea id="questionsText" placeholder="Paste all your questions here...
+
+Example:
+Q1. What is the capital of France?
+(A) London
+(B) Berlin
+(C) Paris
+(D) Madrid
+Answer: C
+
+Q2. Which planet is known as the Red Planet?
+(A) Earth
+(B) Mars
+(C) Jupiter
+(D) Venus
+Answer: B
+
+Note: Leave one blank line after each question"></textarea>
+                    </div>
                     <div id="parseInfo" class="parse-info">
                         Parsed: <span id="parsedCount">0</span> questions successfully
                     </div>
@@ -834,20 +1044,21 @@ Answer: B
         </div>
         
         <footer>
-            <p>STUDY POINT Coaching Centre &copy; 2023 | Test Management System</p>
+            <p>QUEST COACHING CENTRE &copy; 2023 | Test Management System</p>
             <p>All tests stored securely in Firebase</p>
         </footer>
     </div>
 
     <script>
-        // STUDY POINT Coaching Centre Firebase configuration
+        // QUEST COACHING CENTRE Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyBDN5ATO_LQ-3THveZDGyvLjtjjavgTIJk",
-            authDomain: "study-point-coaching-centre.firebaseapp.com",
-            projectId: "study-point-coaching-centre",
-            storageBucket: "study-point-coaching-centre.firebasestorage.app",
-            messagingSenderId: "1044456595909",
-            appId: "1:1044456595909:web:ca77701e20483dc640abac"
+            apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
+            authDomain: "quest-coaching.firebaseapp.com",
+            databaseURL: "https://quest-coaching-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "quest-coaching",
+            storageBucket: "quest-coaching.firebasestorage.app",
+            messagingSenderId: "131948734089",
+            appId: "1:131948734089:web:f4ba25110c8b1298360858"
         };
         
         let db = null;
@@ -957,7 +1168,7 @@ Answer: B
             try {
                 const app = firebase.initializeApp(firebaseConfig);
                 db = app.firestore();
-                showMessage('Connected to STUDY POINT database successfully!', true);
+                showMessage('Connected to QUEST COACHING database successfully!', true);
                 
                 // Load tests on initial load
                 loadPublishedTests();
@@ -967,7 +1178,7 @@ Answer: B
                 if (error.code === 'app/duplicate-app') {
                     // If already initialized, get the existing app
                     db = firebase.app().firestore();
-                    showMessage('Connected to STUDY POINT database successfully!', true);
+                    showMessage('Connected to QUEST COACHING database successfully!', true);
                     loadPublishedTests();
                 } else {
                     showMessage('Failed to connect to database: ' + error.message, false);
@@ -1115,7 +1326,7 @@ Answer: B
                     await db.collection('tests').doc(editingTestId).update(testData);
                     showMessage(`Test updated successfully!`, true);
                     editingTestId = null;
-                    uploadBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Publish Test';
+                    uploadBtn.innerHTML = '<i class="fas fa-save"></i> Update Test';
                 } else {
                     // Create new test - "tests" collection mein save karenge
                     await db.collection('tests').add(testData);
@@ -1346,6 +1557,20 @@ Answer: B
             if (e.key === 'Escape' && helpModal.classList.contains('show')) {
                 helpModal.classList.remove('show');
                 document.body.style.overflow = 'auto';
+            }
+        });
+        
+        // Remove example text when user starts typing
+        questionsTextInput.addEventListener('focus', function() {
+            if (this.value === this.getAttribute('placeholder')) {
+                this.value = '';
+            }
+        });
+        
+        // Restore example if empty on blur
+        questionsTextInput.addEventListener('blur', function() {
+            if (this.value.trim() === '') {
+                this.value = this.getAttribute('placeholder');
             }
         });
     </script>
