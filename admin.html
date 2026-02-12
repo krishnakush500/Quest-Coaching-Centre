@@ -115,6 +115,11 @@
             background-color: #bb2d3b;
             border-color: #b02a37;
         }
+        /* Top student highlight */
+        .top-student-row {
+            background-color: #fff3cd !important;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -360,9 +365,9 @@
                             <div class="simple-instruction">"Old Results": See published results</div>
                             <div class="simple-instruction">From drafts: You can edit or delete</div>
                             <div class="simple-instruction">From published: You can view, edit or delete</div>
-                            <div class="simple-instruction">"View" button: See full result</div>
+                            <div class="simple-instruction">"View" button: See full result with TOP student at the top</div>
                             <div class="simple-instruction">"Edit" button: Make changes to result</div>
-                            <div class="simple-instruction"><strong>NEW:</strong> "Download All Results PDF" button: Get complete result sheet as PDF</div>
+                            <div class="simple-instruction"><strong>NEW:</strong> "Download All Results PDF" button: Get complete result sheet as PDF (top student first)</div>
                         </div>
 
                         <h6 class="text-primary mt-4">Online Test</h6>
@@ -412,9 +417,9 @@
                             <div class="simple-instruction">"Old Results": प्रकाशित रिजल्ट देखें</div>
                             <div class="simple-instruction">ड्राफ्ट से: आप एडिट या डिलीट कर सकते हैं</div>
                             <div class="simple-instruction">प्रकाशित से: आप देख, एडिट या डिलीट कर सकते हैं</div>
-                            <div class="simple-instruction">"View" बटन: पूरा रिजल्ट देखें</div>
+                            <div class="simple-instruction">"View" बटन: पूरा रिजल्ट देखें (टॉप छात्र सबसे ऊपर)</div>
                             <div class="simple-instruction">"Edit" बटन: रिजल्ट में बदलाव करें</div>
-                            <div class="simple-instruction"><strong>नया:</strong> "Download All Results PDF" बटन: पूरी रिजल्ट शीट PDF के रूप में डाउनलोड करें</div>
+                            <div class="simple-instruction"><strong>नया:</strong> "Download All Results PDF" बटन: पूरी रिजल्ट शीट PDF के रूप में डाउनलोड करें (टॉप छात्र पहले)</div>
                         </div>
 
                         <h6 class="text-primary mt-4">ऑनलाइन टेस्ट</h6>
@@ -1366,6 +1371,32 @@
             }
         }
 
+        // ============= HELPER FUNCTION TO SORT STUDENTS BY PERCENTAGE (HIGHEST FIRST) =============
+        function sortStudentsByPercentage(studentsArray, subjectsArray) {
+            // Create a copy to avoid mutating original
+            const sorted = [...studentsArray];
+            
+            // Calculate percentage for each student and sort descending
+            sorted.sort((a, b) => {
+                let totalA = 0, totalMaxA = 0;
+                let totalB = 0, totalMaxB = 0;
+                
+                subjectsArray.forEach(subject => {
+                    totalA += a.marks[subject.name] || 0;
+                    totalMaxA += subject.total;
+                    totalB += b.marks[subject.name] || 0;
+                    totalMaxB += subject.total;
+                });
+                
+                const percentA = totalMaxA > 0 ? (totalA / totalMaxA) : 0;
+                const percentB = totalMaxB > 0 ? (totalB / totalMaxB) : 0;
+                
+                return percentB - percentA; // Descending (highest first)
+            });
+            
+            return sorted;
+        }
+
         // Load Old Results
         async function loadOldResults() {
             try {
@@ -1512,9 +1543,12 @@
             await deleteDoc(doc(db, "results", resultId));
         }
 
-        // ============= PDF GENERATION FUNCTION =============
+        // ============= PDF GENERATION FUNCTION (WITH SORTING) =============
         function generatePDF(resultData, examName) {
             try {
+                // Sort students by percentage (highest first) for PDF
+                const sortedStudents = sortStudentsByPercentage(resultData.students, resultData.subjects);
+                
                 // Use jsPDF with autoTable
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF({
@@ -1534,6 +1568,13 @@
                 doc.setFontSize(10);
                 doc.setTextColor(100);
                 doc.text(`Generated on: ${dateStr}`, 14, 25);
+                
+                // Add "Top Student" indicator
+                if (sortedStudents.length > 0) {
+                    doc.setFontSize(11);
+                    doc.setTextColor(40, 167, 69);
+                    doc.text(`🏆 Top Student: ${sortedStudents[0].name} (Roll No: ${sortedStudents[0].rollNo})`, 14, 32);
+                }
 
                 // Prepare table columns
                 let columns = [
@@ -1554,8 +1595,8 @@
                 columns.push({ header: 'Total', dataKey: 'total' });
                 columns.push({ header: 'Percentage', dataKey: 'percentage' });
 
-                // Prepare rows data
-                const rows = resultData.students.map(student => {
+                // Prepare rows data from SORTED students
+                const rows = sortedStudents.map(student => {
                     let row = {
                         rollNo: student.rollNo,
                         name: student.name,
@@ -1582,7 +1623,7 @@
 
                 // Generate table
                 doc.autoTable({
-                    startY: 35,
+                    startY: 40,
                     head: [columns.map(col => col.header)],
                     body: rows.map(row => 
                         columns.map(col => row[col.dataKey] || '')
@@ -1619,14 +1660,14 @@
 
                 // Save PDF
                 doc.save(`${examName}_Results.pdf`);
-                showToast('PDF Downloaded Successfully!');
+                showToast('PDF Downloaded Successfully! (Top student first)');
             } catch (error) {
                 console.error('PDF Generation Error:', error);
                 alert('Error generating PDF: ' + error.message);
             }
         }
 
-        // View Result - MODIFIED to store data and attach PDF download handler
+        // View Result - MODIFIED to sort students by percentage (highest first) and highlight top student
         async function viewResult(resultId) {
             try {
                 const resultDoc = await getDocs(query(collection(db, "results"), where("__name__", "==", resultId)));
@@ -1643,18 +1684,23 @@
                 currentResultDataForPdf = data;
                 currentExamNameForPdf = data.examName;
                 
-                resultModalTitle.textContent = data.examName;
+                // Sort students by percentage (highest first) for display
+                const sortedStudents = sortStudentsByPercentage(data.students, data.subjects);
+                
+                resultModalTitle.textContent = data.examName + ' (Ranked by Percentage)';
                 
                 let resultHtml = `
                     <p><strong>Date:</strong> ${date}</p>
                     <p><strong>Subjects:</strong> ${data.subjects.map(s => `${s.name} (${s.total})`).join(', ')}</p>
                     <p><strong>Total Students:</strong> ${data.students.length}</p>
+                    ${sortedStudents.length > 0 ? `<div class="alert alert-success"><strong>🏆 Top Student:</strong> ${sortedStudents[0].name} (Roll No: ${sortedStudents[0].rollNo}) with ${((sortedStudents[0].totalMarks || calculateTotal(sortedStudents[0], data.subjects)) / data.subjects.reduce((acc, s) => acc + s.total, 0) * 100).toFixed(2)}%</div>` : ''}
                     
-                    <h5 class="mt-4">Student Results</h5>
+                    <h5 class="mt-4">Student Results (Highest Percentage First)</h5>
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead>
                                 <tr>
+                                    <th>Rank</th>
                                     <th>Roll No</th>
                                     <th>Name</th>
                                     <th>Father Name</th>
@@ -1675,17 +1721,29 @@
                             <tbody>
                 `;
                 
-                // Add student rows
-                data.students.forEach(student => {
+                // Helper function to calculate total marks for a student
+                function calculateTotal(student, subjects) {
+                    let total = 0;
+                    subjects.forEach(subject => {
+                        total += student.marks[subject.name] || 0;
+                    });
+                    return total;
+                }
+                
+                // Add student rows from SORTED array
+                sortedStudents.forEach((student, index) => {
                     let totalMarks = 0;
                     let totalMaxMarks = 0;
                     
-                    resultHtml += `
-                        <tr>
-                            <td>${student.rollNo}</td>
-                            <td>${student.name}</td>
-                            <td>${student.fatherName || '-'}</td>
-                    `;
+                    // Determine if this is the top student (index 0)
+                    const isTopStudent = index === 0;
+                    
+                    // Start row with optional highlight class
+                    resultHtml += `<tr${isTopStudent ? ' class="top-student-row"' : ''}>`;
+                    resultHtml += `<td><strong>#${index + 1}</strong></td>`;
+                    resultHtml += `<td>${student.rollNo}</td>`;
+                    resultHtml += `<td>${student.name}${isTopStudent ? ' 🏆' : ''}</td>`;
+                    resultHtml += `<td>${student.fatherName || '-'}</td>`;
                     
                     // Add marks for each subject
                     data.subjects.forEach(subject => {
@@ -1699,8 +1757,8 @@
                     const percentage = totalMaxMarks > 0 ? ((totalMarks / totalMaxMarks) * 100).toFixed(2) : 0;
                     
                     resultHtml += `
-                            <td>${totalMarks}/${totalMaxMarks}</td>
-                            <td>${percentage}%</td>
+                            <td><strong>${totalMarks}/${totalMaxMarks}</strong></td>
+                            <td><strong>${percentage}%</strong></td>
                         </tr>
                     `;
                 });
