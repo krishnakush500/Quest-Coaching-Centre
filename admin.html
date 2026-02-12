@@ -6,6 +6,10 @@
     <title>Quest Coaching Centre - Admin Panel</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jsPDF Library for PDF download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- AutoTable plugin for jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
     <style>
         .section {
             display: none;
@@ -100,6 +104,16 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+        }
+        /* PDF download button */
+        .pdf-download-btn {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+        .pdf-download-btn:hover {
+            background-color: #bb2d3b;
+            border-color: #b02a37;
         }
     </style>
 </head>
@@ -348,6 +362,7 @@
                             <div class="simple-instruction">From published: You can view, edit or delete</div>
                             <div class="simple-instruction">"View" button: See full result</div>
                             <div class="simple-instruction">"Edit" button: Make changes to result</div>
+                            <div class="simple-instruction"><strong>NEW:</strong> "Download All Results PDF" button: Get complete result sheet as PDF</div>
                         </div>
 
                         <h6 class="text-primary mt-4">Online Test</h6>
@@ -399,6 +414,7 @@
                             <div class="simple-instruction">प्रकाशित से: आप देख, एडिट या डिलीट कर सकते हैं</div>
                             <div class="simple-instruction">"View" बटन: पूरा रिजल्ट देखें</div>
                             <div class="simple-instruction">"Edit" बटन: रिजल्ट में बदलाव करें</div>
+                            <div class="simple-instruction"><strong>नया:</strong> "Download All Results PDF" बटन: पूरी रिजल्ट शीट PDF के रूप में डाउनलोड करें</div>
                         </div>
 
                         <h6 class="text-primary mt-4">ऑनलाइन टेस्ट</h6>
@@ -430,6 +446,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <!-- Added Download PDF button -->
+                    <button type="button" class="btn pdf-download-btn" id="downloadPdfBtn">📥 Download All Results PDF</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -529,7 +547,7 @@
         const createResultBtn = document.getElementById('createResultBtn');
         const draftResultsBtn = document.getElementById('draftResultsBtn');
         const oldResultsBtn = document.getElementById('oldResultsBtn');
-        const onlineTestBtn = document.getElementById('onlineTestBtn'); // CHANGED FROM onlineTestResultsBtn
+        const onlineTestBtn = document.getElementById('onlineTestBtn');
         
         const backToDashboardBtn = document.getElementById('backToDashboardBtn');
         const backToDashboardBtn2 = document.getElementById('backToDashboardBtn2');
@@ -575,6 +593,7 @@
         const resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
         const resultModalTitle = document.getElementById('resultModalTitle');
         const resultDetails = document.getElementById('resultDetails');
+        const downloadPdfBtn = document.getElementById('downloadPdfBtn'); // PDF Button
         
         // Confirmation Modal Elements
         const editPublishedConfirmModal = new bootstrap.Modal(document.getElementById('editPublishedConfirmModal'));
@@ -595,6 +614,10 @@
         let isEditingPublishedResult = false;
         let editingPublishedResultId = null;
         let hasChanges = false; // Track if there are unsaved changes
+        
+        // Store currently viewed result data for PDF download
+        let currentResultDataForPdf = null;
+        let currentExamNameForPdf = '';
 
         // Directly show dashboard (no login required)
         showSection(dashboardSection);
@@ -1489,7 +1512,121 @@
             await deleteDoc(doc(db, "results", resultId));
         }
 
-        // View Result
+        // ============= PDF GENERATION FUNCTION =============
+        function generatePDF(resultData, examName) {
+            try {
+                // Use jsPDF with autoTable
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({
+                    orientation: 'landscape', // Landscape for more columns
+                    unit: 'mm',
+                    format: 'a4'
+                });
+
+                // Set title
+                doc.setFontSize(18);
+                doc.setTextColor(0, 102, 204);
+                doc.text(`QUEST COACHING CENTRE - ${examName}`, 14, 15);
+                
+                // Add date
+                const now = new Date();
+                const dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+                doc.setFontSize(10);
+                doc.setTextColor(100);
+                doc.text(`Generated on: ${dateStr}`, 14, 25);
+
+                // Prepare table columns
+                let columns = [
+                    { header: 'Roll No', dataKey: 'rollNo' },
+                    { header: 'Student Name', dataKey: 'name' },
+                    { header: 'Father Name', dataKey: 'father' }
+                ];
+                
+                // Add subject columns
+                resultData.subjects.forEach(subject => {
+                    columns.push({ 
+                        header: `${subject.name}\n(${subject.total})`, 
+                        dataKey: subject.name 
+                    });
+                });
+                
+                // Add total and percentage columns
+                columns.push({ header: 'Total', dataKey: 'total' });
+                columns.push({ header: 'Percentage', dataKey: 'percentage' });
+
+                // Prepare rows data
+                const rows = resultData.students.map(student => {
+                    let row = {
+                        rollNo: student.rollNo,
+                        name: student.name,
+                        father: student.fatherName || '-'
+                    };
+                    
+                    let totalMarks = 0;
+                    let totalMaxMarks = 0;
+                    
+                    resultData.subjects.forEach(subject => {
+                        const mark = student.marks[subject.name] || 0;
+                        row[subject.name] = `${mark}/${subject.total}`;
+                        totalMarks += mark;
+                        totalMaxMarks += subject.total;
+                    });
+                    
+                    const percentage = totalMaxMarks > 0 ? ((totalMarks / totalMaxMarks) * 100).toFixed(2) : 0;
+                    
+                    row.total = `${totalMarks}/${totalMaxMarks}`;
+                    row.percentage = `${percentage}%`;
+                    
+                    return row;
+                });
+
+                // Generate table
+                doc.autoTable({
+                    startY: 35,
+                    head: [columns.map(col => col.header)],
+                    body: rows.map(row => 
+                        columns.map(col => row[col.dataKey] || '')
+                    ),
+                    styles: {
+                        fontSize: 8,
+                        cellPadding: 2,
+                        lineColor: [200, 200, 200],
+                        lineWidth: 0.1,
+                    },
+                    headStyles: {
+                        fillColor: [41, 128, 185],
+                        textColor: [255, 255, 255],
+                        fontSize: 9,
+                        fontStyle: 'bold',
+                        halign: 'center',
+                        valign: 'middle'
+                    },
+                    alternateRowStyles: {
+                        fillColor: [245, 245, 245]
+                    },
+                    margin: { top: 30, right: 10, bottom: 20, left: 10 },
+                    didDrawPage: function(data) {
+                        // Footer with page number
+                        doc.setFontSize(8);
+                        doc.setTextColor(150);
+                        doc.text(
+                            `Page ${doc.internal.getNumberOfPages()}`,
+                            data.settings.margin.left,
+                            doc.internal.pageSize.height - 10
+                        );
+                    }
+                });
+
+                // Save PDF
+                doc.save(`${examName}_Results.pdf`);
+                showToast('PDF Downloaded Successfully!');
+            } catch (error) {
+                console.error('PDF Generation Error:', error);
+                alert('Error generating PDF: ' + error.message);
+            }
+        }
+
+        // View Result - MODIFIED to store data and attach PDF download handler
         async function viewResult(resultId) {
             try {
                 const resultDoc = await getDocs(query(collection(db, "results"), where("__name__", "==", resultId)));
@@ -1501,6 +1638,10 @@
                 
                 const data = resultDoc.docs[0].data();
                 const date = data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : 'Unknown date';
+                
+                // Store data for PDF download
+                currentResultDataForPdf = data;
+                currentExamNameForPdf = data.examName;
                 
                 resultModalTitle.textContent = data.examName;
                 
@@ -1571,6 +1712,22 @@
                 `;
                 
                 resultDetails.innerHTML = resultHtml;
+                
+                // Attach event listener to PDF download button
+                // Remove any previous listeners to avoid duplicates
+                const newDownloadBtn = downloadPdfBtn.cloneNode(true);
+                downloadPdfBtn.parentNode.replaceChild(newDownloadBtn, downloadPdfBtn);
+                // Update the global reference to the new button
+                window.downloadPdfBtn = newDownloadBtn;
+                
+                newDownloadBtn.addEventListener('click', () => {
+                    if (currentResultDataForPdf) {
+                        generatePDF(currentResultDataForPdf, currentExamNameForPdf);
+                    } else {
+                        alert('No result data to download');
+                    }
+                });
+                
                 resultModal.show();
             } catch (error) {
                 console.error('Error loading result:', error);
