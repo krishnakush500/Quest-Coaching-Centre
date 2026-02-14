@@ -365,9 +365,9 @@
                             <div class="simple-instruction">"Old Results": See published results</div>
                             <div class="simple-instruction">From drafts: You can edit or delete</div>
                             <div class="simple-instruction">From published: You can view, edit or delete</div>
-                            <div class="simple-instruction">"View" button: See full result with TOP student at the top</div>
+                            <div class="simple-instruction">"View" button: See full result with Rank & TOP student</div>
                             <div class="simple-instruction">"Edit" button: Make changes to result</div>
-                            <div class="simple-instruction"><strong>NEW:</strong> "Download All Results PDF" button: Get complete result sheet as PDF (top student first)</div>
+                            <div class="simple-instruction"><strong>PDF Download:</strong> PDF includes Rank, Percentage, and Top Student Highlight</div>
                         </div>
 
                         <h6 class="text-primary mt-4">Online Test</h6>
@@ -417,9 +417,9 @@
                             <div class="simple-instruction">"Old Results": प्रकाशित रिजल्ट देखें</div>
                             <div class="simple-instruction">ड्राफ्ट से: आप एडिट या डिलीट कर सकते हैं</div>
                             <div class="simple-instruction">प्रकाशित से: आप देख, एडिट या डिलीट कर सकते हैं</div>
-                            <div class="simple-instruction">"View" बटन: पूरा रिजल्ट देखें (टॉप छात्र सबसे ऊपर)</div>
+                            <div class="simple-instruction">"View" बटन: रैंक और टॉप छात्र के साथ रिजल्ट देखें</div>
                             <div class="simple-instruction">"Edit" बटन: रिजल्ट में बदलाव करें</div>
-                            <div class="simple-instruction"><strong>नया:</strong> "Download All Results PDF" बटन: पूरी रिजल्ट शीट PDF के रूप में डाउनलोड करें (टॉप छात्र पहले)</div>
+                            <div class="simple-instruction"><strong>PDF डाउनलोड:</strong> PDF में रैंक, प्रतिशत और टॉप छात्र हाइलाइट होगा</div>
                         </div>
 
                         <h6 class="text-primary mt-4">ऑनलाइन टेस्ट</h6>
@@ -452,7 +452,7 @@
                 </div>
                 <div class="modal-footer">
                     <!-- Added Download PDF button -->
-                    <button type="button" class="btn pdf-download-btn" id="downloadPdfBtn">📥 Download All Results PDF</button>
+                    <button type="button" class="btn pdf-download-btn" id="downloadPdfBtn">📥 Download All Results PDF (with Rank)</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -1543,7 +1543,7 @@
             await deleteDoc(doc(db, "results", resultId));
         }
 
-        // ============= PDF GENERATION FUNCTION (WITH SORTING) =============
+        // ============= PDF GENERATION FUNCTION (WITH RANK COLUMN) =============
         function generatePDF(resultData, examName) {
             try {
                 // Sort students by percentage (highest first) for PDF
@@ -1576,8 +1576,9 @@
                     doc.text(`🏆 Top Student: ${sortedStudents[0].name} (Roll No: ${sortedStudents[0].rollNo})`, 14, 32);
                 }
 
-                // Prepare table columns
+                // Prepare table columns - NOW INCLUDING RANK
                 let columns = [
+                    { header: 'Rank', dataKey: 'rank' },
                     { header: 'Roll No', dataKey: 'rollNo' },
                     { header: 'Student Name', dataKey: 'name' },
                     { header: 'Father Name', dataKey: 'father' }
@@ -1596,8 +1597,9 @@
                 columns.push({ header: 'Percentage', dataKey: 'percentage' });
 
                 // Prepare rows data from SORTED students
-                const rows = sortedStudents.map(student => {
+                const rows = sortedStudents.map((student, index) => {
                     let row = {
+                        rank: index + 1, // Add rank (1-based)
                         rollNo: student.rollNo,
                         name: student.name,
                         father: student.fatherName || '-'
@@ -1659,8 +1661,8 @@
                 });
 
                 // Save PDF
-                doc.save(`${examName}_Results.pdf`);
-                showToast('PDF Downloaded Successfully! (Top student first)');
+                doc.save(`${examName}_Results_with_Rank.pdf`);
+                showToast('PDF Downloaded Successfully! (Includes Rank column)');
             } catch (error) {
                 console.error('PDF Generation Error:', error);
                 alert('Error generating PDF: ' + error.message);
