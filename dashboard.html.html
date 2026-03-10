@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>Teacher Dashboard · Fee Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        body {
+            background: #f4f7fc;
+            padding: 20px 16px 32px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        /* cards & surfaces */
+        .card {
+            background: white;
+            border-radius: 28px;
+            padding: 22px 20px;
+            box-shadow: 0 12px 28px -8px rgba(0,20,40,0.12);
+            margin-bottom: 24px;
+            border: 1px solid rgba(156, 180, 209, 0.2);
+        }
+        .badge {
+            background: #ecf3fa;
+            border-radius: 60px;
+            padding: 6px 16px;
+            font-weight: 500;
+            color: #1a4d7a;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        /* session row */
+        .session-ribbon {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px 20px;
+            margin-bottom: 28px;
+            background: white;
+            padding: 12px 22px;
+            border-radius: 50px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.02);
+        }
+        .session-ribbon label {
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1.1rem;
+        }
+        select {
+            background: #f0f5fe;
+            border: 1px solid #bdd3ec;
+            border-radius: 40px;
+            padding: 12px 28px 12px 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #0b2b44;
+            cursor: pointer;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%231d4e7a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            min-width: 130px;
+        }
+        /* single set of three summary boxes (now only for class) */
+        .summary-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0 20px;
+        }
+        .summary-item {
+            flex: 1 1 180px;
+            background: white;
+            border-radius: 32px;
+            padding: 28px 16px;
+            text-align: center;
+            box-shadow: 0 12px 22px -8px rgba(0, 40, 70, 0.2);
+            transition: 0.2s;
+            color: white;
+            font-weight: 600;
+            border: none;
+        }
+        /* distinct background colors for each box as requested */
+        .summary-item.total {
+            background: linear-gradient(145deg, #2563eb, #1e4b8f); /* deep blue */
+        }
+        .summary-item.received {
+            background: linear-gradient(145deg, #16a34a, #0f6e34); /* fresh green */
+        }
+        .summary-item.due {
+            background: linear-gradient(145deg, #dc2626, #b11e1e); /* strong red */
+        }
+        .summary-emoji {
+            font-size: 2.4rem;
+            margin-bottom: 12px;
+            filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2));
+        }
+        .summary-label {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+        .summary-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1.2;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        /* class filter row */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            background: #e9f0f9;
+            border-radius: 48px;
+            padding: 14px 25px;
+            margin: 20px 0 0px;
+        }
+        .filter-bar span {
+            font-weight: 600;
+            color: #1d4a74;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1.2rem;
+        }
+        /* buttons */
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            margin: 28px 0 20px;
+            justify-content: center;
+        }
+        .btn {
+            border: none;
+            background: white;
+            padding: 16px 38px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 10px 18px -8px #153b60a0;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(60, 110, 160, 0.2);
+            flex: 0 1 auto;
+            color: #1a3d5e;
+        }
+        .btn-primary {
+            background: #1b4f9b;
+            color: white;
+            box-shadow: 0 12px 22px -10px #0b2f57;
+        }
+        .btn-primary:hover { background: #0f3f7a; }
+        .btn-outline:hover { background: #dbeafe; }
+        /* recent updates */
+        .updates-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #163a58;
+            margin-bottom: 20px;
+        }
+        .update-item {
+            background: white;
+            border-radius: 40px;
+            padding: 14px 24px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px 20px;
+            font-size: 1rem;
+            border-left: 6px solid #ffb347;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.02);
+        }
+        .update-date { font-weight: 600; color: #0f4a6f; min-width: 90px; }
+        .update-roll { background: #e2ebf3; padding: 4px 15px; border-radius: 30px; font-weight: 500; }
+        .update-name { font-weight: 500; color: #152b3c; }
+        .update-amount { margin-left: auto; font-weight: 700; background: #dff0e0; padding: 5px 18px; border-radius: 40px; color: #166b41; }
+        @media (max-width: 600px) {
+            .summary-item { flex: 1 1 100%; }
+            .update-item { flex-direction: column; align-items: flex-start; }
+            .update-amount { margin-left: 0; }
+        }
+        hr { opacity: 0.2; margin: 25px 0 10px; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- SESSION DROPDOWN (top) with auto select current (2025-26 default) -->
+    <div class="session-ribbon">
+        <label>📅 Session</label>
+        <select id="sessionSelectTop" class="session-dropdown">
+            <option value="2024-25">2024-25</option>
+            <option value="2025-26" selected>2025-26</option>
+            <option value="2026-27">2026-27</option>
+        </select>
+        <div style="margin-left: auto; font-size: 0.95rem; color: #1b4f9b;">👩‍🏫 Teacher · Fee Dashboard</div>
+    </div>
+
+    <!-- CLASS FILTER (dropdown only, no extra boxes above it) -->
+    <div class="filter-bar">
+        <span>🏫 Filter by class</span>
+        <select id="classSelect">
+            <option value="All">All Classes (default)</option>
+            <option value="Class 6">Class 6</option>
+            <option value="Class 7">Class 7</option>
+            <option value="Class 8">Class 8</option>
+            <option value="Class 9">Class 9</option>
+            <option value="Class 10">Class 10</option>
+        </select>
+    </div>
+
+    <!-- ONLY ONE SET OF THREE SUMMARY BOXES (for selected class within session) with distinct solid colors -->
+    <div class="summary-row" id="classSummary">
+        <div class="summary-item total">
+            <div class="summary-emoji">💰</div>
+            <div class="summary-label">Total Fee</div>
+            <div class="summary-value" id="classTotal">₹0</div>
+        </div>
+        <div class="summary-item received">
+            <div class="summary-emoji">✅</div>
+            <div class="summary-label">Received</div>
+            <div class="summary-value" id="classReceived">₹0</div>
+        </div>
+        <div class="summary-item due">
+            <div class="summary-emoji">⏳</div>
+            <div class="summary-label">Due</div>
+            <div class="summary-value" id="classDue">₹0</div>
+        </div>
+    </div>
+
+    <!-- TWO MAIN BUTTONS (add/update) -->
+    <div class="action-buttons">
+        <button class="btn btn-primary" id="goToAddBtn">➕ Add Student</button>
+        <button class="btn btn-outline" id="goToUpdateBtn">✏️ Update Student</button>
+    </div>
+
+    <!-- RECENT UPDATES section (only on dashboard) -->
+    <div class="card">
+        <div class="updates-title">
+            <span>🕒 Recent Updates</span>
+            <span class="badge">latest first</span>
+        </div>
+        <div id="recentUpdatesContainer">
+            <!-- dynamic injected updates -->
+            <div class="update-item">📌 No transactions yet</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ----- localStorage helpers -----
+        const STORAGE_KEY = 'feeManagementStudents';
+
+        function loadStudents() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try { return JSON.parse(stored); } catch(e){ return []; }
+            }
+            // default demo dataset
+            return [
+                { roll_number: "12", student_name: "Rahul Kumar", father_name: "Mr. Sharma", class: "Class 8", session: "2025-26", total_amount: 10000, received_amount: 2000, due_amount: 8000 },
+                { roll_number: "8", student_name: "Ankit Kumar", father_name: "Mr. Verma", class: "Class 7", session: "2025-26", total_amount: 9000, received_amount: 1500, due_amount: 7500 },
+                { roll_number: "15", student_name: "Muskan Kumari", father_name: "Mr. Singh", class: "Class 9", session: "2025-26", total_amount: 12000, received_amount: 3000, due_amount: 9000 },
+                { roll_number: "3", student_name: "Priya Mehta", father_name: "Mr. Mehta", class: "Class 10", session: "2024-25", total_amount: 15000, received_amount: 7000, due_amount: 8000 },
+                { roll_number: "22", student_name: "Aryan Raj", father_name: "Mr. Raj", class: "Class 6", session: "2025-26", total_amount: 8000, received_amount: 4000, due_amount: 4000 },
+                { roll_number: "7", student_name: "Sneha Roy", father_name: "Mr. Roy", class: "Class 8", session: "2026-27", total_amount: 11000, received_amount: 2000, due_amount: 9000 },
+                { roll_number: "19", student_name: "Kabir Das", father_name: "Mr. Das", class: "Class 9", session: "2025-26", total_amount: 12500, received_amount: 5000, due_amount: 7500 }
+            ];
+        }
+
+        function saveStudents(students) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
+        }
+
+        if (!localStorage.getItem(STORAGE_KEY)) {
+            saveStudents(loadStudents());
+        }
+
+        // ------ DOM elements -----
+        const sessionSelect = document.getElementById('sessionSelectTop');
+        const classSelect = document.getElementById('classSelect');
+
+        // summary fields (only one set)
+        const classTotalSpan = document.getElementById('classTotal');
+        const classReceivedSpan = document.getElementById('classReceived');
+        const classDueSpan = document.getElementById('classDue');
+
+        const recentContainer = document.getElementById('recentUpdatesContainer');
+
+        function getAllStudents() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        }
+
+        // ------ render: only class totals inside selected session + class filter -----
+        function renderSummaries() {
+            const students = getAllStudents();
+            const selectedSession = sessionSelect.value;
+            const selectedClass = classSelect.value;
+
+            let classTotal = 0, classReceived = 0, classDue = 0;
+            students.forEach(s => {
+                if (s.session === selectedSession) {
+                    if (selectedClass === 'All' || s.class === selectedClass) {
+                        classTotal += Number(s.total_amount) || 0;
+                        classReceived += Number(s.received_amount) || 0;
+                        classDue += Number(s.due_amount) || 0;
+                    }
+                }
+            });
+            classTotalSpan.innerText = '₹' + classTotal.toLocaleString();
+            classReceivedSpan.innerText = '₹' + classReceived.toLocaleString();
+            classDueSpan.innerText = '₹' + classDue.toLocaleString();
+
+            // ---- recent updates (latest 4-5) ----
+            let recentList = [];
+            const withPayment = students.filter(s => s.received_amount > 0).map(s => ({
+                date: '09 Mar 2026', // mock date for variety
+                roll: s.roll_number,
+                name: s.student_name,
+                amount: s.received_amount,
+            })).reverse();
+
+            const demoUpdates = [
+                { date: '08 Mar 2026', roll: '12', name: 'Rahul Kumar', amount: 2000 },
+                { date: '08 Mar 2026', roll: '8', name: 'Ankit Kumar', amount: 1500 },
+                { date: '07 Mar 2026', roll: '15', name: 'Muskan Kumari', amount: 3000 },
+                { date: '06 Mar 2026', roll: '22', name: 'Aryan Raj', amount: 1000 },
+            ];
+            // merge demo with real, keep latest first style
+            let finalUpdates = demoUpdates.slice(0,4);
+            if (withPayment.length > 0) {
+                finalUpdates = withPayment.slice(0,3).map(p => ({
+                    date: '10 Mar 2026',
+                    roll: p.roll,
+                    name: p.name,
+                    amount: p.amount
+                })).concat(finalUpdates).slice(0,5);
+            }
+
+            recentContainer.innerHTML = '';
+            if (finalUpdates.length === 0) {
+                recentContainer.innerHTML = '<div class="update-item">✨ No recent payments</div>';
+            } else {
+                finalUpdates.forEach(u => {
+                    const div = document.createElement('div');
+                    div.className = 'update-item';
+                    div.innerHTML = `<span class="update-date">${u.date}</span>
+                                      <span class="update-roll">Roll ${u.roll}</span>
+                                      <span class="update-name">${u.name}</span>
+                                      <span class="update-amount">₹${u.amount} received</span>`;
+                    recentContainer.appendChild(div);
+                });
+            }
+        }
+
+        sessionSelect.addEventListener('change', renderSummaries);
+        classSelect.addEventListener('change', renderSummaries);
+
+        renderSummaries();
+
+        // navigation
+        document.getElementById('goToAddBtn').addEventListener('click', () => window.location.href = 'add-student.html');
+        document.getElementById('goToUpdateBtn').addEventListener('click', () => window.location.href = 'update-student.html');
+
+        window.feeManager = { saveStudents, getAllStudents };
+    })();
+</script>
+
+</body>
+</html>
