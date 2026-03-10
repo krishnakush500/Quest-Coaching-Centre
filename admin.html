@@ -120,6 +120,20 @@
             background-color: #fff3cd !important;
             font-weight: 500;
         }
+        /* Fee Management Button Style */
+        .fee-management-btn {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .fee-management-btn:hover {
+            background-color: #bb2d3b;
+            border-color: #b02a37;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3);
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -173,6 +187,19 @@
                                     <h5 class="card-title">Online Test</h5>
                                     <p class="card-text">Manage online tests</p>
                                     <button id="onlineTestBtn" class="btn btn-success">Open</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NEW SECTION: Fee Management Button (sabse niche) -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card text-center dashboard-card border-danger">
+                                <div class="card-body">
+                                    <h5 class="card-title text-danger">💰 Fee Management System</h5>
+                                    <p class="card-text">Manage student fees, add students, update payments</p>
+                                    <button id="feeManagementBtn" class="btn fee-management-btn">📊 Fee Management Dashboard</button>
                                 </div>
                             </div>
                         </div>
@@ -376,6 +403,14 @@
                             <div class="simple-instruction">Opens publishtest.html in new tab</div>
                             <div class="simple-instruction">Use this for online test management</div>
                         </div>
+
+                        <!-- NEW: Fee Management Help -->
+                        <h6 class="text-primary mt-4">Fee Management</h6>
+                        <div class="help-step">
+                            <div class="simple-instruction">"Fee Management Dashboard": Click to open fee management system</div>
+                            <div class="simple-instruction">Opens dashboard.html in new tab</div>
+                            <div class="simple-instruction">Manage student fees, add students, update payments</div>
+                        </div>
                     </div>
                     
                     <!-- Hindi Instructions -->
@@ -427,6 +462,14 @@
                             <div class="simple-instruction">"Online Test": ऑनलाइन टेस्ट मैनेज करने के लिए क्लिक करें</div>
                             <div class="simple-instruction">publishtest.html नई टैब में खुल जाएगा</div>
                             <div class="simple-instruction">इसे ऑनलाइन टेस्ट मैनेजमेंट के लिए उपयोग करें</div>
+                        </div>
+
+                        <!-- NEW: Fee Management Hindi Help -->
+                        <h6 class="text-primary mt-4">फीस प्रबंधन</h6>
+                        <div class="help-step">
+                            <div class="simple-instruction">"Fee Management Dashboard": फीस प्रबंधन प्रणाली खोलने के लिए क्लिक करें</div>
+                            <div class="simple-instruction">dashboard.html नई टैब में खुलेगा</div>
+                            <div class="simple-instruction">छात्रों की फीस प्रबंधित करें, नए छात्र जोड़ें, भुगतान अपडेट करें</div>
                         </div>
                     </div>
                 </div>
@@ -660,6 +703,15 @@
             englishHelpBtn.classList.remove('active');
             hindiHelpBtn.classList.add('active');
         });
+
+        // NEW: Fee Management Button Handler
+        const feeManagementBtn = document.getElementById('feeManagementBtn');
+        if (feeManagementBtn) {
+            feeManagementBtn.addEventListener('click', () => {
+                window.open('dashboard.html', '_blank');
+                showToast('Opening Fee Management Dashboard...');
+            });
+        }
 
         // Navigation Handlers
         createResultBtn.addEventListener('click', () => {
