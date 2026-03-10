@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>✏️ Update Student Fee · Fee Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        body {
+            background: #f2f6fb;
+            padding: 24px 16px 32px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* header & filters */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .page-header h1 {
+            font-size: 2.2rem;
+            color: #113a5e;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            padding: 12px 32px;
+            border-radius: 60px;
+            box-shadow: 0 6px 14px rgba(0,30,60,0.1);
+        }
+        .back-link {
+            background: white;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .back-link a {
+            color: #1b4f9b;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.1rem;
+        }
+
+        /* filter panel */
+        .filter-panel {
+            background: white;
+            border-radius: 70px;
+            padding: 28px 32px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 30px 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 18px 28px -10px #99b8d9;
+            border: 2px solid #d2e3ff;
+        }
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-group label {
+            font-weight: 700;
+            color: #154e7a;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        select {
+            background: #e8f2ff;
+            border: 2px solid #b1cdf0;
+            border-radius: 50px;
+            padding: 14px 38px 14px 26px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #10345c;
+            cursor: pointer;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="%231b4f9b" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 18px center;
+            min-width: 180px;
+        }
+
+        /* student cards grid */
+        .cards-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        .student-card {
+            background: white;
+            border-radius: 48px;
+            padding: 28px 22px;
+            width: 100%;
+            max-width: 340px;
+            box-shadow: 0 25px 35px -12px #2a4d7a;
+            border-left: 10px solid #2563eb;
+            transition: transform 0.2s;
+            border: 1px solid rgba(0,80,150,0.2);
+        }
+        .student-card:hover {
+            transform: translateY(-6px);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 22px;
+            background: #dbeafe;
+            padding: 12px 18px;
+            border-radius: 50px;
+        }
+        .card-header h3 {
+            font-size: 1.6rem;
+            color: #113155;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f1f7ff;
+            margin: 12px 0;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .detail-row span:first-child {
+            color: #2d496c;
+        }
+        .detail-row strong {
+            color: #0b2d4f;
+            font-size: 1.2rem;
+        }
+        .due-highlight {
+            background: #fee9e7;
+            border: 2px solid #dc2626;
+        }
+        .update-btn {
+            background: linear-gradient(145deg, #2563eb, #1b4b9b);
+            border: none;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 700;
+            padding: 16px 20px;
+            width: 100%;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0 5px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 12px 20px -8px #1e3f70;
+        }
+        .update-btn:hover {
+            background: #1b4b9b;
+            transform: scale(1.02);
+        }
+
+        /* update prompt box */
+        .prompt-box {
+            background: #e6f0ff;
+            border-radius: 50px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 3px solid #2563eb;
+        }
+        .prompt-box input {
+            width: 100%;
+            padding: 16px 22px;
+            font-size: 1.2rem;
+            border: 2px solid #a5c4f0;
+            border-radius: 50px;
+            margin-bottom: 15px;
+            outline: none;
+            background: white;
+        }
+        .prompt-box input:focus {
+            border-color: #1b4f9b;
+        }
+        .confirm-btn {
+            background: #16a34a;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 14px;
+            width: 100%;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .confirm-btn:hover {
+            background: #0f7a37;
+        }
+        .cancel-btn {
+            background: #64748b;
+            margin-top: 10px;
+        }
+        .empty-message {
+            background: white;
+            padding: 40px;
+            border-radius: 70px;
+            text-align: center;
+            font-size: 1.4rem;
+            color: #2d4b72;
+            width: 100%;
+        }
+        @media (max-width: 600px) {
+            .filter-panel { flex-direction: column; align-items: stretch; }
+            .page-header h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- header with back link -->
+    <div class="page-header">
+        <h1>
+            <span>✏️</span> Update Fee
+        </h1>
+        <div class="back-link">
+            <a href="dashboard.html">⬅️ Back to Dashboard</a>
+        </div>
+    </div>
+
+    <!-- filter panel: session + class -->
+    <div class="filter-panel">
+        <div class="filter-group">
+            <label>📅 Session</label>
+            <select id="sessionFilter">
+                <option value="2024-25">2024-25</option>
+                <option value="2025-26" selected>2025-26</option>
+                <option value="2026-27">2026-27</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>🏫 Class</label>
+            <select id="classFilter">
+                <option value="All">All Classes</option>
+                <option value="Class 6">Class 6</option>
+                <option value="Class 7">Class 7</option>
+                <option value="Class 8">Class 8</option>
+                <option value="Class 9">Class 9</option>
+                <option value="Class 10">Class 10</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- student cards container -->
+    <div id="cardsContainer" class="cards-grid">
+        <!-- dynamically filled -->
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ----- localStorage key -----
+        const STORAGE_KEY = 'feeManagementStudents';
+
+        // load students from localStorage
+        function loadStudents() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try { return JSON.parse(stored); } catch(e) { return []; }
+            }
+            // fallback demo (if somehow missing)
+            return [
+                { roll_number: "12", student_name: "Rahul Kumar", father_name: "Mr. Sharma", class: "Class 8", session: "2025-26", total_amount: 10000, received_amount: 2000, due_amount: 8000 },
+                { roll_number: "8", student_name: "Ankit Kumar", father_name: "Mr. Verma", class: "Class 7", session: "2025-26", total_amount: 9000, received_amount: 1500, due_amount: 7500 }
+            ];
+        }
+
+        function saveStudents(students) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
+        }
+
+        // DOM elements
+        const sessionFilter = document.getElementById('sessionFilter');
+        const classFilter = document.getElementById('classFilter');
+        const container = document.getElementById('cardsContainer');
+
+        // keep track of which card is in update mode (by roll + session + class to be safe)
+        let activePromptRoll = null;  
+
+        // render cards based on filters
+        function renderCards() {
+            const students = loadStudents();
+            const selectedSession = sessionFilter.value;
+            const selectedClass = classFilter.value;
+
+            // filter students
+            let filtered = students.filter(s => s.session === selectedSession);
+            if (selectedClass !== 'All') {
+                filtered = filtered.filter(s => s.class === selectedClass);
+            }
+
+            // if no students
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="empty-message">📭 No students found for this session & class</div>`;
+                return;
+            }
+
+            // sort by roll for consistency
+            filtered.sort((a,b) => (a.roll_number || '').localeCompare(b.roll_number || ''));
+
+            let html = '';
+            filtered.forEach(s => {
+                const roll = s.roll_number;
+                const safeId = `prompt-${roll}-${s.session}-${s.class}`.replace(/\s/g, ''); // unique enough
+                const confirmId = `confirm-${roll}-${s.session}-${s.class}`.replace(/\s/g, '');
+                // card template
+                html += `
+                    <div class="student-card" data-roll="${roll}" data-session="${s.session}" data-class="${s.class}">
+                        <div class="card-header">
+                            <span style="font-size:2rem;">👤</span>
+                            <h3>${s.student_name}</h3>
+                        </div>
+                        <div class="detail-row"><span>Roll</span> <strong>${roll}</strong></div>
+                        <div class="detail-row"><span>Father</span> <strong>${s.father_name || '—'}</strong></div>
+                        <div class="detail-row"><span>💰 Total</span> <strong>₹${Number(s.total_amount).toLocaleString()}</strong></div>
+                        <div class="detail-row"><span>✅ Received</span> <strong>₹${Number(s.received_amount).toLocaleString()}</strong></div>
+                        <div class="detail-row due-highlight"><span>⏳ Due</span> <strong>₹${Number(s.due_amount).toLocaleString()}</strong></div>
+                        <button class="update-btn" data-roll="${roll}" data-session="${s.session}" data-class="${s.class}">
+                            💰 Update Fee
+                        </button>
+                        <div id="${safeId}" class="prompt-box" style="display: none;">
+                            <input type="number" id="input-${roll}" placeholder="Enter additional received amount" min="1" step="1">
+                            <button class="confirm-btn" id="${confirmId}">✔ Confirm Update</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+
+            // attach click listeners to all "Update Fee" buttons
+            document.querySelectorAll('.update-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const roll = btn.getAttribute('data-roll');
+                    const session = btn.getAttribute('data-session');
+                    const className = btn.getAttribute('data-class');
+                    
+                    // hide any currently open prompt
+                    if (activePromptRoll) {
+                        const prevPrompt = document.getElementById(`prompt-${activePromptRoll}-${sessionFilter.value}-${classFilter.value}`.replace(/\s/g,''));
+                        if (prevPrompt) prevPrompt.style.display = 'none';
+                    }
+
+                    // generate prompt id exactly as in template
+                    const promptId = `prompt-${roll}-${session}-${className}`.replace(/\s/g,'');
+                    const promptDiv = document.getElementById(promptId);
+                    if (promptDiv) {
+                        promptDiv.style.display = 'block';
+                        activePromptRoll = roll;
+                    }
+                });
+            });
+
+            // attach confirm button listeners
+            filtered.forEach(s => {
+                const roll = s.roll_number;
+                const session = s.session;
+                const className = s.class;
+                const confirmId = `confirm-${roll}-${session}-${className}`.replace(/\s/g,'');
+                const confirmBtn = document.getElementById(confirmId);
+                if (confirmBtn) {
+                    confirmBtn.addEventListener('click', () => {
+                        const inputField = document.getElementById(`input-${roll}`);
+                        if (!inputField) return;
+                        
+                        const additional = parseFloat(inputField.value);
+                        if (isNaN(additional) || additional <= 0) {
+                            alert('❌ Please enter a valid positive amount');
+                            return;
+                        }
+
+                        // get latest students array
+                        let students = loadStudents();
+                        // find exact student (match roll, session, class)
+                        const index = students.findIndex(st => 
+                            st.roll_number === roll && 
+                            st.session === session && 
+                            st.class === className
+                        );
+
+                        if (index === -1) {
+                            alert('⚠️ Student not found (maybe changed in another tab)');
+                            // refresh
+                            renderCards();
+                            return;
+                        }
+
+                        // update
+                        const student = students[index];
+                        const oldReceived = Number(student.received_amount) || 0;
+                        const newReceived = oldReceived + additional;
+                        const newDue = Math.max(0, (Number(student.total_amount) || 0) - newReceived);
+
+                        students[index].received_amount = newReceived;
+                        students[index].due_amount = newDue;
+
+                        // save to localStorage
+                        saveStudents(students);
+
+                        // hide prompt
+                        const promptId = `prompt-${roll}-${session}-${className}`.replace(/\s/g,'');
+                        const promptDiv = document.getElementById(promptId);
+                        if (promptDiv) promptDiv.style.display = 'none';
+                        activePromptRoll = null;
+
+                        // success message
+                        alert(`✅ ₹${additional} added to ${student.student_name}. New received: ₹${newReceived}`);
+
+                        // re-render cards to reflect updated values
+                        renderCards();
+                    });
+                }
+            });
+        }
+
+        // event listeners for filter changes
+        sessionFilter.addEventListener('change', () => {
+            activePromptRoll = null; // reset any open prompt
+            renderCards();
+        });
+        classFilter.addEventListener('change', () => {
+            activePromptRoll = null;
+            renderCards();
+        });
+
+        // initial render
+        renderCards();
+
+        // optional: handle storage updates from other tabs (simple refresh)
+        window.addEventListener('storage', function(e) {
+            if (e.key === STORAGE_KEY) {
+                renderCards();
+            }
+        });
+
+    })();
+</script>
+</body>
+</html>
