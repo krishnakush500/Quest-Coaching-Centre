@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>➕ Add Student · Fee Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        body {
+            background: #f0f6ff;
+            padding: 24px 16px 32px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        /* header */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+            background: white;
+            padding: 16px 28px;
+            border-radius: 70px;
+            box-shadow: 0 10px 18px rgba(0,40,70,0.1);
+        }
+        .page-header h1 {
+            font-size: 2rem;
+            color: #113a5e;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .back-link {
+            font-weight: 600;
+        }
+        .back-link a {
+            color: #1b4f9b;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.1rem;
+            background: #e4efff;
+            padding: 10px 24px;
+            border-radius: 50px;
+        }
+
+        /* form card */
+        .form-card {
+            background: white;
+            border-radius: 70px;
+            padding: 40px 36px;
+            box-shadow: 0 30px 40px -15px #1e3f70;
+            border: 2px solid #b9d4fc;
+        }
+
+        .field {
+            margin-bottom: 28px;
+        }
+        label {
+            font-weight: 700;
+            color: #13457a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+        }
+        input, select {
+            width: 100%;
+            padding: 18px 26px;
+            font-size: 1.1rem;
+            background: #f3f9ff;
+            border: 2px solid #c5d9f0;
+            border-radius: 60px;
+            outline: none;
+            transition: 0.2s;
+        }
+        input:focus, select:focus {
+            border-color: #1b4f9b;
+            background: white;
+            box-shadow: 0 0 0 4px #a5c6ff;
+        }
+        .row2 {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .row2 .field {
+            flex: 1 1 200px;
+        }
+
+        /* due field (readonly) */
+        .due-field {
+            background: #fff1f0;
+            border: 2px solid #dc2626;
+            color: #b91c1c;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        .due-field:focus {
+            background: #fff1f0;
+            box-shadow: 0 0 0 4px #ffc5c5;
+        }
+
+        /* submit button */
+        .submit-btn {
+            background: linear-gradient(145deg, #1e4f8a, #113a62);
+            border: none;
+            color: white;
+            font-size: 1.6rem;
+            font-weight: 800;
+            padding: 24px 32px;
+            width: 100%;
+            border-radius: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 18px 28px -8px #0b2d4f;
+            border: 2px solid #97bbf0;
+        }
+        .submit-btn:hover {
+            background: #0f3b66;
+            transform: translateY(-3px);
+        }
+
+        /* helper */
+        .note {
+            text-align: center;
+            color: #2d557a;
+            font-size: 1rem;
+            margin-top: 20px;
+            background: #e4f0ff;
+            padding: 12px;
+            border-radius: 60px;
+        }
+        .emoji-big {
+            font-size: 1.8rem;
+        }
+        hr {
+            border: 1px dashed #b1cff0;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- header with back link -->
+    <div class="page-header">
+        <h1>
+            <span>➕</span> Add New Student
+        </h1>
+        <div class="back-link">
+            <a href="dashboard.html">⬅️ Back to Dashboard</a>
+        </div>
+    </div>
+
+    <!-- main form -->
+    <div class="form-card">
+        <form id="studentForm" onsubmit="return false;">
+            <!-- Roll Number -->
+            <div class="field">
+                <label><span class="emoji-big">🔢</span> Roll Number</label>
+                <input type="text" id="rollNumber" placeholder="e.g. 24, 12A" required>
+            </div>
+
+            <!-- Student Name -->
+            <div class="field">
+                <label><span class="emoji-big">🧑</span> Student Name</label>
+                <input type="text" id="studentName" placeholder="Full name" required>
+            </div>
+
+            <!-- Father Name -->
+            <div class="field">
+                <label><span class="emoji-big">👨</span> Father's Name</label>
+                <input type="text" id="fatherName" placeholder="Father's name" required>
+            </div>
+
+            <!-- row: Total + Received -->
+            <div class="row2">
+                <div class="field">
+                    <label><span class="emoji-big">💰</span> Total Amount (₹)</label>
+                    <input type="number" id="totalAmount" value="0" min="0" step="1" required>
+                </div>
+                <div class="field">
+                    <label><span class="emoji-big">✅</span> Received Amount (₹)</label>
+                    <input type="number" id="receivedAmount" value="0" min="0" step="1" required>
+                </div>
+            </div>
+
+            <!-- Due Amount (auto, readonly) -->
+            <div class="field">
+                <label><span class="emoji-big">⏳</span> Due Amount (auto-calculated)</label>
+                <input type="number" id="dueAmount" class="due-field" readonly value="0">
+            </div>
+
+            <!-- row: Session + Class -->
+            <div class="row2">
+                <div class="field">
+                    <label><span class="emoji-big">📅</span> Session</label>
+                    <select id="sessionSelect">
+                        <option value="2024-25">2024-25</option>
+                        <option value="2025-26" selected>2025-26</option>
+                        <option value="2026-27">2026-27</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label><span class="emoji-big">🏫</span> Class</label>
+                    <select id="classSelect">
+                        <option value="Class 6">Class 6</option>
+                        <option value="Class 7">Class 7</option>
+                        <option value="Class 8" selected>Class 8</option>
+                        <option value="Class 9">Class 9</option>
+                        <option value="Class 10">Class 10</option>
+                    </select>
+                </div>
+            </div>
+
+            <hr>
+            <!-- submit button -->
+            <button type="submit" class="submit-btn" id="addStudentBtn">
+                <span>💾</span> SAVE STUDENT <span>💾</span>
+            </button>
+            <div class="note">
+                ⭐ Due amount updates automatically when you type Total or Received
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ---------- localStorage setup ----------
+        const STORAGE_KEY = 'feeManagementStudents';
+
+        // load students from localStorage, or initialize with demo if empty
+        function loadStudents() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    return JSON.parse(stored);
+                } catch (e) {
+                    return [];
+                }
+            }
+            // if completely empty, we seed with some demo (but that's optional)
+            return [];
+        }
+
+        function saveStudents(students) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
+        }
+
+        // ---------- DOM elements ----------
+        const totalInput = document.getElementById('totalAmount');
+        const receivedInput = document.getElementById('receivedAmount');
+        const dueInput = document.getElementById('dueAmount');
+        const rollInput = document.getElementById('rollNumber');
+        const nameInput = document.getElementById('studentName');
+        const fatherInput = document.getElementById('fatherName');
+        const sessionSelect = document.getElementById('sessionSelect');
+        const classSelect = document.getElementById('classSelect');
+        const addBtn = document.getElementById('addStudentBtn');
+
+        // ---------- auto-calculate due ----------
+        function updateDue() {
+            const total = parseFloat(totalInput.value) || 0;
+            const received = parseFloat(receivedInput.value) || 0;
+            const due = Math.max(0, total - received);
+            dueInput.value = due;
+        }
+
+        // attach listeners
+        totalInput.addEventListener('input', updateDue);
+        receivedInput.addEventListener('input', updateDue);
+
+        // initial calculation (in case defaults are 0)
+        updateDue();
+
+        // ---------- form submission (add student) ----------
+        addBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // get values and trim
+            const roll = rollInput.value.trim();
+            const name = nameInput.value.trim();
+            const father = fatherInput.value.trim();
+            const total = parseFloat(totalInput.value) || 0;
+            const received = parseFloat(receivedInput.value) || 0;
+            const due = parseFloat(dueInput.value) || (total - received);
+            const session = sessionSelect.value;
+            const classVal = classSelect.value;
+
+            // validation
+            if (!roll) {
+                alert('❌ Please enter Roll Number');
+                rollInput.focus();
+                return;
+            }
+            if (!name) {
+                alert('❌ Please enter Student Name');
+                nameInput.focus();
+                return;
+            }
+            if (!father) {
+                alert('❌ Please enter Father\'s Name');
+                fatherInput.focus();
+                return;
+            }
+            if (total <= 0) {
+                alert('❌ Total Amount must be greater than 0');
+                totalInput.focus();
+                return;
+            }
+            if (received < 0) {
+                alert('❌ Received Amount cannot be negative');
+                receivedInput.focus();
+                return;
+            }
+
+            // optional: check if received > total? we allow it, but due becomes 0 (we already set due = max(0,total-received))
+            // but we can warn if overpayment
+            if (received > total) {
+                if (!confirm('⚠️ Received amount is more than total fee. Continue? (Due will be 0)')) {
+                    return;
+                }
+            }
+
+            // load existing students
+            const students = loadStudents();
+
+            // optional: avoid duplicate roll number within same session & class? (good practice)
+            const duplicate = students.find(s => 
+                s.roll_number === roll && 
+                s.session === session && 
+                s.class === classVal
+            );
+            if (duplicate) {
+                alert(`❌ Student with Roll ${roll} already exists in ${session} - ${classVal}. Please use a different roll or update existing.`);
+                return;
+            }
+
+            // create new student object
+            const newStudent = {
+                roll_number: roll,
+                student_name: name,
+                father_name: father,
+                class: classVal,
+                session: session,
+                total_amount: total,
+                received_amount: received,
+                due_amount: due
+            };
+
+            // add and save
+            students.push(newStudent);
+            saveStudents(students);
+
+            // success feedback
+            alert(`✅ Student "${name}" (Roll ${roll}) added successfully!`);
+
+            // reset form (keep session/class defaults, clear others)
+            rollInput.value = '';
+            nameInput.value = '';
+            fatherInput.value = '';
+            totalInput.value = '0';
+            receivedInput.value = '0';
+            updateDue();  // sets due to 0
+            // session and class remain as selected (teacher may add multiple in same)
+        });
+
+        // allow form submission via Enter (but we already use button)
+        // optional: clear validation styling
+    })();
+</script>
+
+</body>
+</html>
