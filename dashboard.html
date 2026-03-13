@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>📊 Teacher Dashboard · Fee Manager</title>
+    <!-- SweetAlert2 for professional popups -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -190,15 +192,21 @@
             margin-top: 20px;
             box-shadow: 0 15px 25px -10px #a5bbd5;
         }
+        .updates-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
         .updates-title {
             display: flex;
             align-items: center;
-            flex-wrap: wrap;
             gap: 12px;
             font-size: 1.5rem;
             font-weight: 700;
             color: #113a5e;
-            margin-bottom: 20px;
         }
         .updates-title span:last-child {
             font-size: 0.9rem;
@@ -206,6 +214,24 @@
             padding: 5px 15px;
             border-radius: 30px;
             white-space: nowrap;
+        }
+        .view-all-btn {
+            background: #1b4f9b;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .view-all-btn:hover {
+            background: #0f3f7a;
+            transform: translateY(-2px);
         }
         .update-item {
             background: #f6faff;
@@ -219,6 +245,11 @@
             border-left: 6px solid #f5a623;
             box-shadow: 0 4px 8px rgba(0,0,0,0.02);
             font-size: 1rem;
+            transition: 0.2s;
+        }
+        .update-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.05);
         }
         .update-date { 
             font-weight: 700; 
@@ -268,6 +299,14 @@
             .summary-item {
                 flex: 1 1 100%;
             }
+            .updates-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .view-all-btn {
+                width: 100%;
+                justify-content: center;
+            }
             .update-item {
                 flex-direction: column;
                 align-items: flex-start;
@@ -291,13 +330,13 @@
 <body>
 <div class="container">
 
-    <!-- 📅 SESSION DROPDOWN - TOP with 2025-26 as default -->
+    <!-- 📅 SESSION DROPDOWN - TOP with 2026-27 as default -->
     <div class="session-bar">
         <label>📆 Session</label>
         <select id="sessionSelect">
             <option value="2024-25">2024-25</option>
-            <option value="2025-26" selected>2025-26</option>
-            <option value="2026-27">2026-27</option>
+            <option value="2025-26">2025-26</option>
+            <option value="2026-27" selected>2026-27</option>
         </select>
         <div class="teacher-badge">👩‍🏫 Teacher Dashboard</div>
     </div>
@@ -342,11 +381,16 @@
         <button class="btn btn-outline" id="updateStudentBtn">✏️ UPDATE STUDENT</button>
     </div>
 
-    <!-- 🕒 RECENT UPDATES SECTION -->
+    <!-- 🕒 RECENT UPDATES SECTION with View All -->
     <div class="updates-card">
-        <div class="updates-title">
-            <span>📋 RECENT UPDATES</span>
-            <span>Latest First</span>
+        <div class="updates-header">
+            <div class="updates-title">
+                <span>📋 RECENT UPDATES</span>
+                <span>Latest 3</span>
+            </div>
+            <button class="view-all-btn" id="viewAllBtn">
+                <i class="fas fa-eye"></i> View All Updates
+            </button>
         </div>
         <div id="recentUpdatesList">
             <!-- Dynamic content will appear here -->
@@ -358,9 +402,13 @@
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+<!-- SweetAlert2 for professional popups -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <script>
-    // ✅ Firebase Configuration (given by you)
+    // ✅ Firebase Configuration
     const firebaseConfig = {
         apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
         authDomain: "quest-coaching.firebaseapp.com",
@@ -385,20 +433,40 @@
     const receivedSpan = document.getElementById('receivedAmount');
     const dueSpan = document.getElementById('dueAmount');
     const recentList = document.getElementById('recentUpdatesList');
+    const viewAllBtn = document.getElementById('viewAllBtn');
 
     // Global students array
     let allStudents = [];
+    let allUpdates = []; // Store all updates for view all feature
 
     // 📥 Load all students from Firebase
     async function loadStudentsFromFirebase() {
         try {
             const snapshot = await feesCollection.get();
             allStudents = [];
+            allUpdates = []; // Reset updates
+            
             snapshot.forEach(doc => {
+                const data = doc.data();
                 allStudents.push({
                     id: doc.id,
-                    ...doc.data()
+                    ...data
                 });
+                
+                // Collect all updates (where received_amount > 0)
+                if (data.received_amount > 0) {
+                    allUpdates.push({
+                        ...data,
+                        id: doc.id
+                    });
+                }
+            });
+            
+            // Sort updates - latest first (using current date for demo)
+            // In real app, you'd use timestamp
+            allUpdates.sort((a, b) => {
+                // For demo, sort by name as fallback
+                return (b.student_name || '').localeCompare(a.student_name || '');
             });
             
             // After loading, update dashboard
@@ -437,22 +505,11 @@
         dueSpan.innerText = '₹' + due.toLocaleString();
     }
 
-    // 🕒 Load recent updates (latest 5)
+    // 🕒 Load recent updates (latest 3 only)
     async function loadRecentUpdates() {
         try {
-            // Get all students with received_amount > 0, sorted by some field
-            const snapshot = await feesCollection.get();
-            const students = [];
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                if (data.received_amount > 0) {
-                    students.push(data);
-                }
-            });
-            
-            // Sort by name or roll for demo (in real app, you'd have timestamp)
-            // For demo, we'll just show last 5
-            const recent = students.slice(-5).reverse();
+            // Get latest 3 updates
+            const recent = allUpdates.slice(-3).reverse();
             
             if (recent.length === 0) {
                 recentList.innerHTML = '<div class="update-item">📌 No recent payments</div>';
@@ -481,9 +538,76 @@
         }
     }
 
+    // View All Updates - Show in SweetAlert2 popup with Close button
+    function showAllUpdates() {
+        if (allUpdates.length === 0) {
+            Swal.fire({
+                title: 'No Updates',
+                text: 'No payment updates found',
+                icon: 'info',
+                confirmButtonColor: '#1b4f9b',
+                confirmButtonText: 'Close'
+            });
+            return;
+        }
+
+        // Create HTML for all updates
+        let updatesHTML = '<div style="max-height: 400px; overflow-y: auto; padding: 5px;">';
+        
+        // Show all updates in reverse order (latest first)
+        allUpdates.slice().reverse().forEach((s, index) => {
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            
+            updatesHTML += `
+                <div style="background: #f8faff; padding: 12px; margin-bottom: 10px; border-radius: 12px; border-left: 4px solid #f5a623; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <div>
+                            <strong style="font-size: 1rem; color: #113155;">${s.student_name}</strong>
+                            <span style="background: #1b4f9b; color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.75rem; margin-left: 8px;">Roll ${s.roll_number}</span>
+                        </div>
+                        <div style="background: #c7f0d2; padding: 4px 12px; border-radius: 30px; color: #0c6e3c; font-weight: bold;">
+                            ₹${s.received_amount}
+                        </div>
+                    </div>
+                    <div style="font-size: 0.85rem; color: #666; margin-top: 8px; display: flex; gap: 15px; flex-wrap: wrap;">
+                        <span><i class="fas fa-school" style="color: #1b4f9b;"></i> ${s.class}</span>
+                        <span><i class="fas fa-calendar" style="color: #1b4f9b;"></i> ${s.session}</span>
+                        <span><i class="fas fa-clock" style="color: #1b4f9b;"></i> ${dateStr}</span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: #888; margin-top: 5px;">
+                        <i class="fas fa-user-tie"></i> ${s.father_name}
+                    </div>
+                </div>
+            `;
+        });
+        updatesHTML += '</div>';
+
+        Swal.fire({
+            title: '<span style="color: #1b4f9b;"><i class="fas fa-history"></i> All Payment Updates</span>',
+            html: updatesHTML,
+            icon: 'info',
+            showConfirmButton: true,
+            confirmButtonText: '<i class="fas fa-times"></i> Close',
+            confirmButtonColor: '#1b4f9b',
+            showCancelButton: false,
+            showCloseButton: true,
+            closeButtonHtml: '×',
+            width: '650px',
+            padding: '20px',
+            background: 'white',
+            customClass: {
+                closeButton: 'swal-close-custom'
+            }
+        });
+    }
+
     // 👂 Event Listeners
     sessionSelect.addEventListener('change', updateDashboard);
     classSelect.addEventListener('change', updateDashboard);
+    
+    // View All button click
+    viewAllBtn.addEventListener('click', showAllUpdates);
 
     // 🔘 Button Navigation
     document.getElementById('addStudentBtn').addEventListener('click', () => {
@@ -494,13 +618,15 @@
         window.location.href = 'update-student.html';
     });
 
+    // Set default session to 2026-27
+    sessionSelect.value = '2026-27';
+
     // 🚀 Initial load from Firebase
     loadStudentsFromFirebase();
 
-    // Refresh data every 5 seconds (optional - for real-time updates)
+    // Refresh data every 5 seconds
     setInterval(loadStudentsFromFirebase, 5000);
 
 </script>
-
 </body>
 </html>
