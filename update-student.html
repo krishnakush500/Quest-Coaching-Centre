@@ -8,6 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 for professional confirmation -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -293,7 +295,7 @@
         </div>
     </div>
 
-    <!-- Filter Panel -->
+    <!-- Filter Panel with 2025-26 as default -->
     <div class="filter-panel">
         <div class="filter-group">
             <label><i class="fas fa-calendar-alt"></i> Session</label>
@@ -366,7 +368,7 @@
 <div id="progressOverlay" class="progress-overlay">
     <div class="progress-card">
         <div class="spinner"></div>
-        <h3><i class="fas fa-sync-alt fa-spin"></i> Processing</h3>
+        <h3><i class="fas fa-sync-alt fa-spin"></i> Processing Payment</h3>
         <div class="progress-bar-container">
             <div id="progressFill" class="progress-bar-fill" style="width: 0%;"></div>
         </div>
@@ -380,6 +382,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- SweetAlert2 for professional confirmations -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- PDF Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -404,6 +408,7 @@
         }
         db = firebase.firestore();
         feesCollection = db.collection('fees');
+        console.log('Firebase initialized');
     } catch (error) {
         console.error('Firebase error:', error);
     }
@@ -425,7 +430,7 @@
     let allStudents = [];
     let selectedStudent = null;
 
-    // Complete Coaching Details as per your requirement
+    // Complete Coaching Details
     const COACHING_DETAILS = {
         name: "QUEST COACHING CENTRE",
         phone: "9708442525",
@@ -474,6 +479,40 @@
 
     function hideProgress() {
         progressOverlay.style.display = 'none';
+    }
+
+    // Professional Confirmation using SweetAlert2
+    async function showProfessionalConfirmation(amount, dueAmount) {
+        const result = await Swal.fire({
+            title: 'Confirm Payment Update',
+            html: `
+                <div style="text-align: left;">
+                    <p><strong>Amount to add:</strong> ₹${amount.toLocaleString()}</p>
+                    <p><strong>Current Due:</strong> ₹${dueAmount.toLocaleString()}</p>
+                    <p><strong>New Due:</strong> ₹${Math.max(0, dueAmount - amount).toLocaleString()}</p>
+                    ${amount > dueAmount ? '<p style="color: #b91c1c;">⚠️ Amount exceeds due amount!</p>' : ''}
+                </div>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#1b4f9b',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, proceed',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true
+        });
+        return result.isConfirmed;
+    }
+
+    // Professional Success Message
+    function showSuccessMessage(amount) {
+        Swal.fire({
+            title: 'Success!',
+            html: `✅ ₹${amount} added successfully!`,
+            icon: 'success',
+            timer: 2000,
+            showConfirmButton: false
+        });
     }
 
     // Load students from Firebase
@@ -551,19 +590,24 @@
         updateModal.show();
     };
 
-    // Confirm Update
+    // Confirm Update Button
     confirmUpdateBtn.addEventListener('click', async () => {
         if (!selectedStudent) return;
 
         const amount = parseFloat(additionalAmount.value);
         if (isNaN(amount) || amount <= 0) {
-            alert('Please enter a valid amount');
+            Swal.fire({
+                title: 'Invalid Amount',
+                text: 'Please enter a valid amount',
+                icon: 'error',
+                confirmButtonColor: '#1b4f9b'
+            });
             return;
         }
 
-        if (amount > selectedStudent.due_amount && !confirm(`Amount (₹${amount}) exceeds due (₹${selectedStudent.due_amount}). Continue?`)) {
-            return;
-        }
+        // Show professional confirmation
+        const confirmed = await showProfessionalConfirmation(amount, selectedStudent.due_amount);
+        if (!confirmed) return;
 
         updateModal.hide();
         showProgress();
@@ -606,20 +650,28 @@
                 };
 
                 hideProgress();
-                showInvoice(invoiceData);
+                // Fix: Check if window is available and open properly
+                setTimeout(() => {
+                    showInvoice(invoiceData);
+                }, 100);
             } else {
                 updateProgress(100, 'Complete!');
                 await new Promise(r => setTimeout(r, 400));
                 hideProgress();
-                alert(`✅ ₹${amount} added successfully!`);
+                showSuccessMessage(amount);
             }
         } catch (error) {
             hideProgress();
-            alert('Error: ' + error.message);
+            Swal.fire({
+                title: 'Error!',
+                text: error.message,
+                icon: 'error',
+                confirmButtonColor: '#1b4f9b'
+            });
         }
     });
 
-    // Show Complete Invoice with all details in one A4 page
+    // Show Complete Invoice with all details in one A4 page - FIXED VERSION
     function showInvoice(data) {
         const s = data.student;
         const c = data.coaching;
@@ -693,15 +745,6 @@
                         font-weight: 700;
                         color: #113a5e;
                         margin-bottom: 10px;
-                    }
-                    .row {
-                        display: flex;
-                        flex-wrap: wrap;
-                        gap: 10px;
-                        margin-bottom: 10px;
-                    }
-                    .col {
-                        flex: 1 1 200px;
                     }
                     .section {
                         background: #f8faff;
@@ -930,14 +973,39 @@
             </html>
         `;
 
-        const win = window.open('', '_blank');
-        win.document.write(invoiceHTML);
-        win.document.close();
+        // Fix: Check if window is available and open properly
+        try {
+            const win = window.open('', '_blank');
+            if (win) {
+                win.document.write(invoiceHTML);
+                win.document.close();
+            } else {
+                // If popup blocked, show alert
+                Swal.fire({
+                    title: 'Popup Blocked',
+                    text: 'Please allow popups for this site to see the invoice',
+                    icon: 'warning',
+                    confirmButtonColor: '#1b4f9b'
+                });
+            }
+        } catch (error) {
+            console.error('Invoice error:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Could not open invoice window',
+                icon: 'error',
+                confirmButtonColor: '#1b4f9b'
+            });
+        }
     }
 
     // Event Listeners
     sessionFilter.addEventListener('change', renderTable);
     classFilter.addEventListener('change', renderTable);
+
+    // Set default session to 2025-26 in the dropdown (already set in HTML)
+    // But ensure it's selected when page loads
+    sessionFilter.value = '2025-26';
 
     // Initial Load
     if (feesCollection) {
