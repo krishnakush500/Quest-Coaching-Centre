@@ -427,10 +427,37 @@
 
     const COACHING_DETAILS = {
         name: "QUEST COACHING CENTRE",
-        address: "Block More, Gopalganj, Bihar – 841428",
-        mobile: "9708442525",
+        phone: "9708442525",
         email: "questcoachingcentre@gmail.com",
-        website: "https://krishnakush500.github.io/Quest-Coaching-Centre/"
+        address: "Block More, Gopalganj, Bihar - 841428",
+        msme: "UDYAM-BR-13-0023012",
+        website: "https://krishnakush500.github.io/Quest-Coaching-Centre/",
+        feeStructure: {
+            tuition: 7200,
+            admission: 500,
+            assignment: 500,
+            examination: 500,
+            subtotal: 8700,
+            discount: 1500,
+            final: 7200
+        },
+        bank: {
+            accountName: "RAVIRANJAN KUMAR",
+            bankName: "Axis Bank, Gopalganj",
+            accountNumber: "917010042629997",
+            ifsc: "UTIB0001075",
+            upi: "9708442525@ybl"
+        },
+        terms: [
+            "Ek baar jama ki gayi fees kisi bhi paristhiti me refund ya transfer nahi ki jayegi.",
+            "Agar tuition fees do installments me jama ki jati hai to: First installment: 4000 rs admission ke samay, Second installment: 4000 rs ek mahine ke andar jama karni hogi.",
+            "Agar second installment samay par jama nahi hoti hai to student ka class entry rok diya ja sakta hai.",
+            "Bina kisi suchna ke lagatar 10 din tak absent rehne par student ka admission cancel kiya ja sakta hai.",
+            "Coaching me badtameezi ya mobile ka galat use karne par turant admission cancel ho sakta hai.",
+            "Student ke personal saman (cycle, mobile, bag etc.) ki zimmedari student ki hogi.",
+            "Coaching ko batch timing aur rules badalne ka adhikar hai.",
+            "Kisi bhi legal dispute ki sthiti me jurisdiction District Court Gopalganj, Bihar hoga."
+        ]
     };
 
     function updateProgress(percent, step) {
@@ -573,8 +600,7 @@
                     student: updatedStudent,
                     paymentAmount: amount,
                     date: new Date(),
-                    transactionId: 'TXN' + Date.now(),
-                    coaching: COACHING_DETAILS
+                    transactionId: 'TXN' + Date.now()
                 };
 
                 hideProgress();
@@ -591,10 +617,10 @@
         }
     });
 
-    // Show Invoice in new window (A4 size)
+    // Show Invoice in new window (A4 size with all details)
     function showInvoice(data) {
         const s = data.student;
-        const coaching = data.coaching;
+        const coaching = COACHING_DETAILS;
         const logoUrl = "https://i.ibb.co/hF9tmnpB/20250903-202922.jpg";
         const invoiceNo = 'INV-' + Date.now();
         const date = new Date(data.date);
@@ -612,7 +638,7 @@
                     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
                     body { 
                         background: #f4f7fc; 
-                        padding: 20px; 
+                        padding: 15px; 
                         min-height: 100vh;
                         display: flex;
                         justify-content: center;
@@ -622,120 +648,163 @@
                         max-width: 900px;
                         width: 100%;
                         background: white;
-                        border-radius: 24px;
-                        padding: 30px;
+                        border-radius: 20px;
+                        padding: 20px;
                         box-shadow: 0 20px 40px rgba(0,0,0,0.15);
                         margin: 0 auto;
+                        font-size: 0.85rem;
                     }
                     @media print {
                         body { background: white; padding: 0; }
-                        .invoice-a4 { box-shadow: none; border-radius: 0; }
+                        .invoice-a4 { box-shadow: none; border-radius: 0; padding: 15px; }
                         .btn-group { display: none; }
                     }
                     .header {
                         display: flex;
-                        gap: 20px;
-                        margin-bottom: 25px;
-                        padding-bottom: 20px;
+                        gap: 15px;
+                        margin-bottom: 15px;
+                        padding-bottom: 10px;
                         border-bottom: 2px dashed #1b4f9b;
                         flex-wrap: wrap;
                     }
                     .logo {
-                        width: 90px;
-                        height: 90px;
+                        width: 70px;
+                        height: 70px;
                         border-radius: 50%;
                         object-fit: cover;
-                        border: 3px solid #1b4f9b;
+                        border: 2px solid #1b4f9b;
                     }
                     .coaching-info h1 {
-                        font-size: 1.8rem;
+                        font-size: 1.5rem;
                         font-weight: 800;
                         color: #1b4f9b;
                         margin: 0;
                     }
                     .coaching-info p {
-                        margin: 2px 0;
+                        margin: 1px 0;
                         color: #5f6b7a;
-                        font-size: 0.95rem;
+                        font-size: 0.8rem;
                     }
-                    .coaching-info i { width: 20px; color: #1b4f9b; }
+                    .coaching-info i { width: 16px; color: #1b4f9b; font-size: 0.8rem; }
                     .title {
-                        font-size: 1.8rem;
+                        font-size: 1.4rem;
                         font-weight: 700;
                         color: #113a5e;
-                        margin-bottom: 20px;
+                        margin-bottom: 15px;
                     }
                     .details-grid {
                         display: grid;
-                        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                        gap: 15px;
+                        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                        gap: 8px;
                         background: #f8faff;
-                        padding: 20px;
-                        border-radius: 18px;
-                        margin-bottom: 25px;
+                        padding: 12px;
+                        border-radius: 12px;
+                        margin-bottom: 15px;
                     }
                     .detail-item {
                         display: flex;
                         flex-direction: column;
                     }
                     .detail-label {
-                        font-size: 0.85rem;
+                        font-size: 0.7rem;
                         color: #5f6b7a;
                     }
                     .detail-value {
-                        font-size: 1.1rem;
+                        font-size: 0.9rem;
                         font-weight: 600;
                         color: #113155;
                     }
-                    table {
+                    .fee-structure, .bank-details {
+                        margin-bottom: 15px;
+                    }
+                    .fee-structure h5, .bank-details h5, .terms h5 {
+                        color: #1b4f9b;
+                        font-size: 1rem;
+                        font-weight: 700;
+                        margin-bottom: 8px;
+                    }
+                    .fee-table {
                         width: 100%;
                         border-collapse: collapse;
-                        margin-bottom: 25px;
+                        font-size: 0.8rem;
                     }
-                    th, td {
-                        padding: 12px;
-                        text-align: left;
+                    .fee-table td {
+                        padding: 4px 8px;
                         border: 1px solid #e0eaf5;
                     }
-                    th {
+                    .fee-table tr:last-child td {
                         background: #1b4f9b;
                         color: white;
+                        font-weight: 700;
                     }
-                    .total-row {
+                    .bank-details p {
+                        margin: 2px 0;
+                        font-size: 0.8rem;
+                    }
+                    .terms {
+                        margin-bottom: 15px;
+                    }
+                    .terms p {
+                        margin: 2px 0;
+                        font-size: 0.7rem;
+                        color: #5f6b7a;
+                    }
+                    .payment-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 15px;
+                        font-size: 0.8rem;
+                    }
+                    .payment-table td {
+                        padding: 6px 8px;
+                        border: 1px solid #e0eaf5;
+                    }
+                    .payment-table .total-row {
                         background: #1b4f9b;
                         color: white;
                         font-weight: 700;
                     }
                     .status-box {
                         background: #f8faff;
-                        padding: 15px;
-                        border-radius: 15px;
-                        margin-bottom: 20px;
+                        padding: 10px;
+                        border-radius: 10px;
+                        margin-bottom: 15px;
+                        font-size: 0.8rem;
                     }
                     .footer {
                         text-align: center;
-                        padding-top: 20px;
+                        padding-top: 10px;
                         border-top: 2px dashed #1b4f9b;
                         color: #5f6b7a;
+                        font-size: 0.7rem;
                     }
                     .btn-group {
                         display: flex;
-                        gap: 10px;
+                        gap: 8px;
                         justify-content: center;
-                        margin-bottom: 25px;
+                        margin-bottom: 15px;
                         flex-wrap: wrap;
                     }
                     .btn {
                         border-radius: 50px;
-                        padding: 10px 25px;
+                        padding: 6px 16px;
                         font-weight: 600;
+                        font-size: 0.8rem;
+                    }
+                    .row {
+                        display: flex;
+                        gap: 15px;
+                        flex-wrap: wrap;
+                    }
+                    .col {
+                        flex: 1;
+                        min-width: 250px;
                     }
                     @media (max-width: 600px) {
-                        .invoice-a4 { padding: 15px; }
+                        .invoice-a4 { padding: 12px; }
                         .header { flex-direction: column; align-items: center; text-align: center; }
                         .coaching-info { text-align: center; }
-                        .details-grid { grid-template-columns: 1fr; }
-                        th, td { padding: 8px; font-size: 0.9rem; }
+                        .row { flex-direction: column; }
                     }
                 </style>
             </head>
@@ -748,13 +817,12 @@
                     </div>
 
                     <div class="header">
-                        <img src="${logoUrl}" alt="Logo" class="logo" onerror="this.src='https://via.placeholder.com/90?text=Logo'">
+                        <img src="${logoUrl}" alt="Logo" class="logo" onerror="this.src='https://via.placeholder.com/70?text=Logo'">
                         <div class="coaching-info">
                             <h1>${coaching.name}</h1>
                             <p><i class="fas fa-map-marker-alt"></i> ${coaching.address}</p>
-                            <p><i class="fas fa-phone"></i> ${coaching.mobile}</p>
-                            <p><i class="fas fa-envelope"></i> ${coaching.email}</p>
-                            <p><i class="fas fa-globe"></i> <a href="${coaching.website}" target="_blank">Website</a></p>
+                            <p><i class="fas fa-phone"></i> ${coaching.phone} | <i class="fas fa-envelope"></i> ${coaching.email}</p>
+                            <p><i class="fas fa-id-card"></i> MSME: ${coaching.msme} | <i class="fas fa-globe"></i> ${coaching.website}</p>
                         </div>
                     </div>
 
@@ -769,7 +837,7 @@
                         <div class="detail-item"><span class="detail-label">Class & Session</span><span class="detail-value">${s.class} (${s.session})</span></div>
                     </div>
 
-                    <table>
+                    <table class="payment-table">
                         <tr><th>Description</th><th>Amount (₹)</th></tr>
                         <tr><td>Total Fee</td><td><strong>₹${Number(s.total_amount).toLocaleString()}</strong></td></tr>
                         <tr><td>Previous Payment</td><td>₹${Number(s.received_amount - data.paymentAmount).toLocaleString()}</td></tr>
@@ -778,17 +846,49 @@
                         <tr><td>Remaining Due</td><td><span style="color: #b91c1c; font-weight: 700;">₹${Number(s.due_amount).toLocaleString()}</span></td></tr>
                     </table>
 
+                    <div class="row">
+                        <div class="col">
+                            <div class="fee-structure">
+                                <h5>📋 Fee Structure</h5>
+                                <table class="fee-table">
+                                    <tr><td>Tuition Fee</td><td>₹${coaching.feeStructure.tuition}</td></tr>
+                                    <tr><td>Admission Fee</td><td>₹${coaching.feeStructure.admission}</td></tr>
+                                    <tr><td>Assignment Fee</td><td>₹${coaching.feeStructure.assignment}</td></tr>
+                                    <tr><td>Examination Fee</td><td>₹${coaching.feeStructure.examination}</td></tr>
+                                    <tr><td>Subtotal</td><td>₹${coaching.feeStructure.subtotal}</td></tr>
+                                    <tr><td>Discount</td><td>-₹${coaching.feeStructure.discount}</td></tr>
+                                    <tr><td><strong>Final Amount</strong></td><td><strong>₹${coaching.feeStructure.final}</strong></td></tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="bank-details">
+                                <h5>🏦 Bank Details</h5>
+                                <p><strong>A/c Name:</strong> ${coaching.bank.accountName}</p>
+                                <p><strong>Bank:</strong> ${coaching.bank.bankName}</p>
+                                <p><strong>A/c No.:</strong> ${coaching.bank.accountNumber}</p>
+                                <p><strong>IFSC:</strong> ${coaching.bank.ifsc}</p>
+                                <p><strong>UPI ID:</strong> ${coaching.bank.upi}</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="status-box">
-                        <p style="display: flex; align-items: center; gap: 10px;">
-                            <i class="fas fa-check-circle" style="color: #16a34a; font-size: 1.5rem;"></i>
+                        <p style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-check-circle" style="color: #16a34a; font-size: 1.2rem;"></i>
                             <span><strong>Status:</strong> ${s.due_amount <= 0 ? 'Fully Paid' : 'Partial Paid'}</span>
                         </p>
-                        <p style="margin: 5px 0 0 35px; color: #5f6b7a;">Transaction ID: ${data.transactionId}</p>
+                        <p style="margin: 3px 0 0 30px; color: #5f6b7a;">Transaction ID: ${data.transactionId}</p>
+                    </div>
+
+                    <div class="terms">
+                        <h5>📜 Terms & Conditions</h5>
+                        ${coaching.terms.map(term => `<p>• ${term}</p>`).join('')}
                     </div>
 
                     <div class="footer">
                         <p>Thank you for timely payment! ✨</p>
-                        <p style="font-size: 0.9rem;">Computer generated invoice - valid without signature</p>
+                        <p>Computer generated invoice - valid without signature</p>
                     </div>
                 </div>
 
