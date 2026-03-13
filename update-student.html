@@ -112,7 +112,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 700px;
+            min-width: 800px;
         }
         th {
             background: #1b4f9b;
@@ -159,6 +159,20 @@
             display: inline-block;
             font-size: 0.9rem;
         }
+        .paid-badge {
+            background: #dcfce7;
+            color: #166534;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-weight: 600;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
         .update-btn {
             background: #2563eb;
             color: white;
@@ -173,8 +187,31 @@
             transition: 0.2s;
             font-size: 0.85rem;
         }
-        .update-btn:hover {
+        .update-btn:hover:not(:disabled) {
             background: #1b4b9b;
+            transform: scale(1.02);
+        }
+        .update-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .delete-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.85rem;
+        }
+        .delete-btn:hover {
+            background: #b91c1c;
             transform: scale(1.02);
         }
 
@@ -279,9 +316,10 @@
             .filter-group { width: 100%; }
             select { width: 100%; min-width: auto; }
             td, th { padding: 8px 5px; font-size: 0.8rem; }
-            .update-btn { padding: 5px 10px; font-size: 0.75rem; }
+            .action-buttons { flex-direction: column; gap: 4px; }
+            .update-btn, .delete-btn { padding: 4px 8px; font-size: 0.7rem; }
             .progress-card { padding: 20px; }
-            .amount-badge, .due-badge { padding: 3px 6px; font-size: 0.8rem; }
+            .amount-badge, .due-badge, .paid-badge { padding: 3px 6px; font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -295,7 +333,7 @@
         </div>
     </div>
 
-    <!-- Filter Panel with 2026-27 as default -->
+    <!-- Filter Panel -->
     <div class="filter-panel">
         <div class="filter-group">
             <label><i class="fas fa-calendar-alt"></i> Session</label>
@@ -368,12 +406,12 @@
 <div id="progressOverlay" class="progress-overlay">
     <div class="progress-card">
         <div class="spinner"></div>
-        <h3><i class="fas fa-sync-alt fa-spin"></i> Processing Payment</h3>
+        <h3><i class="fas fa-sync-alt fa-spin"></i> Processing</h3>
         <div class="progress-bar-container">
             <div id="progressFill" class="progress-bar-fill" style="width: 0%;"></div>
         </div>
         <div id="progressText" class="progress-text">0% Complete</div>
-        <div id="progressStep" class="progress-step" style="color: #5f6b7a;">Initializing...</div>
+        <div id="progressStep" class="progress-step">Initializing...</div>
     </div>
 </div>
 
@@ -466,6 +504,73 @@
         ]
     };
 
+    // Professional Toast Functions
+    function showSuccessToast(message) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: message,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
+    }
+
+    function showErrorToast(message) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: message,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 4000,
+            timerProgressBar: true
+        });
+    }
+
+    function showWarningToast(message) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Warning!',
+            text: message,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
+    }
+
+    // Professional Confirmation for Delete
+    async function showDeleteConfirmation(studentName) {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            html: `You are about to delete <strong>${studentName}</strong><br>This action cannot be undone!`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true
+        });
+        return result.isConfirmed;
+    }
+
+    // Professional Popup for Fully Paid Student
+    function showFullyPaidPopup(studentName) {
+        Swal.fire({
+            title: 'Fully Paid!',
+            html: `<strong>${studentName}</strong> has already paid the full fee.<br>No further updates are allowed.`,
+            icon: 'info',
+            confirmButtonColor: '#1b4f9b',
+            confirmButtonText: 'OK'
+        });
+    }
+
     function updateProgress(percent, step) {
         progressFill.style.width = percent + '%';
         progressText.textContent = percent + '% Complete';
@@ -481,7 +586,139 @@
         progressOverlay.style.display = 'none';
     }
 
-    // Professional Confirmation using SweetAlert2
+    // Load students from Firebase
+    async function loadStudents() {
+        if (!feesCollection) {
+            tableContainer.innerHTML = '<div class="empty-message"><i class="fas fa-exclamation-triangle"></i> Firebase not connected</div>';
+            return;
+        }
+
+        try {
+            const snapshot = await feesCollection.get();
+            allStudents = [];
+            snapshot.forEach(doc => {
+                allStudents.push({ id: doc.id, ...doc.data() });
+            });
+            renderTable();
+        } catch (error) {
+            tableContainer.innerHTML = '<div class="empty-message">Error loading: ' + error.message + '</div>';
+        }
+    }
+
+    // Render Table with Delete Button
+    function renderTable() {
+        const selectedSession = sessionFilter.value;
+        const selectedClass = classFilter.value;
+
+        let filtered = allStudents.filter(s => s.session === selectedSession);
+        if (selectedClass !== 'All') {
+            filtered = filtered.filter(s => s.class === selectedClass);
+        }
+
+        if (filtered.length === 0) {
+            tableContainer.innerHTML = '<div class="empty-message"><i class="fas fa-users-slash"></i> No students found</div>';
+            return;
+        }
+
+        filtered.sort((a, b) => (a.roll_number || '').localeCompare(b.roll_number || ''));
+
+        let html = `<table><thead><tr><th>Roll</th><th>Student Name</th><th>Father</th><th>Total</th><th>Received</th><th>Due</th><th>Actions</th></tr></thead><tbody>`;
+        
+        filtered.forEach(s => {
+            const isFullyPaid = s.due_amount <= 0;
+            const dueBadge = isFullyPaid ? 'paid-badge' : 'due-badge';
+            const dueText = isFullyPaid ? 'PAID' : `₹${Number(s.due_amount).toLocaleString()}`;
+            
+            html += `
+                <tr>
+                    <td><span class="amount-badge">${s.roll_number}</span></td>
+                    <td>
+                        <span class="student-name">${s.student_name}</span>
+                        <div class="father-name">${s.father_name}</div>
+                    </td>
+                    <td>${s.father_name}</td>
+                    <td><span class="amount-badge">₹${Number(s.total_amount).toLocaleString()}</span></td>
+                    <td><span class="amount-badge">₹${Number(s.received_amount).toLocaleString()}</span></td>
+                    <td><span class="${dueBadge}">${dueText}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="update-btn" onclick="openUpdateModal('${s.id}')" ${isFullyPaid ? 'disabled' : ''}>
+                                <i class="fas fa-edit"></i> Update
+                            </button>
+                            <button class="delete-btn" onclick="deleteStudent('${s.id}', '${s.student_name}')">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += `</tbody></table>`;
+        tableContainer.innerHTML = html;
+    }
+
+    // Delete Student Function
+    window.deleteStudent = async function(studentId, studentName) {
+        // Show confirmation
+        const confirmed = await showDeleteConfirmation(studentName);
+        if (!confirmed) return;
+
+        showProgress();
+        
+        try {
+            updateProgress(30, 'Finding student...');
+            await new Promise(r => setTimeout(r, 400));
+
+            updateProgress(60, 'Connecting to Firebase...');
+            await new Promise(r => setTimeout(r, 400));
+
+            updateProgress(80, 'Deleting student...');
+            await feesCollection.doc(studentId).delete();
+
+            updateProgress(100, 'Deleted!');
+            await new Promise(r => setTimeout(r, 500));
+
+            hideProgress();
+            showSuccessToast(`✅ Student "${studentName}" deleted successfully!`);
+            
+            // Reload students
+            await loadStudents();
+            
+        } catch (error) {
+            hideProgress();
+            showErrorToast('Error deleting student: ' + error.message);
+        }
+    };
+
+    // Open Update Modal
+    window.openUpdateModal = function(studentId) {
+        selectedStudent = allStudents.find(s => s.id === studentId);
+        if (!selectedStudent) return;
+
+        // Check if fully paid
+        if (selectedStudent.due_amount <= 0) {
+            showFullyPaidPopup(selectedStudent.student_name);
+            return;
+        }
+
+        modalStudentInfo.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="background: #1b4f9b; color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div>
+                    <h6 style="margin: 0; font-weight: 700;">${selectedStudent.student_name}</h6>
+                    <p style="margin: 0; color: #5f6b7a; font-size: 0.9rem;">Roll: ${selectedStudent.roll_number} | Class: ${selectedStudent.class}</p>
+                    <p style="margin: 0; color: #5f6b7a; font-size: 0.9rem;">Due: <span style="color: #b91c1c; font-weight: 700;">₹${Number(selectedStudent.due_amount).toLocaleString()}</span></p>
+                </div>
+            </div>
+        `;
+        additionalAmount.value = '';
+        updateModal.show();
+    };
+
+    // Professional Confirmation for Update
     async function showProfessionalConfirmation(amount, dueAmount) {
         const result = await Swal.fire({
             title: 'Confirm Payment Update',
@@ -504,104 +741,20 @@
         return result.isConfirmed;
     }
 
-    // Professional Success Message
-    function showSuccessMessage(amount) {
-        Swal.fire({
-            title: 'Success!',
-            html: `✅ ₹${amount} added successfully!`,
-            icon: 'success',
-            timer: 2000,
-            showConfirmButton: false
-        });
-    }
-
-    // Load students from Firebase
-    async function loadStudents() {
-        if (!feesCollection) {
-            tableContainer.innerHTML = '<div class="empty-message"><i class="fas fa-exclamation-triangle"></i> Firebase not connected</div>';
-            return;
-        }
-
-        try {
-            const snapshot = await feesCollection.get();
-            allStudents = [];
-            snapshot.forEach(doc => {
-                allStudents.push({ id: doc.id, ...doc.data() });
-            });
-            renderTable();
-        } catch (error) {
-            tableContainer.innerHTML = '<div class="empty-message">Error loading: ' + error.message + '</div>';
-        }
-    }
-
-    // Render Table
-    function renderTable() {
-        const selectedSession = sessionFilter.value;
-        const selectedClass = classFilter.value;
-
-        let filtered = allStudents.filter(s => s.session === selectedSession);
-        if (selectedClass !== 'All') {
-            filtered = filtered.filter(s => s.class === selectedClass);
-        }
-
-        if (filtered.length === 0) {
-            tableContainer.innerHTML = '<div class="empty-message"><i class="fas fa-users-slash"></i> No students found</div>';
-            return;
-        }
-
-        filtered.sort((a, b) => (a.roll_number || '').localeCompare(b.roll_number || ''));
-
-        let html = `<table><thead><tr><th>Roll</th><th>Student Name</th><th>Father</th><th>Total</th><th>Received</th><th>Due</th><th>Action</th></tr></thead><tbody>`;
-        filtered.forEach(s => {
-            html += `
-                <tr>
-                    <td><span class="amount-badge">${s.roll_number}</span></td>
-                    <td><span class="student-name">${s.student_name}</span><div class="father-name">${s.father_name}</div></td>
-                    <td>${s.father_name}</td>
-                    <td><span class="amount-badge">₹${Number(s.total_amount).toLocaleString()}</span></td>
-                    <td><span class="amount-badge">₹${Number(s.received_amount).toLocaleString()}</span></td>
-                    <td><span class="due-badge">₹${Number(s.due_amount).toLocaleString()}</span></td>
-                    <td><button class="update-btn" onclick="openUpdateModal('${s.id}')"><i class="fas fa-edit"></i> Update</button></td>
-                </tr>
-            `;
-        });
-        html += `</tbody></table>`;
-        tableContainer.innerHTML = html;
-    }
-
-    // Open Update Modal
-    window.openUpdateModal = function(studentId) {
-        selectedStudent = allStudents.find(s => s.id === studentId);
-        if (!selectedStudent) return;
-
-        modalStudentInfo.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <div style="background: #1b4f9b; color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
-                    <i class="fas fa-user-graduate"></i>
-                </div>
-                <div>
-                    <h6 style="margin: 0; font-weight: 700;">${selectedStudent.student_name}</h6>
-                    <p style="margin: 0; color: #5f6b7a; font-size: 0.9rem;">Roll: ${selectedStudent.roll_number} | Class: ${selectedStudent.class}</p>
-                    <p style="margin: 0; color: #5f6b7a; font-size: 0.9rem;">Due: <span style="color: #b91c1c; font-weight: 700;">₹${Number(selectedStudent.due_amount).toLocaleString()}</span></p>
-                </div>
-            </div>
-        `;
-        additionalAmount.value = '';
-        updateModal.show();
-    };
-
     // Confirm Update Button
     confirmUpdateBtn.addEventListener('click', async () => {
         if (!selectedStudent) return;
 
         const amount = parseFloat(additionalAmount.value);
         if (isNaN(amount) || amount <= 0) {
-            Swal.fire({
-                title: 'Invalid Amount',
-                text: 'Please enter a valid amount',
-                icon: 'error',
-                confirmButtonColor: '#1b4f9b'
-            });
+            showErrorToast('Please enter a valid amount');
+            return;
+        }
+
+        // Check if fully paid again (double check)
+        if (selectedStudent.due_amount <= 0) {
+            updateModal.hide();
+            showFullyPaidPopup(selectedStudent.student_name);
             return;
         }
 
@@ -651,10 +804,8 @@
 
                 hideProgress();
                 
-                // FIXED: Open invoice in the same tab instead of popup
+                // Open invoice in the same tab
                 const invoiceHTML = generateInvoiceHTML(invoiceData);
-                
-                // Create a new HTML document in the same tab
                 document.open();
                 document.write(invoiceHTML);
                 document.close();
@@ -663,20 +814,15 @@
                 updateProgress(100, 'Complete!');
                 await new Promise(r => setTimeout(r, 400));
                 hideProgress();
-                showSuccessMessage(amount);
+                showSuccessToast(`✅ ₹${amount} added successfully!`);
             }
         } catch (error) {
             hideProgress();
-            Swal.fire({
-                title: 'Error!',
-                text: error.message,
-                icon: 'error',
-                confirmButtonColor: '#1b4f9b'
-            });
+            showErrorToast('Error: ' + error.message);
         }
     });
 
-    // Generate Invoice HTML - PERFECT VERSION with CENTERED HEADER and SINGLE PAGE PRINT
+    // Generate Invoice HTML with Signature Space
     function generateInvoiceHTML(data) {
         const s = data.student;
         const c = data.coaching;
@@ -853,9 +999,32 @@
                         margin: 1px 0;
                         line-height: 1.2;
                     }
+                    /* Signature Section */
+                    .signature-section {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-top: 15px;
+                        padding-top: 10px;
+                        border-top: 1px solid #e2e8f0;
+                        page-break-inside: avoid;
+                    }
+                    .signature-box {
+                        text-align: center;
+                        width: 200px;
+                    }
+                    .signature-line {
+                        margin-top: 30px;
+                        border-top: 1px solid #000;
+                        width: 180px;
+                    }
+                    .signature-label {
+                        font-size: 0.7rem;
+                        color: #6b7280;
+                        margin-top: 5px;
+                    }
                     .footer {
                         text-align: center;
-                        margin-top: 5px;
+                        margin-top: 10px;
                         color: #6b7280;
                         font-size: 0.64rem;
                         page-break-inside: avoid;
@@ -885,6 +1054,7 @@
                         .coaching-info h1 { font-size: 1.3rem; }
                         .grid-2 { grid-template-columns: 1fr; gap: 2px; }
                         .section { padding: 4px; }
+                        .signature-section { flex-direction: column; align-items: center; gap: 15px; }
                     }
                 </style>
             </head>
@@ -980,6 +1150,18 @@
                         ${c.terms.map(term => `<p>• ${term}</p>`).join('')}
                     </div>
 
+                    <!-- Signature Section -->
+                    <div class="signature-section">
+                        <div class="signature-box">
+                            <div class="signature-line"></div>
+                            <div class="signature-label">Authorized Signatory</div>
+                        </div>
+                        <div class="signature-box">
+                            <div class="signature-line"></div>
+                            <div class="signature-label">Student/Parent Signature</div>
+                        </div>
+                    </div>
+
                     <div class="footer">
                         <p>✨ Thank you for timely payment! ✨</p>
                         <p>This is a computer generated invoice - valid without signature</p>
@@ -1027,9 +1209,6 @@
     // Event Listeners
     sessionFilter.addEventListener('change', renderTable);
     classFilter.addEventListener('change', renderTable);
-
-    // Set default session to 2026-27
-    sessionFilter.value = '2026-27';
 
     // Initial Load
     if (feesCollection) {
