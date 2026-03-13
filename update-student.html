@@ -650,9 +650,15 @@
                 };
 
                 hideProgress();
-                setTimeout(() => {
-                    showInvoice(invoiceData);
-                }, 100);
+                
+                // FIXED: Open invoice in the same tab instead of popup
+                const invoiceHTML = generateInvoiceHTML(invoiceData);
+                
+                // Create a new HTML document in the same tab
+                document.open();
+                document.write(invoiceHTML);
+                document.close();
+                
             } else {
                 updateProgress(100, 'Complete!');
                 await new Promise(r => setTimeout(r, 400));
@@ -670,15 +676,15 @@
         }
     });
 
-    // Show Complete Invoice - PERFECT VERSION with CENTERED HEADER and SINGLE PAGE PRINT
-    function showInvoice(data) {
+    // Generate Invoice HTML - PERFECT VERSION with CENTERED HEADER and SINGLE PAGE PRINT
+    function generateInvoiceHTML(data) {
         const s = data.student;
         const c = data.coaching;
         const logoUrl = "https://i.ibb.co/hF9tmnpB/20250903-202922.jpg";
         const invoiceNo = 'INV-' + Date.now();
         const date = new Date(data.date);
 
-        const invoiceHTML = `
+        return `
             <!DOCTYPE html>
             <html>
             <head>
@@ -888,7 +894,7 @@
                     <div class="btn-group no-print">
                         <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
                         <button class="btn btn-success" onclick="downloadPDF()"><i class="fas fa-download"></i> PDF</button>
-                        <button class="btn btn-secondary" onclick="window.close()"><i class="fas fa-times"></i> Close</button>
+                        <button class="btn btn-secondary" onclick="window.location.href='update-student.html'"><i class="fas fa-arrow-left"></i> Back</button>
                     </div>
 
                     <!-- Centered Header with Logo and Coaching Info -->
@@ -1016,29 +1022,6 @@
             </body>
             </html>
         `;
-
-        try {
-            const win = window.open('', '_blank');
-            if (win) {
-                win.document.write(invoiceHTML);
-                win.document.close();
-            } else {
-                Swal.fire({
-                    title: 'Popup Blocked',
-                    text: 'Please allow popups for this site to see the invoice',
-                    icon: 'warning',
-                    confirmButtonColor: '#1b4f9b'
-                });
-            }
-        } catch (error) {
-            console.error('Invoice error:', error);
-            Swal.fire({
-                title: 'Error',
-                text: 'Could not open invoice window',
-                icon: 'error',
-                confirmButtonColor: '#1b4f9b'
-            });
-        }
     }
 
     // Event Listeners
