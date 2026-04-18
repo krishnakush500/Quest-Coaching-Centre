@@ -16,7 +16,6 @@
         .row2{ display:flex; gap:15px; flex-wrap:wrap; }
         .row2 .field{ flex:1 1 200px; }
         
-        /* Subjects & Fees Section (only for 11/12) */
         .fees-section{ background:#f8fbfe; border-radius:32px; padding:18px 20px; margin:20px 0 12px 0; border:1px solid #d9e6f5; }
         .section-title{ font-size:1.25rem; font-weight:800; color:#174873; margin-bottom:16px; display:flex; align-items:center; gap:8px; border-left:4px solid #1b4f9b; padding-left:14px; }
         .subjects-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(210px,1fr)); gap:12px 20px; margin-bottom:20px; }
@@ -36,6 +35,7 @@
         .due-highlight{ background:#eef2f5; color:#b44; font-weight:700; cursor:default; border-color:#d4e0ec; }
         .btn-submit{ background:#1b4f9b; border:none; color:white; font-size:1.3rem; font-weight:700; padding:18px; width:100%; border-radius:60px; display:flex; align-items:center; justify-content:center; gap:12px; margin-top:18px; cursor:pointer; box-shadow:0 15px 20px -8px #123a60; transition:0.2s; }
         .btn-submit:hover{ background:#0f3d73; transform:translateY(-2px); }
+        .btn-submit:disabled{ opacity:0.6; cursor:not-allowed; transform:none; }
         .info-note{ text-align:center; margin-top:20px; color:#2c577c; }
         a{ color:#1b4f9b; font-weight:600; text-decoration:none; border-bottom:1px dotted #1b4f9b; }
         .loading{ text-align:center; padding:14px; background:#eef2f8; border-radius:50px; margin-top:12px; font-weight:500; display:none; }
@@ -86,7 +86,6 @@
 
     <div id="classWarning" class="class-warning">⚠️ For Class 11 & 12, fee will be calculated based on selected subjects & charges below.</div>
 
-    <!-- Dynamic Section: For Class 11/12 show subject checkboxes, for others show simple total amount -->
     <div id="dynamicFeeSection"></div>
 
     <button class="btn-submit" id="addStudentBtn">➕ Add Student & Save to Firebase</button>
@@ -96,12 +95,10 @@
 </div>
 <div id="successToast" class="success-toast">✅ Student added successfully!</div>
 
-<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
 <script>
-    // Firebase Configuration (Exactly as provided)
     const firebaseConfig = {
         apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
         authDomain: "quest-coaching.firebaseapp.com",
@@ -111,11 +108,11 @@
         messagingSenderId: "131948734089",
         appId: "1:131948734089:web:f4ba25110c8b1298360858"
     };
+    
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const feesCollection = db.collection('fees');
 
-    // Price configuration for 11/12
     const SUBJECTS = [
         { name: "PHYSICS", price: 3000 },
         { name: "CHEMISTRY", price: 3000 },
@@ -126,16 +123,13 @@
     ];
     const EXTRA_FEES = [
         { name: "ADMISSION FEE", price: 500 },
-        { name: "EXAM FEE (Half Yearly + Annual)", price: 500, short: "EXAM FEE" },
+        { name: "EXAM FEE (Half Yearly + Annual)", price: 500 },
         { name: "ASSIGNMENT FEE", price: 500 }
     ];
 
-    // DOM elements
     const dynamicSection = document.getElementById('dynamicFeeSection');
     const classSelect = document.getElementById('classSelect');
     const classWarning = document.getElementById('classWarning');
-    const receivedInp = document.getElementById('receivedAmount');
-    const dueInp = document.getElementById('dueAmount');
     const addBtn = document.getElementById('addStudentBtn');
     const loadingMsg = document.getElementById('loadingMessage');
     const errorDiv = document.getElementById('errorMessage');
@@ -145,16 +139,16 @@
     const fatherInput = document.getElementById('fatherName');
     const sessionSelect = document.getElementById('sessionSelect');
 
-    // References for dynamic elements
     let subjectCheckboxes = [];
     let extraCheckboxes = [];
     let simpleTotalInput = null;
-    let currentMode = 'simple'; // 'simple' or 'advanced'
+    let simpleReceivedInput = null;
+    let simpleDueInput = null;
+    let currentMode = 'simple';
 
-    // Helper functions
     let toastTimeout;
     function showToast(message) {
-        successToast.textContent = message || '✅ Student added successfully!';
+        successToast.textContent = message;
         successToast.style.opacity = '1';
         if (toastTimeout) clearTimeout(toastTimeout);
         toastTimeout = setTimeout(() => { successToast.style.opacity = '0'; }, 2500);
@@ -166,39 +160,36 @@
         setTimeout(() => { errorDiv.style.display = 'none'; }, 4000);
     }
 
-    // Calculate total for advanced mode (11/12)
     function calculateAdvancedTotal() {
         let total = 0;
         subjectCheckboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                total += parseInt(checkbox.getAttribute('data-price')) || 0;
-            }
+            if (checkbox.checked) total += parseInt(checkbox.getAttribute('data-price')) || 0;
         });
         extraCheckboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                total += parseInt(checkbox.getAttribute('data-price')) || 0;
-            }
+            if (checkbox.checked) total += parseInt(checkbox.getAttribute('data-price')) || 0;
         });
         return total;
     }
 
-    // Update due for both modes
     function updateDue() {
         let total = 0;
+        let received = 0;
+        
         if (currentMode === 'advanced') {
             total = calculateAdvancedTotal();
             const totalSpan = document.getElementById('advancedTotalAmount');
             if (totalSpan) totalSpan.innerText = total;
+            const receivedAdvanced = document.getElementById('receivedAmountAdvanced');
+            if (receivedAdvanced) received = parseFloat(receivedAdvanced.value) || 0;
+            const dueAdvanced = document.getElementById('dueAmountAdvanced');
+            if (dueAdvanced) dueAdvanced.value = Math.max(0, total - received);
         } else {
             total = simpleTotalInput ? (parseFloat(simpleTotalInput.value) || 0) : 0;
+            received = simpleReceivedInput ? (parseFloat(simpleReceivedInput.value) || 0) : 0;
+            if (simpleDueInput) simpleDueInput.value = Math.max(0, total - received);
         }
-        const received = parseFloat(receivedInp.value) || 0;
-        const due = Math.max(0, total - received);
-        dueInp.value = due;
-        return total;
     }
 
-    // Render Simple Mode (for classes 6-10)
     function renderSimpleMode() {
         currentMode = 'simple';
         dynamicSection.innerHTML = `
@@ -209,47 +200,28 @@
                 </div>
                 <div class="field">
                     <label>💵 Received Amount (₹)</label>
-                    <input type="number" id="receivedAmountSimple" value="0" min="0" step="1">
+                    <input type="number" id="simpleReceivedAmount" value="0" min="0" step="1">
                 </div>
                 <div class="field">
                     <label>⏳ Due Amount (Auto)</label>
-                    <input type="number" id="dueAmountSimple" class="due-highlight" readonly value="0">
+                    <input type="number" id="simpleDueAmount" class="due-highlight" readonly value="0">
                 </div>
             </div>
         `;
+        
         simpleTotalInput = document.getElementById('simpleTotalAmount');
-        const receivedSimple = document.getElementById('receivedAmountSimple');
-        const dueSimple = document.getElementById('dueAmountSimple');
+        simpleReceivedInput = document.getElementById('simpleReceivedAmount');
+        simpleDueInput = document.getElementById('simpleDueAmount');
         
-        // Sync with main received input
-        if (receivedSimple) {
-            receivedSimple.value = receivedInp.value;
-            receivedSimple.addEventListener('input', (e) => {
-                receivedInp.value = e.target.value;
-                updateDue();
-            });
-        }
-        
-        if (simpleTotalInput) {
-            simpleTotalInput.addEventListener('input', () => {
-                updateDue();
-            });
-        }
-        
-        receivedInp.value = receivedSimple ? receivedSimple.value : '0';
-        receivedInp.removeEventListener('input', updateDue);
-        receivedInp.addEventListener('input', (e) => {
-            if (receivedSimple) receivedSimple.value = e.target.value;
-            updateDue();
-        });
+        if (simpleTotalInput) simpleTotalInput.addEventListener('input', updateDue);
+        if (simpleReceivedInput) simpleReceivedInput.addEventListener('input', updateDue);
         
         updateDue();
     }
 
-    // Render Advanced Mode (for classes 11/12)
     function renderAdvancedMode() {
         currentMode = 'advanced';
-        let html = `
+        dynamicSection.innerHTML = `
             <div class="fees-section">
                 <div class="section-title">📖 Subjects (₹3000 each)</div>
                 <div class="subjects-grid" id="subjectsGrid"></div>
@@ -269,9 +241,7 @@
                 </div>
             </div>
         `;
-        dynamicSection.innerHTML = html;
         
-        // Render subjects
         const subjectsGrid = document.getElementById('subjectsGrid');
         subjectCheckboxes = [];
         SUBJECTS.forEach(sub => {
@@ -281,7 +251,7 @@
             cb.type = 'checkbox';
             cb.id = `sub_${sub.name}`;
             cb.setAttribute('data-price', sub.price);
-            cb.addEventListener('change', () => { updateDue(); });
+            cb.addEventListener('change', updateDue);
             const label = document.createElement('label');
             label.htmlFor = `sub_${sub.name}`;
             label.innerText = sub.name;
@@ -295,7 +265,6 @@
             subjectCheckboxes.push(cb);
         });
         
-        // Render extra charges
         const extraContainer = document.getElementById('extraChargesContainer');
         extraCheckboxes = [];
         EXTRA_FEES.forEach(extra => {
@@ -305,7 +274,7 @@
             cb.type = 'checkbox';
             cb.id = `extra_${extra.name.replace(/\s/g, '_')}`;
             cb.setAttribute('data-price', extra.price);
-            cb.addEventListener('change', () => { updateDue(); });
+            cb.addEventListener('change', updateDue);
             const label = document.createElement('label');
             label.htmlFor = cb.id;
             label.innerText = extra.name;
@@ -321,25 +290,11 @@
         });
         
         const receivedAdvanced = document.getElementById('receivedAmountAdvanced');
-        if (receivedAdvanced) {
-            receivedAdvanced.value = receivedInp.value;
-            receivedAdvanced.addEventListener('input', (e) => {
-                receivedInp.value = e.target.value;
-                updateDue();
-            });
-        }
-        
-        receivedInp.value = receivedAdvanced ? receivedAdvanced.value : '0';
-        receivedInp.removeEventListener('input', updateDue);
-        receivedInp.addEventListener('input', (e) => {
-            if (receivedAdvanced) receivedAdvanced.value = e.target.value;
-            updateDue();
-        });
+        if (receivedAdvanced) receivedAdvanced.addEventListener('input', updateDue);
         
         updateDue();
     }
 
-    // Get selected subjects (for advanced mode)
     function getSelectedSubjects() {
         if (currentMode !== 'advanced') return [];
         const selected = [];
@@ -358,7 +313,6 @@
         return selected;
     }
 
-    // Get total amount based on current mode
     function getTotalAmount() {
         if (currentMode === 'advanced') {
             return calculateAdvancedTotal();
@@ -367,23 +321,32 @@
         }
     }
 
-    // Reset form after successful submission
+    function getReceivedAmount() {
+        if (currentMode === 'advanced') {
+            const receivedAdvanced = document.getElementById('receivedAmountAdvanced');
+            return receivedAdvanced ? (parseFloat(receivedAdvanced.value) || 0) : 0;
+        } else {
+            return simpleReceivedInput ? (parseFloat(simpleReceivedInput.value) || 0) : 0;
+        }
+    }
+
     function resetForm() {
         rollInput.value = '';
         nameInput.value = '';
         fatherInput.value = '';
-        receivedInp.value = '0';
         if (currentMode === 'advanced') {
             subjectCheckboxes.forEach(cb => cb.checked = false);
             extraCheckboxes.forEach(cb => cb.checked = false);
+            const receivedAdvanced = document.getElementById('receivedAmountAdvanced');
+            if (receivedAdvanced) receivedAdvanced.value = '0';
         } else {
             if (simpleTotalInput) simpleTotalInput.value = '0';
+            if (simpleReceivedInput) simpleReceivedInput.value = '0';
         }
         updateDue();
         rollInput.focus();
     }
 
-    // Handle class change
     function onClassChange() {
         const selectedClass = classSelect.value;
         if (selectedClass === 'Class 11' || selectedClass === 'Class 12') {
@@ -395,7 +358,6 @@
         }
     }
 
-    // Add Student to Firebase
     addBtn.addEventListener('click', async function() {
         errorDiv.style.display = 'none';
         
@@ -411,10 +373,14 @@
         }
         
         const totalAmount = getTotalAmount();
-        const receivedAmount = parseFloat(receivedInp.value) || 0;
-        const dueAmount = parseFloat(dueInp.value) || (totalAmount - receivedAmount);
+        const receivedAmount = getReceivedAmount();
+        const dueAmount = Math.max(0, totalAmount - receivedAmount);
         
-        // Prepare student data
+        if (totalAmount === 0 && currentMode === 'simple') {
+            const confirmZero = confirm("⚠️ Total amount is ₹0. Are you sure you want to add student with zero fees?");
+            if (!confirmZero) return;
+        }
+        
         let studentData = {
             roll_number: roll,
             student_name: name,
@@ -427,7 +393,6 @@
             created_at: firebase.firestore.FieldValue.serverTimestamp()
         };
         
-        // Add subject details only for 11/12
         if (classVal === 'Class 11' || classVal === 'Class 12') {
             studentData.subjects = getSelectedSubjects();
             studentData.extra_fees = getSelectedExtraFees();
@@ -441,7 +406,6 @@
         
         loadingMsg.style.display = 'block';
         addBtn.disabled = true;
-        addBtn.style.opacity = '0.7';
         
         try {
             await feesCollection.add(studentData);
@@ -453,15 +417,12 @@
         } finally {
             loadingMsg.style.display = 'none';
             addBtn.disabled = false;
-            addBtn.style.opacity = '1';
         }
     });
     
-    // Initialize
     classSelect.addEventListener('change', onClassChange);
-    onClassChange(); // Initial render
+    onClassChange();
     
-    // Enter key support
     const fields = ['rollNumber', 'studentName', 'fatherName'];
     fields.forEach(id => {
         const el = document.getElementById(id);
