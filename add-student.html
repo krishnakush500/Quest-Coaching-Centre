@@ -539,6 +539,7 @@
         const receivedAmount = getReceivedAmount();
         const dueAmount = Math.max(0, totalAmount - receivedAmount);
         
+        // IMPORTANT: Store subjects and extra_fees at TOP LEVEL for invoice to work properly
         let studentData = {
             roll_number: roll,
             student_name: name,
@@ -553,11 +554,21 @@
             created_at: firebase.firestore.FieldValue.serverTimestamp()
         };
         
+        // Store subjects and extra_fees at top level so invoice can read them easily
+        if (currentMode === 'advanced') {
+            studentData.subjects = getSelectedSubjects();      // Array of subject names
+            studentData.extra_fees = getSelectedExtraFees();  // Array of extra fee names
+            studentData.subjects_list = getSelectedSubjects(); // Duplicate for safety
+        }
+        
         loadingMsg.style.display = 'block';
         addBtn.disabled = true;
         
         try {
-            await feesCollection.add(studentData);
+            const docRef = await feesCollection.add(studentData);
+            console.log("Student added with ID:", docRef.id);
+            console.log("Subjects saved:", studentData.subjects);
+            console.log("Extra fees saved:", studentData.extra_fees);
             showToast(`✅ ${name} added successfully! (Total: ₹${totalAmount})`);
             resetForm();
         } catch (error) {
