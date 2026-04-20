@@ -67,6 +67,10 @@
         <label>👨 Father Name</label>
         <input type="text" id="fatherName" placeholder="Father's name" required>
     </div>
+    <div class="field">
+        <label>📞 Phone Number</label>
+        <input type="tel" id="phoneNumber" placeholder="e.g. 9876543210" pattern="[0-9]{10}" title="Please enter 10 digit mobile number">
+    </div>
     <div class="row2">
         <div class="field">
             <label>📅 Session</label>
@@ -156,6 +160,7 @@
     const rollInput = document.getElementById('rollNumber');
     const nameInput = document.getElementById('studentName');
     const fatherInput = document.getElementById('fatherName');
+    const phoneInput = document.getElementById('phoneNumber');
     const sessionSelect = document.getElementById('sessionSelect');
 
     let subjectCheckboxes = [];
@@ -474,6 +479,7 @@
         rollInput.value = '';
         nameInput.value = '';
         fatherInput.value = '';
+        phoneInput.value = '';
         
         if (currentMode === 'advanced') {
             subjectCheckboxes.forEach(cb => cb.checked = false);
@@ -511,6 +517,7 @@
         const roll = rollInput.value.trim();
         const name = nameInput.value.trim();
         const father = fatherInput.value.trim();
+        const phone = phoneInput.value.trim();
         const session = sessionSelect.value;
         const classVal = classSelect.value;
         
@@ -527,6 +534,7 @@
             roll_number: roll,
             student_name: name,
             father_name: father,
+            phone_number: phone || '',
             class: classVal,
             session: session,
             total_amount: totalAmount,
@@ -546,11 +554,10 @@
         addBtn.disabled = true;
         
         try {
-            // Add student to fees collection
             const docRef = await feesCollection.add(studentData);
             const studentId = docRef.id;
             
-            // 🔥 IMPORTANT: If received amount > 0, save a transaction in transactions collection
+            // If received amount > 0, save transaction
             if (receivedAmount > 0) {
                 const transactionId = 'TXN' + Date.now() + Math.floor(Math.random() * 10000);
                 const transactionData = {
@@ -587,7 +594,7 @@
     classSelect.addEventListener('change', onClassChange);
     onClassChange();
     
-    const fields = ['rollNumber', 'studentName', 'fatherName'];
+    const fields = ['rollNumber', 'studentName', 'fatherName', 'phoneNumber'];
     fields.forEach(id => {
         const el = document.getElementById(id);
         if(el) el.addEventListener('keypress', (e) => { if(e.key === 'Enter') addBtn.click(); });
