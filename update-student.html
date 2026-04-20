@@ -138,12 +138,19 @@ let selectedStudent = null;
 
 const COACHING_DETAILS = {
     name: "QUEST COACHING CENTRE", phone: "9708442525", email: "questcoachingcentre@gmail.com",
-    address: "Block More, Gopalganj, Bihar - 841428", msme: "UDYAM-BR-13-0023012"
+    address: "Block More, Gopalganj, Bihar - 841428", msme: "UDYAM-BR-13-0023012",
+    bank: {
+        accountName: "RAVIRANJAN KUMAR",
+        bankName: "Axis Bank, Gopalganj",
+        accountNumber: "917010042629997",
+        ifsc: "UTIB0001075",
+        upi: "9708442525@ybl"
+    }
 };
 
 const TERMS_CONDITIONS_HINDI = [
     "एक बार जमा की गई फीस किसी भी परिस्थिति में वापस (Refund) या स्थानांतरित (Transfer) नहीं की जाएगी।",
-    "यदि आप ट्यूशन शुल्क दो किश्तों (Installments) में जमा करते हैं, तो पहली किश्त कुल शुल्क (Fee) का 50% नामांकन के समय और दूसरी किश्त बाकी का 50% शुल्क (Fee) नामांकन की तिथि से एक माह के भीतर जमा करनी होगी。",
+    "यदि आप ट्यूशन शुल्क दो किश्तों (Installments) में जमा करते हैं, तो पहली किश्त कुल शुल्क (Fee) का 50% नामांकन के समय और दूसरी किश्त बाकी का 50% शुल्क (Fee) नामांकन की तिथि से एक माह के भीतर जमा करनी होगी।",
     "दूसरी किश्त (Installment) समय पर जमा न होने की स्थिति में छात्र के कक्षा प्रवेश पर प्रतिबंध लगाया जा सकता है।",
     "बिना किसी पूर्व सूचना के लगातार 10 दिनों तक अनुपस्थित रहने पर छात्र का नामांकन रद्द (नाम काटा) किया जा सकता है।",
     "संस्थान में अभद्र व्यवहार करने या मोबाइल का दुरुपयोग करने पर छात्र का नामांकन तत्काल प्रभाव से रद्द किया जा सकता है।",
@@ -211,7 +218,7 @@ function renderTable() {
     tableContainer.innerHTML = html;
 }
 
-// Download PDF Report - Simple, Direct Download
+// Download PDF Report
 downloadPdfBtn.addEventListener('click', async function() {
     let filtered = allStudents.filter(s => s.session === sessionFilter.value);
     if (classFilter.value !== 'All') filtered = filtered.filter(s => s.class === classFilter.value);
@@ -311,9 +318,6 @@ downloadPdfBtn.addEventListener('click', async function() {
             </div>
             <script>
                 window.onload = function() {
-                    var style = document.createElement('style');
-                    style.innerHTML = '@media print { body { margin: 0; padding: 0; } .no-print { display: none; } }';
-                    document.head.appendChild(style);
                     window.print();
                 };
             <\/script>
@@ -321,7 +325,6 @@ downloadPdfBtn.addEventListener('click', async function() {
         </html>
     `;
     
-    // Direct download as PDF using print/save
     const printWindow = window.open('', '_blank');
     printWindow.document.write(pdfHtml);
     printWindow.document.close();
@@ -477,12 +480,22 @@ function generateInvoiceHTML(data) {
     let subtotal = 0;
     let discountAmount = 0;
     
+    // Get discount from multiple possible locations
+    if (s.discount_applied && s.discount_applied > 0) {
+        discountAmount = s.discount_applied;
+    } else if (s.fee_breakdown && s.fee_breakdown.discount > 0) {
+        discountAmount = s.fee_breakdown.discount;
+    }
+    
+    // Subjects for Class 11/12
     if (s.subjects && s.subjects.length > 0) {
         s.subjects.forEach(sub => { feeRows += `<tr><td style="font-weight:500;">${sub} (Subject Fee)</td><td style="text-align:right;">₹3,000/-</td></tr>`; subtotal += 3000; });
     }
+    // Extra Fees for Class 11/12
     if (s.extra_fees && s.extra_fees.length > 0) {
         s.extra_fees.forEach(fee => { feeRows += `<tr><td style="font-weight:500;">${fee}</td><td style="text-align:right;">₹500/-</td></tr>`; subtotal += 500; });
     }
+    // Checkbox mode for Class 6-10
     if ((!s.subjects || s.subjects.length === 0) && s.fee_breakdown) {
         const fb = s.fee_breakdown;
         if (fb.type === 'checkbox_based') {
@@ -490,11 +503,22 @@ function generateInvoiceHTML(data) {
             if (fb.admission > 0) { feeRows += `<tr><td style="font-weight:500;">Admission Fee</td><td style="text-align:right;">₹${fb.admission}/-</td></tr>`; subtotal += fb.admission; }
             if (fb.exam > 0) { feeRows += `<tr><td style="font-weight:500;">Exam Fee</td><td style="text-align:right;">₹${fb.exam}/-</td></tr>`; subtotal += fb.exam; }
             if (fb.assignment > 0) { feeRows += `<tr><td style="font-weight:500;">Assignment Fee</td><td style="text-align:right;">₹${fb.assignment}/-</td></tr>`; subtotal += fb.assignment; }
-            discountAmount = fb.discount || 0;
-        } else if (fb.type === 'subject_based') { discountAmount = fb.discount || 0; }
+        } else if (fb.type === 'subject_based') {
+            if (fb.subjects && fb.subjects.length > 0) {
+                fb.subjects.forEach(sub => { feeRows += `<tr><td style="font-weight:500;">${sub} (Subject Fee)</td><td style="text-align:right;">₹3,000/-</td></tr>`; subtotal += 3000; });
+            }
+            if (fb.admission_fee > 0) { feeRows += `<tr><td style="font-weight:500;">Admission Fee</td><td style="text-align:right;">₹${fb.admission_fee}/-</td></tr>`; subtotal += fb.admission_fee; }
+            if (fb.exam_fee > 0) { feeRows += `<tr><td style="font-weight:500;">Exam Fee</td><td style="text-align:right;">₹${fb.exam_fee}/-</td></tr>`; subtotal += fb.exam_fee; }
+            if (fb.assignment_fee > 0) { feeRows += `<tr><td style="font-weight:500;">Assignment Fee</td><td style="text-align:right;">₹${fb.assignment_fee}/-</td></tr>`; subtotal += fb.assignment_fee; }
+        }
     }
     if (feeRows === '') { feeRows = `<tr><td style="font-weight:500;">Total Fee</td><td style="text-align:right;">₹${Number(s.total_amount).toLocaleString()}/-</td></tr>`; subtotal = s.total_amount; }
-    if (discountAmount > 0) { feeRows += `<tr><td style="color:#b91c1c; font-weight:500;">🎁 Discount</td><td style="color:#b91c1c; text-align:right;">- ₹${discountAmount.toLocaleString()}/-</td></tr>`; }
+    
+    // Only show discount row if discountAmount > 0
+    if (discountAmount > 0) {
+        feeRows += `<tr><td style="color:#b91c1c; font-weight:500;">🎁 Discount</td><td style="color:#b91c1c; text-align:right;">- ₹${discountAmount.toLocaleString()}/-</td></tr>`;
+    }
+    
     const finalTotal = subtotal - discountAmount;
     
     return `<!DOCTYPE html>
@@ -574,11 +598,11 @@ function generateInvoiceHTML(data) {
         </tbody></table></div>
         <div class="section"><div class="section-title"><i class="fas fa-university"></i> BANK DETAILS</div>
         <div class="grid-2">
-            <div><span class="label">Account Name:</span> <span class="value">${c.bank?.accountName || 'N/A'}</span></div>
-            <div><span class="label">Bank Name:</span> <span class="value">${c.bank?.bankName || 'N/A'}</span></div>
-            <div><span class="label">Account Number:</span> <span class="value">${c.bank?.accountNumber || 'N/A'}</span></div>
-            <div><span class="label">IFSC Code:</span> <span class="value">${c.bank?.ifsc || 'N/A'}</span></div>
-            <div><span class="label">UPI ID:</span> <span class="value">${c.bank?.upi || 'N/A'}</span></div>
+            <div><span class="label">Account Name:</span> <span class="value">${c.bank.accountName}</span></div>
+            <div><span class="label">Bank Name:</span> <span class="value">${c.bank.bankName}</span></div>
+            <div><span class="label">Account Number:</span> <span class="value">${c.bank.accountNumber}</span></div>
+            <div><span class="label">IFSC Code:</span> <span class="value">${c.bank.ifsc}</span></div>
+            <div><span class="label">UPI ID:</span> <span class="value">${c.bank.upi}</span></div>
         </div></div>
         <div class="status-box"><p><i class="fas fa-check-circle" style="color:#16a34a;"></i> <strong>Payment Status:</strong> ${s.due_amount <= 0 ? 'FULLY PAID ✅' : 'PARTIAL PAID'}</p><p style="font-size:0.65rem;">Transaction ID: ${data.transactionId}</p></div>
         <div class="terms"><strong><i class="fas fa-file-contract"></i> नियम एवं शर्तें:</strong>${TERMS_CONDITIONS_HINDI.map(t => `<p>• ${t}</p>`).join('')}</div>
