@@ -22,6 +22,9 @@
         select, .search-input { background: #e8f2ff; border: 1px solid #b1cdf0; border-radius: 40px; padding: 8px 20px; font-size: 0.95rem; color: #10345c; outline: none; }
         .search-input { width: 200px; cursor: text; }
         
+        .download-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; border-radius: 40px; font-weight: 500; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; }
+        .download-btn:hover { background: #b91c1c; }
+        
         .table-card { background: white; border-radius: 30px; padding: 16px; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; min-width: 800px; }
         th { background: #1b4f9b; color: white; padding: 12px 8px; font-weight: 600; font-size: 0.9rem; text-align: left; }
@@ -57,20 +60,12 @@
         .transaction-item { background: #f8faff; border-radius: 16px; padding: 12px; margin-bottom: 10px; border-left: 4px solid #1b4f9b; }
         .invoice-small-btn { background: #16a34a; color: white; border: none; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; cursor: pointer; }
         
-        .detail-row { display: flex; padding: 8px 0; border-bottom: 1px solid #e0eaf5; }
-        .detail-label { width: 140px; font-weight: 600; color: #1b4f9b; }
-        .detail-value { flex: 1; color: #113155; }
-        .subjects-list, .extras-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
-        .subject-tag { background: #e8f0fe; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; color: #1b4f9b; }
-        .extra-tag { background: #fef7e0; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; color: #7a5c00; }
-        
         @media (max-width: 600px) {
             .page-header h1 { font-size: 1.3rem; }
             .filter-group { width: 100%; }
             select, .search-input { width: 100%; }
             td, th { padding: 8px 5px; font-size: 0.8rem; }
             .action-buttons { flex-direction: column; gap: 4px; }
-            .detail-label { width: 100px; font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -84,11 +79,12 @@
         <div class="filter-group"><label><i class="fas fa-search"></i> Search Roll No</label><input type="text" id="rollSearchInput" class="search-input" placeholder="Enter roll number..."></div>
         <div class="filter-group"><label><i class="fas fa-calendar-alt"></i> Session</label><select id="sessionFilter"><option value="2024-25">2024-25</option><option value="2025-26">2025-26</option><option value="2026-27" selected>2026-27</option></select></div>
         <div class="filter-group"><label><i class="fas fa-school"></i> Class</label><select id="classFilter"><option value="All">All Classes</option><option value="Class 6">Class 6</option><option value="Class 7">Class 7</option><option value="Class 8">Class 8</option><option value="Class 9">Class 9</option><option value="Class 10">Class 10</option><option value="Class 11">Class 11</option><option value="Class 12">Class 12</option></select></div>
+        <div class="filter-group"><button id="downloadPdfBtn" class="download-btn"><i class="fas fa-file-pdf"></i> Download PDF Report</button></div>
     </div>
     <div class="table-card"><div id="studentsTableContainer"><div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading students...</div></div></div>
 </div>
 
-<!-- Update Modal -->
+<!-- Modals -->
 <div class="modal fade" id="updateModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-dialog-centered"><div class="modal-content" style="border-radius: 25px;"><div class="modal-header"><h5 class="modal-title" style="color:#1b4f9b;"><i class="fas fa-rupee-sign"></i> Update Fee</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div id="modalStudentInfo" style="background:#f8faff;padding:15px;border-radius:18px;margin-bottom:20px;"></div><div class="mb-3"><label class="form-label fw-bold">Additional Amount (₹)</label><input type="number" id="additionalAmount" class="form-control" min="1" placeholder="Enter amount" style="border-radius:20px;"></div><div class="form-check mb-2"><input class="form-check-input" type="checkbox" id="generateInvoiceCheck" checked><label class="form-check-label fw-bold"><i class="fas fa-file-invoice"></i> Generate Invoice</label></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" id="confirmUpdateBtn" class="btn btn-primary" style="background:#1b4f9b;">Update</button></div></div></div></div>
 
 <div class="modal fade" id="historyModal" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" style="color:#1b4f9b;"><i class="fas fa-history"></i> Transaction History</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div id="historyStudentInfo" style="background:#f8faff;padding:15px;border-radius:18px;margin-bottom:20px;"></div><div id="transactionsList"></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div></div></div></div>
@@ -132,6 +128,7 @@ const confirmUpdateBtn = document.getElementById('confirmUpdateBtn');
 const progressOverlay = document.getElementById('progressOverlay');
 const progressFill = document.getElementById('progressFill');
 const progressText = document.getElementById('progressText');
+const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 
 const updateModal = new bootstrap.Modal(document.getElementById('updateModal'));
 const historyModal = new bootstrap.Modal(document.getElementById('historyModal'));
@@ -141,13 +138,12 @@ let selectedStudent = null;
 
 const COACHING_DETAILS = {
     name: "QUEST COACHING CENTRE", phone: "9708442525", email: "questcoachingcentre@gmail.com",
-    address: "Block More, Gopalganj, Bihar - 841428", msme: "UDYAM-BR-13-0023012",
-    bank: { accountName: "RAVIRANJAN KUMAR", bankName: "Axis Bank, Gopalganj", accountNumber: "917010042629997", ifsc: "UTIB0001075", upi: "9708442525@ybl" }
+    address: "Block More, Gopalganj, Bihar - 841428", msme: "UDYAM-BR-13-0023012"
 };
 
 const TERMS_CONDITIONS_HINDI = [
     "एक बार जमा की गई फीस किसी भी परिस्थिति में वापस (Refund) या स्थानांतरित (Transfer) नहीं की जाएगी।",
-    "यदि आप ट्यूशन शुल्क दो किश्तों (Installments) में जमा करते हैं, तो पहली किश्त कुल शुल्क (Fee) का 50% नामांकन के समय और दूसरी किश्त बाकी का 50% शुल्क (Fee) नामांकन की तिथि से एक माह के भीतर जमा करनी होगी।",
+    "यदि आप ट्यूशन शुल्क दो किश्तों (Installments) में जमा करते हैं, तो पहली किश्त कुल शुल्क (Fee) का 50% नामांकन के समय और दूसरी किश्त बाकी का 50% शुल्क (Fee) नामांकन की तिथि से एक माह के भीतर जमा करनी होगी。",
     "दूसरी किश्त (Installment) समय पर जमा न होने की स्थिति में छात्र के कक्षा प्रवेश पर प्रतिबंध लगाया जा सकता है।",
     "बिना किसी पूर्व सूचना के लगातार 10 दिनों तक अनुपस्थित रहने पर छात्र का नामांकन रद्द (नाम काटा) किया जा सकता है।",
     "संस्थान में अभद्र व्यवहार करने या मोबाइल का दुरुपयोग करने पर छात्र का नामांकन तत्काल प्रभाव से रद्द किया जा सकता है।",
@@ -180,43 +176,176 @@ function renderTable() {
     if (classFilter.value !== 'All') filtered = filtered.filter(s => s.class === classFilter.value);
     const searchRoll = rollSearchInput.value.trim().toLowerCase();
     if (searchRoll) filtered = filtered.filter(s => (s.roll_number || '').toString().toLowerCase().includes(searchRoll));
+    
     if (filtered.length === 0) { tableContainer.innerHTML = '<div class="empty-message">No students found</div>'; return; }
-    filtered.sort((a, b) => (a.roll_number || '').toString().localeCompare((b.roll_number || '').toString()));
-    let html = `<table><thead><tr><th>Roll</th><th>Student Name</th><th>Father</th><th>Total</th><th>Received</th><th>Due</th><th>Actions</th></tr></thead><tbody>`;
+    
+    filtered.sort((a, b) => (b.due_amount || 0) - (a.due_amount || 0));
+    
+    let html = `<table><thead>
+        <tr><th>Roll</th><th>Student Name</th><th>Father</th><th>Total (₹)</th><th>Received (₹)</th><th>Due (₹)</th><th>Actions</th>
+        </tr></thead><tbody>`;
+    
     filtered.forEach(s => {
-        const isFullyPaid = s.due_amount <= 0, dueBadge = isFullyPaid ? 'paid-badge' : 'due-badge', dueText = isFullyPaid ? 'PAID' : `₹${Number(s.due_amount).toLocaleString()}`;
+        const isFullyPaid = s.due_amount <= 0;
+        const dueBadge = isFullyPaid ? 'paid-badge' : 'due-badge';
+        const dueText = isFullyPaid ? 'PAID' : `₹${Number(s.due_amount).toLocaleString()}`;
+        
         html += `<tr data-student-id="${s.id}">
             <td><span class="amount-badge">${s.roll_number}</span></td>
-            <td><span class="student-name" onclick="showStudentDetails('${s.id}')">${s.student_name}</span><div class="father-name">${s.father_name}</div></td>
+            <td>
+                <div><span class="student-name" onclick="event.stopPropagation(); showStudentDetails('${s.id}')">${s.student_name}</span></div>
+                <div class="father-name"><i class="fas fa-phone"></i> ${s.phone_number || 'N/A'}</div>
+             </div></td>
             <td>${s.father_name}</td>
             <td><span class="amount-badge">₹${Number(s.total_amount).toLocaleString()}</span></td>
             <td><span class="amount-badge">₹${Number(s.received_amount).toLocaleString()}</span></td>
             <td><span class="${dueBadge}">${dueText}</span></td>
-            <td><div class="action-buttons"><button class="history-btn" onclick="event.stopPropagation(); showTransactionHistory('${s.id}')"><i class="fas fa-history"></i> History</button>
-            <button class="update-btn" onclick="event.stopPropagation(); openUpdateModal('${s.id}')" ${isFullyPaid ? 'disabled' : ''}><i class="fas fa-edit"></i> Update</button>
-            <button class="delete-btn" onclick="event.stopPropagation(); deleteStudent('${s.id}', '${s.student_name}')"><i class="fas fa-trash-alt"></i> Delete</button></div></td>
+            <td><div class="action-buttons">
+                <button class="history-btn" onclick="event.stopPropagation(); showTransactionHistory('${s.id}')"><i class="fas fa-history"></i> History</button>
+                <button class="update-btn" onclick="event.stopPropagation(); openUpdateModal('${s.id}')" ${isFullyPaid ? 'disabled' : ''}><i class="fas fa-edit"></i> Update</button>
+                <button class="delete-btn" onclick="event.stopPropagation(); deleteStudent('${s.id}', '${s.student_name}')"><i class="fas fa-trash-alt"></i> Delete</button>
+            </div></div></td>
         </tr>`;
     });
-    html += `</tbody></td>`;
+    html += `</tbody></table>`;
     tableContainer.innerHTML = html;
 }
+
+// Download PDF Report - Simple, Direct Download
+downloadPdfBtn.addEventListener('click', async function() {
+    let filtered = allStudents.filter(s => s.session === sessionFilter.value);
+    if (classFilter.value !== 'All') filtered = filtered.filter(s => s.class === classFilter.value);
+    const searchRoll = rollSearchInput.value.trim().toLowerCase();
+    if (searchRoll) filtered = filtered.filter(s => (s.roll_number || '').toString().toLowerCase().includes(searchRoll));
+    
+    filtered.sort((a, b) => (b.due_amount || 0) - (a.due_amount || 0));
+    
+    let totalFee = 0, totalReceived = 0, totalDue = 0;
+    filtered.forEach(s => {
+        totalFee += Number(s.total_amount) || 0;
+        totalReceived += Number(s.received_amount) || 0;
+        totalDue += Number(s.due_amount) || 0;
+    });
+    
+    let tableRows = '';
+    filtered.forEach((s, index) => {
+        const status = s.due_amount <= 0 ? 'PAID' : 'PENDING';
+        const statusColor = s.due_amount <= 0 ? '#16a34a' : '#dc2626';
+        tableRows += `
+            <tr style="border-bottom: 1px solid #e2e8f0;">
+                <td style="padding: 10px 8px; text-align: center;">${index + 1}</td>
+                <td style="padding: 10px 8px;">${s.roll_number || ''}</td>
+                <td style="padding: 10px 8px;"><strong>${s.student_name || ''}</strong><br><span style="font-size: 11px; color: #64748b;">${s.father_name || ''}</span></td>
+                <td style="padding: 10px 8px;">${s.phone_number || 'N/A'}</td>
+                <td style="padding: 10px 8px;">${s.class || ''}</td>
+                <td style="padding: 10px 8px; text-align: right;">₹${Number(s.total_amount).toLocaleString()}</td>
+                <td style="padding: 10px 8px; text-align: right;">₹${Number(s.received_amount).toLocaleString()}</td>
+                <td style="padding: 10px 8px; text-align: right; font-weight: 600; color: ${statusColor};">₹${Number(s.due_amount).toLocaleString()}</td>
+                <td style="padding: 10px 8px; text-align: center;"><span style="background: ${statusColor}15; color: ${statusColor}; padding: 4px 10px; border-radius: 20px; font-size: 11px;">${status}</span></td>
+            </tr>
+        `;
+    });
+    
+    const currentDate = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+    const className = classFilter.value === 'All' ? 'All Classes' : classFilter.value;
+    const sessionName = sessionFilter.value;
+    
+    const pdfHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Student Fee Report - ${COACHING_DETAILS.name}</title>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+                body { padding: 30px 20px; background: white; }
+                .container { max-width: 1200px; margin: 0 auto; }
+                .header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #1b4f9b; padding-bottom: 15px; }
+                .coaching-name { font-size: 22px; font-weight: 800; color: #1b4f9b; margin: 0; }
+                .coaching-address { font-size: 11px; color: #4a5568; margin: 5px 0; }
+                .report-title { font-size: 16px; font-weight: 700; color: #113a5e; text-align: center; margin: 15px 0 5px; }
+                .report-meta { text-align: center; font-size: 11px; color: #64748b; margin-bottom: 20px; }
+                .summary { background: linear-gradient(135deg, #1b4f9b, #2563eb); color: white; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-around; flex-wrap: wrap; }
+                .summary-item { text-align: center; }
+                .summary-label { font-size: 11px; opacity: 0.9; margin-bottom: 5px; }
+                .summary-value { font-size: 20px; font-weight: 800; }
+                table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 11px; }
+                th { background: #1b4f9b; color: white; padding: 10px 8px; font-weight: 600; text-align: center; }
+                td { padding: 8px; }
+                .footer { margin-top: 25px; padding-top: 15px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 10px; color: #64748b; }
+                .signatures { display: flex; justify-content: space-between; margin-top: 30px; }
+                .signature-line { border-top: 1px solid #000; width: 200px; margin-top: 30px; }
+                .signature-text { font-size: 10px; text-align: center; margin-top: 5px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <div class="coaching-name">${COACHING_DETAILS.name}</div>
+                    <div class="coaching-address">${COACHING_DETAILS.address} | 📞 ${COACHING_DETAILS.phone} | ✉️ ${COACHING_DETAILS.email}</div>
+                    <div class="coaching-address">MSME: ${COACHING_DETAILS.msme}</div>
+                </div>
+                <div class="report-title">📊 STUDENT FEE REPORT</div>
+                <div class="report-meta">Session: ${sessionName} | Class: ${className} | Date: ${currentDate} | Total Students: ${filtered.length}</div>
+                
+                <div class="summary">
+                    <div class="summary-item"><div class="summary-label">💰 Total Fee</div><div class="summary-value">₹${totalFee.toLocaleString()}</div></div>
+                    <div class="summary-item"><div class="summary-label">💵 Total Received</div><div class="summary-value">₹${totalReceived.toLocaleString()}</div></div>
+                    <div class="summary-item"><div class="summary-label">⏳ Total Due</div><div class="summary-value">₹${totalDue.toLocaleString()}</div></div>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th><th>Roll No</th><th>Student Name</th><th>Phone</th><th>Class</th><th>Total</th><th>Received</th><th>Due</th><th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+                
+                <div class="signatures">
+                    <div><div class="signature-line"></div><div class="signature-text">Authorized Signatory</div></div>
+                    <div><div class="signature-line"></div><div class="signature-text">Principal / Director</div></div>
+                </div>
+                <div class="footer">This is a computer generated report | Generated by Quest Coaching Management System</div>
+            </div>
+            <script>
+                window.onload = function() {
+                    var style = document.createElement('style');
+                    style.innerHTML = '@media print { body { margin: 0; padding: 0; } .no-print { display: none; } }';
+                    document.head.appendChild(style);
+                    window.print();
+                };
+            <\/script>
+        </body>
+        </html>
+    `;
+    
+    // Direct download as PDF using print/save
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(pdfHtml);
+    printWindow.document.close();
+});
 
 function showStudentDetails(studentId) {
     const student = allStudents.find(s => s.id === studentId);
     if (!student) return;
+    
     let subjectsHtml = '', extraFeesHtml = '';
     if (student.subjects && student.subjects.length > 0) {
-        subjectsHtml = `<div class="detail-row"><div class="detail-label">📖 Subjects:</div><div class="detail-value"><div class="subjects-list">${student.subjects.map(sub => `<span class="subject-tag">📘 ${sub} (₹3000)</span>`).join('')}</div></div></div>`;
+        subjectsHtml = `<div><strong>📖 Subjects:</strong> ${student.subjects.map(s => `${s} (₹3000)`).join(', ')}</div>`;
     }
     if (student.extra_fees && student.extra_fees.length > 0) {
-        extraFeesHtml = `<div class="detail-row"><div class="detail-label">📌 Extra Charges:</div><div class="detail-value"><div class="extras-list">${student.extra_fees.map(fee => `<span class="extra-tag">${fee} (₹500)</span>`).join('')}</div></div></div>`;
+        extraFeesHtml = `<div><strong>📌 Extra Charges:</strong> ${student.extra_fees.map(f => `${f} (₹500)`).join(', ')}</div>`;
     }
+    
     Swal.fire({
         title: `<strong>${student.student_name}</strong>`,
         html: `
             <div style="text-align: left;">
                 <div><strong>🔢 Roll No:</strong> ${student.roll_number}</div>
                 <div><strong>👨 Father:</strong> ${student.father_name}</div>
+                <div><strong>📞 Phone:</strong> ${student.phone_number || 'N/A'}</div>
                 <div><strong>🏫 Class:</strong> ${student.class}</div>
                 <div><strong>📅 Session:</strong> ${student.session}</div>
                 ${subjectsHtml ? `<hr>${subjectsHtml}` : ''}
@@ -247,6 +376,7 @@ window.showTransactionHistory = async function(studentId) {
         <div style="background:#1b4f9b;color:white;width:45px;height:45px;border-radius:50%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-user-graduate"></i></div>
         <div><h6 style="margin:0;font-weight:700;">${student.student_name}</h6>
         <p style="margin:0;color:#5f6b7a;">Roll: ${student.roll_number} | Class: ${student.class}</p>
+        <p style="margin:0;">📞 ${student.phone_number || 'N/A'}</p>
         <p style="margin:0;">Total Paid: <strong>₹${Number(student.received_amount).toLocaleString()}</strong> | Due: <strong style="color:#b91c1c;">₹${Number(student.due_amount).toLocaleString()}</strong></p>${subjectsInfo}</div>
     </div>`;
     document.getElementById('historyStudentInfo').innerHTML = info;
@@ -347,47 +477,24 @@ function generateInvoiceHTML(data) {
     let subtotal = 0;
     let discountAmount = 0;
     
-    // SUBJECTS - Jo teacher ne add student time select kiye the
     if (s.subjects && s.subjects.length > 0) {
-        s.subjects.forEach(sub => { 
-            feeRows += `<tr><td style="font-weight:500;">${sub} (Subject Fee)</td><td>₹3,000/-</td></tr>`;
-            subtotal += 3000;
-        });
+        s.subjects.forEach(sub => { feeRows += `<tr><td style="font-weight:500;">${sub} (Subject Fee)</td><td style="text-align:right;">₹3,000/-</td></tr>`; subtotal += 3000; });
     }
-    
-    // EXTRA FEES - Additional Charges
     if (s.extra_fees && s.extra_fees.length > 0) {
-        s.extra_fees.forEach(fee => { 
-            feeRows += `<tr><td style="font-weight:500;">${fee}</td><td>₹500/-</td></tr>`;
-            subtotal += 500;
-        });
+        s.extra_fees.forEach(fee => { feeRows += `<tr><td style="font-weight:500;">${fee}</td><td style="text-align:right;">₹500/-</td></tr>`; subtotal += 500; });
     }
-    
-    // FEE BREAKDOWN se bhi check karo (checkbox mode ke liye Class 6-10)
     if ((!s.subjects || s.subjects.length === 0) && s.fee_breakdown) {
         const fb = s.fee_breakdown;
         if (fb.type === 'checkbox_based') {
-            if (fb.tuition > 0) { feeRows += `<tr><td style="font-weight:500;">Tuition Fee</td><td>₹${fb.tuition}/-</td></tr>`; subtotal += fb.tuition; }
-            if (fb.admission > 0) { feeRows += `<tr><td style="font-weight:500;">Admission Fee</td><td>₹${fb.admission}/-</td></tr>`; subtotal += fb.admission; }
-            if (fb.exam > 0) { feeRows += `<tr><td style="font-weight:500;">Exam Fee (Half Yearly + Annual)</td><td>₹${fb.exam}/-</td></tr>`; subtotal += fb.exam; }
-            if (fb.assignment > 0) { feeRows += `<tr><td style="font-weight:500;">Assignment Fee</td><td>₹${fb.assignment}/-</td></tr>`; subtotal += fb.assignment; }
+            if (fb.tuition > 0) { feeRows += `<tr><td style="font-weight:500;">Tuition Fee</td><td style="text-align:right;">₹${fb.tuition}/-</td></tr>`; subtotal += fb.tuition; }
+            if (fb.admission > 0) { feeRows += `<tr><td style="font-weight:500;">Admission Fee</td><td style="text-align:right;">₹${fb.admission}/-</td></tr>`; subtotal += fb.admission; }
+            if (fb.exam > 0) { feeRows += `<tr><td style="font-weight:500;">Exam Fee</td><td style="text-align:right;">₹${fb.exam}/-</td></tr>`; subtotal += fb.exam; }
+            if (fb.assignment > 0) { feeRows += `<tr><td style="font-weight:500;">Assignment Fee</td><td style="text-align:right;">₹${fb.assignment}/-</td></tr>`; subtotal += fb.assignment; }
             discountAmount = fb.discount || 0;
-        } else if (fb.type === 'subject_based') {
-            discountAmount = fb.discount || 0;
-        }
+        } else if (fb.type === 'subject_based') { discountAmount = fb.discount || 0; }
     }
-    
-    // Agar kuch bhi nahi mila to total amount daal do
-    if (feeRows === '') { 
-        feeRows = `<tr><td style="font-weight:500;">Total Fee</td><td>₹${Number(s.total_amount).toLocaleString()}/-</td></tr>`;
-        subtotal = s.total_amount;
-    }
-    
-    // Apply discount if any
-    if (discountAmount > 0) {
-        feeRows += `<tr><td style="color:#b91c1c; font-weight:500;">🎁 Discount</td><td style="color:#b91c1c;">- ₹${discountAmount.toLocaleString()}/-</td></tr>`;
-    }
-    
+    if (feeRows === '') { feeRows = `<tr><td style="font-weight:500;">Total Fee</td><td style="text-align:right;">₹${Number(s.total_amount).toLocaleString()}/-</td></tr>`; subtotal = s.total_amount; }
+    if (discountAmount > 0) { feeRows += `<tr><td style="color:#b91c1c; font-weight:500;">🎁 Discount</td><td style="color:#b91c1c; text-align:right;">- ₹${discountAmount.toLocaleString()}/-</td></tr>`; }
     const finalTotal = subtotal - discountAmount;
     
     return `<!DOCTYPE html>
@@ -445,68 +552,37 @@ function generateInvoiceHTML(data) {
             </div>
         </div>
         <h2 class="title"><i class="fas fa-file-invoice"></i> FEE PAYMENT INVOICE</h2>
-        
-        <div class="section">
-            <div class="section-title"><i class="fas fa-user-graduate"></i> STUDENT DETAILS</div>
-            <div class="grid-2">
-                <div><span class="label">Invoice No:</span> <span class="value">${invoiceNo}</span></div>
-                <div><span class="label">Date:</span> <span class="value">${new Date(date).toLocaleString()}</span></div>
-                <div><span class="label">Student Name:</span> <span class="value">${s.student_name}</span></div>
-                <div><span class="label">Roll Number:</span> <span class="value">${s.roll_number}</span></div>
-                <div><span class="label">Father's Name:</span> <span class="value">${s.father_name}</span></div>
-                <div><span class="label">Class & Session:</span> <span class="value">${s.class} (${s.session})</span></div>
-            </div>
-        </div>
-        
-        <div class="section">
-            <div class="section-title"><i class="fas fa-coins"></i> FEE STRUCTURE</div>
-            <table>
-                <thead><tr><th>Description</th><th>Amount (₹)</th></tr></thead>
-                <tbody>${feeRows}
-                <tr class="total-row"><td><strong>💰 Total Fee</strong></td><td><strong>₹${finalTotal.toLocaleString()}/-</strong></td></tr>
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="section">
-            <div class="section-title"><i class="fas fa-credit-card"></i> PAYMENT DETAILS</div>
-            <table>
-                <thead><tr><th>Description</th><th>Amount (₹)</th></tr></thead>
-                <tbody>
-                    <tr><td>Total Fee</td><td>₹${Number(s.total_amount).toLocaleString()}/-</td></tr>
-                    <tr><td>Previous Payment</td><td>₹${Number(s.received_amount - data.paymentAmount).toLocaleString()}/-</td></tr>
-                    <tr style="background:#e8f0fe;"><td><strong>💰 Current Payment</strong></td><td><strong style="color:#16a34a;">+ ₹${data.paymentAmount.toLocaleString()}/-</strong></td></tr>
-                    <tr class="total-row"><td><strong>✅ Total Paid</strong></td><td><strong>₹${Number(s.received_amount).toLocaleString()}/-</strong></td></tr>
-                    <tr><td>⏳ Remaining Due</td><td><span style="color:#b91c1c;font-weight:700;">₹${Number(s.due_amount).toLocaleString()}/-</span></td></tr>
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="section">
-            <div class="section-title"><i class="fas fa-university"></i> BANK DETAILS</div>
-            <div class="grid-2">
-                <div><span class="label">Account Name:</span> <span class="value">${c.bank.accountName}</span></div>
-                <div><span class="label">Bank Name:</span> <span class="value">${c.bank.bankName}</span></div>
-                <div><span class="label">Account Number:</span> <span class="value">${c.bank.accountNumber}</span></div>
-                <div><span class="label">IFSC Code:</span> <span class="value">${c.bank.ifsc}</span></div>
-                <div><span class="label">UPI ID:</span> <span class="value">${c.bank.upi}</span></div>
-            </div>
-        </div>
-        
-        <div class="status-box">
-            <p><i class="fas fa-check-circle" style="color:#16a34a;"></i> <strong>Payment Status:</strong> ${s.due_amount <= 0 ? 'FULLY PAID ✅' : 'PARTIAL PAID'}</p>
-            <p style="font-size:0.65rem;">Transaction ID: ${data.transactionId}</p>
-        </div>
-        
-        <div class="terms">
-            <strong><i class="fas fa-file-contract"></i> नियम एवं शर्तें:</strong>
-            ${TERMS_CONDITIONS_HINDI.map(t => `<p>• ${t}</p>`).join('')}
-        </div>
-        
-        <div class="signature-section">
-            <div class="signature-box"><div class="signature-line"></div><div class="signature-label">Authorized Signatory</div></div>
-            <div class="signature-box"><div class="signature-line"></div><div class="signature-label">Student/Parent Signature</div></div>
-        </div>
+        <div class="section"><div class="section-title"><i class="fas fa-user-graduate"></i> STUDENT DETAILS</div>
+        <div class="grid-2">
+            <div><span class="label">Invoice No:</span> <span class="value">${invoiceNo}</span></div>
+            <div><span class="label">Date:</span> <span class="value">${new Date(date).toLocaleString()}</span></div>
+            <div><span class="label">Student Name:</span> <span class="value">${s.student_name}</span></div>
+            <div><span class="label">Roll Number:</span> <span class="value">${s.roll_number}</span></div>
+            <div><span class="label">Father's Name:</span> <span class="value">${s.father_name}</span></div>
+            <div><span class="label">Phone Number:</span> <span class="value">${s.phone_number || 'N/A'}</span></div>
+            <div><span class="label">Class & Session:</span> <span class="value">${s.class} (${s.session})</span></div>
+        </div></div>
+        <div class="section"><div class="section-title"><i class="fas fa-coins"></i> FEE STRUCTURE</div>
+        <table><thead><tr><th>Description</th><th>Amount (₹)</th></tr></thead><tbody>${feeRows}<tr class="total-row"><td><strong>💰 Total Fee</strong></td><td style="text-align:right;"><strong>₹${finalTotal.toLocaleString()}/-</strong></td></tr></tbody></table></div>
+        <div class="section"><div class="section-title"><i class="fas fa-credit-card"></i> PAYMENT DETAILS</div>
+        <table><thead><tr><th>Description</th><th>Amount (₹)</th></tr></thead><tbody>
+            <tr><td>Total Fee</td><td style="text-align:right;">₹${Number(s.total_amount).toLocaleString()}/-</td></tr>
+            <tr><td>Previous Payment</td><td style="text-align:right;">₹${Number(s.received_amount - data.paymentAmount).toLocaleString()}/-</td></tr>
+            <tr style="background:#e8f0fe;"><td><strong>💰 Current Payment</strong></td><td style="text-align:right;"><strong style="color:#16a34a;">+ ₹${data.paymentAmount.toLocaleString()}/-</strong></td></tr>
+            <tr class="total-row"><td><strong>✅ Total Paid</strong></td><td style="text-align:right;"><strong>₹${Number(s.received_amount).toLocaleString()}/-</strong></td></tr>
+            <tr><td>⏳ Remaining Due</td><td style="text-align:right;"><span style="color:#b91c1c;font-weight:700;">₹${Number(s.due_amount).toLocaleString()}/-</span></td></tr>
+        </tbody></table></div>
+        <div class="section"><div class="section-title"><i class="fas fa-university"></i> BANK DETAILS</div>
+        <div class="grid-2">
+            <div><span class="label">Account Name:</span> <span class="value">${c.bank?.accountName || 'N/A'}</span></div>
+            <div><span class="label">Bank Name:</span> <span class="value">${c.bank?.bankName || 'N/A'}</span></div>
+            <div><span class="label">Account Number:</span> <span class="value">${c.bank?.accountNumber || 'N/A'}</span></div>
+            <div><span class="label">IFSC Code:</span> <span class="value">${c.bank?.ifsc || 'N/A'}</span></div>
+            <div><span class="label">UPI ID:</span> <span class="value">${c.bank?.upi || 'N/A'}</span></div>
+        </div></div>
+        <div class="status-box"><p><i class="fas fa-check-circle" style="color:#16a34a;"></i> <strong>Payment Status:</strong> ${s.due_amount <= 0 ? 'FULLY PAID ✅' : 'PARTIAL PAID'}</p><p style="font-size:0.65rem;">Transaction ID: ${data.transactionId}</p></div>
+        <div class="terms"><strong><i class="fas fa-file-contract"></i> नियम एवं शर्तें:</strong>${TERMS_CONDITIONS_HINDI.map(t => `<p>• ${t}</p>`).join('')}</div>
+        <div class="signature-section"><div class="signature-box"><div class="signature-line"></div><div class="signature-label">Authorized Signatory</div></div><div class="signature-box"><div class="signature-line"></div><div class="signature-label">Student/Parent Signature</div></div></div>
         <div class="footer"><p>✨ Thank you for timely payment! ✨</p><p>This is a computer generated invoice</p></div>
     </div>
     <script>
