@@ -118,8 +118,8 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const feesCollection = db.collection('fees');
+    const transactionsCollection = db.collection('transactions');
 
-    // For Class 11 & 12 - Subject based
     const SUBJECTS = [
         { name: "PHYSICS", price: 3000 },
         { name: "CHEMISTRY", price: 3000 },
@@ -134,10 +134,9 @@
         { name: "ASSIGNMENT FEE", price: 500 }
     ];
 
-    // For Class 6-10 - Checkbox based fees
     const getTuitionFee = (className) => {
         if (className === 'Class 10') return 7200;
-        return 6000; // For Class 6,7,8,9
+        return 6000;
     };
 
     const BASE_FEES = {
@@ -159,20 +158,17 @@
     const fatherInput = document.getElementById('fatherName');
     const sessionSelect = document.getElementById('sessionSelect');
 
-    // For Advanced Mode (11/12)
     let subjectCheckboxes = [];
     let extraCheckboxes = [];
     let advancedDiscountInput = null;
     let advancedReceivedInput = null;
     let advancedDueInput = null;
     
-    // For Checkbox Mode (6-10)
     let feeCheckboxes = {};
     let discountInput = null;
     let receivedInput = null;
     let dueInput = null;
     let currentTuitionFee = 6000;
-    
     let currentMode = 'simple';
 
     let toastTimeout;
@@ -189,7 +185,6 @@
         setTimeout(() => { errorDiv.style.display = 'none'; }, 4000);
     }
 
-    // Calculate total for advanced mode (11/12) with discount
     function calculateAdvancedTotal() {
         let total = 0;
         subjectCheckboxes.forEach(checkbox => {
@@ -198,28 +193,21 @@
         extraCheckboxes.forEach(checkbox => {
             if (checkbox.checked) total += parseInt(checkbox.getAttribute('data-price')) || 0;
         });
-        
-        // Apply discount
         let discount = 0;
         if (advancedDiscountInput) discount = parseFloat(advancedDiscountInput.value) || 0;
         total = Math.max(0, total - discount);
-        
         return total;
     }
 
-    // Calculate total for checkbox mode (6-10)
     function calculateCheckboxTotal() {
         let total = 0;
         if (feeCheckboxes.tuition && feeCheckboxes.tuition.checked) total += currentTuitionFee;
         if (feeCheckboxes.admission && feeCheckboxes.admission.checked) total += BASE_FEES.admission.price;
         if (feeCheckboxes.exam && feeCheckboxes.exam.checked) total += BASE_FEES.exam.price;
         if (feeCheckboxes.assignment && feeCheckboxes.assignment.checked) total += BASE_FEES.assignment.price;
-        
-        // Apply discount
         let discount = 0;
         if (discountInput) discount = parseFloat(discountInput.value) || 0;
         total = Math.max(0, total - discount);
-        
         return total;
     }
 
@@ -242,7 +230,6 @@
         }
     }
 
-    // Render Checkbox Mode for Class 6-10
     function renderCheckboxMode(className) {
         currentMode = 'checkbox';
         currentTuitionFee = getTuitionFee(className);
@@ -296,7 +283,6 @@
             </div>
         `;
         
-        // Get all elements
         feeCheckboxes = {
             tuition: document.getElementById('fee_tuition'),
             admission: document.getElementById('fee_admission'),
@@ -308,7 +294,6 @@
         receivedInput = document.getElementById('receivedAmountCheckbox');
         dueInput = document.getElementById('dueAmountCheckbox');
         
-        // Add event listeners
         Object.values(feeCheckboxes).forEach(cb => {
             if (cb) cb.addEventListener('change', updateDue);
         });
@@ -318,7 +303,6 @@
         updateDue();
     }
 
-    // Render Advanced Mode for Class 11/12 with Discount
     function renderAdvancedMode() {
         currentMode = 'advanced';
         dynamicSection.innerHTML = `
@@ -539,7 +523,6 @@
         const receivedAmount = getReceivedAmount();
         const dueAmount = Math.max(0, totalAmount - receivedAmount);
         
-        // IMPORTANT: Store subjects and extra_fees at TOP LEVEL for invoice to work properly
         let studentData = {
             roll_number: roll,
             student_name: name,
@@ -554,22 +537,43 @@
             created_at: firebase.firestore.FieldValue.serverTimestamp()
         };
         
-        // Store subjects and extra_fees at top level so invoice can read them easily
         if (currentMode === 'advanced') {
-            studentData.subjects = getSelectedSubjects();      // Array of subject names
-            studentData.extra_fees = getSelectedExtraFees();  // Array of extra fee names
-            studentData.subjects_list = getSelectedSubjects(); // Duplicate for safety
+            studentData.subjects = getSelectedSubjects();
+            studentData.extra_fees = getSelectedExtraFees();
         }
         
         loadingMsg.style.display = 'block';
         addBtn.disabled = true;
         
         try {
+            // Add student to fees collection
             const docRef = await feesCollection.add(studentData);
-            console.log("Student added with ID:", docRef.id);
-            console.log("Subjects saved:", studentData.subjects);
-            console.log("Extra fees saved:", studentData.extra_fees);
-            showToast(`✅ ${name} added successfully! (Total: ₹${totalAmount})`);
+            const studentId = docRef.id;
+            
+            // 🔥 IMPORTANT: If received amount > 0, save a transaction in transactions collection
+            if (receivedAmount > 0) {
+                const transactionId = 'TXN' + Date.now() + Math.floor(Math.random() * 10000);
+                const transactionData = {
+                    studentId: studentId,
+                    studentName: name,
+                    rollNumber: roll,
+                    studentClass: classVal,
+                    session: session,
+                    amount: receivedAmount,
+                    previousReceived: 0,
+                    newReceived: receivedAmount,
+                    previousDue: totalAmount,
+                    newDue: dueAmount,
+                    transactionId: transactionId,
+                    date: new Date().toISOString(),
+                    created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                    note: `Initial admission payment of ₹${receivedAmount}`
+                };
+                await transactionsCollection.add(transactionData);
+                console.log("Initial transaction saved:", transactionId);
+            }
+            
+            showToast(`✅ ${name} added successfully! (Total: ₹${totalAmount}, Paid: ₹${receivedAmount})`);
             resetForm();
         } catch (error) {
             console.error("Firestore error:", error);
