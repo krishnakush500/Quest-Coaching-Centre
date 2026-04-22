@@ -9,6 +9,7 @@
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   
   <!-- html2pdf library for PDF generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -761,7 +762,7 @@
       font-size: 1rem;
     }
     
-    /* Password Modal */
+    /* Password Modal - Updated with Email Field */
     .password-modal {
       position: fixed;
       top: 0;
@@ -785,8 +786,13 @@
     }
     .password-box h3 {
       color: #1a237e;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       font-size: 1.3rem;
+    }
+    .password-box p {
+      color: #666;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
     }
     .password-input {
       width: 100%;
@@ -794,8 +800,8 @@
       font-size: 1rem;
       border: 2px solid #ddd;
       border-radius: 8px;
-      margin-bottom: 20px;
-      text-align: center;
+      margin-bottom: 15px;
+      text-align: left;
     }
     .password-input:focus {
       border-color: #1a237e;
@@ -1031,16 +1037,29 @@
   </style>
 </head>
 <body>
-  <!-- Password Modal -->
+  <!-- Password Modal - Updated with Email Field -->
   <div class="password-modal" id="passwordModal">
     <div class="password-box">
-      <h3><i class="fas fa-lock"></i> Admin Access</h3>
-      <p>Enter password to open admin panel:</p>
-      <input type="password" class="password-input" id="adminPassword" placeholder="Enter password" autocomplete="off">
-      <div class="password-error" id="passwordError">Incorrect password!</div>
+      <h3><i class="fas fa-lock"></i> Admin Login</h3>
+      <p>Enter your email and password to access admin panel</p>
+      
+      <!-- Email Field -->
+      <input type="email" id="adminEmail" class="password-input" 
+             placeholder="Email address" autocomplete="off">
+      
+      <!-- Password Field -->
+      <input type="password" id="adminPassword" class="password-input" 
+             placeholder="Password" autocomplete="off">
+      
+      <div class="password-error" id="passwordError">Invalid email or password!</div>
+      
       <div class="password-buttons">
-        <button class="password-btn submit" onclick="checkAdminPassword()">Submit</button>
-        <button class="password-btn cancel" onclick="closePasswordModal()">Cancel</button>
+        <button class="password-btn submit" onclick="checkAdminPassword()">
+          <i class="fas fa-sign-in-alt"></i> Login
+        </button>
+        <button class="password-btn cancel" onclick="closePasswordModal()">
+          <i class="fas fa-times"></i> Cancel
+        </button>
       </div>
     </div>
   </div>
@@ -1442,6 +1461,7 @@
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    const auth = firebase.auth();
 
     // Global variables
     let allResults = [];
@@ -1454,35 +1474,88 @@
     let onlineTests = [];
     let currentTab = 'results';
 
-    // Password Modal Functions
+    // ============ EMAIL + PASSWORD LOGIN SYSTEM ============
+    
     function openPasswordModal() {
       const modal = document.getElementById('passwordModal');
       modal.style.display = 'flex';
-      document.getElementById('adminPassword').focus();
+      document.getElementById('adminEmail').value = '';
+      document.getElementById('adminPassword').value = '';
       document.getElementById('passwordError').style.display = 'none';
+      document.getElementById('adminEmail').focus();
     }
 
     function closePasswordModal() {
       const modal = document.getElementById('passwordModal');
       modal.style.display = 'none';
+      document.getElementById('adminEmail').value = '';
       document.getElementById('adminPassword').value = '';
     }
 
-    function checkAdminPassword() {
+    async function checkAdminPassword() {
+      const email = document.getElementById('adminEmail').value;
       const password = document.getElementById('adminPassword').value;
       const errorElement = document.getElementById('passwordError');
       
-      if (password === "4805") {
-        closePasswordModal();
-        window.open('admin.html', '_blank');
-      } else {
+      if(!email || !password) {
+        errorElement.textContent = 'Please enter both email and password!';
         errorElement.style.display = 'block';
-        document.getElementById('adminPassword').value = '';
-        document.getElementById('adminPassword').focus();
+        return;
+      }
+      
+      const submitBtn = document.querySelector('.password-btn.submit');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+      submitBtn.disabled = true;
+      errorElement.style.display = 'none';
+      
+      try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+        
+        // Agar user login ho gaya toh admin panel khol do
+        // Firebase Auth mein sirf teachers ke accounts honge
+        if(user) {
+          sessionStorage.setItem('adminLoggedIn', 'true');
+          sessionStorage.setItem('adminEmail', user.email);
+          sessionStorage.setItem('loginTime', Date.now());
+          
+          closePasswordModal();
+          window.open('admin.html', '_blank');
+        } else {
+          errorElement.textContent = 'Login failed!';
+          errorElement.style.display = 'block';
+        }
+        
+      } catch(error) {
+        console.error('Login Error:', error);
+        
+        if(error.code === 'auth/user-not-found') {
+          errorElement.textContent = 'Email not found! Please contact admin.';
+        } else if(error.code === 'auth/wrong-password') {
+          errorElement.textContent = 'Wrong password! Please try again.';
+        } else if(error.code === 'auth/invalid-email') {
+          errorElement.textContent = 'Invalid email format!';
+        } else if(error.code === 'auth/too-many-requests') {
+          errorElement.textContent = 'Too many failed attempts! Please try later.';
+        } else {
+          errorElement.textContent = 'Login failed: ' + error.message;
+        }
+        errorElement.style.display = 'block';
+        
+      } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
       }
     }
 
-    // Enter key support for password input
+    // Enter key support
+    document.getElementById('adminEmail').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('adminPassword').focus();
+      }
+    });
+
     document.getElementById('adminPassword').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
         checkAdminPassword();
