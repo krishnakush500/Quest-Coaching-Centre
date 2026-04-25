@@ -91,10 +91,11 @@
             background-color: #1ba87e;
             border-color: #1ba87e;
         }
-        /* New Dashboard Cards */
+        /* New Dashboard Cards - Equal Size */
         .dashboard-card {
             transition: transform 0.3s, box-shadow 0.3s;
             height: 100%;
+            min-height: 200px;
         }
         .dashboard-card:hover {
             transform: translateY(-5px);
@@ -104,6 +105,18 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            height: 100%;
+        }
+        .dashboard-card .btn {
+            margin-top: 15px;
+            min-width: 160px;
+        }
+        /* Equal button size for all dashboard cards */
+        .dashboard-card .btn {
+            width: 180px;
+            padding: 10px 15px;
         }
         /* PDF download button */
         .pdf-download-btn {
@@ -127,12 +140,34 @@
             color: white;
             font-weight: bold;
             transition: all 0.3s;
+            width: 220px !important;
         }
         .fee-management-btn:hover {
             background-color: #bb2d3b;
             border-color: #b02a37;
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3);
+        }
+        /* NEW: Admission Management Button */
+        .admission-management-btn {
+            background-color: #198754;
+            border-color: #198754;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s;
+            width: 220px !important;
+        }
+        .admission-management-btn:hover {
+            background-color: #157347;
+            border-color: #146c43;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(25, 135, 84, 0.3);
+        }
+        /* Equal card button container */
+        .card-btn-wrapper {
+            display: flex;
+            justify-content: center;
+            width: 100%;
         }
     </style>
 </head>
@@ -152,14 +187,16 @@
                         QUEST COACHING CENTRE
                     </div>
                     
-                    <!-- Dashboard Cards -->
+                    <!-- Dashboard Cards - All Equal Size -->
                     <div class="row">
                         <div class="col-md-3 mb-4">
                             <div class="card text-center dashboard-card">
                                 <div class="card-body">
                                     <h5 class="card-title">Create Result</h5>
                                     <p class="card-text">Create a new exam result</p>
-                                    <button id="createResultBtn" class="btn btn-primary">Go</button>
+                                    <div class="card-btn-wrapper">
+                                        <button id="createResultBtn" class="btn btn-primary">Go</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -168,7 +205,9 @@
                                 <div class="card-body">
                                     <h5 class="card-title">Draft Results</h5>
                                     <p class="card-text">View and edit draft results</p>
-                                    <button id="draftResultsBtn" class="btn btn-warning">Go</button>
+                                    <div class="card-btn-wrapper">
+                                        <button id="draftResultsBtn" class="btn btn-warning">Go</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -177,7 +216,9 @@
                                 <div class="card-body">
                                     <h5 class="card-title">Old Results</h5>
                                     <p class="card-text">View published results</p>
-                                    <button id="oldResultsBtn" class="btn btn-info">Go</button>
+                                    <div class="card-btn-wrapper">
+                                        <button id="oldResultsBtn" class="btn btn-info">Go</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -186,20 +227,35 @@
                                 <div class="card-body">
                                     <h5 class="card-title">Online Test</h5>
                                     <p class="card-text">Manage online tests</p>
-                                    <button id="onlineTestBtn" class="btn btn-success">Open</button>
+                                    <div class="card-btn-wrapper">
+                                        <button id="onlineTestBtn" class="btn btn-success">Open</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- NEW SECTION: Fee Management Button (sabse niche) -->
-                    <div class="row mt-4">
-                        <div class="col-12">
+                    <!-- NEW ROW: Admission Management + Fee Management (Both side by side) -->
+                    <div class="row mt-2">
+                        <div class="col-md-6 mb-4">
+                            <div class="card text-center dashboard-card border-success">
+                                <div class="card-body">
+                                    <h5 class="card-title text-success">📋 Admission Management</h5>
+                                    <p class="card-text">Manage student admissions, view all students</p>
+                                    <div class="card-btn-wrapper">
+                                        <button id="admissionManagementBtn" class="btn admission-management-btn">👨‍🎓 Student Dashboard</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
                             <div class="card text-center dashboard-card border-danger">
                                 <div class="card-body">
                                     <h5 class="card-title text-danger">💰 Fee Management System</h5>
                                     <p class="card-text">Manage student fees, add students, update payments</p>
-                                    <button id="feeManagementBtn" class="btn fee-management-btn">📊 Fee Management Dashboard</button>
+                                    <div class="card-btn-wrapper">
+                                        <button id="feeManagementBtn" class="btn fee-management-btn">📊 Fee Management Dashboard</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -404,11 +460,15 @@
                             <div class="simple-instruction">Use this for online test management</div>
                         </div>
 
-                        <!-- NEW: Fee Management Help -->
+                        <h6 class="text-primary mt-4">Admission Management</h6>
+                        <div class="help-step">
+                            <div class="simple-instruction">"Student Dashboard": Click to manage student admissions</div>
+                            <div class="simple-instruction">View all students, add new admissions, manage existing students</div>
+                        </div>
+
                         <h6 class="text-primary mt-4">Fee Management</h6>
                         <div class="help-step">
                             <div class="simple-instruction">"Fee Management Dashboard": Click to open fee management system</div>
-                            <div class="simple-instruction">Opens dashboard.html in new tab</div>
                             <div class="simple-instruction">Manage student fees, add students, update payments</div>
                         </div>
                     </div>
@@ -464,7 +524,12 @@
                             <div class="simple-instruction">इसे ऑनलाइन टेस्ट मैनेजमेंट के लिए उपयोग करें</div>
                         </div>
 
-                        <!-- NEW: Fee Management Hindi Help -->
+                        <h6 class="text-primary mt-4">एडमिशन प्रबंधन</h6>
+                        <div class="help-step">
+                            <div class="simple-instruction">"Student Dashboard": छात्र एडमिशन प्रबंधित करने के लिए क्लिक करें</div>
+                            <div class="simple-instruction">सभी छात्र देखें, नए एडमिशन जोड़ें, मौजूदा छात्र प्रबंधित करें</div>
+                        </div>
+
                         <h6 class="text-primary mt-4">फीस प्रबंधन</h6>
                         <div class="help-step">
                             <div class="simple-instruction">"Fee Management Dashboard": फीस प्रबंधन प्रणाली खोलने के लिए क्लिक करें</div>
@@ -494,7 +559,6 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <!-- Added Download PDF button -->
                     <button type="button" class="btn pdf-download-btn" id="downloadPdfBtn">📥 Download All Results PDF (with Rank)</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
@@ -571,7 +635,7 @@
             where
         } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-        // Firebase configuration - UPDATED WITH NEW CONFIG
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
             authDomain: "quest-coaching.firebaseapp.com",
@@ -596,6 +660,9 @@
         const draftResultsBtn = document.getElementById('draftResultsBtn');
         const oldResultsBtn = document.getElementById('oldResultsBtn');
         const onlineTestBtn = document.getElementById('onlineTestBtn');
+        
+        // NEW: Admission Management Button
+        const admissionManagementBtn = document.getElementById('admissionManagementBtn');
         
         const backToDashboardBtn = document.getElementById('backToDashboardBtn');
         const backToDashboardBtn2 = document.getElementById('backToDashboardBtn2');
@@ -641,7 +708,7 @@
         const resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
         const resultModalTitle = document.getElementById('resultModalTitle');
         const resultDetails = document.getElementById('resultDetails');
-        const downloadPdfBtn = document.getElementById('downloadPdfBtn'); // PDF Button
+        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
         
         // Confirmation Modal Elements
         const editPublishedConfirmModal = new bootstrap.Modal(document.getElementById('editPublishedConfirmModal'));
@@ -661,35 +728,48 @@
         let editingDraftId = null;
         let isEditingPublishedResult = false;
         let editingPublishedResultId = null;
-        let hasChanges = false; // Track if there are unsaved changes
+        let hasChanges = false;
         
-        // Store currently viewed result data for PDF download
         let currentResultDataForPdf = null;
         let currentExamNameForPdf = '';
 
-        // Directly show dashboard (no login required)
-        showSection(dashboardSection);
+        // NEW: Admission Management Button Handler
+        if (admissionManagementBtn) {
+            admissionManagementBtn.addEventListener('click', () => {
+                window.open('student-dashboard.html', '_blank');
+                showToast('Opening Student Admission Dashboard...');
+            });
+        }
 
-        // Vibration function
+        function showSection(section) {
+            dashboardSection.classList.remove('active');
+            createResultSection.classList.remove('active');
+            draftResultsSection.classList.remove('active');
+            oldResultsSection.classList.remove('active');
+            section.classList.add('active');
+        }
+
+        function showToast(message) {
+            toastMessage.textContent = message;
+            successToast.show();
+        }
+
         function vibrateButton() {
             if (navigator.vibrate) {
                 navigator.vibrate(50);
             }
         }
 
-        // Add click vibration to all buttons
         document.addEventListener('click', function(e) {
             if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
                 vibrateButton();
             }
         });
 
-        // Help Button Click Handler
         helpButton.addEventListener('click', () => {
             helpModal.show();
         });
 
-        // Language Switch Handlers (Help Modal)
         englishHelpBtn.addEventListener('click', () => {
             englishInstructions.style.display = 'block';
             hindiInstructions.style.display = 'none';
@@ -704,7 +784,6 @@
             hindiHelpBtn.classList.add('active');
         });
 
-        // NEW: Fee Management Button Handler
         const feeManagementBtn = document.getElementById('feeManagementBtn');
         if (feeManagementBtn) {
             feeManagementBtn.addEventListener('click', () => {
@@ -713,7 +792,6 @@
             });
         }
 
-        // Navigation Handlers
         createResultBtn.addEventListener('click', () => {
             resetCreateResultForm();
             showSection(createResultSection);
@@ -729,22 +807,15 @@
             showSection(oldResultsSection);
         });
         
-        // CHANGED: Online Test Button Handler
         onlineTestBtn.addEventListener('click', () => {
-            // Open publishtest.html in a new tab
             window.open('publishtest.html', '_blank');
-            
-            // Optional: Show a toast notification
             showToast('Opening Online Test Management...');
         });
         
-        // Handle back to dashboard with confirmation for edited published results
         backToDashboardBtn.addEventListener('click', () => {
             if (isEditingPublishedResult && hasChanges) {
-                // Show confirmation modal before going back
                 editPublishedConfirmModal.show();
             } else {
-                // No changes or not editing published result, just go back
                 resetCreateResultForm();
                 showSection(dashboardSection);
             }
@@ -758,15 +829,12 @@
             showSection(dashboardSection);
         });
 
-        // Confirmation Modal Button Handlers
         dontSaveConfirmBtn.addEventListener('click', () => {
-            // User chose "Don't Save"
             resetCreateResultForm();
             showSection(dashboardSection);
         });
         
         saveDraftConfirmBtn.addEventListener('click', () => {
-            // User chose "Save as Draft"
             if (validateResultData()) {
                 saveEditedPublishedResultAsDraft();
             } else {
@@ -775,7 +843,6 @@
         });
         
         saveChangesConfirmBtn.addEventListener('click', () => {
-            // User chose "Save Changes"
             if (validateResultData()) {
                 updateExistingPublishedResult();
             } else {
@@ -783,7 +850,6 @@
             }
         });
 
-        // Create Result - Step 1: Generate Subject Fields
         generateSubjectFieldsBtn.addEventListener('click', () => {
             const subjectCount = parseInt(subjectCountInput.value);
             if (subjectCount < 1) return;
@@ -812,9 +878,7 @@
             step1NextBtn.classList.remove('d-none');
         });
 
-        // Create Result - Step 1: Next Button
         nextToStudentEntryBtn.addEventListener('click', () => {
-            // Validate subject fields
             const subjectNameInputs = document.querySelectorAll('.subject-name');
             const subjectTotalInputs = document.querySelectorAll('.subject-total');
             
@@ -838,18 +902,12 @@
                 return;
             }
             
-            // Generate marks fields
             generateMarksFields();
-            
-            // Show step 2
             examSetupStep.classList.add('d-none');
             studentEntryStep.classList.remove('d-none');
-            
-            // Set up change tracking
             setupChangeTracking();
         });
 
-        // Create Result - Generate Marks Fields
         function generateMarksFields() {
             marksFields.innerHTML = '<h5>Enter Marks</h5>';
             
@@ -864,12 +922,10 @@
             });
         }
 
-        // Create Result - Increment Roll No
         incrementRollBtn.addEventListener('click', () => {
             rollNoInput.value = parseInt(rollNoInput.value) + 1;
         });
 
-        // Create Result - Add Student
         addStudentBtn.addEventListener('click', () => {
             const rollNo = parseInt(rollNoInput.value);
             const name = studentNameInput.value.trim();
@@ -880,7 +936,6 @@
                 return;
             }
             
-            // Validate marks
             const markInputs = document.querySelectorAll('.subject-mark');
             const marks = {};
             let valid = true;
@@ -894,7 +949,6 @@
                     return;
                 }
                 
-                // Check if mark exceeds subject total
                 const subject = subjects.find(s => s.name === subjectName);
                 if (mark > subject.total) {
                     alert(`Marks for ${subjectName} cannot exceed ${subject.total}`);
@@ -907,7 +961,6 @@
             
             if (!valid) return;
             
-            // Add student to list
             students.push({
                 rollNo,
                 name,
@@ -915,23 +968,19 @@
                 marks
             });
             
-            // Update table
             updateStudentsTable();
             
-            // Clear form and increment roll no
             studentNameInput.value = '';
             fatherNameInput.value = '';
             markInputs.forEach(input => input.value = '');
             rollNoInput.value = rollNo + 1;
             
-            // Mark as having changes
             hasChanges = true;
             updateButtonVisibility();
 
             showToast('Student added successfully!');
         });
 
-        // Create Result - Update Students Table
         function updateStudentsTable() {
             studentsTableBody.innerHTML = '';
             
@@ -958,7 +1007,6 @@
                 studentsTableBody.appendChild(row);
             });
             
-            // Add event listeners for edit and delete buttons
             document.querySelectorAll('.edit-student').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const index = parseInt(e.target.getAttribute('data-index'));
@@ -974,24 +1022,20 @@
             });
         }
 
-        // Create Result - Edit Student
         function editStudent(index) {
             const student = students[index];
             editingStudentIndex = index;
             
-            // Fill form with student data
             rollNoInput.value = student.rollNo;
             studentNameInput.value = student.name;
             fatherNameInput.value = student.fatherName || '';
             
-            // Fill marks
             const markInputs = document.querySelectorAll('.subject-mark');
             markInputs.forEach(input => {
                 const subjectName = input.getAttribute('data-subject');
                 input.value = student.marks[subjectName] || 0;
             });
             
-            // Show update and cancel buttons
             addStudentBtn.classList.add('d-none');
             updateStudentBtn.classList.remove('d-none');
             cancelEditBtn.classList.remove('d-none');
@@ -999,7 +1043,6 @@
             showToast('Student edit mode activated!');
         }
 
-        // Create Result - Update Student
         updateStudentBtn.addEventListener('click', () => {
             if (editingStudentIndex === null) return;
             
@@ -1012,7 +1055,6 @@
                 return;
             }
             
-            // Validate marks
             const markInputs = document.querySelectorAll('.subject-mark');
             const marks = {};
             let valid = true;
@@ -1026,7 +1068,6 @@
                     return;
                 }
                 
-                // Check if mark exceeds subject total
                 const subject = subjects.find(s => s.name === subjectName);
                 if (mark > subject.total) {
                     alert(`Marks for ${subjectName} cannot exceed ${subject.total}`);
@@ -1039,7 +1080,6 @@
             
             if (!valid) return;
             
-            // Update student
             students[editingStudentIndex] = {
                 rollNo,
                 name,
@@ -1047,56 +1087,39 @@
                 marks
             };
             
-            // Update table
             updateStudentsTable();
-            
-            // Reset form
             cancelEdit();
-            
-            // Mark as having changes
             hasChanges = true;
             updateButtonVisibility();
 
             showToast('Student updated successfully!');
         });
 
-        // Create Result - Cancel Edit
         cancelEditBtn.addEventListener('click', cancelEdit);
 
         function cancelEdit() {
             editingStudentIndex = null;
-            
-            // Clear form
             studentNameInput.value = '';
             fatherNameInput.value = '';
             const markInputs = document.querySelectorAll('.subject-mark');
             markInputs.forEach(input => input.value = '');
-            
-            // Show add button, hide update and cancel
             addStudentBtn.classList.remove('d-none');
             updateStudentBtn.classList.add('d-none');
             cancelEditBtn.classList.add('d-none');
-
             showToast('Edit cancelled!');
         }
 
-        // Create Result - Delete Student
         function deleteStudent(index) {
             if (confirm('Are you sure you want to delete this student?')) {
                 students.splice(index, 1);
                 updateStudentsTable();
-                
-                // Mark as having changes
                 hasChanges = true;
                 updateButtonVisibility();
-                
                 showToast('Student deleted successfully!');
             }
         }
 
-        // Setup change tracking for inputs
         function setupChangeTracking() {
-            // Track changes in form inputs
             const trackedInputs = [
                 examNameInput,
                 ...document.querySelectorAll('.subject-name'),
@@ -1114,16 +1137,13 @@
             });
         }
 
-        // Update button visibility based on editing mode
         function updateButtonVisibility() {
             if (isEditingPublishedResult) {
-                // When editing published result, show Save Changes and Don't Save buttons
                 saveDraftBtn.classList.add('d-none');
                 publishResultBtn.classList.add('d-none');
                 saveChangesBtn.classList.remove('d-none');
                 dontSaveBtn.classList.remove('d-none');
             } else {
-                // When creating new result or editing draft
                 saveDraftBtn.classList.remove('d-none');
                 publishResultBtn.classList.remove('d-none');
                 saveChangesBtn.classList.add('d-none');
@@ -1131,7 +1151,6 @@
             }
         }
 
-        // Create Result - Save as Draft
         saveDraftBtn.addEventListener('click', async () => {
             if (!validateResultData()) return;
             
@@ -1144,17 +1163,14 @@
                 };
                 
                 if (editingDraftId) {
-                    // Update existing draft
                     const draftRef = doc(db, "draft_results", editingDraftId);
                     await updateDoc(draftRef, resultData);
                     showToast('Draft updated successfully!');
                 } else {
-                    // Create new draft
                     await addDoc(collection(db, "draft_results"), resultData);
                     showToast('Draft saved successfully!');
                 }
                 
-                // Reset form
                 resetCreateResultForm();
                 showSection(dashboardSection);
             } catch (error) {
@@ -1163,14 +1179,12 @@
             }
         });
 
-        // Save Changes button for editing published results
         saveChangesBtn.addEventListener('click', () => {
             if (validateResultData()) {
                 updateExistingPublishedResult();
             }
         });
 
-        // Don't Save button handler
         dontSaveBtn.addEventListener('click', () => {
             if (confirm('Are you sure you want to discard all changes?')) {
                 resetCreateResultForm();
@@ -1178,7 +1192,6 @@
             }
         });
 
-        // Update existing published result
         async function updateExistingPublishedResult() {
             if (!validateResultData()) return;
             
@@ -1190,13 +1203,10 @@
                     updatedAt: serverTimestamp()
                 };
                 
-                // Update the existing published result
                 const resultRef = doc(db, "results", editingPublishedResultId);
                 await updateDoc(resultRef, resultData);
                 
                 showToast('Result updated successfully!');
-                
-                // Reset form and go back to dashboard
                 resetCreateResultForm();
                 showSection(dashboardSection);
             } catch (error) {
@@ -1205,7 +1215,6 @@
             }
         }
 
-        // Save edited published result as draft
         async function saveEditedPublishedResultAsDraft() {
             try {
                 const resultData = {
@@ -1213,12 +1222,11 @@
                     subjects,
                     students,
                     createdAt: serverTimestamp(),
-                    originalResultId: editingPublishedResultId // Track which result this draft came from
+                    originalResultId: editingPublishedResultId
                 };
                 
                 await addDoc(collection(db, "draft_results"), resultData);
                 showToast('Changes saved as draft!');
-                
                 resetCreateResultForm();
                 showSection(dashboardSection);
             } catch (error) {
@@ -1227,11 +1235,9 @@
             }
         }
 
-        // Create Result - Publish Result (for new results only)
         publishResultBtn.addEventListener('click', async () => {
             if (!validateResultData()) return;
             
-            // Check if we're editing a published result (shouldn't happen with this button)
             if (isEditingPublishedResult) {
                 alert('Please use "Save Changes" button to update published results.');
                 return;
@@ -1247,15 +1253,11 @@
                 
                 await addDoc(collection(db, "results"), resultData);
                 
-                // If we were editing a draft, delete it
                 if (editingDraftId) {
                     await deleteDoc(doc(db, "draft_results", editingDraftId));
                 }
                 
-                // Show published success toast
                 publishedToast.show();
-                
-                // Reset form
                 resetCreateResultForm();
                 showSection(dashboardSection);
             } catch (error) {
@@ -1264,7 +1266,6 @@
             }
         });
 
-        // Validate Result Data
         function validateResultData() {
             if (!examNameInput.value.trim()) {
                 alert('Please enter exam name');
@@ -1279,7 +1280,6 @@
             return true;
         }
 
-        // Reset Create Result Form
         function resetCreateResultForm() {
             examNameInput.value = '';
             subjectCountInput.value = '';
@@ -1297,7 +1297,6 @@
             updateButtonVisibility();
         }
 
-        // Load Draft Results
         async function loadDraftResults() {
             try {
                 const q = query(collection(db, "draft_results"), orderBy("createdAt", "desc"));
@@ -1330,7 +1329,6 @@
                     draftResultsList.appendChild(draftCard);
                 });
                 
-                // Add event listeners
                 document.querySelectorAll('.edit-draft').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         const draftId = e.target.getAttribute('data-id');
@@ -1350,7 +1348,6 @@
             }
         }
 
-        // Edit Draft
         async function editDraft(draftId) {
             try {
                 const draftDoc = await getDocs(query(collection(db, "draft_results"), where("__name__", "==", draftId)));
@@ -1362,14 +1359,11 @@
                 
                 const data = draftDoc.docs[0].data();
                 
-                // Set form values
                 examNameInput.value = data.examName;
                 subjectCountInput.value = data.subjects.length;
                 
-                // Generate subject fields
                 generateSubjectFieldsBtn.click();
                 
-                // Wait a bit for DOM to update, then set subject values
                 setTimeout(() => {
                     const subjectNameInputs = document.querySelectorAll('.subject-name');
                     const subjectTotalInputs = document.querySelectorAll('.subject-total');
@@ -1383,22 +1377,17 @@
                         }
                     });
                     
-                    // Proceed to step 2
                     nextToStudentEntryBtn.click();
                     
-                    // Set students data
                     students = data.students;
                     updateStudentsTable();
                     
-                    // Set editing draft ID
                     editingDraftId = draftId;
                     isEditingPublishedResult = false;
                     hasChanges = false;
                     
-                    // Update button visibility
                     updateButtonVisibility();
                     
-                    // Show create result section
                     showSection(createResultSection);
                 }, 100);
 
@@ -1409,7 +1398,6 @@
             }
         }
 
-        // Delete Draft
         async function deleteDraft(draftId) {
             if (!confirm('Are you sure you want to delete this draft?')) return;
             
@@ -1423,12 +1411,9 @@
             }
         }
 
-        // ============= HELPER FUNCTION TO SORT STUDENTS BY PERCENTAGE (HIGHEST FIRST) =============
         function sortStudentsByPercentage(studentsArray, subjectsArray) {
-            // Create a copy to avoid mutating original
             const sorted = [...studentsArray];
             
-            // Calculate percentage for each student and sort descending
             sorted.sort((a, b) => {
                 let totalA = 0, totalMaxA = 0;
                 let totalB = 0, totalMaxB = 0;
@@ -1443,13 +1428,12 @@
                 const percentA = totalMaxA > 0 ? (totalA / totalMaxA) : 0;
                 const percentB = totalMaxB > 0 ? (totalB / totalMaxB) : 0;
                 
-                return percentB - percentA; // Descending (highest first)
+                return percentB - percentA;
             });
             
             return sorted;
         }
 
-        // Load Old Results
         async function loadOldResults() {
             try {
                 const q = query(collection(db, "results"), orderBy("createdAt", "desc"));
@@ -1486,7 +1470,6 @@
                     oldResultsList.appendChild(resultCard);
                 });
                 
-                // Add event listeners
                 document.querySelectorAll('.view-result').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         const resultId = e.target.getAttribute('data-id');
@@ -1494,7 +1477,6 @@
                     });
                 });
 
-                // Add event listeners for edit and delete buttons
                 document.querySelectorAll('.edit-result').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         const resultId = e.target.getAttribute('data-id');
@@ -1514,7 +1496,6 @@
             }
         }
 
-        // Edit Result (Published Result)
         async function editResult(resultId) {
             try {
                 const resultDoc = await getDocs(query(collection(db, "results"), where("__name__", "==", resultId)));
@@ -1527,14 +1508,11 @@
                 const data = resultDoc.docs[0].data();
                 const docId = resultDoc.docs[0].id;
                 
-                // Set form values
                 examNameInput.value = data.examName;
                 subjectCountInput.value = data.subjects.length;
                 
-                // Generate subject fields
                 generateSubjectFieldsBtn.click();
                 
-                // Wait a bit for DOM to update, then set subject values
                 setTimeout(() => {
                     const subjectNameInputs = document.querySelectorAll('.subject-name');
                     const subjectTotalInputs = document.querySelectorAll('.subject-total');
@@ -1548,25 +1526,19 @@
                         }
                     });
                     
-                    // Proceed to step 2
                     nextToStudentEntryBtn.click();
                     
-                    // Set students data
                     students = data.students;
                     updateStudentsTable();
                     
-                    // Set editing flags
                     editingDraftId = null;
                     isEditingPublishedResult = true;
                     editingPublishedResultId = docId;
                     hasChanges = false;
                     
-                    // Update button visibility
                     updateButtonVisibility();
                     
-                    // Show create result section
                     showSection(createResultSection);
-
                 }, 100);
 
                 showToast('Result loaded for editing!');
@@ -1576,12 +1548,11 @@
             }
         }
 
-        // Delete Result (Published Result)
         async function deleteResult(resultId) {
             if (!confirm('Are you sure you want to delete this published result?')) return;
             
             try {
-                await deleteResultFromDB(resultId);
+                await deleteDoc(doc(db, "results", resultId));
                 showToast('Result deleted successfully!');
                 loadOldResults();
             } catch (error) {
@@ -1590,45 +1561,32 @@
             }
         }
 
-        // Delete Result from Database
-        async function deleteResultFromDB(resultId) {
-            await deleteDoc(doc(db, "results", resultId));
-        }
-
-        // ============= PDF GENERATION FUNCTION (WITH RANK COLUMN) =============
         function generatePDF(resultData, examName) {
             try {
-                // Sort students by percentage (highest first) for PDF
                 const sortedStudents = sortStudentsByPercentage(resultData.students, resultData.subjects);
-                
-                // Use jsPDF with autoTable
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF({
-                    orientation: 'landscape', // Landscape for more columns
+                    orientation: 'landscape',
                     unit: 'mm',
                     format: 'a4'
                 });
 
-                // Set title
                 doc.setFontSize(18);
                 doc.setTextColor(0, 102, 204);
                 doc.text(`QUEST COACHING CENTRE - ${examName}`, 14, 15);
                 
-                // Add date
                 const now = new Date();
                 const dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
                 doc.setFontSize(10);
                 doc.setTextColor(100);
                 doc.text(`Generated on: ${dateStr}`, 14, 25);
                 
-                // Add "Top Student" indicator
                 if (sortedStudents.length > 0) {
                     doc.setFontSize(11);
                     doc.setTextColor(40, 167, 69);
                     doc.text(`🏆 Top Student: ${sortedStudents[0].name} (Roll No: ${sortedStudents[0].rollNo})`, 14, 32);
                 }
 
-                // Prepare table columns - NOW INCLUDING RANK
                 let columns = [
                     { header: 'Rank', dataKey: 'rank' },
                     { header: 'Roll No', dataKey: 'rollNo' },
@@ -1636,7 +1594,6 @@
                     { header: 'Father Name', dataKey: 'father' }
                 ];
                 
-                // Add subject columns
                 resultData.subjects.forEach(subject => {
                     columns.push({ 
                         header: `${subject.name}\n(${subject.total})`, 
@@ -1644,14 +1601,12 @@
                     });
                 });
                 
-                // Add total and percentage columns
                 columns.push({ header: 'Total', dataKey: 'total' });
                 columns.push({ header: 'Percentage', dataKey: 'percentage' });
 
-                // Prepare rows data from SORTED students
                 const rows = sortedStudents.map((student, index) => {
                     let row = {
-                        rank: index + 1, // Add rank (1-based)
+                        rank: index + 1,
                         rollNo: student.rollNo,
                         name: student.name,
                         father: student.fatherName || '-'
@@ -1675,7 +1630,6 @@
                     return row;
                 });
 
-                // Generate table
                 doc.autoTable({
                     startY: 40,
                     head: [columns.map(col => col.header)],
@@ -1701,7 +1655,6 @@
                     },
                     margin: { top: 30, right: 10, bottom: 20, left: 10 },
                     didDrawPage: function(data) {
-                        // Footer with page number
                         doc.setFontSize(8);
                         doc.setTextColor(150);
                         doc.text(
@@ -1712,7 +1665,6 @@
                     }
                 });
 
-                // Save PDF
                 doc.save(`${examName}_Results_with_Rank.pdf`);
                 showToast('PDF Downloaded Successfully! (Includes Rank column)');
             } catch (error) {
@@ -1721,7 +1673,6 @@
             }
         }
 
-        // View Result - MODIFIED to sort students by percentage (highest first) and highlight top student
         async function viewResult(resultId) {
             try {
                 const resultDoc = await getDocs(query(collection(db, "results"), where("__name__", "==", resultId)));
@@ -1734,11 +1685,9 @@
                 const data = resultDoc.docs[0].data();
                 const date = data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : 'Unknown date';
                 
-                // Store data for PDF download
                 currentResultDataForPdf = data;
                 currentExamNameForPdf = data.examName;
                 
-                // Sort students by percentage (highest first) for display
                 const sortedStudents = sortStudentsByPercentage(data.students, data.subjects);
                 
                 resultModalTitle.textContent = data.examName + ' (Ranked by Percentage)';
@@ -1747,7 +1696,7 @@
                     <p><strong>Date:</strong> ${date}</p>
                     <p><strong>Subjects:</strong> ${data.subjects.map(s => `${s.name} (${s.total})`).join(', ')}</p>
                     <p><strong>Total Students:</strong> ${data.students.length}</p>
-                    ${sortedStudents.length > 0 ? `<div class="alert alert-success"><strong>🏆 Top Student:</strong> ${sortedStudents[0].name} (Roll No: ${sortedStudents[0].rollNo}) with ${((sortedStudents[0].totalMarks || calculateTotal(sortedStudents[0], data.subjects)) / data.subjects.reduce((acc, s) => acc + s.total, 0) * 100).toFixed(2)}%</div>` : ''}
+                    ${sortedStudents.length > 0 ? `<div class="alert alert-success"><strong>🏆 Top Student:</strong> ${sortedStudents[0].name} (Roll No: ${sortedStudents[0].rollNo})</div>` : ''}
                     
                     <h5 class="mt-4">Student Results (Highest Percentage First)</h5>
                     <div class="table-responsive">
@@ -1760,12 +1709,10 @@
                                     <th>Father Name</th>
                 `;
                 
-                // Add subject columns
                 data.subjects.forEach(subject => {
                     resultHtml += `<th>${subject.name}</th>`;
                 });
                 
-                // Add total column
                 resultHtml += `<th>Total</th>`;
                 resultHtml += `<th>Percentage</th>`;
                 
@@ -1775,36 +1722,21 @@
                             <tbody>
                 `;
                 
-                // Helper function to calculate total marks for a student
-                function calculateTotal(student, subjects) {
-                    let total = 0;
-                    subjects.forEach(subject => {
-                        total += student.marks[subject.name] || 0;
-                    });
-                    return total;
-                }
-                
-                // Add student rows from SORTED array
                 sortedStudents.forEach((student, index) => {
                     let totalMarks = 0;
                     let totalMaxMarks = 0;
-                    
-                    // Determine if this is the top student (index 0)
                     const isTopStudent = index === 0;
                     
-                    // Start row with optional highlight class
                     resultHtml += `<tr${isTopStudent ? ' class="top-student-row"' : ''}>`;
                     resultHtml += `<td><strong>#${index + 1}</strong></td>`;
                     resultHtml += `<td>${student.rollNo}</td>`;
                     resultHtml += `<td>${student.name}${isTopStudent ? ' 🏆' : ''}</td>`;
                     resultHtml += `<td>${student.fatherName || '-'}</td>`;
                     
-                    // Add marks for each subject
                     data.subjects.forEach(subject => {
                         const mark = student.marks[subject.name] || 0;
                         totalMarks += mark;
                         totalMaxMarks += subject.total;
-                        
                         resultHtml += `<td>${mark}/${subject.total}</td>`;
                     });
                     
@@ -1825,11 +1757,8 @@
                 
                 resultDetails.innerHTML = resultHtml;
                 
-                // Attach event listener to PDF download button
-                // Remove any previous listeners to avoid duplicates
                 const newDownloadBtn = downloadPdfBtn.cloneNode(true);
                 downloadPdfBtn.parentNode.replaceChild(newDownloadBtn, downloadPdfBtn);
-                // Update the global reference to the new button
                 window.downloadPdfBtn = newDownloadBtn;
                 
                 newDownloadBtn.addEventListener('click', () => {
@@ -1845,23 +1774,6 @@
                 console.error('Error loading result:', error);
                 alert('Error loading result: ' + error.message);
             }
-        }
-
-        // Helper Functions
-        function showSection(section) {
-            // Hide all sections
-            dashboardSection.classList.remove('active');
-            createResultSection.classList.remove('active');
-            draftResultsSection.classList.remove('active');
-            oldResultsSection.classList.remove('active');
-            
-            // Show the requested section
-            section.classList.add('active');
-        }
-
-        function showToast(message) {
-            toastMessage.textContent = message;
-            successToast.show();
         }
     </script>
 </body>
