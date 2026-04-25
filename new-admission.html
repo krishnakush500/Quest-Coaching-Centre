@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>📝 Quest Coaching · New Admission</title>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        body {
+            background: #f0f4fa;
+            padding: 16px 12px 32px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .header-bar {
+            background: white;
+            border-radius: 40px;
+            padding: 14px 24px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 18px rgba(0,20,40,0.08);
+        }
+        .back-btn {
+            background: #e8f0fe;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #1b4f9b;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 32px;
+            padding: 30px;
+            box-shadow: 0 15px 30px -12px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e3a5f;
+            margin: 20px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #f5a623;
+            display: inline-block;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .full-width {
+            grid-column: span 2;
+        }
+        
+        .form-group {
+            margin-bottom: 5px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+        }
+        
+        .required {
+            color: #dc2626;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            background: #fafbfc;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #1b4f9b;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(27, 79, 155, 0.1);
+            background: white;
+        }
+        
+        .name-boxes {
+            display: flex;
+            gap: 12px;
+        }
+        .name-box {
+            flex: 1;
+        }
+        .name-box label {
+            font-size: 0.65rem;
+            margin-bottom: 3px;
+        }
+        
+        .radio-group, .checkbox-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            padding: 8px 0;
+        }
+        .radio-group label, .checkbox-group label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        .radio-group input, .checkbox-group input {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .photo-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+        .photo-box {
+            width: 140px;
+            height: 160px;
+            border: 2px dashed #1b4f9b;
+            border-radius: 16px;
+            background: #f8fafc;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+        .photo-box:hover {
+            border-color: #f5a623;
+            background: #f1f5f9;
+        }
+        .photo-placeholder {
+            text-align: center;
+            padding: 15px;
+        }
+        .photo-placeholder i {
+            font-size: 2rem;
+            color: #1b4f9b;
+        }
+        .photo-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        #studentPhoto {
+            display: none;
+        }
+        
+        .declaration-box {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 20px;
+            margin: 20px 0;
+            border: 1px solid #e2e8f0;
+        }
+        .declaration-text {
+            font-style: italic;
+            color: #334155;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+        }
+        .signature-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .signature-item {
+            flex: 1;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #1b4f9b, #0f3f7a);
+            color: white;
+            padding: 16px 28px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(27, 79, 155, 0.3);
+        }
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .progress-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .progress-card {
+            background: white;
+            padding: 35px;
+            border-radius: 30px;
+            text-align: center;
+            min-width: 280px;
+        }
+        .progress-bar-container {
+            width: 100%;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #1b4f9b, #f5a623);
+            border-radius: 20px;
+            transition: width 0.3s ease;
+        }
+        
+        @media (max-width: 700px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .full-width {
+                grid-column: span 1;
+            }
+            .name-boxes {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .form-card {
+                padding: 20px;
+            }
+            .photo-section {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header-bar">
+        <div class="logo-area">
+            <h1>🏫 Quest कोचिंग सेंटर</h1>
+            <p>search for knowledge | Under MR. RAVI SIR</p>
+        </div>
+        <button class="back-btn" onclick="window.location.href='student-dashboard.html'">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </button>
+    </div>
+    
+    <div class="form-card">
+        <h2 style="color: #1e3a5f; margin-bottom: 20px;"><i class="fas fa-user-plus"></i> New Student Admission Form</h2>
+        <div id="formAlert"></div>
+        
+        <div class="photo-section">
+            <div class="photo-box" id="photoUploadBox">
+                <div class="photo-placeholder" id="photoPlaceholder">
+                    <i class="fas fa-camera"></i>
+                    <p>Passport Size Photo</p>
+                    <p style="font-size: 10px;">Click to upload</p>
+                </div>
+                <img id="photoPreview" class="photo-preview" alt="Preview">
+            </div>
+            <input type="file" id="studentPhoto" accept="image/*">
+        </div>
+        
+        <form id="admissionForm">
+            <div class="form-group">
+                <label>1. Full Name of the Applicant <span class="required">*</span></label>
+                <div class="name-boxes">
+                    <div class="name-box"><input type="text" id="firstName" placeholder="First Name" required></div>
+                    <div class="name-box"><input type="text" id="middleName" placeholder="Middle Name"></div>
+                    <div class="name-box"><input type="text" id="lastName" placeholder="Last Name" required></div>
+                </div>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group"><label>2. Nationality <span class="required">*</span></label><input type="text" id="nationality" value="Indian" required></div>
+                <div class="form-group"><label>3. Date of Birth <span class="required">*</span></label><input type="date" id="dob" required></div>
+                <div class="form-group">
+                    <label>4. Sex <span class="required">*</span></label>
+                    <div class="radio-group"><label><input type="radio" name="gender" value="Male" required> Male</label><label><input type="radio" name="gender" value="Female"> Female</label></div>
+                </div>
+                <div class="form-group"><label>5. Class <span class="required">*</span></label>
+                    <select id="class" required>
+                        <option value="">Select Class</option>
+                        <option>6th</option><option>7th</option><option>8th</option>
+                        <option>9th</option><option>10th</option>
+                        <option>11th (Science)</option><option>11th (Commerce)</option>
+                        <option>12th (Science)</option><option>12th (Commerce)</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>6. Father's Name <span class="required">*</span></label><input type="text" id="fatherName" required></div>
+                <div class="form-group"><label>7. Mother's Name</label><input type="text" id="motherName"></div>
+                <div class="form-group"><label>8. Contact No. (Student's) <span class="required">*</span></label><input type="tel" id="studentMobile" maxlength="10" required></div>
+                <div class="form-group full-width"><label>9. Complete Address <span class="required">*</span></label><textarea id="address" rows="2" required></textarea></div>
+                <div class="form-group"><label>10. Aadhar No.</label><input type="text" id="aadhar" maxlength="12"></div>
+                <div class="form-group"><label>11. Present School/College <span class="required">*</span></label><input type="text" id="presentSchool" required></div>
+                <div class="form-group full-width">
+                    <label>12. How did you come to know about QCC</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="knowAbout" value="Google"> Google</label>
+                        <label><input type="checkbox" name="knowAbout" value="Teacher"> Teacher</label>
+                        <label><input type="checkbox" name="knowAbout" value="Friend/Relatives"> Friend / Relatives</label>
+                    </div>
+                </div>
+                <div class="form-group full-width"><label>13. Mention Information (Psychological/Physical) If Any</label><textarea id="medicalInfo" rows="2"></textarea></div>
+            </div>
+            
+            <div class="declaration-box">
+                <div class="declaration-text"><i class="fas fa-file-signature"></i> <strong>DECLARATION</strong><br>I hereby declare that the information furnished in this form is true to the best of my/our knowledge and belief.</div>
+                <div class="checkbox-group"><label><input type="checkbox" id="declaration" required> I Agree to the above declaration <span class="required">*</span></label></div>
+                <div class="signature-row">
+                    <div class="signature-item"><label>Date:</label><input type="text" id="declarationDate" readonly></div>
+                    <div class="signature-item"><label>Place:</label><input type="text" id="declarationPlace" placeholder="e.g., Gopalganj"></div>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-submit" id="submitBtn"><i class="fas fa-save"></i> Submit Admission</button>
+        </form>
+    </div>
+</div>
+
+<div class="progress-overlay" id="progressOverlay">
+    <div class="progress-card">
+        <h3><i class="fas fa-spinner fa-spin"></i> Processing Admission</h3>
+        <div class="progress-bar-container"><div class="progress-bar-fill" id="progressFill"></div></div>
+        <div class="progress-status" id="progressStatus">Initializing...</div>
+        <div class="progress-percent" id="progressPercent">0%</div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
+        authDomain: "quest-coaching.firebaseapp.com",
+        projectId: "quest-coaching",
+        storageBucket: "quest-coaching.firebasestorage.app"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    
+    document.getElementById('declarationDate').value = new Date().toLocaleDateString('en-IN');
+    
+    // Photo Upload
+    const photoBox = document.getElementById('photoUploadBox');
+    const photoInput = document.getElementById('studentPhoto');
+    const photoPreview = document.getElementById('photoPreview');
+    const photoPlaceholder = document.getElementById('photoPlaceholder');
+    
+    photoBox.addEventListener('click', () => photoInput.click());
+    photoInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Photo should be less than 5MB');
+                this.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                photoPreview.src = event.target.result;
+                photoPreview.style.display = 'block';
+                photoPlaceholder.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    const progressOverlay = document.getElementById('progressOverlay');
+    const progressFill = document.getElementById('progressFill');
+    const progressStatus = document.getElementById('progressStatus');
+    const progressPercent = document.getElementById('progressPercent');
+    
+    function updateProgress(percent, status) {
+        progressFill.style.width = percent + '%';
+        progressPercent.textContent = percent + '%';
+        if (status) progressStatus.textContent = status;
+    }
+    
+    function getPhotoAsBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    function getSelectedKnowAbout() {
+        const checkboxes = document.querySelectorAll('input[name="knowAbout"]:checked');
+        return Array.from(checkboxes).map(cb => cb.value).join(', ');
+    }
+    
+    function generateAdmissionNo() {
+        const year = new Date().getFullYear();
+        const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        return `QCC/${year}/${random}`;
+    }
+    
+    function showAlert(msg, type) {
+        const div = document.getElementById('formAlert');
+        div.innerHTML = `<div style="background:${type==='error'?'#fee2e2':'#d1fae5'}; color:${type==='error'?'#991b1b':'#065f46'}; padding:12px; border-radius:16px; margin-bottom:20px;">${msg}</div>`;
+        setTimeout(() => { if (div.innerHTML.includes(msg)) div.innerHTML = ''; }, 4000);
+    }
+    
+    document.getElementById('admissionForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const firstName = document.getElementById('firstName').value.trim();
+        const middleName = document.getElementById('middleName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const nationality = document.getElementById('nationality').value.trim();
+        const dob = document.getElementById('dob').value;
+        const gender = document.querySelector('input[name="gender"]:checked')?.value;
+        const classVal = document.getElementById('class').value;
+        const fatherName = document.getElementById('fatherName').value.trim();
+        const motherName = document.getElementById('motherName').value.trim();
+        const studentMobile = document.getElementById('studentMobile').value.trim();
+        const address = document.getElementById('address').value.trim();
+        const aadhar = document.getElementById('aadhar').value.trim();
+        const presentSchool = document.getElementById('presentSchool').value.trim();
+        const knowAbout = getSelectedKnowAbout();
+        const medicalInfo = document.getElementById('medicalInfo').value.trim();
+        const declaration = document.getElementById('declaration').checked;
+        const declarationPlace = document.getElementById('declarationPlace').value.trim();
+        const photoFile = document.getElementById('studentPhoto').files[0];
+        
+        const fullName = [firstName, middleName, lastName].filter(n => n).join(' ');
+        
+        if (!firstName || !lastName || !nationality || !dob || !gender || !classVal || !fatherName || !studentMobile || !address || !presentSchool) {
+            showAlert('Please fill all required fields (*)', 'error');
+            return;
+        }
+        if (studentMobile.length !== 10 || !/^\d+$/.test(studentMobile)) {
+            showAlert('Enter valid 10-digit mobile number', 'error');
+            return;
+        }
+        if (!photoFile) {
+            showAlert('Please upload passport size photo', 'error');
+            return;
+        }
+        if (!declaration) {
+            showAlert('Please accept the declaration', 'error');
+            return;
+        }
+        
+        progressOverlay.style.display = 'flex';
+        updateProgress(0, 'Starting...');
+        
+        try {
+            updateProgress(20, 'Validating information...'); await new Promise(r => setTimeout(r, 300));
+            updateProgress(40, 'Processing photo...'); const photoUrl = await getPhotoAsBase64(photoFile);
+            updateProgress(60, 'Photo processed...'); await new Promise(r => setTimeout(r, 200));
+            updateProgress(80, 'Generating admission number...'); const admissionNo = generateAdmissionNo();
+            updateProgress(95, 'Saving to database...');
+            
+            const admissionData = {
+                admissionNo, studentName: fullName, fatherName, motherName: motherName || '', dob, gender,
+                classApplying: classVal, previousPercentage: '', schoolName: presentSchool, address,
+                parentMobile: studentMobile, alternateMobile: '', aadhar: aadhar || '', nationality,
+                knowAbout: knowAbout || '', medicalInfo: medicalInfo || '', photoUrl,
+                admissionDate: new Date().toISOString(), session: '2026-27',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(), status: 'active'
+            };
+            
+            await db.collection('admissions').add(admissionData);
+            updateProgress(100, 'Complete!');
+            
+            setTimeout(() => {
+                progressOverlay.style.display = 'none';
+                Swal.fire({
+                    title: '✅ Admission Successful!',
+                    text: `Student ${fullName} has been admitted. Admission No: ${admissionNo}`,
+                    icon: 'success',
+                    confirmButtonColor: '#1b4f9b',
+                    confirmButtonText: 'Go to Dashboard'
+                }).then(() => {
+                    window.location.href = 'student-dashboard.html';
+                });
+            }, 500);
+            
+        } catch (error) {
+            progressOverlay.style.display = 'none';
+            showAlert('Error: ' + error.message, 'error');
+        }
+    });
+</script>
+</body>
+</html>
