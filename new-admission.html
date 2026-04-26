@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * {
@@ -265,6 +266,36 @@
             transition: width 0.3s ease;
         }
         
+        /* Auth Loading Screen */
+        .auth-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 10000;
+        }
+        .auth-loading .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1b4f9b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .main-content {
+            display: none;
+        }
+        
         @media (max-width: 700px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -286,100 +317,109 @@
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="header-bar">
-        <div class="logo-area">
-            <h1>🏫 Quest कोचिंग सेंटर</h1>
-            <p>search for knowledge | Under MR. RAVI SIR</p>
-        </div>
-        <button class="back-btn" onclick="window.location.href='student-dashboard.html'">
-            <i class="fas fa-arrow-left"></i> Back to Dashboard
-        </button>
+    <!-- Auth Loading Screen -->
+    <div id="authLoading" class="auth-loading">
+        <div class="spinner"></div>
+        <p style="margin-top: 15px; color: #1b4f9b; font-weight: 600;">Verifying access...</p>
     </div>
-    
-    <div class="form-card">
-        <h2 style="color: #1e3a5f; margin-bottom: 20px;"><i class="fas fa-user-plus"></i> New Student Admission Form</h2>
-        <div id="formAlert"></div>
-        
-        <div class="photo-section">
-            <div class="photo-box" id="photoUploadBox">
-                <div class="photo-placeholder" id="photoPlaceholder">
-                    <i class="fas fa-camera"></i>
-                    <p>Passport Size Photo</p>
-                    <p style="font-size: 10px;">Click to upload</p>
-                </div>
-                <img id="photoPreview" class="photo-preview" alt="Preview">
+
+    <!-- Main Content -->
+    <div id="mainContent" class="main-content">
+    <div class="container">
+        <div class="header-bar">
+            <div class="logo-area">
+                <h1>🏫 Quest कोचिंग सेंटर</h1>
+                <p>search for knowledge | Under MR. RAVI SIR</p>
             </div>
-            <input type="file" id="studentPhoto" accept="image/*">
+            <button class="back-btn" onclick="window.location.href='student-dashboard.html'">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </button>
         </div>
         
-        <form id="admissionForm">
-            <div class="form-group">
-                <label>1. Full Name of the Applicant <span class="required">*</span></label>
-                <div class="name-boxes">
-                    <div class="name-box"><input type="text" id="firstName" placeholder="First Name" required></div>
-                    <div class="name-box"><input type="text" id="middleName" placeholder="Middle Name"></div>
-                    <div class="name-box"><input type="text" id="lastName" placeholder="Last Name" required></div>
+        <div class="form-card">
+            <h2 style="color: #1e3a5f; margin-bottom: 20px;"><i class="fas fa-user-plus"></i> New Student Admission Form</h2>
+            <div id="formAlert"></div>
+            
+            <div class="photo-section">
+                <div class="photo-box" id="photoUploadBox">
+                    <div class="photo-placeholder" id="photoPlaceholder">
+                        <i class="fas fa-camera"></i>
+                        <p>Passport Size Photo</p>
+                        <p style="font-size: 10px;">Click to upload</p>
+                    </div>
+                    <img id="photoPreview" class="photo-preview" alt="Preview">
                 </div>
+                <input type="file" id="studentPhoto" accept="image/*">
             </div>
             
-            <div class="form-grid">
-                <div class="form-group"><label>2. Nationality <span class="required">*</span></label><input type="text" id="nationality" value="Indian" required></div>
-                <div class="form-group"><label>3. Date of Birth <span class="required">*</span></label><input type="date" id="dob" required></div>
+            <form id="admissionForm">
                 <div class="form-group">
-                    <label>4. Sex <span class="required">*</span></label>
-                    <div class="radio-group"><label><input type="radio" name="gender" value="Male" required> Male</label><label><input type="radio" name="gender" value="Female"> Female</label></div>
-                </div>
-                <div class="form-group"><label>5. Class <span class="required">*</span></label>
-                    <select id="class" required>
-                        <option value="">Select Class</option>
-                        <option>6th</option><option>7th</option><option>8th</option>
-                        <option>9th</option><option>10th</option>
-                        <option>11th (Science)</option><option>11th (Commerce)</option>
-                        <option>12th (Science)</option><option>12th (Commerce)</option>
-                    </select>
-                </div>
-                <div class="form-group"><label>6. Father's Name <span class="required">*</span></label><input type="text" id="fatherName" required></div>
-                <div class="form-group"><label>7. Mother's Name</label><input type="text" id="motherName"></div>
-                <div class="form-group"><label>8. Contact No. (Student's) <span class="required">*</span></label><input type="tel" id="studentMobile" maxlength="10" required></div>
-                <div class="form-group full-width"><label>9. Complete Address <span class="required">*</span></label><textarea id="address" rows="2" required></textarea></div>
-                <div class="form-group"><label>10. Aadhar No.</label><input type="text" id="aadhar" maxlength="12"></div>
-                <div class="form-group"><label>11. Present School/College <span class="required">*</span></label><input type="text" id="presentSchool" required></div>
-                <div class="form-group full-width">
-                    <label>12. How did you come to know about QCC</label>
-                    <div class="checkbox-group">
-                        <label><input type="checkbox" name="knowAbout" value="Google"> Google</label>
-                        <label><input type="checkbox" name="knowAbout" value="Teacher"> Teacher</label>
-                        <label><input type="checkbox" name="knowAbout" value="Friend/Relatives"> Friend / Relatives</label>
+                    <label>1. Full Name of the Applicant <span class="required">*</span></label>
+                    <div class="name-boxes">
+                        <div class="name-box"><input type="text" id="firstName" placeholder="First Name" required></div>
+                        <div class="name-box"><input type="text" id="middleName" placeholder="Middle Name"></div>
+                        <div class="name-box"><input type="text" id="lastName" placeholder="Last Name" required></div>
                     </div>
                 </div>
-                <div class="form-group full-width"><label>13. Mention Information (Psychological/Physical) If Any</label><textarea id="medicalInfo" rows="2"></textarea></div>
-            </div>
-            
-            <div class="declaration-box">
-                <div class="declaration-text"><i class="fas fa-file-signature"></i> <strong>DECLARATION</strong><br>I hereby declare that the information furnished in this form is true to the best of my/our knowledge and belief.</div>
-                <div class="checkbox-group"><label><input type="checkbox" id="declaration" required> I Agree to the above declaration <span class="required">*</span></label></div>
-                <div class="signature-row">
-                    <div class="signature-item"><label>Date:</label><input type="text" id="declarationDate" readonly></div>
-                    <div class="signature-item"><label>Place:</label><input type="text" id="declarationPlace" placeholder="e.g., Gopalganj"></div>
+                
+                <div class="form-grid">
+                    <div class="form-group"><label>2. Nationality <span class="required">*</span></label><input type="text" id="nationality" value="Indian" required></div>
+                    <div class="form-group"><label>3. Date of Birth <span class="required">*</span></label><input type="date" id="dob" required></div>
+                    <div class="form-group">
+                        <label>4. Sex <span class="required">*</span></label>
+                        <div class="radio-group"><label><input type="radio" name="gender" value="Male" required> Male</label><label><input type="radio" name="gender" value="Female"> Female</label></div>
+                    </div>
+                    <div class="form-group"><label>5. Class <span class="required">*</span></label>
+                        <select id="class" required>
+                            <option value="">Select Class</option>
+                            <option>6th</option><option>7th</option><option>8th</option>
+                            <option>9th</option><option>10th</option>
+                            <option>11th (Science)</option><option>11th (Commerce)</option>
+                            <option>12th (Science)</option><option>12th (Commerce)</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>6. Father's Name <span class="required">*</span></label><input type="text" id="fatherName" required></div>
+                    <div class="form-group"><label>7. Mother's Name</label><input type="text" id="motherName"></div>
+                    <div class="form-group"><label>8. Contact No. (Student's) <span class="required">*</span></label><input type="tel" id="studentMobile" maxlength="10" required></div>
+                    <div class="form-group full-width"><label>9. Complete Address <span class="required">*</span></label><textarea id="address" rows="2" required></textarea></div>
+                    <div class="form-group"><label>10. Aadhar No.</label><input type="text" id="aadhar" maxlength="12"></div>
+                    <div class="form-group"><label>11. Present School/College <span class="required">*</span></label><input type="text" id="presentSchool" required></div>
+                    <div class="form-group full-width">
+                        <label>12. How did you come to know about QCC</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" name="knowAbout" value="Google"> Google</label>
+                            <label><input type="checkbox" name="knowAbout" value="Teacher"> Teacher</label>
+                            <label><input type="checkbox" name="knowAbout" value="Friend/Relatives"> Friend / Relatives</label>
+                        </div>
+                    </div>
+                    <div class="form-group full-width"><label>13. Mention Information (Psychological/Physical) If Any</label><textarea id="medicalInfo" rows="2"></textarea></div>
                 </div>
-            </div>
-            
-            <button type="submit" class="btn-submit" id="submitBtn"><i class="fas fa-save"></i> Submit Admission</button>
-        </form>
+                
+                <div class="declaration-box">
+                    <div class="declaration-text"><i class="fas fa-file-signature"></i> <strong>DECLARATION</strong><br>I hereby declare that the information furnished in this form is true to the best of my/our knowledge and belief.</div>
+                    <div class="checkbox-group"><label><input type="checkbox" id="declaration" required> I Agree to the above declaration <span class="required">*</span></label></div>
+                    <div class="signature-row">
+                        <div class="signature-item"><label>Date:</label><input type="text" id="declarationDate" readonly></div>
+                        <div class="signature-item"><label>Place:</label><input type="text" id="declarationPlace" placeholder="e.g., Gopalganj"></div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-submit" id="submitBtn"><i class="fas fa-save"></i> Submit Admission</button>
+            </form>
+        </div>
     </div>
-</div>
-
-<div class="progress-overlay" id="progressOverlay">
-    <div class="progress-card">
-        <h3><i class="fas fa-spinner fa-spin"></i> Processing Admission</h3>
-        <div class="progress-bar-container"><div class="progress-bar-fill" id="progressFill"></div></div>
-        <div class="progress-status" id="progressStatus">Initializing...</div>
-        <div class="progress-percent" id="progressPercent">0%</div>
     </div>
-</div>
 
-<script>
+    <div class="progress-overlay" id="progressOverlay">
+        <div class="progress-card">
+            <h3><i class="fas fa-spinner fa-spin"></i> Processing Admission</h3>
+            <div class="progress-bar-container"><div class="progress-bar-fill" id="progressFill"></div></div>
+            <div class="progress-status" id="progressStatus">Initializing...</div>
+            <div class="progress-percent" id="progressPercent">0%</div>
+        </div>
+    </div>
+
+    <script>
     const firebaseConfig = {
         apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
         authDomain: "quest-coaching.firebaseapp.com",
@@ -388,6 +428,40 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // Auth Elements
+    const authLoading = document.getElementById('authLoading');
+    const mainContent = document.getElementById('mainContent');
+
+    // ============ AUTHENTICATION CHECK ============
+    auth.onAuthStateChanged((user) => {
+        if (!user) {
+            Swal.fire({
+                title: 'Access Denied!',
+                text: 'Please login from main page first!',
+                icon: 'error',
+                confirmButtonColor: '#1b4f9b',
+                confirmButtonText: 'Go to Login'
+            }).then(() => {
+                window.location.href = 'index.html';
+            });
+            return;
+        }
+        
+        authLoading.style.display = 'none';
+        mainContent.style.display = 'block';
+        
+        // Add logout button
+        const logoutBtn = document.createElement('button');
+        logoutBtn.innerHTML = '🚪 Logout';
+        logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+        logoutBtn.onclick = async () => {
+            await auth.signOut();
+            window.location.href = 'index.html';
+        };
+        document.body.appendChild(logoutBtn);
+    });
     
     document.getElementById('declarationDate').value = new Date().toLocaleDateString('en-IN');
     
@@ -534,6 +608,6 @@
             showAlert('Error: ' + error.message, 'error');
         }
     });
-</script>
+    </script>
 </body>
 </html>
