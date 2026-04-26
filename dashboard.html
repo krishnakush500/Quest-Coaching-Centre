@@ -6,6 +6,10 @@
     <title>📊 Teacher Dashboard · Fee Manager</title>
     <!-- SweetAlert2 for professional popups -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <style>
         * {
             margin: 0;
@@ -282,6 +286,36 @@
             white-space: nowrap;
         }
 
+        /* Auth Loading Screen */
+        .auth-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9999;
+        }
+        .auth-loading .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1b4f9b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .main-content {
+            display: none;
+        }
+
         @media (max-width: 600px) {
             .session-bar {
                 flex-direction: column;
@@ -328,305 +362,342 @@
     </style>
 </head>
 <body>
-<div class="container">
-
-    <!-- 📅 SESSION DROPDOWN - TOP with 2026-27 as default -->
-    <div class="session-bar">
-        <label>📆 Session</label>
-        <select id="sessionSelect">
-            <option value="2024-25">2024-25</option>
-            <option value="2025-26">2025-26</option>
-            <option value="2026-27" selected>2026-27</option>
-        </select>
-        <div class="teacher-badge">👩‍🏫 Teacher Dashboard</div>
+    <!-- Auth Loading Screen -->
+    <div id="authLoading" class="auth-loading">
+        <div class="spinner"></div>
+        <p style="margin-top: 15px; color: #1b4f9b; font-weight: 600;">Verifying access...</p>
     </div>
 
-    <!-- 🏫 CLASS FILTER from 6 to 12 -->
-    <div class="filter-section">
-        <span>🔽 Filter by Class</span>
-        <select id="classSelect">
-            <option value="All">📚 All Classes</option>
-            <option value="Class 6">🎒 Class 6</option>
-            <option value="Class 7">📘 Class 7</option>
-            <option value="Class 8">📗 Class 8</option>
-            <option value="Class 9">📕 Class 9</option>
-            <option value="Class 10">📙 Class 10</option>
-            <option value="Class 11">📖 Class 11</option>
-            <option value="Class 12">📚 Class 12</option>
-        </select>
-    </div>
+    <!-- Main Content -->
+    <div id="mainContent" class="main-content">
+    <div class="container">
 
-    <!-- 💰 SUMMARY BOXES -->
-    <div class="summary-row">
-        <div class="summary-item total">
-            <div class="summary-emoji">💰💰</div>
-            <div class="summary-label">TOTAL FEE</div>
-            <div class="summary-value" id="totalAmount">₹0</div>
+        <!-- 📅 SESSION DROPDOWN - TOP with 2026-27 as default -->
+        <div class="session-bar">
+            <label>📆 Session</label>
+            <select id="sessionSelect">
+                <option value="2024-25">2024-25</option>
+                <option value="2025-26">2025-26</option>
+                <option value="2026-27" selected>2026-27</option>
+            </select>
+            <div class="teacher-badge">👩‍🏫 Teacher Dashboard</div>
         </div>
-        <div class="summary-item received">
-            <div class="summary-emoji">✅✅</div>
-            <div class="summary-label">RECEIVED</div>
-            <div class="summary-value" id="receivedAmount">₹0</div>
-        </div>
-        <div class="summary-item due">
-            <div class="summary-emoji">⏳⏳</div>
-            <div class="summary-label">DUE AMOUNT</div>
-            <div class="summary-value" id="dueAmount">₹0</div>
-        </div>
-    </div>
 
-    <!-- 🔘 MAIN BUTTONS -->
-    <div class="action-buttons">
-        <button class="btn btn-primary" id="addStudentBtn">➕ ADD STUDENT</button>
-        <button class="btn btn-outline" id="updateStudentBtn">✏️ UPDATE STUDENT</button>
-    </div>
+        <!-- 🏫 CLASS FILTER from 6 to 12 -->
+        <div class="filter-section">
+            <span>🔽 Filter by Class</span>
+            <select id="classSelect">
+                <option value="All">📚 All Classes</option>
+                <option value="Class 6">🎒 Class 6</option>
+                <option value="Class 7">📘 Class 7</option>
+                <option value="Class 8">📗 Class 8</option>
+                <option value="Class 9">📕 Class 9</option>
+                <option value="Class 10">📙 Class 10</option>
+                <option value="Class 11">📖 Class 11</option>
+                <option value="Class 12">📚 Class 12</option>
+            </select>
+        </div>
 
-    <!-- 🕒 RECENT UPDATES SECTION with View All -->
-    <div class="updates-card">
-        <div class="updates-header">
-            <div class="updates-title">
-                <span>📋 RECENT UPDATES</span>
-                <span>Latest 3</span>
+        <!-- 💰 SUMMARY BOXES -->
+        <div class="summary-row">
+            <div class="summary-item total">
+                <div class="summary-emoji">💰💰</div>
+                <div class="summary-label">TOTAL FEE</div>
+                <div class="summary-value" id="totalAmount">₹0</div>
             </div>
-            <button class="view-all-btn" id="viewAllBtn">
-                <i class="fas fa-eye"></i> View All Updates
-            </button>
+            <div class="summary-item received">
+                <div class="summary-emoji">✅✅</div>
+                <div class="summary-label">RECEIVED</div>
+                <div class="summary-value" id="receivedAmount">₹0</div>
+            </div>
+            <div class="summary-item due">
+                <div class="summary-emoji">⏳⏳</div>
+                <div class="summary-label">DUE AMOUNT</div>
+                <div class="summary-value" id="dueAmount">₹0</div>
+            </div>
         </div>
-        <div id="recentUpdatesList">
-            <!-- Dynamic content will appear here -->
-            <div class="update-item">⏳ Loading updates from Firebase...</div>
+
+        <!-- 🔘 MAIN BUTTONS -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" id="addStudentBtn">➕ ADD STUDENT</button>
+            <button class="btn btn-outline" id="updateStudentBtn">✏️ UPDATE STUDENT</button>
+        </div>
+
+        <!-- 🕒 RECENT UPDATES SECTION with View All -->
+        <div class="updates-card">
+            <div class="updates-header">
+                <div class="updates-title">
+                    <span>📋 RECENT UPDATES</span>
+                    <span>Latest 3</span>
+                </div>
+                <button class="view-all-btn" id="viewAllBtn">
+                    <i class="fas fa-eye"></i> View All Updates
+                </button>
+            </div>
+            <div id="recentUpdatesList">
+                <!-- Dynamic content will appear here -->
+                <div class="update-item">⏳ Loading updates from Firebase...</div>
+            </div>
         </div>
     </div>
-</div>
+    </div>
 
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-<!-- SweetAlert2 for professional popups -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<!-- Font Awesome for icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<script>
-    // ✅ Firebase Configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
-        authDomain: "quest-coaching.firebaseapp.com",
-        databaseURL: "https://quest-coaching-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "quest-coaching",
-        storageBucket: "quest-coaching.firebasestorage.app",
-        messagingSenderId: "131948734089",
-        appId: "1:131948734089:web:f4ba25110c8b1298360858"
-    };
+    <script>
+        // ✅ Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
+            authDomain: "quest-coaching.firebaseapp.com",
+            databaseURL: "https://quest-coaching-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "quest-coaching",
+            storageBucket: "quest-coaching.firebasestorage.app",
+            messagingSenderId: "131948734089",
+            appId: "1:131948734089:web:f4ba25110c8b1298360858"
+        };
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    
-    // Collection reference for fees
-    const feesCollection = db.collection('fees');
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
 
-    // DOM Elements
-    const sessionSelect = document.getElementById('sessionSelect');
-    const classSelect = document.getElementById('classSelect');
-    const totalSpan = document.getElementById('totalAmount');
-    const receivedSpan = document.getElementById('receivedAmount');
-    const dueSpan = document.getElementById('dueAmount');
-    const recentList = document.getElementById('recentUpdatesList');
-    const viewAllBtn = document.getElementById('viewAllBtn');
-
-    // Global students array
-    let allStudents = [];
-    let allUpdates = []; // Store all updates for view all feature
-
-    // 📥 Load all students from Firebase
-    async function loadStudentsFromFirebase() {
-        try {
-            const snapshot = await feesCollection.get();
-            allStudents = [];
-            allUpdates = []; // Reset updates
-            
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                allStudents.push({
-                    id: doc.id,
-                    ...data
-                });
-                
-                // Collect all updates (where received_amount > 0)
-                if (data.received_amount > 0) {
-                    allUpdates.push({
-                        ...data,
-                        id: doc.id
-                    });
-                }
-            });
-            
-            // Sort updates - latest first (using current date for demo)
-            // In real app, you'd use timestamp
-            allUpdates.sort((a, b) => {
-                // For demo, sort by name as fallback
-                return (b.student_name || '').localeCompare(a.student_name || '');
-            });
-            
-            // After loading, update dashboard
-            updateDashboard();
-            loadRecentUpdates();
-            
-        } catch (error) {
-            console.error('Error loading students:', error);
-            recentList.innerHTML = '<div class="update-item">❌ Error loading from Firebase</div>';
-        }
-    }
-
-    // 🔄 Update dashboard based on filters
-    function updateDashboard() {
-        const selectedSession = sessionSelect.value;
-        const selectedClass = classSelect.value;
-
-        // Filter students based on session AND class
-        let filteredStudents = allStudents.filter(s => s.session === selectedSession);
+        // DOM Elements
+        const authLoading = document.getElementById('authLoading');
+        const mainContent = document.getElementById('mainContent');
         
-        if (selectedClass !== 'All') {
-            filteredStudents = filteredStudents.filter(s => s.class === selectedClass);
-        }
-
-        // Calculate totals
-        let total = 0, received = 0, due = 0;
-        filteredStudents.forEach(s => {
-            total += Number(s.total_amount) || 0;
-            received += Number(s.received_amount) || 0;
-            due += Number(s.due_amount) || 0;
-        });
-
-        // Update summary boxes
-        totalSpan.innerText = '₹' + total.toLocaleString();
-        receivedSpan.innerText = '₹' + received.toLocaleString();
-        dueSpan.innerText = '₹' + due.toLocaleString();
-    }
-
-    // 🕒 Load recent updates (latest 3 only)
-    async function loadRecentUpdates() {
-        try {
-            // Get latest 3 updates
-            const recent = allUpdates.slice(-3).reverse();
-            
-            if (recent.length === 0) {
-                recentList.innerHTML = '<div class="update-item">📌 No recent payments</div>';
+        // ============ AUTHENTICATION CHECK ============
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                // Not logged in - redirect to index
+                Swal.fire({
+                    title: 'Access Denied!',
+                    text: 'Please login from main page first!',
+                    icon: 'error',
+                    confirmButtonColor: '#1b4f9b',
+                    confirmButtonText: 'Go to Login'
+                }).then(() => {
+                    window.location.href = 'index.html';
+                });
                 return;
             }
             
-            recentList.innerHTML = '';
-            recent.forEach(s => {
-                const div = document.createElement('div');
-                div.className = 'update-item';
-                // Use current date for demo
+            // User is logged in - show content
+            authLoading.style.display = 'none';
+            mainContent.style.display = 'block';
+            
+            // Load all data after auth is confirmed
+            loadStudentsFromFirebase();
+            
+            // Add logout button
+            const logoutBtn = document.createElement('button');
+            logoutBtn.innerHTML = '🚪 Logout';
+            logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            logoutBtn.onclick = async () => {
+                await auth.signOut();
+                window.location.href = 'index.html';
+            };
+            document.body.appendChild(logoutBtn);
+        });
+        
+        // Collection reference for fees
+        const feesCollection = db.collection('fees');
+
+        // DOM Elements for dashboard
+        const sessionSelect = document.getElementById('sessionSelect');
+        const classSelect = document.getElementById('classSelect');
+        const totalSpan = document.getElementById('totalAmount');
+        const receivedSpan = document.getElementById('receivedAmount');
+        const dueSpan = document.getElementById('dueAmount');
+        const recentList = document.getElementById('recentUpdatesList');
+        const viewAllBtn = document.getElementById('viewAllBtn');
+
+        // Global students array
+        let allStudents = [];
+        let allUpdates = [];
+
+        // 📥 Load all students from Firebase
+        async function loadStudentsFromFirebase() {
+            try {
+                const snapshot = await feesCollection.get();
+                allStudents = [];
+                allUpdates = [];
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    allStudents.push({
+                        id: doc.id,
+                        ...data
+                    });
+                    
+                    if (data.received_amount > 0) {
+                        allUpdates.push({
+                            ...data,
+                            id: doc.id
+                        });
+                    }
+                });
+                
+                // Sort updates
+                allUpdates.sort((a, b) => {
+                    return (b.student_name || '').localeCompare(a.student_name || '');
+                });
+                
+                updateDashboard();
+                loadRecentUpdates();
+                
+            } catch (error) {
+                console.error('Error loading students:', error);
+                if (recentList) {
+                    recentList.innerHTML = '<div class="update-item">❌ Error loading from Firebase</div>';
+                }
+            }
+        }
+
+        // 🔄 Update dashboard based on filters
+        function updateDashboard() {
+            const selectedSession = sessionSelect.value;
+            const selectedClass = classSelect.value;
+
+            let filteredStudents = allStudents.filter(s => s.session === selectedSession);
+            
+            if (selectedClass !== 'All') {
+                filteredStudents = filteredStudents.filter(s => s.class === selectedClass);
+            }
+
+            let total = 0, received = 0, due = 0;
+            filteredStudents.forEach(s => {
+                total += Number(s.total_amount) || 0;
+                received += Number(s.received_amount) || 0;
+                due += Number(s.due_amount) || 0;
+            });
+
+            totalSpan.innerText = '₹' + total.toLocaleString();
+            receivedSpan.innerText = '₹' + received.toLocaleString();
+            dueSpan.innerText = '₹' + due.toLocaleString();
+        }
+
+        // 🕒 Load recent updates (latest 3 only)
+        async function loadRecentUpdates() {
+            try {
+                const recent = allUpdates.slice(-3).reverse();
+                
+                if (recent.length === 0) {
+                    recentList.innerHTML = '<div class="update-item">📌 No recent payments</div>';
+                    return;
+                }
+                
+                recentList.innerHTML = '';
+                recent.forEach(s => {
+                    const div = document.createElement('div');
+                    div.className = 'update-item';
+                    const today = new Date();
+                    const dateStr = today.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                    
+                    div.innerHTML = `
+                        <span class="update-date">${dateStr}</span>
+                        <span class="update-roll">Roll ${s.roll_number}</span>
+                        <span class="update-name">${s.student_name}</span>
+                        <span class="update-amount">₹${s.received_amount} received</span>
+                    `;
+                    recentList.appendChild(div);
+                });
+                
+            } catch (error) {
+                console.error('Error loading recent updates:', error);
+            }
+        }
+
+        // View All Updates
+        function showAllUpdates() {
+            if (allUpdates.length === 0) {
+                Swal.fire({
+                    title: 'No Updates',
+                    text: 'No payment updates found',
+                    icon: 'info',
+                    confirmButtonColor: '#1b4f9b',
+                    confirmButtonText: 'Close'
+                });
+                return;
+            }
+
+            let updatesHTML = '<div style="max-height: 400px; overflow-y: auto; padding: 5px;">';
+            
+            allUpdates.slice().reverse().forEach((s, index) => {
                 const today = new Date();
                 const dateStr = today.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
                 
-                div.innerHTML = `
-                    <span class="update-date">${dateStr}</span>
-                    <span class="update-roll">Roll ${s.roll_number}</span>
-                    <span class="update-name">${s.student_name}</span>
-                    <span class="update-amount">₹${s.received_amount} received</span>
+                updatesHTML += `
+                    <div style="background: #f8faff; padding: 12px; margin-bottom: 10px; border-radius: 12px; border-left: 4px solid #f5a623; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                            <div>
+                                <strong style="font-size: 1rem; color: #113155;">${s.student_name}</strong>
+                                <span style="background: #1b4f9b; color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.75rem; margin-left: 8px;">Roll ${s.roll_number}</span>
+                            </div>
+                            <div style="background: #c7f0d2; padding: 4px 12px; border-radius: 30px; color: #0c6e3c; font-weight: bold;">
+                                ₹${s.received_amount}
+                            </div>
+                        </div>
+                        <div style="font-size: 0.85rem; color: #666; margin-top: 8px; display: flex; gap: 15px; flex-wrap: wrap;">
+                            <span><i class="fas fa-school" style="color: #1b4f9b;"></i> ${s.class}</span>
+                            <span><i class="fas fa-calendar" style="color: #1b4f9b;"></i> ${s.session}</span>
+                            <span><i class="fas fa-clock" style="color: #1b4f9b;"></i> ${dateStr}</span>
+                        </div>
+                        <div style="font-size: 0.8rem; color: #888; margin-top: 5px;">
+                            <i class="fas fa-user-tie"></i> ${s.father_name}
+                        </div>
+                    </div>
                 `;
-                recentList.appendChild(div);
             });
-            
-        } catch (error) {
-            console.error('Error loading recent updates:', error);
-        }
-    }
+            updatesHTML += '</div>';
 
-    // View All Updates - Show in SweetAlert2 popup with Close button
-    function showAllUpdates() {
-        if (allUpdates.length === 0) {
             Swal.fire({
-                title: 'No Updates',
-                text: 'No payment updates found',
+                title: '<span style="color: #1b4f9b;"><i class="fas fa-history"></i> All Payment Updates</span>',
+                html: updatesHTML,
                 icon: 'info',
+                showConfirmButton: true,
+                confirmButtonText: '<i class="fas fa-times"></i> Close',
                 confirmButtonColor: '#1b4f9b',
-                confirmButtonText: 'Close'
+                showCancelButton: false,
+                showCloseButton: true,
+                width: '650px',
+                padding: '20px',
+                background: 'white'
             });
-            return;
         }
 
-        // Create HTML for all updates
-        let updatesHTML = '<div style="max-height: 400px; overflow-y: auto; padding: 5px;">';
+        // 👂 Event Listeners
+        if (sessionSelect) sessionSelect.addEventListener('change', updateDashboard);
+        if (classSelect) classSelect.addEventListener('change', updateDashboard);
+        if (viewAllBtn) viewAllBtn.addEventListener('click', showAllUpdates);
+
+        // 🔘 Button Navigation
+        const addStudentBtn = document.getElementById('addStudentBtn');
+        const updateStudentBtn = document.getElementById('updateStudentBtn');
         
-        // Show all updates in reverse order (latest first)
-        allUpdates.slice().reverse().forEach((s, index) => {
-            const today = new Date();
-            const dateStr = today.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-            
-            updatesHTML += `
-                <div style="background: #f8faff; padding: 12px; margin-bottom: 10px; border-radius: 12px; border-left: 4px solid #f5a623; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-                        <div>
-                            <strong style="font-size: 1rem; color: #113155;">${s.student_name}</strong>
-                            <span style="background: #1b4f9b; color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.75rem; margin-left: 8px;">Roll ${s.roll_number}</span>
-                        </div>
-                        <div style="background: #c7f0d2; padding: 4px 12px; border-radius: 30px; color: #0c6e3c; font-weight: bold;">
-                            ₹${s.received_amount}
-                        </div>
-                    </div>
-                    <div style="font-size: 0.85rem; color: #666; margin-top: 8px; display: flex; gap: 15px; flex-wrap: wrap;">
-                        <span><i class="fas fa-school" style="color: #1b4f9b;"></i> ${s.class}</span>
-                        <span><i class="fas fa-calendar" style="color: #1b4f9b;"></i> ${s.session}</span>
-                        <span><i class="fas fa-clock" style="color: #1b4f9b;"></i> ${dateStr}</span>
-                    </div>
-                    <div style="font-size: 0.8rem; color: #888; margin-top: 5px;">
-                        <i class="fas fa-user-tie"></i> ${s.father_name}
-                    </div>
-                </div>
-            `;
-        });
-        updatesHTML += '</div>';
+        if (addStudentBtn) {
+            addStudentBtn.addEventListener('click', () => {
+                window.location.href = 'add-student.html';
+            });
+        }
 
-        Swal.fire({
-            title: '<span style="color: #1b4f9b;"><i class="fas fa-history"></i> All Payment Updates</span>',
-            html: updatesHTML,
-            icon: 'info',
-            showConfirmButton: true,
-            confirmButtonText: '<i class="fas fa-times"></i> Close',
-            confirmButtonColor: '#1b4f9b',
-            showCancelButton: false,
-            showCloseButton: true,
-            closeButtonHtml: '×',
-            width: '650px',
-            padding: '20px',
-            background: 'white',
-            customClass: {
-                closeButton: 'swal-close-custom'
+        if (updateStudentBtn) {
+            updateStudentBtn.addEventListener('click', () => {
+                window.location.href = 'update-student.html';
+            });
+        }
+
+        // Set default session
+        if (sessionSelect) sessionSelect.value = '2026-27';
+        
+        // Auto-refresh every 10 seconds
+        setInterval(() => {
+            if (allStudents.length > 0) {
+                loadStudentsFromFirebase();
             }
-        });
-    }
-
-    // 👂 Event Listeners
-    sessionSelect.addEventListener('change', updateDashboard);
-    classSelect.addEventListener('change', updateDashboard);
-    
-    // View All button click
-    viewAllBtn.addEventListener('click', showAllUpdates);
-
-    // 🔘 Button Navigation
-    document.getElementById('addStudentBtn').addEventListener('click', () => {
-        window.location.href = 'add-student.html';
-    });
-
-    document.getElementById('updateStudentBtn').addEventListener('click', () => {
-        window.location.href = 'update-student.html';
-    });
-
-    // Set default session to 2026-27
-    sessionSelect.value = '2026-27';
-
-    // 🚀 Initial load from Firebase
-    loadStudentsFromFirebase();
-
-    // Refresh data every 5 seconds
-    setInterval(loadStudentsFromFirebase, 5000);
-
-</script>
+        }, 10000);
+    </script>
 </body>
 </html>
