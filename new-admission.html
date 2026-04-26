@@ -15,6 +15,10 @@
     <!-- Supabase SDK (Storage only) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     
+    <!-- jsPDF and html2canvas for PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * {
@@ -121,10 +125,6 @@
         }
         .name-box {
             flex: 1;
-        }
-        .name-box label {
-            font-size: 0.65rem;
-            margin-bottom: 3px;
         }
         
         .radio-group, .checkbox-group {
@@ -301,6 +301,124 @@
             display: none;
         }
         
+        /* Admission Card Styles */
+        .admission-card {
+            max-width: 900px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            overflow: hidden;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #1b4f9b, #0f3f7a);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        .card-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        .card-header p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+        .card-body {
+            padding: 25px;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .info-table tr {
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .info-table td {
+            padding: 12px 8px;
+            vertical-align: top;
+        }
+        .info-table td:first-child {
+            width: 35%;
+            font-weight: 700;
+            color: #1e3a5f;
+            background: #f8fafc;
+        }
+        .info-table td:last-child {
+            width: 65%;
+            color: #334155;
+        }
+        .photo-section-card {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .student-photo-card {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #1b4f9b;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px dashed #e2e8f0;
+        }
+        .signature-box {
+            text-align: center;
+            width: 45%;
+        }
+        .signature-line {
+            border-top: 1px solid #000;
+            width: 100%;
+            margin-top: 30px;
+        }
+        .signature-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 8px;
+        }
+        .btn-group-card {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 20px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+        .btn-card {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .btn-print {
+            background: #1b4f9b;
+            color: white;
+        }
+        .btn-share {
+            background: #16a34a;
+            color: white;
+        }
+        .btn-pdf {
+            background: #dc2626;
+            color: white;
+        }
+        .btn-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
         @media (max-width: 700px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -317,6 +435,17 @@
             }
             .photo-section {
                 justify-content: center;
+            }
+            .signature-section {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            .signature-box {
+                width: 80%;
+            }
+            .btn-group-card {
+                flex-direction: column;
             }
         }
     </style>
@@ -380,7 +509,9 @@
                             <option>6th</option><option>7th</option><option>8th</option>
                             <option>9th</option><option>10th</option>
                             <option>11th (Science)</option><option>11th (Commerce)</option>
+                            <option>11th (Arts)</option>
                             <option>12th (Science)</option><option>12th (Commerce)</option>
+                            <option>12th (Arts)</option>
                         </select>
                     </div>
                     <div class="form-group"><label>6. Father's Name <span class="required">*</span></label><input type="text" id="fatherName" required></div>
@@ -389,15 +520,23 @@
                     <div class="form-group full-width"><label>9. Complete Address <span class="required">*</span></label><textarea id="address" rows="2" required></textarea></div>
                     <div class="form-group"><label>10. Aadhar No.</label><input type="text" id="aadhar" maxlength="12"></div>
                     <div class="form-group"><label>11. Present School/College <span class="required">*</span></label><input type="text" id="presentSchool" required></div>
+                    <div class="form-group"><label>12. Session <span class="required">*</span></label>
+                        <select id="sessionSelect" required>
+                            <option value="2026-27" selected>2026-27</option>
+                            <option value="2027-28">2027-28</option>
+                            <option value="2028-29">2028-29</option>
+                            <option value="2029-30">2029-30</option>
+                        </select>
+                    </div>
                     <div class="form-group full-width">
-                        <label>12. How did you come to know about QCC</label>
+                        <label>13. How did you come to know about QCC</label>
                         <div class="checkbox-group">
                             <label><input type="checkbox" name="knowAbout" value="Google"> Google</label>
                             <label><input type="checkbox" name="knowAbout" value="Teacher"> Teacher</label>
                             <label><input type="checkbox" name="knowAbout" value="Friend/Relatives"> Friend / Relatives</label>
                         </div>
                     </div>
-                    <div class="form-group full-width"><label>13. Mention Information (Psychological/Physical) If Any</label><textarea id="medicalInfo" rows="2"></textarea></div>
+                    <div class="form-group full-width"><label>14. Mention Information (Psychological/Physical) If Any</label><textarea id="medicalInfo" rows="2"></textarea></div>
                 </div>
                 
                 <div class="declaration-box">
@@ -425,7 +564,7 @@
     </div>
 
     <script>
-    // ============ FIREBASE CONFIG (Auth + Firestore) ============
+    // ============ FIREBASE CONFIG ============
     const firebaseConfig = {
         apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
         authDomain: "quest-coaching.firebaseapp.com",
@@ -436,23 +575,21 @@
         appId: "1:131948734089:web:f4ba25110c8b1298360858"
     };
     
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
     const admissionsCollection = db.collection('admissions');
     
-    // ============ SUPABASE CONFIG (Storage only) ============
+    // ============ SUPABASE CONFIG ============
     const SUPABASE_URL = 'https://zjwvxqjmccqhyxsaeggw.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_6a_9nxKSSLUZMmSGleyycg_kQ4a4BtI';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const STORAGE_BUCKET = 'student_photos';
     
-    // Auth Elements
     const authLoading = document.getElementById('authLoading');
     const mainContent = document.getElementById('mainContent');
     
-    // ============ AUTHENTICATION CHECK ============
+    // Auth check
     auth.onAuthStateChanged((user) => {
         if (!user) {
             Swal.fire({
@@ -466,11 +603,9 @@
             });
             return;
         }
-        
         authLoading.style.display = 'none';
         mainContent.style.display = 'block';
         
-        // Add logout button
         const logoutBtn = document.createElement('button');
         logoutBtn.innerHTML = '🚪 Logout';
         logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.2);';
@@ -483,7 +618,7 @@
     
     document.getElementById('declarationDate').value = new Date().toLocaleDateString('en-IN');
     
-    // Photo Upload Box Events
+    // Photo Upload
     const photoBox = document.getElementById('photoUploadBox');
     const photoInput = document.getElementById('studentPhoto');
     const photoPreview = document.getElementById('photoPreview');
@@ -493,11 +628,6 @@
     photoInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
-            if (file.size > 2 * 1024 * 1024) {
-                alert('Photo should be less than 2MB');
-                this.value = '';
-                return;
-            }
             const reader = new FileReader();
             reader.onload = function(event) {
                 photoPreview.src = event.target.result;
@@ -519,8 +649,8 @@
         if (status) progressStatus.textContent = status;
     }
     
-    // ============ PHOTO COMPRESS FUNCTION ============
-    async function compressPhoto(file, maxWidth = 300, maxHeight = 300, quality = 0.7) {
+    // ============ PHOTO COMPRESS FUNCTION (to ~300 KB) ============
+    async function compressPhoto(file, maxWidth = 400, maxHeight = 400, quality = 0.75) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -558,17 +688,13 @@
         });
     }
     
-    // ============ UPLOAD PHOTO TO SUPABASE STORAGE ============
+    // ============ UPLOAD PHOTO TO SUPABASE ============
     async function uploadPhotoToSupabase(file, admissionNo) {
         try {
-            // Compress photo pehle
-            const compressedBlob = await compressPhoto(file, 300, 300, 0.7);
-            
-            // File extension
+            const compressedBlob = await compressPhoto(file, 400, 400, 0.75);
             const fileExt = 'jpg';
             const fileName = `${admissionNo}_${Date.now()}.${fileExt}`;
             
-            // Upload to Supabase Storage
             const { data, error } = await supabaseClient.storage
                 .from(STORAGE_BUCKET)
                 .upload(fileName, compressedBlob, {
@@ -578,7 +704,6 @@
             
             if (error) throw error;
             
-            // Get public URL
             const { data: urlData } = supabaseClient.storage
                 .from(STORAGE_BUCKET)
                 .getPublicUrl(fileName);
@@ -607,6 +732,130 @@
         setTimeout(() => { if (div.innerHTML.includes(msg)) div.innerHTML = ''; }, 4000);
     }
     
+    // ============ DISPLAY ADMISSION CARD ============
+    function displayAdmissionCard(studentData, photoUrl) {
+        const admissionDate = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+        
+        const cardHtml = `
+            <div id="admissionCard" class="admission-card">
+                <div class="card-header">
+                    <h1>🏫 QUEST COACHING CENTRE</h1>
+                    <p>Under the guidance of MR. RAVI SIR</p>
+                    <p>Block More, Gopalganj, Bihar - 841428 | 📞 +91 9708442525</p>
+                </div>
+                <div class="card-body">
+                    <div class="photo-section-card">
+                        <img src="${photoUrl}" class="student-photo-card" onerror="this.src='https://via.placeholder.com/120'">
+                    </div>
+                    <h3 style="color: #1b4f9b; text-align: center; margin-bottom: 20px;">🎓 STUDENT ADMISSION FORM</h3>
+                    <table class="info-table">
+                        <tr><td><i class="fas fa-id-card"></i> Admission No:</td><td><strong>${studentData.admissionNo}</strong></td></tr>
+                        <tr><td><i class="fas fa-calendar-alt"></i> Admission Date:</td><td>${admissionDate}</td></tr>
+                        <tr><td><i class="fas fa-user-graduate"></i> Student Name:</td><td>${studentData.studentName}</td></tr>
+                        <tr><td><i class="fas fa-father"></i> Father's Name:</td><td>${studentData.fatherName}</td></tr>
+                        <tr><td><i class="fas fa-mother"></i> Mother's Name:</td><td>${studentData.motherName || '-'}</td></tr>
+                        <tr><td><i class="fas fa-calendar"></i> Date of Birth:</td><td>${studentData.dob}</td></tr>
+                        <tr><td><i class="fas fa-venus-mars"></i> Gender:</td><td>${studentData.gender}</td></tr>
+                        <tr><td><i class="fas fa-chalkboard"></i> Class:</td><td>${studentData.classApplying}</td></tr>
+                        <tr><td><i class="fas fa-school"></i> Present School/College:</td><td>${studentData.schoolName}</td></tr>
+                        <tr><td><i class="fas fa-map-marker-alt"></i> Address:</td><td>${studentData.address}</td></tr>
+                        <tr><td><i class="fas fa-phone"></i> Mobile Number:</td><td>${studentData.parentMobile}</td></tr>
+                        <tr><td><i class="fas fa-id-card"></i> Aadhar No:</td><td>${studentData.aadhar || '-'}</td></tr>
+                        <tr><td><i class="fas fa-globe"></i> Nationality:</td><td>${studentData.nationality}</td></tr>
+                        <tr><td><i class="fas fa-question-circle"></i> Know About QCC:</td><td>${studentData.knowAbout || '-'}</td></tr>
+                        <tr><td><i class="fas fa-notes-medical"></i> Medical Info:</td><td>${studentData.medicalInfo || 'None'}</td></tr>
+                    </table>
+                    
+                    <div class="signature-section">
+                        <div class="signature-box">
+                            <div class="signature-line"></div>
+                            <div class="signature-label">Parent/Guardian Signature</div>
+                        </div>
+                        <div class="signature-box">
+                            <div class="signature-line"></div>
+                            <div class="signature-label">Student Signature</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="btn-group-card">
+                    <button class="btn-card btn-print" onclick="printAdmissionCard()"><i class="fas fa-print"></i> Print</button>
+                    <button class="btn-card btn-share" onclick="shareAdmissionCard()"><i class="fas fa-share-alt"></i> Share</button>
+                    <button class="btn-card btn-pdf" onclick="downloadAdmissionPDF()"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                </div>
+            </div>
+        `;
+        
+        // Create temporary container
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = cardHtml;
+        document.body.appendChild(tempDiv);
+        
+        // Show in Swal
+        Swal.fire({
+            title: '✅ Admission Successful!',
+            html: cardHtml,
+            showConfirmButton: false,
+            showCloseButton: true,
+            width: '950px',
+            padding: '0',
+            customClass: {
+                popup: 'admission-swal-popup'
+            },
+            didOpen: () => {
+                // Add print/share/pdf functions to window
+                window.printAdmissionCard = function() {
+                    const printContent = document.getElementById('admissionCard').cloneNode(true);
+                    const printWindow = window.open('', '_blank');
+                    printWindow.document.write(`
+                        <html><head><title>Admission Card - ${studentData.studentName}</title>
+                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                        <style>
+                            body { font-family: 'Segoe UI', Roboto, sans-serif; padding: 20px; }
+                            .admission-card { max-width: 900px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+                            .card-header { background: linear-gradient(135deg, #1b4f9b, #0f3f7a); color: white; padding: 25px; text-align: center; }
+                            .card-body { padding: 25px; }
+                            .info-table { width: 100%; border-collapse: collapse; }
+                            .info-table td { padding: 10px 8px; border-bottom: 1px solid #e2e8f0; }
+                            .info-table td:first-child { font-weight: 700; background: #f8fafc; width: 35%; }
+                            .photo-section-card { text-align: center; margin-bottom: 20px; }
+                            .student-photo-card { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #1b4f9b; }
+                            .signature-section { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 2px dashed #e2e8f0; }
+                            .signature-box { text-align: center; width: 45%; }
+                            .signature-line { border-top: 1px solid #000; width: 100%; margin-top: 30px; }
+                            .btn-group-card { display: none; }
+                        </style>
+                        </head><body>${printContent.outerHTML}</body></html>
+                    `);
+                    printWindow.document.close();
+                    printWindow.print();
+                };
+                
+                window.shareAdmissionCard = function() {
+                    const text = `Admission Confirmation - Quest Coaching Centre\n\nStudent: ${studentData.studentName}\nAdmission No: ${studentData.admissionNo}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}\n\nThank you for choosing Quest Coaching Centre!`;
+                    if (navigator.share) {
+                        navigator.share({ title: 'Admission Confirmation', text: text });
+                    } else {
+                        navigator.clipboard.writeText(text);
+                        Swal.fire('Copied!', 'Details copied to clipboard', 'success');
+                    }
+                };
+                
+                window.downloadAdmissionPDF = async function() {
+                    const element = document.getElementById('admissionCard');
+                    const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+                    const imgData = canvas.toDataURL('image/png');
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const imgWidth = 190;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+                    pdf.save(`Admission_${studentData.admissionNo}_${studentData.studentName}.pdf`);
+                    Swal.fire('Downloaded!', 'PDF downloaded successfully', 'success');
+                };
+            }
+        });
+    }
+    
     // ============ SUBMIT FORM ============
     document.getElementById('admissionForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -624,6 +873,7 @@
         const address = document.getElementById('address').value.trim();
         const aadhar = document.getElementById('aadhar').value.trim();
         const presentSchool = document.getElementById('presentSchool').value.trim();
+        const sessionSelect = document.getElementById('sessionSelect').value;
         const knowAbout = getSelectedKnowAbout();
         const medicalInfo = document.getElementById('medicalInfo').value.trim();
         const declaration = document.getElementById('declaration').checked;
@@ -657,7 +907,7 @@
             updateProgress(20, 'Generating admission number...');
             const admissionNo = generateAdmissionNo();
             
-            updateProgress(40, 'Uploading photo to cloud...');
+            updateProgress(40, 'Compressing and uploading photo...');
             let photoUrl = '';
             try {
                 photoUrl = await uploadPhotoToSupabase(photoFile, admissionNo);
@@ -671,7 +921,6 @@
             
             updateProgress(80, 'Saving student data to database...');
             
-            // Save to Firebase Firestore
             const admissionData = {
                 admissionNo: admissionNo,
                 studentName: fullName,
@@ -680,18 +929,16 @@
                 dob: dob,
                 gender: gender,
                 classApplying: classVal,
-                previousPercentage: '',
                 schoolName: presentSchool,
                 address: address,
                 parentMobile: studentMobile,
-                alternateMobile: '',
                 aadhar: aadhar || '',
                 nationality: nationality,
                 knowAbout: knowAbout || '',
                 medicalInfo: medicalInfo || '',
-                photoUrl: photoUrl,  // Supabase URL
+                photoUrl: photoUrl,
                 admissionDate: new Date().toISOString(),
-                session: '2026-27',
+                session: sessionSelect,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 status: 'active'
             };
@@ -701,15 +948,7 @@
             
             setTimeout(() => {
                 progressOverlay.style.display = 'none';
-                Swal.fire({
-                    title: '✅ Admission Successful!',
-                    html: `Student <strong>${fullName}</strong> has been admitted.<br>📛 Admission No: <strong>${admissionNo}</strong><br>📸 Photo saved in cloud storage.`,
-                    icon: 'success',
-                    confirmButtonColor: '#1b4f9b',
-                    confirmButtonText: 'Go to Dashboard'
-                }).then(() => {
-                    window.location.href = 'student-dashboard.html';
-                });
+                displayAdmissionCard(admissionData, photoUrl);
             }, 500);
             
         } catch (error) {
