@@ -8,6 +8,7 @@
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <style>
         * {
             margin: 0;
@@ -311,6 +312,36 @@
             transform: translateY(-2px);
         }
 
+        /* Auth Loading Screen */
+        .auth-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 10000;
+        }
+        .auth-loading .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1b4f9b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .main-content {
+            display: none;
+        }
+
         @media (max-width: 600px) {
             .session-bar {
                 flex-direction: column;
@@ -357,84 +388,91 @@
     </style>
 </head>
 <body>
-<div class="container">
-
-    <!-- Session Bar -->
-    <div class="session-bar">
-        <label>📆 Session</label>
-        <select id="sessionSelect">
-            <option value="2024-25">2024-25</option>
-            <option value="2025-26">2025-26</option>
-            <option value="2026-27" selected>2026-27</option>
-        </select>
-        <div class="teacher-badge">👨‍🏫 MR. RAVI SIR · Student Dashboard</div>
+    <!-- Auth Loading Screen -->
+    <div id="authLoading" class="auth-loading">
+        <div class="spinner"></div>
+        <p style="margin-top: 15px; color: #1b4f9b; font-weight: 600;">Verifying access...</p>
     </div>
 
-    <!-- Class Filter -->
-    <div class="filter-section">
-        <span>🔽 Filter by Class</span>
-        <select id="classSelect">
-            <option value="All">📚 All Classes</option>
-            <option value="6th">🎒 Class 6</option>
-            <option value="7th">📘 Class 7</option>
-            <option value="8th">📗 Class 8</option>
-            <option value="9th">📕 Class 9</option>
-            <option value="10th">📙 Class 10</option>
-            <option value="11th (Science)">🔬 Class 11 (Science)</option>
-            <option value="11th (Commerce)">📊 Class 11 (Commerce)</option>
-            <option value="12th (Science)">🧪 Class 12 (Science)</option>
-            <option value="12th (Commerce)">📈 Class 12 (Commerce)</option>
-        </select>
-    </div>
+    <!-- Main Content -->
+    <div id="mainContent" class="main-content">
+    <div class="container">
 
-    <!-- Summary Boxes -->
-    <div class="summary-row">
-        <div class="summary-item total">
-            <div class="summary-emoji">👨‍🎓👩‍🎓</div>
-            <div class="summary-label">TOTAL STUDENTS</div>
-            <div class="summary-value" id="totalStudents">0</div>
+        <!-- Session Bar -->
+        <div class="session-bar">
+            <label>📆 Session</label>
+            <select id="sessionSelect">
+                <option value="2024-25">2024-25</option>
+                <option value="2025-26">2025-26</option>
+                <option value="2026-27" selected>2026-27</option>
+            </select>
+            <div class="teacher-badge">👨‍🏫 MR. RAVI SIR · Student Dashboard</div>
         </div>
-        <div class="summary-item boys">
-            <div class="summary-emoji">👦👦</div>
-            <div class="summary-label">BOYS</div>
-            <div class="summary-value" id="totalBoys">0</div>
-        </div>
-        <div class="summary-item girls">
-            <div class="summary-emoji">👧👧</div>
-            <div class="summary-label">GIRLS</div>
-            <div class="summary-value" id="totalGirls">0</div>
-        </div>
-    </div>
 
-    <!-- Action Buttons -->
-    <div class="action-buttons">
-        <button class="btn btn-primary" id="addStudentBtn">➕ NEW ADMISSION</button>
-        <button class="btn btn-outline" id="manageStudentBtn">📋 MANAGE STUDENTS</button>
-    </div>
+        <!-- Class Filter -->
+        <div class="filter-section">
+            <span>🔽 Filter by Class</span>
+            <select id="classSelect">
+                <option value="All">📚 All Classes</option>
+                <option value="6th">🎒 Class 6</option>
+                <option value="7th">📘 Class 7</option>
+                <option value="8th">📗 Class 8</option>
+                <option value="9th">📕 Class 9</option>
+                <option value="10th">📙 Class 10</option>
+                <option value="11th (Science)">🔬 Class 11 (Science)</option>
+                <option value="11th (Commerce)">📊 Class 11 (Commerce)</option>
+                <option value="12th (Science)">🧪 Class 12 (Science)</option>
+                <option value="12th (Commerce)">📈 Class 12 (Commerce)</option>
+            </select>
+        </div>
 
-    <!-- Students List -->
-    <div class="updates-card">
-        <div class="updates-header">
-            <div class="updates-title">
-                <span>📋 STUDENTS LIST</span>
-                <span id="studentCountBadge">Latest Students</span>
+        <!-- Summary Boxes -->
+        <div class="summary-row">
+            <div class="summary-item total">
+                <div class="summary-emoji">👨‍🎓👩‍🎓</div>
+                <div class="summary-label">TOTAL STUDENTS</div>
+                <div class="summary-value" id="totalStudents">0</div>
             </div>
-            <button class="view-all-btn" id="viewAllBtn">
-                <i class="fas fa-eye"></i> View All Students
-            </button>
+            <div class="summary-item boys">
+                <div class="summary-emoji">👦👦</div>
+                <div class="summary-label">BOYS</div>
+                <div class="summary-value" id="totalBoys">0</div>
+            </div>
+            <div class="summary-item girls">
+                <div class="summary-emoji">👧👧</div>
+                <div class="summary-label">GIRLS</div>
+                <div class="summary-value" id="totalGirls">0</div>
+            </div>
         </div>
-        <div id="studentsList">
-            <div class="student-item">⏳ Loading students from database...</div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" id="addStudentBtn">➕ NEW ADMISSION</button>
+            <button class="btn btn-outline" id="manageStudentBtn">📋 MANAGE STUDENTS</button>
+        </div>
+
+        <!-- Students List -->
+        <div class="updates-card">
+            <div class="updates-header">
+                <div class="updates-title">
+                    <span>📋 STUDENTS LIST</span>
+                    <span id="studentCountBadge">Latest Students</span>
+                </div>
+                <button class="view-all-btn" id="viewAllBtn">
+                    <i class="fas fa-eye"></i> View All Students
+                </button>
+            </div>
+            <div id="studentsList">
+                <div class="student-item">⏳ Loading students from database...</div>
+            </div>
         </div>
     </div>
-</div>
+    </div>
 
-<!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script>
-    // Firebase Config
+    <script>
     const firebaseConfig = {
         apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
         authDomain: "quest-coaching.firebaseapp.com",
@@ -444,7 +482,42 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const admissionsCollection = db.collection('admissions');
+    const auth = firebase.auth();
+
+    // Auth Elements
+    const authLoading = document.getElementById('authLoading');
+    const mainContent = document.getElementById('mainContent');
+
+    // ============ AUTHENTICATION CHECK ============
+    auth.onAuthStateChanged((user) => {
+        if (!user) {
+            Swal.fire({
+                title: 'Access Denied!',
+                text: 'Please login from main page first!',
+                icon: 'error',
+                confirmButtonColor: '#1b4f9b',
+                confirmButtonText: 'Go to Login'
+            }).then(() => {
+                window.location.href = 'index.html';
+            });
+            return;
+        }
+        
+        authLoading.style.display = 'none';
+        mainContent.style.display = 'block';
+        
+        // Add logout button
+        const logoutBtn = document.createElement('button');
+        logoutBtn.innerHTML = '🚪 Logout';
+        logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+        logoutBtn.onclick = async () => {
+            await auth.signOut();
+            window.location.href = 'index.html';
+        };
+        document.body.appendChild(logoutBtn);
+        
+        loadStudentsFromFirebase();
+    });
 
     // DOM Elements
     const sessionSelect = document.getElementById('sessionSelect');
@@ -460,7 +533,7 @@
     // Load students from Firebase
     async function loadStudentsFromFirebase() {
         try {
-            const snapshot = await admissionsCollection.get();
+            const snapshot = await db.collection('admissions').get();
             allStudents = [];
             snapshot.forEach(doc => {
                 allStudents.push({ id: doc.id, ...doc.data() });
@@ -646,7 +719,7 @@
         });
     });
 
-    // Navigation buttons
+    // Navigation buttons - SAME TAB
     document.getElementById('addStudentBtn').addEventListener('click', () => {
         window.location.href = 'new-admission.html';
     });
@@ -656,8 +729,7 @@
     });
 
     // Initial load
-    loadStudentsFromFirebase();
     setInterval(loadStudentsFromFirebase, 10000);
-</script>
+    </script>
 </body>
 </html>
