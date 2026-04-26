@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * {
@@ -151,6 +152,36 @@
             color: #64748b;
         }
         
+        /* Auth Loading Screen */
+        .auth-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 10000;
+        }
+        .auth-loading .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1b4f9b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .main-content {
+            display: none;
+        }
+        
         @media (max-width: 700px) {
             .filter-card { flex-direction: column; }
             .action-buttons { flex-direction: column; }
@@ -159,56 +190,65 @@
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="header-bar">
-        <div class="logo-area">
-            <h1>📋 Manage Students</h1>
-            <p>Quest Coaching Centre | Under MR. RAVI SIR</p>
-        </div>
-        <button class="back-btn" onclick="window.location.href='student-dashboard.html'">
-            <i class="fas fa-arrow-left"></i> Back to Dashboard
-        </button>
+    <!-- Auth Loading Screen -->
+    <div id="authLoading" class="auth-loading">
+        <div class="spinner"></div>
+        <p style="margin-top: 15px; color: #1b4f9b; font-weight: 600;">Verifying access...</p>
     </div>
-    
-    <div class="filter-card">
-        <div class="filter-group">
-            <label>🔍 Search by Name / Admission No / Mobile</label>
-            <input type="text" id="searchInput" placeholder="Type to search...">
-        </div>
-        <div class="filter-group">
-            <label>📚 Filter by Class</label>
-            <select id="classFilter">
-                <option value="All">All Classes</option>
-                <option>6th</option><option>7th</option><option>8th</option>
-                <option>9th</option><option>10th</option>
-                <option>11th (Science)</option><option>11th (Commerce)</option>
-                <option>12th (Science)</option><option>12th (Commerce)</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label>📆 Session</label>
-            <select id="sessionFilter">
-                <option value="All">All Sessions</option>
-                <option>2024-25</option><option>2025-26</option>
-                <option selected>2026-27</option>
-            </select>
-        </div>
-        <button class="search-btn" onclick="filterStudents()"><i class="fas fa-search"></i> Search</button>
-    </div>
-    
-    <div class="students-card">
-        <table>
-            <thead>
-                <tr><th>Photo</th><th>Admission No</th><th>Student Name</th><th>Father Name</th><th>Class</th><th>Gender</th><th>Mobile</th><th>Actions</th></tr>
-            </thead>
-            <tbody id="studentsTableBody">
-                <tr><td colspan="8" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading students...</td></tr>
-            </tbody>
-        </table>
-    </div>
-</div>
 
-<script>
+    <!-- Main Content -->
+    <div id="mainContent" class="main-content">
+    <div class="container">
+        <div class="header-bar">
+            <div class="logo-area">
+                <h1>📋 Manage Students</h1>
+                <p>Quest Coaching Centre | Under MR. RAVI SIR</p>
+            </div>
+            <button class="back-btn" onclick="window.location.href='student-dashboard.html'">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </button>
+        </div>
+        
+        <div class="filter-card">
+            <div class="filter-group">
+                <label>🔍 Search by Name / Admission No / Mobile</label>
+                <input type="text" id="searchInput" placeholder="Type to search...">
+            </div>
+            <div class="filter-group">
+                <label>📚 Filter by Class</label>
+                <select id="classFilter">
+                    <option value="All">All Classes</option>
+                    <option>6th</option><option>7th</option><option>8th</option>
+                    <option>9th</option><option>10th</option>
+                    <option>11th (Science)</option><option>11th (Commerce)</option>
+                    <option>12th (Science)</option><option>12th (Commerce)</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>📆 Session</label>
+                <select id="sessionFilter">
+                    <option value="All">All Sessions</option>
+                    <option>2024-25</option><option>2025-26</option>
+                    <option selected>2026-27</option>
+                </select>
+            </div>
+            <button class="search-btn" onclick="filterStudents()"><i class="fas fa-search"></i> Search</button>
+        </div>
+        
+        <div class="students-card">
+            <table>
+                <thead>
+                    <tr><th>Photo</th><th>Admission No</th><th>Student Name</th><th>Father Name</th><th>Class</th><th>Gender</th><th>Mobile</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="studentsTableBody">
+                    <tr><td colspan="8" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading students...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </div>
+
+    <script>
     const firebaseConfig = {
         apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
         authDomain: "quest-coaching.firebaseapp.com",
@@ -217,6 +257,42 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // Auth Elements
+    const authLoading = document.getElementById('authLoading');
+    const mainContent = document.getElementById('mainContent');
+
+    // ============ AUTHENTICATION CHECK ============
+    auth.onAuthStateChanged((user) => {
+        if (!user) {
+            Swal.fire({
+                title: 'Access Denied!',
+                text: 'Please login from main page first!',
+                icon: 'error',
+                confirmButtonColor: '#1b4f9b',
+                confirmButtonText: 'Go to Login'
+            }).then(() => {
+                window.location.href = 'index.html';
+            });
+            return;
+        }
+        
+        authLoading.style.display = 'none';
+        mainContent.style.display = 'block';
+        
+        // Add logout button
+        const logoutBtn = document.createElement('button');
+        logoutBtn.innerHTML = '🚪 Logout';
+        logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+        logoutBtn.onclick = async () => {
+            await auth.signOut();
+            window.location.href = 'index.html';
+        };
+        document.body.appendChild(logoutBtn);
+        
+        loadStudents();
+    });
     
     let allStudents = [];
     
@@ -377,6 +453,6 @@
     document.getElementById('sessionFilter').addEventListener('change', filterStudents);
     
     loadStudents();
-</script>
+    </script>
 </body>
 </html>
