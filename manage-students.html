@@ -6,6 +6,7 @@
     <title>📋 Quest Coaching · Manage Students</title>
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -119,12 +120,14 @@
         .student-photo {
             width: 45px;
             height: 45px;
-            border-radius: 10px;
+            border-radius: 50%;
             object-fit: cover;
+            background: #e2e8f0;
         }
         .action-buttons {
             display: flex;
             gap: 8px;
+            flex-wrap: wrap;
         }
         .edit-btn, .delete-btn, .view-btn {
             padding: 6px 12px;
@@ -252,18 +255,16 @@
     const firebaseConfig = {
         apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
         authDomain: "quest-coaching.firebaseapp.com",
-        projectId: "quest-coaching",
-        storageBucket: "quest-coaching.firebasestorage.app"
+        projectId: "quest-coaching"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
+    const admissionsCollection = db.collection('admissions');
 
-    // Auth Elements
     const authLoading = document.getElementById('authLoading');
     const mainContent = document.getElementById('mainContent');
 
-    // ============ AUTHENTICATION CHECK ============
     auth.onAuthStateChanged((user) => {
         if (!user) {
             Swal.fire({
@@ -281,7 +282,6 @@
         authLoading.style.display = 'none';
         mainContent.style.display = 'block';
         
-        // Add logout button
         const logoutBtn = document.createElement('button');
         logoutBtn.innerHTML = '🚪 Logout';
         logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.2);';
@@ -298,7 +298,7 @@
     
     async function loadStudents() {
         try {
-            const snapshot = await db.collection('admissions').get();
+            const snapshot = await admissionsCollection.get();
             allStudents = [];
             snapshot.forEach(doc => {
                 allStudents.push({ id: doc.id, ...doc.data() });
@@ -344,9 +344,13 @@
         students.forEach(student => {
             const genderClass = student.gender === 'Male' ? 'male' : 'female';
             const genderText = student.gender === 'Male' ? 'Male' : 'Female';
-            const photoHtml = student.photoUrl ? 
-                `<img src="${student.photoUrl}" class="student-photo" onerror="this.src='https://via.placeholder.com/45'">` : 
-                '<div style="width:45px;height:45px;background:#e2e8f0;border-radius:10px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-user"></i></div>';
+            
+            let photoHtml = '';
+            if (student.photoUrl) {
+                photoHtml = `<img src="${student.photoUrl}" class="student-photo" onerror="this.src='https://via.placeholder.com/45'">`;
+            } else {
+                photoHtml = `<div class="student-photo" style="display:flex;align-items:center;justify-content:center;"><i class="fas fa-user" style="color:#64748b;"></i></div>`;
+            }
             
             html += `<tr>
                 <td>${photoHtml}</td>
@@ -376,11 +380,18 @@
             admissionDate = date.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
         }
         
+        let photoHtml = '';
+        if (student.photoUrl) {
+            photoHtml = `<div style="text-align:center; margin-bottom:15px;"><img src="${student.photoUrl}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:2px solid #1b4f9b;"></div>`;
+        } else {
+            photoHtml = `<div style="text-align:center; margin-bottom:15px;"><div style="width:100px;height:100px;background:#e2e8f0;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;"><i class="fas fa-user" style="font-size:40px;color:#64748b;"></i></div></div>`;
+        }
+        
         Swal.fire({
             title: student.studentName,
             html: `
-                <div style="text-align:center"><img src="${student.photoUrl || ''}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;"></div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left;margin-top:15px;">
+                ${photoHtml}
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:left;">
                     <div><strong>Admission No:</strong></div><div>${student.admissionNo}</div>
                     <div><strong>Father:</strong></div><div>${student.fatherName}</div>
                     <div><strong>Mother:</strong></div><div>${student.motherName || '-'}</div>
@@ -419,7 +430,7 @@
             }
         }).then(async (result) => {
             if (result.isConfirmed) {
-                await db.collection('admissions').doc(studentId).update({
+                await admissionsCollection.doc(studentId).update({
                     studentName: result.value.name,
                     fatherName: result.value.father,
                     parentMobile: result.value.mobile,
@@ -441,7 +452,7 @@
             confirmButtonText: 'Yes, delete'
         }).then(async (result) => {
             if (result.isConfirmed) {
-                await db.collection('admissions').doc(studentId).delete();
+                await admissionsCollection.doc(studentId).delete();
                 Swal.fire('Deleted!', 'Student has been removed.', 'success');
                 loadStudents();
             }
