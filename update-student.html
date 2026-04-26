@@ -162,7 +162,6 @@
             });
             return;
         }
-        
         authLoading.style.display = 'none';
         mainContent.style.display = 'block';
         
@@ -174,7 +173,6 @@
             window.location.href = 'index.html';
         };
         document.body.appendChild(logoutBtn);
-        
         loadStudents();
     });
 
@@ -233,7 +231,6 @@
     function hideProgress() { progressOverlay.style.display = 'none'; }
 
     async function loadStudents() {
-        if (!feesCollection) { tableContainer.innerHTML = '<div class="empty-message">Firebase not connected</div>'; return; }
         try {
             const snapshot = await feesCollection.get();
             allStudents = [];
@@ -247,33 +244,21 @@
         if (classFilter.value !== 'All') filtered = filtered.filter(s => s.class === classFilter.value);
         const searchRoll = rollSearchInput.value.trim().toLowerCase();
         if (searchRoll) filtered = filtered.filter(s => (s.roll_number || '').toString().toLowerCase().includes(searchRoll));
-        
         if (filtered.length === 0) { tableContainer.innerHTML = '<div class="empty-message">📭 No students found</div>'; return; }
         
-        let html = `<table><thead>
-            <tr><th>Roll No</th><th>Student Name</th><th>Father Name</th><th>Total (₹)</th><th>Received (₹)</th><th>Due (₹)</th><th>Actions</th>
-            </tr></thead><tbody>`;
-        
+        let html = `</table><thead><tr><th>Roll No</th><th>Student Name</th><th>Father Name</th><th>Total (₹)</th><th>Received (₹)</th><th>Due (₹)</th><th>Actions</th></tr></thead><tbody>`;
         filtered.forEach(s => {
             const isFullyPaid = s.due_amount <= 0;
             const dueBadgeClass = isFullyPaid ? 'paid-badge' : 'due-badge';
             const dueText = isFullyPaid ? 'PAID' : `₹${Number(s.due_amount).toLocaleString()}`;
-            
             html += `<tr>
                 <td><span class="roll-badge">${s.roll_number || '-'}</span></td>
-                <td>
-                    <div><span class="student-name" onclick="showStudentDetails('${s.id}')">${s.student_name || '-'}</span></div>
-                    <div class="father-name"><i class="fas fa-phone-alt"></i> ${s.phone_number || 'N/A'}</div>
-                </td>
+                <td><div><span class="student-name" onclick="showStudentDetails('${s.id}')">${s.student_name || '-'}</span></div><div class="father-name"><i class="fas fa-phone-alt"></i> ${s.phone_number || 'N/A'}</div></td>
                 <td>${s.father_name || '-'}</td>
                 <td><span class="amount-badge">₹${Number(s.total_amount).toLocaleString()}</span></td>
                 <td><span class="amount-badge">₹${Number(s.received_amount).toLocaleString()}</span></td>
                 <td><span class="${dueBadgeClass}">${dueText}</span></td>
-                <td><div class="action-buttons">
-                    <button class="history-btn" onclick="showTransactionHistory('${s.id}')"><i class="fas fa-history"></i> History</button>
-                    <button class="update-btn" onclick="openUpdateModal('${s.id}')" ${isFullyPaid ? 'disabled' : ''}><i class="fas fa-edit"></i> Update</button>
-                    <button class="delete-btn" onclick="deleteStudent('${s.id}', '${s.student_name}')"><i class="fas fa-trash-alt"></i> Delete</button>
-                </div></td>
+                <td><div class="action-buttons"><button class="history-btn" onclick="showTransactionHistory('${s.id}')"><i class="fas fa-history"></i> History</button><button class="update-btn" onclick="openUpdateModal('${s.id}')" ${isFullyPaid ? 'disabled' : ''}><i class="fas fa-edit"></i> Update</button><button class="delete-btn" onclick="deleteStudent('${s.id}', '${s.student_name}')"><i class="fas fa-trash-alt"></i> Delete</button></div></td>
             </tr>`;
         });
         html += `</tbody></table>`;
@@ -283,101 +268,39 @@
     window.showStudentDetails = function(studentId) {
         const student = allStudents.find(s => s.id === studentId);
         if (!student) return;
-        
         let subjectsHtml = '', extraFeesHtml = '';
-        if (student.subjects && student.subjects.length > 0) {
-            subjectsHtml = `<div><strong>📖 Subjects:</strong> ${student.subjects.join(', ')}</div>`;
-        }
-        if (student.extra_fees && student.extra_fees.length > 0) {
-            extraFeesHtml = `<div><strong>📌 Extra Charges:</strong> ${student.extra_fees.join(', ')}</div>`;
-        }
-        
+        if (student.subjects && student.subjects.length > 0) subjectsHtml = `<div><strong>📖 Subjects:</strong> ${student.subjects.join(', ')}</div>`;
+        if (student.extra_fees && student.extra_fees.length > 0) extraFeesHtml = `<div><strong>📌 Extra Charges:</strong> ${student.extra_fees.join(', ')}</div>`;
         Swal.fire({
             title: `<strong>${student.student_name}</strong>`,
-            html: `<div style="text-align: left;">
-                <div><strong>🎫 Roll No:</strong> ${student.roll_number}</div>
-                <div><strong>👨 Father:</strong> ${student.father_name}</div>
-                <div><strong>📞 Phone:</strong> ${student.phone_number || 'N/A'}</div>
-                <div><strong>🏫 Class:</strong> ${student.class}</div>
-                <div><strong>📅 Session:</strong> ${student.session}</div>
-                ${subjectsHtml ? `<hr>${subjectsHtml}` : ''}
-                ${extraFeesHtml ? `<hr>${extraFeesHtml}` : ''}
-                <hr>
-                <div><strong>💰 Total Amount:</strong> ₹${Number(student.total_amount).toLocaleString()}</div>
-                <div><strong>💵 Received Amount:</strong> ₹${Number(student.received_amount).toLocaleString()}</div>
-                <div><strong>⏳ Due Amount:</strong> <span style="color:${student.due_amount <= 0 ? 'green' : 'red'}">₹${Number(student.due_amount).toLocaleString()}</span></div>
-            </div>`,
-            icon: 'info',
-            confirmButtonColor: '#1b4f9b',
-            confirmButtonText: 'Close'
+            html: `<div style="text-align: left;"><div><strong>🎫 Roll No:</strong> ${student.roll_number}</div><div><strong>👨 Father:</strong> ${student.father_name}</div><div><strong>📞 Phone:</strong> ${student.phone_number || 'N/A'}</div><div><strong>🏫 Class:</strong> ${student.class}</div><div><strong>📅 Session:</strong> ${student.session}</div>${subjectsHtml ? `<hr>${subjectsHtml}` : ''}${extraFeesHtml ? `<hr>${extraFeesHtml}` : ''}<hr><div><strong>💰 Total Amount:</strong> ₹${Number(student.total_amount).toLocaleString()}</div><div><strong>💵 Received:</strong> ₹${Number(student.received_amount).toLocaleString()}</div><div><strong>⏳ Due:</strong> <span style="color:${student.due_amount <= 0 ? 'green' : 'red'}">₹${Number(student.due_amount).toLocaleString()}</span></div></div>`,
+            icon: 'info', confirmButtonColor: '#1b4f9b', confirmButtonText: 'Close'
         });
     };
 
     window.showTransactionHistory = async function(studentId) {
         const student = allStudents.find(s => s.id === studentId);
         if (!student) return;
-        
         let subjectsInfo = '';
-        if (student.subjects && student.subjects.length > 0) {
-            subjectsInfo = `<div><strong>📖 Subjects:</strong> ${student.subjects.join(', ')}</div>`;
-        }
-        if (student.extra_fees && student.extra_fees.length > 0) {
-            subjectsInfo += `<div><strong>📌 Extra Charges:</strong> ${student.extra_fees.join(', ')}</div>`;
-        }
-        
-        document.getElementById('historyStudentInfo').innerHTML = `
-            <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
-                <div style="background:#1b4f9b; color:white; width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
-                    <i class="fas fa-user-graduate fa-lg"></i>
-                </div>
-                <div>
-                    <h5 style="margin:0; font-weight:700;">${student.student_name}</h5>
-                    <p style="margin:5px 0 0; color:#5f6b7a;">Roll: ${student.roll_number} | Class: ${student.class} | Session: ${student.session}</p>
-                    <p style="margin:5px 0 0;"><i class="fas fa-phone"></i> ${student.phone_number || 'N/A'} | <i class="fas fa-user"></i> ${student.father_name}</p>
-                    <p style="margin:5px 0 0;">Total Paid: <strong>₹${Number(student.received_amount).toLocaleString()}</strong> | Due: <strong style="color:#b91c1c;">₹${Number(student.due_amount).toLocaleString()}</strong></p>
-                    ${subjectsInfo}
-                </div>
-            </div>
-        `;
-        
+        if (student.subjects && student.subjects.length > 0) subjectsInfo = `<div><strong>📖 Subjects:</strong> ${student.subjects.join(', ')}</div>`;
+        if (student.extra_fees && student.extra_fees.length > 0) subjectsInfo += `<div><strong>📌 Extra Charges:</strong> ${student.extra_fees.join(', ')}</div>`;
+        document.getElementById('historyStudentInfo').innerHTML = `<div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap;"><div style="background:#1b4f9b; color:white; width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center;"><i class="fas fa-user-graduate fa-lg"></i></div><div><h5 style="margin:0; font-weight:700;">${student.student_name}</h5><p style="margin:5px 0 0; color:#5f6b7a;">Roll: ${student.roll_number} | Class: ${student.class} | Session: ${student.session}</p><p style="margin:5px 0 0;"><i class="fas fa-phone"></i> ${student.phone_number || 'N/A'} | <i class="fas fa-user"></i> ${student.father_name}</p><p style="margin:5px 0 0;">Total Paid: <strong>₹${Number(student.received_amount).toLocaleString()}</strong> | Due: <strong style="color:#b91c1c;">₹${Number(student.due_amount).toLocaleString()}</strong></p>${subjectsInfo}</div></div>`;
         document.getElementById('transactionsList').innerHTML = '<p class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading transactions...</p>';
         historyModal.show();
-        
         try {
             const snapshot = await transactionsCollection.where('studentId', '==', studentId).get();
-            let transactions = [];
-            snapshot.forEach(doc => transactions.push({ id: doc.id, ...doc.data() }));
-            
-            if (transactions.length === 0) {
-                document.getElementById('transactionsList').innerHTML = '<p class="text-center text-muted">📭 No transactions found</p>';
-            } else {
+            let transactions = []; snapshot.forEach(doc => transactions.push({ id: doc.id, ...doc.data() }));
+            if (transactions.length === 0) document.getElementById('transactionsList').innerHTML = '<p class="text-center text-muted">📭 No transactions found</p>';
+            else {
                 transactions.sort((a, b) => (b.created_at?.toDate?.() || new Date(b.date)) - (a.created_at?.toDate?.() || new Date(a.date)));
                 let html = '';
                 transactions.forEach(t => {
                     const date = t.created_at?.toDate ? t.created_at.toDate() : new Date(t.date);
-                    html += `
-                        <div class="transaction-item">
-                            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; align-items:center;">
-                                <div>
-                                    <span style="font-weight:700; font-size:1.1rem;">+ ₹${Number(t.amount).toLocaleString()}</span>
-                                    <div style="font-size:0.75rem; color:#5f6b7a; margin-top:4px;">
-                                        <i class="fas fa-calendar"></i> ${date.toLocaleDateString()} ${date.toLocaleTimeString()}
-                                    </div>
-                                    <div style="font-size:0.7rem; color:#888;">ID: ${t.transactionId}</div>
-                                    <div style="font-size:0.7rem;">Invoice: ${t.invoiceNumber || 'N/A'}</div>
-                                </div>
-                                <button class="invoice-small-btn" onclick="generateInvoiceForTransaction('${studentId}', '${t.transactionId}', '${t.invoiceNumber || ''}', ${t.amount})">
-                                    <i class="fas fa-file-invoice"></i> Invoice
-                                </button>
-                            </div>
-                        </div>
-                    `;
+                    html += `<div class="transaction-item"><div style="display:flex; justify-content:space-between; flex-wrap:wrap; align-items:center;"><div><span style="font-weight:700; font-size:1.1rem;">+ ₹${Number(t.amount).toLocaleString()}</span><div style="font-size:0.75rem; color:#5f6b7a; margin-top:4px;"><i class="fas fa-calendar"></i> ${date.toLocaleDateString()} ${date.toLocaleTimeString()}</div><div style="font-size:0.7rem; color:#888;">ID: ${t.transactionId}</div><div style="font-size:0.7rem;">Invoice: ${t.invoiceNumber || 'N/A'}</div></div><button class="invoice-small-btn" onclick="generateInvoiceForTransaction('${studentId}', '${t.transactionId}', '${t.invoiceNumber || ''}', ${t.amount})"><i class="fas fa-file-invoice"></i> Invoice</button></div></div>`;
                 });
                 document.getElementById('transactionsList').innerHTML = html;
             }
-        } catch (error) {
-            document.getElementById('transactionsList').innerHTML = `<p class="text-center text-danger">Error: ${error.message}</p>`;
-        }
+        } catch (error) { document.getElementById('transactionsList').innerHTML = `<p class="text-center text-danger">Error: ${error.message}</p>`; }
     };
 
     window.generateInvoiceForTransaction = async function(studentId, transactionId, savedInvoiceNumber, amount) {
@@ -388,29 +311,13 @@
             let invoiceNumber = savedInvoiceNumber;
             if (!invoiceNumber) {
                 const txnQuery = await transactionsCollection.where('transactionId', '==', transactionId).get();
-                if (!txnQuery.empty) {
-                    invoiceNumber = txnQuery.docs[0].data().invoiceNumber;
-                    if (!invoiceNumber) {
-                        invoiceNumber = generateInvoiceNumber();
-                        await transactionsCollection.doc(txnQuery.docs[0].id).update({ invoiceNumber: invoiceNumber });
-                    }
-                } else {
-                    invoiceNumber = generateInvoiceNumber();
-                }
+                if (!txnQuery.empty) { invoiceNumber = txnQuery.docs[0].data().invoiceNumber || generateInvoiceNumber(); }
+                else { invoiceNumber = generateInvoiceNumber(); }
             }
-            const invoiceData = { 
-                student: student, 
-                paymentAmount: amount, 
-                date: new Date(), 
-                transactionId: transactionId, 
-                invoiceNumber: invoiceNumber,
-                coaching: COACHING_DETAILS 
-            };
+            const invoiceData = { student: student, paymentAmount: amount, date: new Date(), transactionId: transactionId, invoiceNumber: invoiceNumber, coaching: COACHING_DETAILS };
             hideProgress();
             const invoiceHTML = generateInvoiceHTML(invoiceData);
-            const win = window.open(); 
-            win.document.write(invoiceHTML); 
-            win.document.close();
+            const win = window.open(); win.document.write(invoiceHTML); win.document.close();
         } catch (error) { hideProgress(); showErrorToast('Error: ' + error.message); }
     };
 
@@ -424,9 +331,7 @@
             txns.forEach(doc => batch.delete(doc.ref));
             batch.delete(feesCollection.doc(studentId));
             await batch.commit();
-            hideProgress();
-            showSuccessToast(`✅ "${studentName}" deleted successfully`);
-            await loadStudents();
+            hideProgress(); showSuccessToast(`✅ "${studentName}" deleted successfully`); await loadStudents();
         } catch (error) { hideProgress(); showErrorToast('Error: ' + error.message); }
     };
 
@@ -434,15 +339,8 @@
         selectedStudent = allStudents.find(s => s.id === studentId);
         if (!selectedStudent) return;
         if (selectedStudent.due_amount <= 0) { showFullyPaidPopup(selectedStudent.student_name); return; }
-        modalStudentInfo.innerHTML = `
-            <div style="text-align:center;">
-                <strong style="font-size:1.1rem;">${selectedStudent.student_name}</strong><br>
-                Roll: ${selectedStudent.roll_number}<br>
-                <span style="color:#b91c1c;">Due Amount: ₹${Number(selectedStudent.due_amount).toLocaleString()}</span>
-            </div>
-        `;
-        additionalAmount.value = '';
-        updateModal.show();
+        modalStudentInfo.innerHTML = `<div style="text-align:center;"><strong style="font-size:1.1rem;">${selectedStudent.student_name}</strong><br>Roll: ${selectedStudent.roll_number}<br><span style="color:#b91c1c;">Due Amount: ₹${Number(selectedStudent.due_amount).toLocaleString()}</span></div>`;
+        additionalAmount.value = ''; updateModal.show();
     };
 
     confirmUpdateBtn.addEventListener('click', async () => {
@@ -450,7 +348,6 @@
         const amount = parseFloat(additionalAmount.value);
         if (isNaN(amount) || amount <= 0) { showErrorToast('❌ Please enter a valid amount'); return; }
         if (amount > selectedStudent.due_amount) { showErrorToast(`⚠️ Cannot exceed due amount of ₹${selectedStudent.due_amount.toLocaleString()}`); return; }
-        if (selectedStudent.due_amount <= 0) { updateModal.hide(); showFullyPaidPopup(selectedStudent.student_name); return; }
         updateModal.hide(); showProgress();
         try {
             const newReceived = (selectedStudent.received_amount || 0) + amount;
@@ -458,182 +355,45 @@
             const transactionId = 'TXN' + Date.now().toString().slice(-8) + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
             const invoiceNumber = generateInvoiceNumber();
             const now = new Date();
-            
-            await transactionsCollection.add({ 
-                studentId: selectedStudent.id, 
-                studentName: selectedStudent.student_name, 
-                rollNumber: selectedStudent.roll_number,
-                amount: amount, 
-                previousReceived: selectedStudent.received_amount, 
-                newReceived: newReceived, 
-                previousDue: selectedStudent.due_amount, 
-                newDue: newDue, 
-                transactionId: transactionId,
-                invoiceNumber: invoiceNumber,
-                date: now.toISOString(), 
-                created_at: firebase.firestore.FieldValue.serverTimestamp() 
-            });
-            
-            await feesCollection.doc(selectedStudent.id).update({ 
-                received_amount: newReceived, 
-                due_amount: newDue 
-            });
-            
-            selectedStudent.received_amount = newReceived;
-            selectedStudent.due_amount = newDue;
+            await transactionsCollection.add({ studentId: selectedStudent.id, studentName: selectedStudent.student_name, rollNumber: selectedStudent.roll_number, amount: amount, previousReceived: selectedStudent.received_amount, newReceived: newReceived, previousDue: selectedStudent.due_amount, newDue: newDue, transactionId: transactionId, invoiceNumber: invoiceNumber, date: now.toISOString(), created_at: firebase.firestore.FieldValue.serverTimestamp() });
+            await feesCollection.doc(selectedStudent.id).update({ received_amount: newReceived, due_amount: newDue });
+            selectedStudent.received_amount = newReceived; selectedStudent.due_amount = newDue;
             await loadStudents();
-            
             if (generateInvoiceCheck.checked) {
-                const invoiceData = { 
-                    student: selectedStudent, 
-                    paymentAmount: amount, 
-                    date: now, 
-                    transactionId: transactionId,
-                    invoiceNumber: invoiceNumber,
-                    coaching: COACHING_DETAILS 
-                };
+                const invoiceData = { student: selectedStudent, paymentAmount: amount, date: now, transactionId: transactionId, invoiceNumber: invoiceNumber, coaching: COACHING_DETAILS };
                 hideProgress();
                 const invoiceHTML = generateInvoiceHTML(invoiceData);
-                const win = window.open(); 
-                win.document.write(invoiceHTML); 
-                win.document.close();
-            } else { 
-                hideProgress(); 
-                showSuccessToast(`✅ ₹${amount.toLocaleString()} added for ${selectedStudent.student_name}`); 
-            }
+                const win = window.open(); win.document.write(invoiceHTML); win.document.close();
+            } else { hideProgress(); showSuccessToast(`✅ ₹${amount.toLocaleString()} added for ${selectedStudent.student_name}`); }
         } catch (error) { hideProgress(); showErrorToast('Error: ' + error.message); }
     });
 
     function generateInvoiceHTML(data) {
         const s = data.student, c = data.coaching;
         const logoUrl = "https://i.ibb.co/hF9tmnpB/20250903-202922.jpg";
-        
-        let feeRows = '';
-        let subtotal = 0;
-        
-        if (s.subjects && s.subjects.length > 0) {
-            s.subjects.forEach(sub => { feeRows += `<tr><td style="font-weight:500;">${sub} (Subject Fee)</td><td style="text-align:right;">₹3,000/-</td></tr>`; subtotal += 3000; });
-        }
-        if (s.extra_fees && s.extra_fees.length > 0) {
-            s.extra_fees.forEach(fee => { feeRows += `<tr><td style="font-weight:500;">${fee}</td><td style="text-align:right;">₹500/-</td></tr>`; subtotal += 500; });
-        }
-        if (feeRows === '') {
-            feeRows = `<tr><td style="font-weight:500;">Total Fee</td><td style="text-align:right;">₹${Number(s.total_amount).toLocaleString()}/-</td></tr>`;
-            subtotal = s.total_amount;
-        }
-        
-        const finalTotal = subtotal;
-        
-        return `<!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>Invoice - ${s.student_name}</title>
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-            <style>
-                @media print { .no-print { display:none; } }
-                *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
-                body{background:#f4f7fc;padding:20px;display:flex;justify-content:center;}
-                .invoice-a4{max-width:1000px;width:100%;background:white;border-radius:12px;padding:20px;margin:0;}
-                .header{text-align:center;margin-bottom:15px;border-bottom:2px solid #1b4f9b;padding-bottom:10px;}
-                .logo{width:70px;height:70px;border-radius:50%;object-fit:cover;border:2px solid #1b4f9b;}
-                .coaching-info h1{font-size:1.5rem;color:#1b4f9b;}
-                .coaching-info p{margin:2px 0;color:#4a5568;font-size:0.75rem;}
-                .title{font-size:1.2rem;font-weight:700;text-align:center;margin:10px 0;}
-                .section{background:#f8faff;padding:10px;border-radius:8px;margin-bottom:8px;border-left:3px solid #1b4f9b;}
-                .section-title{font-weight:700;color:#1b4f9b;margin-bottom:6px;}
-                .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
-                .label{color:#4b5563;font-size:0.7rem;}
-                .value{font-weight:600;font-size:0.75rem;}
-                table{width:100%;border-collapse:collapse;margin:6px 0;font-size:0.7rem;}
-                th,td{padding:5px;border:1px solid #e2e8f0;text-align:left;}
-                th{background:#1b4f9b;color:white;}
-                .status-box{background:#f0f9ff;padding:6px;border-radius:6px;margin:6px 0;border-left:3px solid #16a34a;}
-                .terms{font-size:0.6rem;margin-top:8px;padding-top:6px;border-top:1px dashed #1b4f9b;}
-                .signature-section{display:flex;justify-content:space-between;margin-top:12px;padding-top:8px;border-top:1px solid #e2e8f0;}
-                .signature-box{text-align:center;width:180px;}
-                .signature-line{margin-top:25px;border-top:1px solid #000;width:160px;margin:25px auto 0;}
-                .btn-group{display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap;}
-                .btn{padding:5px 14px;font-size:0.7rem;border:none;border-radius:50px;cursor:pointer;}
-                .btn-primary{background:#1b4f9b;color:white;}
-                .btn-success{background:#16a34a;color:white;}
-                .btn-secondary{background:#6c757d;color:white;}
-            </style>
-        </head>
-        <body>
-        <div class="invoice-a4">
-            <div class="btn-group no-print">
-                <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
-                <button class="btn btn-success" onclick="downloadInvoicePDF()"><i class="fas fa-download"></i> PDF</button>
-                <button class="btn btn-secondary" onclick="window.close()"><i class="fas fa-times"></i> Close</button>
-            </div>
-            <div class="header">
-                <img src="${logoUrl}" class="logo" onerror="this.src='https://via.placeholder.com/70?text=Logo'">
-                <div class="coaching-info">
-                    <h1>${c.name}</h1>
-                    <p><i class="fas fa-map-marker-alt"></i> ${c.address}</p>
-                    <p><i class="fas fa-phone"></i> ${c.phone} | <i class="fas fa-envelope"></i> ${c.email}</p>
-                    <p><i class="fas fa-id-card"></i> MSME: ${c.msme}</p>
-                </div>
-            </div>
-            <h2 class="title"><i class="fas fa-file-invoice"></i> FEE PAYMENT INVOICE</h2>
-            <div class="section">
-                <div class="section-title"><i class="fas fa-user-graduate"></i> STUDENT DETAILS</div>
-                <div class="grid-2">
-                    <div><span class="label">Invoice No:</span> <span class="value">${data.invoiceNumber}</span></div>
-                    <div><span class="label">Date:</span> <span class="value">${new Date().toLocaleString()}</span></div>
-                    <div><span class="label">Student Name:</span> <span class="value">${s.student_name}</span></div>
-                    <div><span class="label">Roll Number:</span> <span class="value">${s.roll_number}</span></div>
-                    <div><span class="label">Father's Name:</span> <span class="value">${s.father_name}</span></div>
-                    <div><span class="label">Phone:</span> <span class="value">${s.phone_number || 'N/A'}</span></div>
-                    <div><span class="label">Class & Session:</span> <span class="value">${s.class} (${s.session})</span></div>
-                </div>
-            </div>
-            <div class="section">
-                <div class="section-title"><i class="fas fa-coins"></i> FEE STRUCTURE</div>
-                <table><thead><tr><th>Description</th><th>Amount (₹)</th></tr></thead><tbody>${feeRows}</tbody></table>
-            </div>
-            <div class="section">
-                <div class="section-title"><i class="fas fa-credit-card"></i> PAYMENT DETAILS</div>
-                <table>
-                    <thead><tr><th>Description</th><th>Amount (₹)</th></tr></thead>
-                    <tbody>
-                        <tr><td>Total Fee</td><td style="text-align:right;">₹${Number(s.total_amount).toLocaleString()}/-</td></tr>
-                        <tr><td>Previous Payment</td><td style="text-align:right;">₹${Number(s.received_amount - data.paymentAmount).toLocaleString()}/-</td></tr>
-                        <tr style="background:#e8f0fe;"><td><strong>💰 Current Payment</strong></td><td style="text-align:right;"><strong style="color:#16a34a;">+ ₹${data.paymentAmount.toLocaleString()}/-</strong></td></tr>
-                        <tr style="background:#1b4f9b; color:white;"><td><strong>✅ Total Paid</strong></td><td style="text-align:right;"><strong>₹${Number(s.received_amount).toLocaleString()}/-</strong></td></tr>
-                        <tr><td>⏳ Remaining Due</td><td style="text-align:right;"><span style="color:#b91c1c; font-weight:700;">₹${Number(s.due_amount).toLocaleString()}/-</span></td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="status-box">
-                <p><i class="fas fa-check-circle" style="color:#16a34a;"></i> <strong>Payment Status:</strong> ${s.due_amount <= 0 ? 'FULLY PAID ✅' : 'PARTIAL PAID'}</p>
-                <p style="font-size:0.65rem;">Transaction ID: ${data.transactionId}</p>
-            </div>
-            <div class="signature-section">
-                <div class="signature-box"><div class="signature-line"></div><div class="signature-label">Authorized Signatory</div></div>
-                <div class="signature-box"><div class="signature-line"></div><div class="signature-label">Student/Parent Signature</div></div>
-            </div>
-            <div class="footer text-center mt-3"><p>✨ Thank you for timely payment! ✨</p><p>This is a computer generated invoice</p></div>
-        </div>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"><\/script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>
-        <script>
-            function downloadInvoicePDF() {
-                const { jsPDF } = window.jspdf;
-                const element = document.querySelector('.invoice-a4');
-                html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
-                    const imgData = canvas.toDataURL('image/png');
-                    const pdf = new jsPDF('p', 'mm', 'a4');
-                    const imgWidth = 190;
-                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                    pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-                    pdf.save('Invoice_${s.roll_number}_${s.student_name}.pdf');
-                });
+        let feeRows = '', subtotal = 0, discountAmount = 0;
+        if (s.discount_applied && s.discount_applied > 0) discountAmount = s.discount_applied;
+        else if (s.fee_breakdown && s.fee_breakdown.discount > 0) discountAmount = s.fee_breakdown.discount;
+        if (s.subjects && s.subjects.length > 0) { s.subjects.forEach(sub => { feeRows += `<tr><td style="font-weight:500;">${sub} (Subject Fee)</td><td style="text-align:right;">₹3,000/-</td></tr>`; subtotal += 3000; }); }
+        if (s.extra_fees && s.extra_fees.length > 0) { s.extra_fees.forEach(fee => { feeRows += `<tr><td style="font-weight:500;">${fee}</td><td style="text-align:right;">₹500/-</td></tr>`; subtotal += 500; }); }
+        if ((!s.subjects || s.subjects.length === 0) && s.fee_breakdown) {
+            const fb = s.fee_breakdown;
+            if (fb.type === 'checkbox_based') {
+                if (fb.tuition > 0) { feeRows += `<table><td style="font-weight:500;">Tuition Fee</td><td style="text-align:right;">₹${fb.tuition}/-</td></tr>`; subtotal += fb.tuition; }
+                if (fb.admission > 0) { feeRows += `<tr><td style="font-weight:500;">Admission Fee</td><td style="text-align:right;">₹${fb.admission}/-</td></tr>`; subtotal += fb.admission; }
+                if (fb.exam > 0) { feeRows += `<tr><td style="font-weight:500;">Exam Fee</td><td style="text-align:right;">₹${fb.exam}/-</td></tr>`; subtotal += fb.exam; }
+                if (fb.assignment > 0) { feeRows += `<tr><td style="font-weight:500;">Assignment Fee</td><td style="text-align:right;">₹${fb.assignment}/-</td></tr>`; subtotal += fb.assignment; }
+            } else if (fb.type === 'subject_based') {
+                if (fb.subjects && fb.subjects.length > 0) { fb.subjects.forEach(sub => { feeRows += `<tr><td style="font-weight:500;">${sub} (Subject Fee)</td><td style="text-align:right;">₹3,000/-</td></tr>`; subtotal += 3000; }); }
+                if (fb.admission_fee > 0) { feeRows += `<tr><td style="font-weight:500;">Admission Fee</td><td style="text-align:right;">₹${fb.admission_fee}/-</td></table>`; subtotal += fb.admission_fee; }
+                if (fb.exam_fee > 0) { feeRows += `<tr><td style="font-weight:500;">Exam Fee</td><td style="text-align:right;">₹${fb.exam_fee}/-</td></tr>`; subtotal += fb.exam_fee; }
+                if (fb.assignment_fee > 0) { feeRows += `<tr><td style="font-weight:500;">Assignment Fee</td><td style="text-align:right;">₹${fb.assignment_fee}/-</td></tr>`; subtotal += fb.assignment_fee; }
             }
-        <\/script>
-        </body>
-        </html>`;
+        }
+        if (feeRows === '') { feeRows = `<tr><td style="font-weight:500;">Total Fee</td><td style="text-align:right;">₹${Number(s.total_amount).toLocaleString()}/-</td></tr>`; subtotal = s.total_amount; }
+        if (discountAmount > 0) { feeRows += `<tr><td style="color:#b91c1c; font-weight:500;">🎁 Discount</td><td style="color:#b91c1c; text-align:right;">- ₹${discountAmount.toLocaleString()}/-</td></tr>`; }
+        const finalTotal = subtotal - discountAmount;
+        return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Invoice - ${s.student_name}</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"><style>@media print{.no-print{display:none;}}*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;}body{background:#f4f7fc;padding:20px;display:flex;justify-content:center;}.invoice-a4{max-width:1000px;width:100%;background:white;border-radius:12px;padding:20px;margin:0;}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #1b4f9b;padding-bottom:10px;}.logo{width:70px;height:70px;border-radius:50%;object-fit:cover;border:2px solid #1b4f9b;}.coaching-info h1{font-size:1.5rem;color:#1b4f9b;}.coaching-info p{margin:2px 0;color:#4a5568;font-size:0.75rem;}.title{font-size:1.2rem;font-weight:700;text-align:center;margin:10px 0;}.section{background:#f8faff;padding:10px;border-radius:8px;margin-bottom:8px;border-left:3px solid #1b4f9b;}.section-title{font-weight:700;color:#1b4f9b;margin-bottom:6px;}.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}.label{color:#4b5563;font-size:0.7rem;}.value{font-weight:600;font-size:0.75rem;}table{width:100%;border-collapse:collapse;margin:6px 0;font-size:0.7rem;}th,td{padding:5px;border:1px solid #e2e8f0;text-align:left;}th{background:#1b4f9b;color:white;}.status-box{background:#f0f9ff;padding:6px;border-radius:6px;margin:6px 0;border-left:3px solid #16a34a;}.terms{font-size:0.6rem;margin-top:8px;padding-top:6px;border-top:1px dashed #1b4f9b;}.terms p{margin:2px 0;line-height:1.3;}.signature-section{display:flex;justify-content:space-between;margin-top:12px;padding-top:8px;border-top:1px solid #e2e8f0;}.signature-box{text-align:center;width:180px;}.signature-line{margin-top:25px;border-top:1px solid #000;width:160px;margin:25px auto 0;}.btn-group{display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap;}.btn{padding:5px 14px;font-size:0.7rem;border:none;border-radius:50px;cursor:pointer;}.btn-primary{background:#1b4f9b;color:white;}.btn-success{background:#16a34a;color:white;}.btn-secondary{background:#6c757d;color:white;}</style></head><body><div class="invoice-a4"><div class="btn-group no-print"><button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Print</button><button class="btn btn-success" onclick="downloadInvoicePDF()"><i class="fas fa-download"></i> PDF</button><button class="btn btn-secondary" onclick="window.close()"><i class="fas fa-times"></i> Close</button></div><div class="header"><img src="${logoUrl}" class="logo" onerror="this.src='https://via.placeholder.com/70?text=Logo'"><div class="coaching-info"><h1>${c.name}</h1><p><i class="fas fa-map-marker-alt"></i> ${c.address}</p><p><i class="fas fa-phone"></i> ${c.phone} | <i class="fas fa-envelope"></i> ${c.email}</p><p><i class="fas fa-id-card"></i> MSME: ${c.msme}</p></div></div><h2 class="title"><i class="fas fa-file-invoice"></i> FEE PAYMENT INVOICE</h2><div class="section"><div class="section-title"><i class="fas fa-user-graduate"></i> STUDENT DETAILS</div><div class="grid-2"><div><span class="label">Invoice No:</span> <span class="value">${data.invoiceNumber}</span></div><div><span class="label">Date:</span> <span class="value">${new Date(data.date).toLocaleString()}</span></div><div><span class="label">Student Name:</span> <span class="value">${s.student_name}</span></div><div><span class="label">Roll Number:</span> <span class="value">${s.roll_number}</span></div><div><span class="label">Father's Name:</span> <span class="value">${s.father_name}</span></div><div><span class="label">Phone Number:</span> <span class="value">${s.phone_number || 'N/A'}</span></div><div><span class="label">Class & Session:</span> <span class="value">${s.class} (${s.session})</span></div></div></div><div class="section"><div class="section-title"><i class="fas fa-coins"></i> FEE STRUCTURE</div><table><thead><tr><th>Description</th><th>Amount (₹)</th></tr></thead><tbody>${feeRows}<tr class="total-row"><td><strong>💰 Total Fee</strong></td><td style="text-align:right;"><strong>₹${finalTotal.toLocaleString()}/-</strong></td></tr></tbody></table></div><div class="section"><div class="section-title"><i class="fas fa-credit-card"></i> PAYMENT DETAILS</div><table><thead><tr><th>Description</th><th>Amount (₹)</th></table></thead><tbody><tr><td>Total Fee</td><td style="text-align:right;">₹${Number(s.total_amount).toLocaleString()}/-</td></tr><tr><td>Previous Payment</td><td style="text-align:right;">₹${Number(s.received_amount - data.paymentAmount).toLocaleString()}/-</td></tr><tr style="background:#e8f0fe;"><td><strong>💰 Current Payment</strong></td><td style="text-align:right;"><strong style="color:#16a34a;">+ ₹${data.paymentAmount.toLocaleString()}/-</strong></td></tr><tr style="background:#1b4f9b; color:white;"><td><strong>✅ Total Paid</strong></td><td style="text-align:right;"><strong>₹${Number(s.received_amount).toLocaleString()}/-</strong></td></tr><tr><td>⏳ Remaining Due</td><td style="text-align:right;"><span style="color:#b91c1c; font-weight:700;">₹${Number(s.due_amount).toLocaleString()}/-</span></td></tr></tbody></div><div class="status-box"><p><i class="fas fa-check-circle" style="color:#16a34a;"></i> <strong>Payment Status:</strong> ${s.due_amount <= 0 ? 'FULLY PAID ✅' : 'PARTIAL PAID'}</p><p style="font-size:0.65rem;">Transaction ID: ${data.transactionId}</p></div><div class="terms"><strong><i class="fas fa-file-contract"></i> नियम एवं शर्तें:</strong>${TERMS_CONDITIONS_HINDI.map(t => `<p>• ${t}</p>`).join('')}</div><div class="signature-section"><div class="signature-box"><div class="signature-line"></div><div class="signature-label">Authorized Signatory</div></div><div class="signature-box"><div class="signature-line"></div><div class="signature-label">Student/Parent Signature</div></div></div><div class="footer text-center mt-3"><p>✨ Thank you for timely payment! ✨</p><p>This is a computer generated invoice</p></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"><\/script><script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script><script>function downloadInvoicePDF(){const {jsPDF}=window.jspdf;const element=document.querySelector('.invoice-a4');html2canvas(element,{scale:2,useCORS:true}).then(canvas=>{const imgData=canvas.toDataURL('image/png');const pdf=new jsPDF('p','mm','a4');const imgWidth=190;const imgHeight=(canvas.height*imgWidth)/canvas.width;pdf.addImage(imgData,'PNG',10,10,imgWidth,imgHeight);pdf.save('Invoice_${s.roll_number}_${s.student_name}.pdf');});}<\/script></body></html>`;
     }
 
     downloadPdfBtn.addEventListener('click', function() {
@@ -641,18 +401,10 @@
         if (classFilter.value !== 'All') filtered = filtered.filter(s => s.class === classFilter.value);
         const searchRoll = rollSearchInput.value.trim().toLowerCase();
         if (searchRoll) filtered = filtered.filter(s => (s.roll_number || '').toString().toLowerCase().includes(searchRoll));
-        
         let tableRows = '';
-        filtered.forEach((s, index) => {
-            const status = s.due_amount <= 0 ? 'PAID' : 'PENDING';
-            tableRows += `<tr><td>${index+1}</td><td>${s.roll_number}</td><td>${s.student_name}</td><td>${s.father_name}</td><td>${s.class}</td><td>₹${Number(s.total_amount).toLocaleString()}</td><td>₹${Number(s.received_amount).toLocaleString()}</td><td>₹${Number(s.due_amount).toLocaleString()}</td><td>${status}</td></tr>`;
-        });
-        
-        const printHtml = `<!DOCTYPE html><html><head><title>Fee Report</title><style>body{font-family:Arial;padding:20px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ddd;padding:8px;text-align:left;}th{background:#1b4f9b;color:white;}</style></head><body><h2>${COACHING_DETAILS.name}</h2><h3>Student Fee Report</h3><p>Session: ${sessionFilter.value} | Class: ${classFilter.value}</p><table><thead><tr><th>#</th><th>Roll</th><th>Student</th><th>Father</th><th>Class</th><th>Total</th><th>Received</th><th>Due</th><th>Status</th></tr></thead><tbody>${tableRows}</tbody></table><p>Generated on: ${new Date().toLocaleString()}</p></body></html>`;
-        const win = window.open();
-        win.document.write(printHtml);
-        win.document.close();
-        win.print();
+        filtered.forEach((s, index) => { tableRows += `<tr><td>${index+1}</td><td>${s.roll_number}</td><td>${s.student_name}</td><td>${s.father_name}</td><td>${s.class}</td><td>₹${Number(s.total_amount).toLocaleString()}</td><td>₹${Number(s.received_amount).toLocaleString()}</td><td>₹${Number(s.due_amount).toLocaleString()}</td><td>${s.due_amount <= 0 ? 'PAID' : 'PENDING'}</td>`; });
+        const printHtml = `<!DOCTYPE html><html><head><title>Fee Report</title><style>body{font-family:Arial;padding:20px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ddd;padding:8px;text-align:left;}th{background:#1b4f9b;color:white;}</style></head><body><h2>${COACHING_DETAILS.name}</h2><h3>Student Fee Report</h3><p>Session: ${sessionFilter.value} | Class: ${classFilter.value} | Total Students: ${filtered.length}</p><table><thead><tr><th>#</th><th>Roll</th><th>Student</th><th>Father</th><th>Class</th><th>Total</th><th>Received</th><th>Due</th><th>Status</th></tr></thead><tbody>${tableRows}</tbody></table><p>Generated on: ${new Date().toLocaleString()}</p><p>📞 For any query: ${COACHING_DETAILS.phone}</p></body></html>`;
+        const win = window.open(); win.document.write(printHtml); win.document.close(); win.print();
     });
 
     sessionFilter.addEventListener('change', renderTable);
