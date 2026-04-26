@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>➕ Add Student · Fee Manager</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <style>
         *{ margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Roboto,sans-serif; }
         body{ background:#f0f5fa; padding:24px 16px; display:flex; flex-direction:column; align-items:center; }
@@ -48,556 +52,622 @@
         .success-toast{ position:fixed; bottom:25px; left:50%; transform:translateX(-50%); background:#1e6f3f; color:white; padding:12px 28px; border-radius:60px; font-weight:600; z-index:1000; opacity:0; transition:opacity 0.2s; pointer-events:none; }
         .class-warning{ background:#fff3cd; border-left:4px solid #ffc107; padding:10px 15px; border-radius:12px; margin-bottom:15px; font-size:0.85rem; color:#856404; display:none; }
         hr{ margin:10px 0; }
+        
+        /* Auth Loading Screen */
+        .auth-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9999;
+        }
+        .auth-loading .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1b4f9b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .main-content {
+            display: none;
+        }
+        
         @media (max-width:650px){ .form-card{ padding:24px 18px; } .subjects-grid{ grid-template-columns:1fr; } }
     </style>
 </head>
 <body>
-<div class="form-card">
-    <h2>📋 Add New Student</h2>
-    
-    <div class="field">
-        <label>🔢 Roll Number</label>
-        <input type="text" id="rollNumber" placeholder="e.g. 24" required>
+    <!-- Auth Loading Screen -->
+    <div id="authLoading" class="auth-loading">
+        <div class="spinner"></div>
+        <p style="margin-top: 15px; color: #1b4f9b; font-weight: 600;">Verifying access...</p>
     </div>
-    <div class="field">
-        <label>🧑 Student Name</label>
-        <input type="text" id="studentName" placeholder="Full name" required>
-    </div>
-    <div class="field">
-        <label>👨 Father Name</label>
-        <input type="text" id="fatherName" placeholder="Father's name" required>
-    </div>
-    <div class="field">
-        <label>📞 Phone Number</label>
-        <input type="tel" id="phoneNumber" placeholder="e.g. 9876543210" pattern="[0-9]{10}" title="Please enter 10 digit mobile number">
-    </div>
-    <div class="row2">
+
+    <!-- Main Content -->
+    <div id="mainContent" class="main-content">
+    <div class="form-card">
+        <h2>📋 Add New Student</h2>
+        
         <div class="field">
-            <label>📅 Session</label>
-            <select id="sessionSelect">
-                <option value="2024-25">2024-25</option>
-                <option value="2025-26">2025-26</option>
-                <option value="2026-27" selected>2026-27</option>
-            </select>
+            <label>🔢 Roll Number</label>
+            <input type="text" id="rollNumber" placeholder="e.g. 24" required>
         </div>
         <div class="field">
-            <label>🏫 Class</label>
-            <select id="classSelect">
-                <option value="Class 6">Class 6</option>
-                <option value="Class 7">Class 7</option>
-                <option value="Class 8">Class 8</option>
-                <option value="Class 9">Class 9</option>
-                <option value="Class 10">Class 10</option>
-                <option value="Class 11">Class 11</option>
-                <option value="Class 12">Class 12</option>
-            </select>
+            <label>🧑 Student Name</label>
+            <input type="text" id="studentName" placeholder="Full name" required>
         </div>
+        <div class="field">
+            <label>👨 Father Name</label>
+            <input type="text" id="fatherName" placeholder="Father's name" required>
+        </div>
+        <div class="field">
+            <label>📞 Phone Number</label>
+            <input type="tel" id="phoneNumber" placeholder="e.g. 9876543210" pattern="[0-9]{10}" title="Please enter 10 digit mobile number">
+        </div>
+        <div class="row2">
+            <div class="field">
+                <label>📅 Session</label>
+                <select id="sessionSelect">
+                    <option value="2024-25">2024-25</option>
+                    <option value="2025-26">2025-26</option>
+                    <option value="2026-27" selected>2026-27</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>🏫 Class</label>
+                <select id="classSelect">
+                    <option value="Class 6">Class 6</option>
+                    <option value="Class 7">Class 7</option>
+                    <option value="Class 8">Class 8</option>
+                    <option value="Class 9">Class 9</option>
+                    <option value="Class 10">Class 10</option>
+                    <option value="Class 11">Class 11</option>
+                    <option value="Class 12">Class 12</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="classWarning" class="class-warning">⚠️ For Class 11 & 12, fee will be calculated based on selected subjects & charges below.</div>
+
+        <div id="dynamicFeeSection"></div>
+
+        <button class="btn-submit" id="addStudentBtn">➕ Add Student & Save to Firebase</button>
+        <div class="info-note">↩ <a href="dashboard.html">Back to dashboard</a></div>
+        <div id="loadingMessage" class="loading">⏳ Saving to Firebase...</div>
+        <div id="errorMessage" class="error-msg"></div>
+    </div>
+    <div id="successToast" class="success-toast">✅ Student added successfully!</div>
     </div>
 
-    <div id="classWarning" class="class-warning">⚠️ For Class 11 & 12, fee will be calculated based on selected subjects & charges below.</div>
-
-    <div id="dynamicFeeSection"></div>
-
-    <button class="btn-submit" id="addStudentBtn">➕ Add Student & Save to Firebase</button>
-    <div class="info-note">↩ <a href="dashboard.html">Back to dashboard</a></div>
-    <div id="loadingMessage" class="loading">⏳ Saving to Firebase...</div>
-    <div id="errorMessage" class="error-msg"></div>
-</div>
-<div id="successToast" class="success-toast">✅ Student added successfully!</div>
-
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
-        authDomain: "quest-coaching.firebaseapp.com",
-        databaseURL: "https://quest-coaching-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "quest-coaching",
-        storageBucket: "quest-coaching.firebasestorage.app",
-        messagingSenderId: "131948734089",
-        appId: "1:131948734089:web:f4ba25110c8b1298360858"
-    };
-    
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const feesCollection = db.collection('fees');
-    const transactionsCollection = db.collection('transactions');
-
-    const SUBJECTS = [
-        { name: "PHYSICS", price: 3000 },
-        { name: "CHEMISTRY", price: 3000 },
-        { name: "BIOLOGY", price: 3000 },
-        { name: "MATHS", price: 3000 },
-        { name: "HINDI", price: 3000 },
-        { name: "ENGLISH", price: 3000 }
-    ];
-    const EXTRA_FEES = [
-        { name: "ADMISSION FEE", price: 500 },
-        { name: "EXAM FEE (Half Yearly + Annual)", price: 500 },
-        { name: "ASSIGNMENT FEE", price: 500 }
-    ];
-
-    const getTuitionFee = (className) => {
-        if (className === 'Class 10') return 7200;
-        return 6000;
-    };
-
-    const BASE_FEES = {
-        tuition: { price: 0, label: "📚 Tuition Fee" },
-        admission: { price: 500, label: "📋 Admission Fee" },
-        exam: { price: 500, label: "📝 Exam Fee (Half Yearly + Annual)" },
-        assignment: { price: 500, label: "📖 Assignment Fee" }
-    };
-
-    const dynamicSection = document.getElementById('dynamicFeeSection');
-    const classSelect = document.getElementById('classSelect');
-    const classWarning = document.getElementById('classWarning');
-    const addBtn = document.getElementById('addStudentBtn');
-    const loadingMsg = document.getElementById('loadingMessage');
-    const errorDiv = document.getElementById('errorMessage');
-    const successToast = document.getElementById('successToast');
-    const rollInput = document.getElementById('rollNumber');
-    const nameInput = document.getElementById('studentName');
-    const fatherInput = document.getElementById('fatherName');
-    const phoneInput = document.getElementById('phoneNumber');
-    const sessionSelect = document.getElementById('sessionSelect');
-
-    let subjectCheckboxes = [];
-    let extraCheckboxes = [];
-    let advancedDiscountInput = null;
-    let advancedReceivedInput = null;
-    let advancedDueInput = null;
-    
-    let feeCheckboxes = {};
-    let discountInput = null;
-    let receivedInput = null;
-    let dueInput = null;
-    let currentTuitionFee = 6000;
-    let currentMode = 'simple';
-
-    let toastTimeout;
-    function showToast(message) {
-        successToast.textContent = message;
-        successToast.style.opacity = '1';
-        if (toastTimeout) clearTimeout(toastTimeout);
-        toastTimeout = setTimeout(() => { successToast.style.opacity = '0'; }, 2500);
-    }
-
-    function showError(message) {
-        errorDiv.textContent = message;
-        errorDiv.style.display = 'block';
-        setTimeout(() => { errorDiv.style.display = 'none'; }, 4000);
-    }
-
-    function calculateAdvancedTotal() {
-        let total = 0;
-        subjectCheckboxes.forEach(checkbox => {
-            if (checkbox.checked) total += parseInt(checkbox.getAttribute('data-price')) || 0;
-        });
-        extraCheckboxes.forEach(checkbox => {
-            if (checkbox.checked) total += parseInt(checkbox.getAttribute('data-price')) || 0;
-        });
-        let discount = 0;
-        if (advancedDiscountInput) discount = parseFloat(advancedDiscountInput.value) || 0;
-        total = Math.max(0, total - discount);
-        return total;
-    }
-
-    function calculateCheckboxTotal() {
-        let total = 0;
-        if (feeCheckboxes.tuition && feeCheckboxes.tuition.checked) total += currentTuitionFee;
-        if (feeCheckboxes.admission && feeCheckboxes.admission.checked) total += BASE_FEES.admission.price;
-        if (feeCheckboxes.exam && feeCheckboxes.exam.checked) total += BASE_FEES.exam.price;
-        if (feeCheckboxes.assignment && feeCheckboxes.assignment.checked) total += BASE_FEES.assignment.price;
-        let discount = 0;
-        if (discountInput) discount = parseFloat(discountInput.value) || 0;
-        total = Math.max(0, total - discount);
-        return total;
-    }
-
-    function updateDue() {
-        let total = 0;
-        let received = 0;
-        
-        if (currentMode === 'advanced') {
-            total = calculateAdvancedTotal();
-            const totalSpan = document.getElementById('advancedTotalAmount');
-            if (totalSpan) totalSpan.innerText = total;
-            received = advancedReceivedInput ? (parseFloat(advancedReceivedInput.value) || 0) : 0;
-            if (advancedDueInput) advancedDueInput.value = Math.max(0, total - received);
-        } else if (currentMode === 'checkbox') {
-            total = calculateCheckboxTotal();
-            const totalSpan = document.getElementById('checkboxTotalAmount');
-            if (totalSpan) totalSpan.innerText = total;
-            received = receivedInput ? (parseFloat(receivedInput.value) || 0) : 0;
-            if (dueInput) dueInput.value = Math.max(0, total - received);
-        }
-    }
-
-    function renderCheckboxMode(className) {
-        currentMode = 'checkbox';
-        currentTuitionFee = getTuitionFee(className);
-        
-        dynamicSection.innerHTML = `
-            <div class="checkbox-fees-box">
-                <div class="section-title" style="margin-bottom:15px;">💰 Select Fees Components</div>
-                
-                <div class="fee-checkbox-item">
-                    <input type="checkbox" id="fee_tuition" checked>
-                    <label for="fee_tuition">${BASE_FEES.tuition.label}</label>
-                    <span class="fee-price">₹${currentTuitionFee}/-</span>
-                </div>
-                
-                <div class="fee-checkbox-item">
-                    <input type="checkbox" id="fee_admission" checked>
-                    <label for="fee_admission">${BASE_FEES.admission.label}</label>
-                    <span class="fee-price">₹${BASE_FEES.admission.price}/-</span>
-                </div>
-                
-                <div class="fee-checkbox-item">
-                    <input type="checkbox" id="fee_exam" checked>
-                    <label for="fee_exam">${BASE_FEES.exam.label}</label>
-                    <span class="fee-price">₹${BASE_FEES.exam.price}/-</span>
-                </div>
-                
-                <div class="fee-checkbox-item">
-                    <input type="checkbox" id="fee_assignment" checked>
-                    <label for="fee_assignment">${BASE_FEES.assignment.label}</label>
-                    <span class="fee-price">₹${BASE_FEES.assignment.price}/-</span>
-                </div>
-                
-                <div class="discount-box">
-                    <label style="font-weight:600; margin-bottom:8px; display:block;">🎁 Discount (₹)</label>
-                    <input type="number" id="discountAmount" value="0" min="0" step="1" placeholder="Enter discount amount" style="width:100%; padding:10px 15px; border-radius:40px; border:1px solid #ffe2a4; background:white;">
-                </div>
-                
-                <div class="total-box" style="margin-top:20px;">
-                    <span class="total-label">💰 Total Fees:</span>
-                    <span class="total-amount" id="checkboxTotalAmount">0</span>
-                </div>
-                
-                <div class="field" style="margin-top:15px;">
-                    <label>💵 Received Amount (₹)</label>
-                    <input type="number" id="receivedAmountCheckbox" value="0" min="0" step="1">
-                </div>
-                <div class="field">
-                    <label>⏳ Due Amount (Auto)</label>
-                    <input type="number" id="dueAmountCheckbox" class="due-highlight" readonly value="0">
-                </div>
-            </div>
-        `;
-        
-        feeCheckboxes = {
-            tuition: document.getElementById('fee_tuition'),
-            admission: document.getElementById('fee_admission'),
-            exam: document.getElementById('fee_exam'),
-            assignment: document.getElementById('fee_assignment')
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
+            authDomain: "quest-coaching.firebaseapp.com",
+            databaseURL: "https://quest-coaching-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "quest-coaching",
+            storageBucket: "quest-coaching.firebasestorage.app",
+            messagingSenderId: "131948734089",
+            appId: "1:131948734089:web:f4ba25110c8b1298360858"
         };
         
-        discountInput = document.getElementById('discountAmount');
-        receivedInput = document.getElementById('receivedAmountCheckbox');
-        dueInput = document.getElementById('dueAmountCheckbox');
-        
-        Object.values(feeCheckboxes).forEach(cb => {
-            if (cb) cb.addEventListener('change', updateDue);
-        });
-        if (discountInput) discountInput.addEventListener('input', updateDue);
-        if (receivedInput) receivedInput.addEventListener('input', updateDue);
-        
-        updateDue();
-    }
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        const feesCollection = db.collection('fees');
+        const transactionsCollection = db.collection('transactions');
 
-    function renderAdvancedMode() {
-        currentMode = 'advanced';
-        dynamicSection.innerHTML = `
-            <div class="fees-section">
-                <div class="section-title">📖 Subjects (₹3000 each)</div>
-                <div class="subjects-grid" id="subjectsGrid"></div>
-                <div class="section-title" style="margin-top:6px;">📌 Additional Charges</div>
-                <div class="extra-charges" id="extraChargesContainer"></div>
-                
-                <div class="discount-box" style="margin-top:15px;">
-                    <label style="font-weight:600; margin-bottom:8px; display:block;">🎁 Discount (₹)</label>
-                    <input type="number" id="advancedDiscountAmount" value="0" min="0" step="1" placeholder="Enter discount amount" style="width:100%; padding:10px 15px; border-radius:40px; border:1px solid #ffe2a4; background:white;">
-                </div>
-                
-                <div class="total-box">
-                    <span class="total-label">💰 Total Fees (Auto-Calculated):</span>
-                    <span class="total-amount" id="advancedTotalAmount">0</span>
-                </div>
-                <div class="field" style="margin-top:5px;">
-                    <label>💵 Received Amount (₹)</label>
-                    <input type="number" id="receivedAmountAdvanced" value="0" min="0" step="1">
-                </div>
-                <div class="field">
-                    <label>⏳ Due Amount (Auto)</label>
-                    <input type="number" id="dueAmountAdvanced" class="due-highlight" readonly value="0">
-                </div>
-            </div>
-        `;
+        // DOM Elements for Auth
+        const authLoading = document.getElementById('authLoading');
+        const mainContent = document.getElementById('mainContent');
         
-        const subjectsGrid = document.getElementById('subjectsGrid');
-        subjectCheckboxes = [];
-        SUBJECTS.forEach(sub => {
-            const div = document.createElement('div');
-            div.className = 'subject-item';
-            const cb = document.createElement('input');
-            cb.type = 'checkbox';
-            cb.id = `sub_${sub.name}`;
-            cb.setAttribute('data-price', sub.price);
-            cb.addEventListener('change', updateDue);
-            const label = document.createElement('label');
-            label.htmlFor = `sub_${sub.name}`;
-            label.innerText = sub.name;
-            const priceSpan = document.createElement('span');
-            priceSpan.className = 'subject-price';
-            priceSpan.innerText = `₹${sub.price}`;
-            div.appendChild(cb);
-            div.appendChild(label);
-            div.appendChild(priceSpan);
-            subjectsGrid.appendChild(div);
-            subjectCheckboxes.push(cb);
-        });
-        
-        const extraContainer = document.getElementById('extraChargesContainer');
-        extraCheckboxes = [];
-        EXTRA_FEES.forEach(extra => {
-            const div = document.createElement('div');
-            div.className = 'extra-item';
-            const cb = document.createElement('input');
-            cb.type = 'checkbox';
-            cb.id = `extra_${extra.name.replace(/\s/g, '_')}`;
-            cb.setAttribute('data-price', extra.price);
-            cb.addEventListener('change', updateDue);
-            const label = document.createElement('label');
-            label.htmlFor = cb.id;
-            label.innerText = extra.name;
-            const priceSpan = document.createElement('span');
-            priceSpan.style.fontWeight = 'bold';
-            priceSpan.style.marginLeft = '6px';
-            priceSpan.innerText = `(+₹${extra.price})`;
-            div.appendChild(cb);
-            div.appendChild(label);
-            div.appendChild(priceSpan);
-            extraContainer.appendChild(div);
-            extraCheckboxes.push(cb);
-        });
-        
-        advancedDiscountInput = document.getElementById('advancedDiscountAmount');
-        advancedReceivedInput = document.getElementById('receivedAmountAdvanced');
-        advancedDueInput = document.getElementById('dueAmountAdvanced');
-        
-        if (advancedDiscountInput) advancedDiscountInput.addEventListener('input', updateDue);
-        if (advancedReceivedInput) advancedReceivedInput.addEventListener('input', updateDue);
-        
-        updateDue();
-    }
-
-    function getSelectedSubjects() {
-        if (currentMode !== 'advanced') return [];
-        const selected = [];
-        subjectCheckboxes.forEach((cb, idx) => {
-            if (cb.checked) selected.push(SUBJECTS[idx].name);
-        });
-        return selected;
-    }
-
-    function getSelectedExtraFees() {
-        if (currentMode !== 'advanced') return [];
-        const selected = [];
-        extraCheckboxes.forEach((cb, idx) => {
-            if (cb.checked) selected.push(EXTRA_FEES[idx].name);
-        });
-        return selected;
-    }
-
-    function getTotalAmount() {
-        if (currentMode === 'advanced') {
-            return calculateAdvancedTotal();
-        } else if (currentMode === 'checkbox') {
-            return calculateCheckboxTotal();
-        }
-        return 0;
-    }
-
-    function getReceivedAmount() {
-        if (currentMode === 'advanced') {
-            return advancedReceivedInput ? (parseFloat(advancedReceivedInput.value) || 0) : 0;
-        } else if (currentMode === 'checkbox') {
-            return receivedInput ? (parseFloat(receivedInput.value) || 0) : 0;
-        }
-        return 0;
-    }
-
-    function getDiscountAmount() {
-        if (currentMode === 'advanced') {
-            return advancedDiscountInput ? (parseFloat(advancedDiscountInput.value) || 0) : 0;
-        } else if (currentMode === 'checkbox') {
-            return discountInput ? (parseFloat(discountInput.value) || 0) : 0;
-        }
-        return 0;
-    }
-
-    function getFeeBreakdown() {
-        if (currentMode === 'advanced') {
-            const subjectsTotal = getSelectedSubjects().length * 3000;
-            const extraTotal = (extraCheckboxes[0]?.checked ? 500 : 0) + 
-                              (extraCheckboxes[1]?.checked ? 500 : 0) + 
-                              (extraCheckboxes[2]?.checked ? 500 : 0);
-            const subtotal = subjectsTotal + extraTotal;
-            const discount = getDiscountAmount();
-            
-            return {
-                type: 'subject_based',
-                subjects: getSelectedSubjects(),
-                subjects_total: subjectsTotal,
-                admission_fee: extraCheckboxes[0]?.checked ? 500 : 0,
-                exam_fee: extraCheckboxes[1]?.checked ? 500 : 0,
-                assignment_fee: extraCheckboxes[2]?.checked ? 500 : 0,
-                subtotal: subtotal,
-                discount: discount,
-                total: Math.max(0, subtotal - discount)
-            };
-        } else if (currentMode === 'checkbox') {
-            let breakdown = {
-                type: 'checkbox_based',
-                tuition: feeCheckboxes.tuition?.checked ? currentTuitionFee : 0,
-                admission: feeCheckboxes.admission?.checked ? BASE_FEES.admission.price : 0,
-                exam: feeCheckboxes.exam?.checked ? BASE_FEES.exam.price : 0,
-                assignment: feeCheckboxes.assignment?.checked ? BASE_FEES.assignment.price : 0,
-                discount: getDiscountAmount()
-            };
-            breakdown.subtotal = breakdown.tuition + breakdown.admission + breakdown.exam + breakdown.assignment;
-            breakdown.total = Math.max(0, breakdown.subtotal - breakdown.discount);
-            return breakdown;
-        }
-        return {};
-    }
-
-    function resetForm() {
-        rollInput.value = '';
-        nameInput.value = '';
-        fatherInput.value = '';
-        phoneInput.value = '';
-        
-        if (currentMode === 'advanced') {
-            subjectCheckboxes.forEach(cb => cb.checked = false);
-            extraCheckboxes.forEach(cb => cb.checked = false);
-            if (advancedDiscountInput) advancedDiscountInput.value = '0';
-            if (advancedReceivedInput) advancedReceivedInput.value = '0';
-        } else if (currentMode === 'checkbox') {
-            if (feeCheckboxes.tuition) feeCheckboxes.tuition.checked = true;
-            if (feeCheckboxes.admission) feeCheckboxes.admission.checked = true;
-            if (feeCheckboxes.exam) feeCheckboxes.exam.checked = true;
-            if (feeCheckboxes.assignment) feeCheckboxes.assignment.checked = true;
-            if (discountInput) discountInput.value = '0';
-            if (receivedInput) receivedInput.value = '0';
-        }
-        
-        updateDue();
-        rollInput.focus();
-    }
-
-    function onClassChange() {
-        const selectedClass = classSelect.value;
-        
-        if (selectedClass === 'Class 11' || selectedClass === 'Class 12') {
-            classWarning.style.display = 'block';
-            renderAdvancedMode();
-        } else {
-            classWarning.style.display = 'none';
-            renderCheckboxMode(selectedClass);
-        }
-    }
-
-    addBtn.addEventListener('click', async function() {
-        errorDiv.style.display = 'none';
-        
-        const roll = rollInput.value.trim();
-        const name = nameInput.value.trim();
-        const father = fatherInput.value.trim();
-        const phone = phoneInput.value.trim();
-        const session = sessionSelect.value;
-        const classVal = classSelect.value;
-        
-        if (!roll || !name || !father) {
-            showError('❌ Please fill Roll Number, Student Name and Father Name');
-            return;
-        }
-        
-        const totalAmount = getTotalAmount();
-        const receivedAmount = getReceivedAmount();
-        const dueAmount = Math.max(0, totalAmount - receivedAmount);
-        
-        let studentData = {
-            roll_number: roll,
-            student_name: name,
-            father_name: father,
-            phone_number: phone || '',
-            class: classVal,
-            session: session,
-            total_amount: totalAmount,
-            received_amount: receivedAmount,
-            due_amount: dueAmount,
-            discount_applied: getDiscountAmount(),
-            fee_breakdown: getFeeBreakdown(),
-            created_at: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        
-        if (currentMode === 'advanced') {
-            studentData.subjects = getSelectedSubjects();
-            studentData.extra_fees = getSelectedExtraFees();
-        }
-        
-        loadingMsg.style.display = 'block';
-        addBtn.disabled = true;
-        
-        try {
-            const docRef = await feesCollection.add(studentData);
-            const studentId = docRef.id;
-            
-            if (receivedAmount > 0) {
-                const transactionId = 'TXN' + Date.now() + Math.floor(Math.random() * 10000);
-                const transactionData = {
-                    studentId: studentId,
-                    studentName: name,
-                    rollNumber: roll,
-                    studentClass: classVal,
-                    session: session,
-                    amount: receivedAmount,
-                    previousReceived: 0,
-                    newReceived: receivedAmount,
-                    previousDue: totalAmount,
-                    newDue: dueAmount,
-                    transactionId: transactionId,
-                    date: new Date().toISOString(),
-                    created_at: firebase.firestore.FieldValue.serverTimestamp(),
-                    note: `Initial admission payment of ₹${receivedAmount}`
-                };
-                await transactionsCollection.add(transactionData);
-                console.log("Initial transaction saved:", transactionId);
+        // ============ AUTHENTICATION CHECK ============
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                // Not logged in - redirect to index
+                alert('Please login from main page first!');
+                window.location.href = 'index.html';
+                return;
             }
             
-            showToast(`✅ ${name} added successfully! (Total: ₹${totalAmount}, Paid: ₹${receivedAmount})`);
-            resetForm();
-        } catch (error) {
-            console.error("Firestore error:", error);
-            showError(`❌ Save failed: ${error.message}`);
-        } finally {
-            loadingMsg.style.display = 'none';
-            addBtn.disabled = false;
+            // User is logged in - show content
+            authLoading.style.display = 'none';
+            mainContent.style.display = 'block';
+            
+            // Add logout button
+            const logoutBtn = document.createElement('button');
+            logoutBtn.innerHTML = '🚪 Logout';
+            logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            logoutBtn.onclick = async () => {
+                await auth.signOut();
+                window.location.href = 'index.html';
+            };
+            document.body.appendChild(logoutBtn);
+        });
+
+        const SUBJECTS = [
+            { name: "PHYSICS", price: 3000 },
+            { name: "CHEMISTRY", price: 3000 },
+            { name: "BIOLOGY", price: 3000 },
+            { name: "MATHS", price: 3000 },
+            { name: "HINDI", price: 3000 },
+            { name: "ENGLISH", price: 3000 }
+        ];
+        const EXTRA_FEES = [
+            { name: "ADMISSION FEE", price: 500 },
+            { name: "EXAM FEE (Half Yearly + Annual)", price: 500 },
+            { name: "ASSIGNMENT FEE", price: 500 }
+        ];
+
+        const getTuitionFee = (className) => {
+            if (className === 'Class 10') return 7200;
+            return 6000;
+        };
+
+        const BASE_FEES = {
+            tuition: { price: 0, label: "📚 Tuition Fee" },
+            admission: { price: 500, label: "📋 Admission Fee" },
+            exam: { price: 500, label: "📝 Exam Fee (Half Yearly + Annual)" },
+            assignment: { price: 500, label: "📖 Assignment Fee" }
+        };
+
+        const dynamicSection = document.getElementById('dynamicFeeSection');
+        const classSelect = document.getElementById('classSelect');
+        const classWarning = document.getElementById('classWarning');
+        const addBtn = document.getElementById('addStudentBtn');
+        const loadingMsg = document.getElementById('loadingMessage');
+        const errorDiv = document.getElementById('errorMessage');
+        const successToast = document.getElementById('successToast');
+        const rollInput = document.getElementById('rollNumber');
+        const nameInput = document.getElementById('studentName');
+        const fatherInput = document.getElementById('fatherName');
+        const phoneInput = document.getElementById('phoneNumber');
+        const sessionSelect = document.getElementById('sessionSelect');
+
+        let subjectCheckboxes = [];
+        let extraCheckboxes = [];
+        let advancedDiscountInput = null;
+        let advancedReceivedInput = null;
+        let advancedDueInput = null;
+        
+        let feeCheckboxes = {};
+        let discountInput = null;
+        let receivedInput = null;
+        let dueInput = null;
+        let currentTuitionFee = 6000;
+        let currentMode = 'simple';
+
+        let toastTimeout;
+        function showToast(message) {
+            successToast.textContent = message;
+            successToast.style.opacity = '1';
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => { successToast.style.opacity = '0'; }, 2500);
         }
-    });
-    
-    classSelect.addEventListener('change', onClassChange);
-    onClassChange();
-    
-    const fields = ['rollNumber', 'studentName', 'fatherName', 'phoneNumber'];
-    fields.forEach(id => {
-        const el = document.getElementById(id);
-        if(el) el.addEventListener('keypress', (e) => { if(e.key === 'Enter') addBtn.click(); });
-    });
-</script>
+
+        function showError(message) {
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => { errorDiv.style.display = 'none'; }, 4000);
+        }
+
+        function calculateAdvancedTotal() {
+            let total = 0;
+            subjectCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) total += parseInt(checkbox.getAttribute('data-price')) || 0;
+            });
+            extraCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) total += parseInt(checkbox.getAttribute('data-price')) || 0;
+            });
+            let discount = 0;
+            if (advancedDiscountInput) discount = parseFloat(advancedDiscountInput.value) || 0;
+            total = Math.max(0, total - discount);
+            return total;
+        }
+
+        function calculateCheckboxTotal() {
+            let total = 0;
+            if (feeCheckboxes.tuition && feeCheckboxes.tuition.checked) total += currentTuitionFee;
+            if (feeCheckboxes.admission && feeCheckboxes.admission.checked) total += BASE_FEES.admission.price;
+            if (feeCheckboxes.exam && feeCheckboxes.exam.checked) total += BASE_FEES.exam.price;
+            if (feeCheckboxes.assignment && feeCheckboxes.assignment.checked) total += BASE_FEES.assignment.price;
+            let discount = 0;
+            if (discountInput) discount = parseFloat(discountInput.value) || 0;
+            total = Math.max(0, total - discount);
+            return total;
+        }
+
+        function updateDue() {
+            let total = 0;
+            let received = 0;
+            
+            if (currentMode === 'advanced') {
+                total = calculateAdvancedTotal();
+                const totalSpan = document.getElementById('advancedTotalAmount');
+                if (totalSpan) totalSpan.innerText = total;
+                received = advancedReceivedInput ? (parseFloat(advancedReceivedInput.value) || 0) : 0;
+                if (advancedDueInput) advancedDueInput.value = Math.max(0, total - received);
+            } else if (currentMode === 'checkbox') {
+                total = calculateCheckboxTotal();
+                const totalSpan = document.getElementById('checkboxTotalAmount');
+                if (totalSpan) totalSpan.innerText = total;
+                received = receivedInput ? (parseFloat(receivedInput.value) || 0) : 0;
+                if (dueInput) dueInput.value = Math.max(0, total - received);
+            }
+        }
+
+        function renderCheckboxMode(className) {
+            currentMode = 'checkbox';
+            currentTuitionFee = getTuitionFee(className);
+            
+            dynamicSection.innerHTML = `
+                <div class="checkbox-fees-box">
+                    <div class="section-title" style="margin-bottom:15px;">💰 Select Fees Components</div>
+                    
+                    <div class="fee-checkbox-item">
+                        <input type="checkbox" id="fee_tuition" checked>
+                        <label for="fee_tuition">${BASE_FEES.tuition.label}</label>
+                        <span class="fee-price">₹${currentTuitionFee}/-</span>
+                    </div>
+                    
+                    <div class="fee-checkbox-item">
+                        <input type="checkbox" id="fee_admission" checked>
+                        <label for="fee_admission">${BASE_FEES.admission.label}</label>
+                        <span class="fee-price">₹${BASE_FEES.admission.price}/-</span>
+                    </div>
+                    
+                    <div class="fee-checkbox-item">
+                        <input type="checkbox" id="fee_exam" checked>
+                        <label for="fee_exam">${BASE_FEES.exam.label}</label>
+                        <span class="fee-price">₹${BASE_FEES.exam.price}/-</span>
+                    </div>
+                    
+                    <div class="fee-checkbox-item">
+                        <input type="checkbox" id="fee_assignment" checked>
+                        <label for="fee_assignment">${BASE_FEES.assignment.label}</label>
+                        <span class="fee-price">₹${BASE_FEES.assignment.price}/-</span>
+                    </div>
+                    
+                    <div class="discount-box">
+                        <label style="font-weight:600; margin-bottom:8px; display:block;">🎁 Discount (₹)</label>
+                        <input type="number" id="discountAmount" value="0" min="0" step="1" placeholder="Enter discount amount" style="width:100%; padding:10px 15px; border-radius:40px; border:1px solid #ffe2a4; background:white;">
+                    </div>
+                    
+                    <div class="total-box" style="margin-top:20px;">
+                        <span class="total-label">💰 Total Fees:</span>
+                        <span class="total-amount" id="checkboxTotalAmount">0</span>
+                    </div>
+                    
+                    <div class="field" style="margin-top:15px;">
+                        <label>💵 Received Amount (₹)</label>
+                        <input type="number" id="receivedAmountCheckbox" value="0" min="0" step="1">
+                    </div>
+                    <div class="field">
+                        <label>⏳ Due Amount (Auto)</label>
+                        <input type="number" id="dueAmountCheckbox" class="due-highlight" readonly value="0">
+                    </div>
+                </div>
+            `;
+            
+            feeCheckboxes = {
+                tuition: document.getElementById('fee_tuition'),
+                admission: document.getElementById('fee_admission'),
+                exam: document.getElementById('fee_exam'),
+                assignment: document.getElementById('fee_assignment')
+            };
+            
+            discountInput = document.getElementById('discountAmount');
+            receivedInput = document.getElementById('receivedAmountCheckbox');
+            dueInput = document.getElementById('dueAmountCheckbox');
+            
+            Object.values(feeCheckboxes).forEach(cb => {
+                if (cb) cb.addEventListener('change', updateDue);
+            });
+            if (discountInput) discountInput.addEventListener('input', updateDue);
+            if (receivedInput) receivedInput.addEventListener('input', updateDue);
+            
+            updateDue();
+        }
+
+        function renderAdvancedMode() {
+            currentMode = 'advanced';
+            dynamicSection.innerHTML = `
+                <div class="fees-section">
+                    <div class="section-title">📖 Subjects (₹3000 each)</div>
+                    <div class="subjects-grid" id="subjectsGrid"></div>
+                    <div class="section-title" style="margin-top:6px;">📌 Additional Charges</div>
+                    <div class="extra-charges" id="extraChargesContainer"></div>
+                    
+                    <div class="discount-box" style="margin-top:15px;">
+                        <label style="font-weight:600; margin-bottom:8px; display:block;">🎁 Discount (₹)</label>
+                        <input type="number" id="advancedDiscountAmount" value="0" min="0" step="1" placeholder="Enter discount amount" style="width:100%; padding:10px 15px; border-radius:40px; border:1px solid #ffe2a4; background:white;">
+                    </div>
+                    
+                    <div class="total-box">
+                        <span class="total-label">💰 Total Fees (Auto-Calculated):</span>
+                        <span class="total-amount" id="advancedTotalAmount">0</span>
+                    </div>
+                    <div class="field" style="margin-top:5px;">
+                        <label>💵 Received Amount (₹)</label>
+                        <input type="number" id="receivedAmountAdvanced" value="0" min="0" step="1">
+                    </div>
+                    <div class="field">
+                        <label>⏳ Due Amount (Auto)</label>
+                        <input type="number" id="dueAmountAdvanced" class="due-highlight" readonly value="0">
+                    </div>
+                </div>
+            `;
+            
+            const subjectsGrid = document.getElementById('subjectsGrid');
+            subjectCheckboxes = [];
+            SUBJECTS.forEach(sub => {
+                const div = document.createElement('div');
+                div.className = 'subject-item';
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.id = `sub_${sub.name}`;
+                cb.setAttribute('data-price', sub.price);
+                cb.addEventListener('change', updateDue);
+                const label = document.createElement('label');
+                label.htmlFor = `sub_${sub.name}`;
+                label.innerText = sub.name;
+                const priceSpan = document.createElement('span');
+                priceSpan.className = 'subject-price';
+                priceSpan.innerText = `₹${sub.price}`;
+                div.appendChild(cb);
+                div.appendChild(label);
+                div.appendChild(priceSpan);
+                subjectsGrid.appendChild(div);
+                subjectCheckboxes.push(cb);
+            });
+            
+            const extraContainer = document.getElementById('extraChargesContainer');
+            extraCheckboxes = [];
+            EXTRA_FEES.forEach(extra => {
+                const div = document.createElement('div');
+                div.className = 'extra-item';
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.id = `extra_${extra.name.replace(/\s/g, '_')}`;
+                cb.setAttribute('data-price', extra.price);
+                cb.addEventListener('change', updateDue);
+                const label = document.createElement('label');
+                label.htmlFor = cb.id;
+                label.innerText = extra.name;
+                const priceSpan = document.createElement('span');
+                priceSpan.style.fontWeight = 'bold';
+                priceSpan.style.marginLeft = '6px';
+                priceSpan.innerText = `(+₹${extra.price})`;
+                div.appendChild(cb);
+                div.appendChild(label);
+                div.appendChild(priceSpan);
+                extraContainer.appendChild(div);
+                extraCheckboxes.push(cb);
+            });
+            
+            advancedDiscountInput = document.getElementById('advancedDiscountAmount');
+            advancedReceivedInput = document.getElementById('receivedAmountAdvanced');
+            advancedDueInput = document.getElementById('dueAmountAdvanced');
+            
+            if (advancedDiscountInput) advancedDiscountInput.addEventListener('input', updateDue);
+            if (advancedReceivedInput) advancedReceivedInput.addEventListener('input', updateDue);
+            
+            updateDue();
+        }
+
+        function getSelectedSubjects() {
+            if (currentMode !== 'advanced') return [];
+            const selected = [];
+            subjectCheckboxes.forEach((cb, idx) => {
+                if (cb.checked) selected.push(SUBJECTS[idx].name);
+            });
+            return selected;
+        }
+
+        function getSelectedExtraFees() {
+            if (currentMode !== 'advanced') return [];
+            const selected = [];
+            extraCheckboxes.forEach((cb, idx) => {
+                if (cb.checked) selected.push(EXTRA_FEES[idx].name);
+            });
+            return selected;
+        }
+
+        function getTotalAmount() {
+            if (currentMode === 'advanced') {
+                return calculateAdvancedTotal();
+            } else if (currentMode === 'checkbox') {
+                return calculateCheckboxTotal();
+            }
+            return 0;
+        }
+
+        function getReceivedAmount() {
+            if (currentMode === 'advanced') {
+                return advancedReceivedInput ? (parseFloat(advancedReceivedInput.value) || 0) : 0;
+            } else if (currentMode === 'checkbox') {
+                return receivedInput ? (parseFloat(receivedInput.value) || 0) : 0;
+            }
+            return 0;
+        }
+
+        function getDiscountAmount() {
+            if (currentMode === 'advanced') {
+                return advancedDiscountInput ? (parseFloat(advancedDiscountInput.value) || 0) : 0;
+            } else if (currentMode === 'checkbox') {
+                return discountInput ? (parseFloat(discountInput.value) || 0) : 0;
+            }
+            return 0;
+        }
+
+        function getFeeBreakdown() {
+            if (currentMode === 'advanced') {
+                const subjectsTotal = getSelectedSubjects().length * 3000;
+                const extraTotal = (extraCheckboxes[0]?.checked ? 500 : 0) + 
+                                  (extraCheckboxes[1]?.checked ? 500 : 0) + 
+                                  (extraCheckboxes[2]?.checked ? 500 : 0);
+                const subtotal = subjectsTotal + extraTotal;
+                const discount = getDiscountAmount();
+                
+                return {
+                    type: 'subject_based',
+                    subjects: getSelectedSubjects(),
+                    subjects_total: subjectsTotal,
+                    admission_fee: extraCheckboxes[0]?.checked ? 500 : 0,
+                    exam_fee: extraCheckboxes[1]?.checked ? 500 : 0,
+                    assignment_fee: extraCheckboxes[2]?.checked ? 500 : 0,
+                    subtotal: subtotal,
+                    discount: discount,
+                    total: Math.max(0, subtotal - discount)
+                };
+            } else if (currentMode === 'checkbox') {
+                let breakdown = {
+                    type: 'checkbox_based',
+                    tuition: feeCheckboxes.tuition?.checked ? currentTuitionFee : 0,
+                    admission: feeCheckboxes.admission?.checked ? BASE_FEES.admission.price : 0,
+                    exam: feeCheckboxes.exam?.checked ? BASE_FEES.exam.price : 0,
+                    assignment: feeCheckboxes.assignment?.checked ? BASE_FEES.assignment.price : 0,
+                    discount: getDiscountAmount()
+                };
+                breakdown.subtotal = breakdown.tuition + breakdown.admission + breakdown.exam + breakdown.assignment;
+                breakdown.total = Math.max(0, breakdown.subtotal - breakdown.discount);
+                return breakdown;
+            }
+            return {};
+        }
+
+        function resetForm() {
+            rollInput.value = '';
+            nameInput.value = '';
+            fatherInput.value = '';
+            phoneInput.value = '';
+            
+            if (currentMode === 'advanced') {
+                subjectCheckboxes.forEach(cb => cb.checked = false);
+                extraCheckboxes.forEach(cb => cb.checked = false);
+                if (advancedDiscountInput) advancedDiscountInput.value = '0';
+                if (advancedReceivedInput) advancedReceivedInput.value = '0';
+            } else if (currentMode === 'checkbox') {
+                if (feeCheckboxes.tuition) feeCheckboxes.tuition.checked = true;
+                if (feeCheckboxes.admission) feeCheckboxes.admission.checked = true;
+                if (feeCheckboxes.exam) feeCheckboxes.exam.checked = true;
+                if (feeCheckboxes.assignment) feeCheckboxes.assignment.checked = true;
+                if (discountInput) discountInput.value = '0';
+                if (receivedInput) receivedInput.value = '0';
+            }
+            
+            updateDue();
+            rollInput.focus();
+        }
+
+        function onClassChange() {
+            const selectedClass = classSelect.value;
+            
+            if (selectedClass === 'Class 11' || selectedClass === 'Class 12') {
+                classWarning.style.display = 'block';
+                renderAdvancedMode();
+            } else {
+                classWarning.style.display = 'none';
+                renderCheckboxMode(selectedClass);
+            }
+        }
+
+        addBtn.addEventListener('click', async function() {
+            errorDiv.style.display = 'none';
+            
+            const roll = rollInput.value.trim();
+            const name = nameInput.value.trim();
+            const father = fatherInput.value.trim();
+            const phone = phoneInput.value.trim();
+            const session = sessionSelect.value;
+            const classVal = classSelect.value;
+            
+            if (!roll || !name || !father) {
+                showError('❌ Please fill Roll Number, Student Name and Father Name');
+                return;
+            }
+            
+            const totalAmount = getTotalAmount();
+            const receivedAmount = getReceivedAmount();
+            const dueAmount = Math.max(0, totalAmount - receivedAmount);
+            
+            let studentData = {
+                roll_number: roll,
+                student_name: name,
+                father_name: father,
+                phone_number: phone || '',
+                class: classVal,
+                session: session,
+                total_amount: totalAmount,
+                received_amount: receivedAmount,
+                due_amount: dueAmount,
+                discount_applied: getDiscountAmount(),
+                fee_breakdown: getFeeBreakdown(),
+                created_at: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            if (currentMode === 'advanced') {
+                studentData.subjects = getSelectedSubjects();
+                studentData.extra_fees = getSelectedExtraFees();
+            }
+            
+            loadingMsg.style.display = 'block';
+            addBtn.disabled = true;
+            
+            try {
+                const docRef = await feesCollection.add(studentData);
+                const studentId = docRef.id;
+                
+                if (receivedAmount > 0) {
+                    const transactionId = 'TXN' + Date.now() + Math.floor(Math.random() * 10000);
+                    const transactionData = {
+                        studentId: studentId,
+                        studentName: name,
+                        rollNumber: roll,
+                        studentClass: classVal,
+                        session: session,
+                        amount: receivedAmount,
+                        previousReceived: 0,
+                        newReceived: receivedAmount,
+                        previousDue: totalAmount,
+                        newDue: dueAmount,
+                        transactionId: transactionId,
+                        date: new Date().toISOString(),
+                        created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                        note: `Initial admission payment of ₹${receivedAmount}`
+                    };
+                    await transactionsCollection.add(transactionData);
+                    console.log("Initial transaction saved:", transactionId);
+                }
+                
+                showToast(`✅ ${name} added successfully! (Total: ₹${totalAmount}, Paid: ₹${receivedAmount})`);
+                resetForm();
+            } catch (error) {
+                console.error("Firestore error:", error);
+                showError(`❌ Save failed: ${error.message}`);
+            } finally {
+                loadingMsg.style.display = 'none';
+                addBtn.disabled = false;
+            }
+        });
+        
+        classSelect.addEventListener('change', onClassChange);
+        onClassChange();
+        
+        const fields = ['rollNumber', 'studentName', 'fatherName', 'phoneNumber'];
+        fields.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.addEventListener('keypress', (e) => { if(e.key === 'Enter') addBtn.click(); });
+        });
+    </script>
 </body>
 </html>
