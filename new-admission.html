@@ -234,6 +234,7 @@
         .action-btn.pdf { background: #dc2626; color: white; }
         .action-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         
+        /* ============ ADMISSION CARD STYLES (Exactly same as before) ============ */
         :root {
             --primary: #1a3a5c;
             --primary-dark: #0f2b44;
@@ -330,7 +331,7 @@
         }
         
         @media print {
-            .no-print, .action-buttons-card, .header-bar, .back-btn, .btn-submit, .btn-update, .mode-badge { display: none !important; }
+            .no-print, .action-buttons-card, .header-bar, .back-btn { display: none !important; }
             .admission-card { box-shadow: none; margin: 0; max-width: 100%; }
             body { background: white; padding: 0; }
             .terms-list { grid-template-columns: 1fr 1fr; }
@@ -350,12 +351,13 @@
                 <h1>🏫 Quest कोचिंग सेंटर</h1>
                 <p>search for knowledge | Under MR. RAVI SIR</p>
             </div>
-            <button class="back-btn" onclick="goBack()">
+            <button class="back-btn" id="backButton" onclick="goBack()">
                 <i class="fas fa-arrow-left"></i> Back
             </button>
         </div>
         
-        <div class="form-card">
+        <!-- Form Section (Only shown in NEW or EDIT mode) -->
+        <div id="formSection" class="form-card" style="display: none;">
             <h2 style="color: #1e3a5f; margin-bottom: 20px;">
                 <i class="fas fa-user-plus"></i> Student Admission Form
                 <span id="modeBadge" class="mode-badge"></span>
@@ -439,6 +441,9 @@
                 <div id="submitButtonContainer"></div>
             </form>
         </div>
+        
+        <!-- Card Section (Only shown in VIEW mode) -->
+        <div id="cardSection" style="display: none;"></div>
     </div>
     </div>
 
@@ -502,20 +507,17 @@
     let currentStudentData = null;
     let existingPhotoUrl = null;
     
-    const modeBadge = document.getElementById('modeBadge');
-    if (mode === 'view') {
-        modeBadge.textContent = '🔍 VIEW MODE (Read Only)';
-        modeBadge.className = 'mode-badge mode-view';
-    } else if (mode === 'edit') {
-        modeBadge.textContent = '✏️ EDIT MODE';
-        modeBadge.className = 'mode-badge mode-edit';
-    } else {
-        modeBadge.textContent = '📝 NEW ADMISSION';
-        modeBadge.className = 'mode-badge mode-new';
-    }
-    
     const authLoading = document.getElementById('authLoading');
     const mainContent = document.getElementById('mainContent');
+    const formSection = document.getElementById('formSection');
+    const cardSection = document.getElementById('cardSection');
+    const backButton = document.getElementById('backButton');
+    const modeBadge = document.getElementById('modeBadge');
+    
+    // Set back button destination
+    function goBack() {
+        window.location.href = 'manage-students.html';
+    }
     
     auth.onAuthStateChanged((user) => {
         if (!user) {
@@ -537,15 +539,47 @@
         logoutBtn.onclick = async () => { await auth.signOut(); window.location.href = 'index.html'; };
         document.body.appendChild(logoutBtn);
         
-        if ((mode === 'view' || mode === 'edit') && studentId) {
-            loadStudentData(studentId);
+        if (mode === 'view' && studentId) {
+            // VIEW MODE - Only show the admission card, not the form
+            modeBadge.textContent = '🔍 VIEW MODE (Read Only)';
+            modeBadge.className = 'mode-badge mode-view';
+            formSection.style.display = 'none';
+            cardSection.style.display = 'block';
+            loadAndDisplayCard(studentId);
+        } else if (mode === 'edit' && studentId) {
+            // EDIT MODE - Show form with auto-filled data
+            modeBadge.textContent = '✏️ EDIT MODE';
+            modeBadge.className = 'mode-badge mode-edit';
+            formSection.style.display = 'block';
+            cardSection.style.display = 'none';
+            loadStudentForEdit(studentId);
         } else {
+            // NEW MODE - Show blank form
+            modeBadge.textContent = '📝 NEW ADMISSION';
+            modeBadge.className = 'mode-badge mode-new';
+            formSection.style.display = 'block';
+            cardSection.style.display = 'none';
             setupNewMode();
             document.getElementById('admissionForm').addEventListener('submit', submitNewAdmission);
         }
     });
     
-    async function loadStudentData(id) {
+    async function loadAndDisplayCard(id) {
+        try {
+            const doc = await admissionsCollection.doc(id).get();
+            if (!doc.exists) {
+                Swal.fire('Error', 'Student not found!', 'error').then(() => { goBack(); });
+                return;
+            }
+            currentStudentData = { id: doc.id, ...doc.data() };
+            displayAdmissionCard(currentStudentData, currentStudentData.photoUrl);
+        } catch (error) {
+            console.error('Error loading student:', error);
+            Swal.fire('Error', 'Failed to load student data', 'error');
+        }
+    }
+    
+    async function loadStudentForEdit(id) {
         try {
             const doc = await admissionsCollection.doc(id).get();
             if (!doc.exists) {
@@ -555,13 +589,7 @@
             currentStudentData = { id: doc.id, ...doc.data() };
             existingPhotoUrl = currentStudentData.photoUrl;
             fillFormWithData(currentStudentData);
-            
-            if (mode === 'view') {
-                makeFormReadOnly();
-                displayAdmissionCard(currentStudentData, existingPhotoUrl);
-            } else if (mode === 'edit') {
-                setupEditMode();
-            }
+            setupEditMode();
         } catch (error) {
             console.error('Error loading student:', error);
             Swal.fire('Error', 'Failed to load student data', 'error');
@@ -603,24 +631,6 @@
         }
     }
     
-    function makeFormReadOnly() {
-        const inputs = document.querySelectorAll('input, select, textarea, .radio-group input, .checkbox-group input');
-        inputs.forEach(input => { input.disabled = true; input.classList.add('readonly-field'); });
-        document.getElementById('declaration').disabled = true;
-        document.getElementById('photoUploadBox').style.pointerEvents = 'none';
-        document.getElementById('photoUploadBox').style.opacity = '0.7';
-        
-        const container = document.getElementById('submitButtonContainer');
-        container.innerHTML = `
-            <div class="action-buttons-card">
-                <button class="action-btn print" onclick="printAdmissionCard()"><i class="fas fa-print"></i> Print Form</button>
-                <button class="action-btn share" onclick="shareAdmissionCard()"><i class="fas fa-share-alt"></i> Share</button>
-                <button class="action-btn pdf" onclick="downloadAdmissionPDF()"><i class="fas fa-file-pdf"></i> Download PDF</button>
-                <button class="action-btn" style="background:#1b4f9b; color:white;" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back</button>
-            </div>
-        `;
-    }
-    
     function setupEditMode() {
         const container = document.getElementById('submitButtonContainer');
         container.innerHTML = `<button type="submit" class="btn-submit btn-update" id="updateStudentBtn"><i class="fas fa-save"></i> Update Student</button>`;
@@ -635,6 +645,7 @@
     function setupNewMode() {
         const container = document.getElementById('submitButtonContainer');
         container.innerHTML = `<button type="submit" class="btn-submit" id="submitBtn"><i class="fas fa-save"></i> Submit Admission</button>`;
+        document.getElementById('declarationDate').value = new Date().toLocaleDateString('en-IN');
     }
     
     function getFormData() {
@@ -687,10 +698,6 @@
         setTimeout(() => div.innerHTML = '', 4000);
     }
     
-    function goBack() {
-        window.location.href = 'manage-students.html';
-    }
-    
     document.getElementById('declarationDate').value = new Date().toLocaleDateString('en-IN');
     
     const photoBox = document.getElementById('photoUploadBox');
@@ -698,7 +705,7 @@
     const photoPreview = document.getElementById('photoPreview');
     const photoPlaceholder = document.getElementById('photoPlaceholder');
     
-    photoBox.addEventListener('click', () => { if (mode !== 'view') photoInput.click(); });
+    photoBox.addEventListener('click', () => { photoInput.click(); });
     photoInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -914,7 +921,7 @@
                         <div class="detail-title">PARENT INFORMATION</div>
                         <div class="detail-content"><table class="detail-table">
                             <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td></tr>
-                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}<tr></tr>
+                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td></tr>
                             <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td></tr>
                             <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td></tr>
                         </table></div>
@@ -923,7 +930,7 @@
                 <div class="details-section">
                     <div class="detail-box">
                         <div class="detail-title">ADDRESS DETAILS</div>
-                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td></tr></td></div>
+                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td></tr></table></div>
                     </div>
                     <div class="detail-box">
                         <div class="detail-title">EDUCATION DETAILS</div>
@@ -950,14 +957,8 @@
             </div>
         `;
         
-        Swal.fire({
-            title: 'Student Admission Form',
-            html: cardHtml,
-            showConfirmButton: false,
-            showCloseButton: true,
-            width: '1150px',
-            padding: '0'
-        });
+        cardSection.innerHTML = cardHtml;
+        cardSection.style.display = 'block';
         
         setTimeout(() => {
             const verifyText = `Verified Admission: ${studentData.admissionNo}\nStudent: ${studentData.studentName}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}`;
