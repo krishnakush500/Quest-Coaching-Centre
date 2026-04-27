@@ -514,7 +514,6 @@
     const backButton = document.getElementById('backButton');
     const modeBadge = document.getElementById('modeBadge');
     
-    // Set back button destination
     function goBack() {
         window.location.href = 'manage-students.html';
     }
@@ -540,21 +539,18 @@
         document.body.appendChild(logoutBtn);
         
         if (mode === 'view' && studentId) {
-            // VIEW MODE - Only show the admission card, not the form
             modeBadge.textContent = '🔍 VIEW MODE (Read Only)';
             modeBadge.className = 'mode-badge mode-view';
             formSection.style.display = 'none';
             cardSection.style.display = 'block';
             loadAndDisplayCard(studentId);
         } else if (mode === 'edit' && studentId) {
-            // EDIT MODE - Show form with auto-filled data
             modeBadge.textContent = '✏️ EDIT MODE';
             modeBadge.className = 'mode-badge mode-edit';
             formSection.style.display = 'block';
             cardSection.style.display = 'none';
             loadStudentForEdit(studentId);
         } else {
-            // NEW MODE - Show blank form
             modeBadge.textContent = '📝 NEW ADMISSION';
             modeBadge.className = 'mode-badge mode-new';
             formSection.style.display = 'block';
@@ -865,6 +861,133 @@
         }
     }
     
+    // PDF Download URL for QR Code
+    let currentPdfBlobUrl = null;
+    
+    async function generatePdfBlobUrl(studentData, photoUrl) {
+        // Create a temporary div to render the card for PDF
+        const tempDiv = document.createElement('div');
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.left = '-9999px';
+        tempDiv.style.top = '-9999px';
+        tempDiv.style.width = '1100px';
+        document.body.appendChild(tempDiv);
+        
+        const admDate = new Date(studentData.admissionDate);
+        const dobDate = new Date(studentData.dob);
+        
+        let termsHtml = `
+            <ul class="terms-col">
+                ${TERMS_LEFT.map((term, i) => `<li><strong>${i+1}.</strong> ${term}</li>`).join('')}
+            </ul>
+            <ul class="terms-col">
+                ${TERMS_RIGHT.map((term, i) => `<li><strong>${i+12}.</strong> ${term}</li>`).join('')}
+            </ul>
+        `;
+        
+        tempDiv.innerHTML = `
+            <div id="pdfCard" class="admission-card">
+                <div class="card-header">
+                    <div class="logo-center">
+                        <div class="logo-img-card"><img src="${LOGO_URL}" alt="Logo"></div>
+                        <div class="institution-name">
+                            <h1>QUEST COACHING CENTRE</h1>
+                            <div class="tagline">|| SEARCH FOR KNOWLEDGE ||</div>
+                            <div class="under">Under the guidance of MR. RAVI SIR</div>
+                        </div>
+                        <div class="contact-strip-card">
+                            <div class="contact-item-card"><i class="fas fa-map-marker-alt"></i> Block More, Gopalganj - 841428</div>
+                            <div class="contact-item-card"><i class="fas fa-phone-alt"></i> +91 9708442525</div>
+                            <div class="contact-item-card"><i class="fas fa-envelope"></i> questcoachingcentre@gmail.com</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="title-banner"><h2>🎓 ADMISSION FORM 🎓</h2></div>
+                <div class="top-row">
+                    <div class="photo-card"><img src="${photoUrl}" alt="Photo"></div>
+                    <div class="info-group">
+                        <div class="info-row"><span class="info-label">ADMISSION NO.</span><span class="info-value adm-no">${studentData.admissionNo}</span></div>
+                        <div class="info-row"><span class="info-label">ADMISSION DATE</span><span class="info-value">${admDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
+                        <div class="info-row"><span class="info-label">ACADEMIC SESSION</span><span class="info-value">${studentData.session}</span></div>
+                        <div class="info-row"><span class="info-label">CLASS APPLYING</span><span class="info-value">${studentData.classApplying}</span></div>
+                    </div>
+                    <div class="qr-card"><div class="qr-box" style="background:white; padding:10px; border:2px solid #c5a059; border-radius:16px;"><div id="pdfQrCode"></div></div><div class="qr-label-card">SCAN TO VERIFY</div></div>
+                </div>
+                <div class="details-section">
+                    <div class="detail-box">
+                        <div class="detail-title">PERSONAL DETAILS</div>
+                        <div class="detail-content"><table class="detail-table">
+                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td></tr>
+                            <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
+                            <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td></tr>
+                            <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td></tr>
+                            <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td></tr>
+                        </table></div>
+                    </div>
+                    <div class="detail-box">
+                        <div class="detail-title">PARENT INFORMATION</div>
+                        <div class="detail-content"><table class="detail-table">
+                            <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td></tr>
+                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td></tr>
+                            <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td></tr>
+                            <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td></tr>
+                        </table></div>
+                    </div>
+                </div>
+                <div class="details-section">
+                    <div class="detail-box">
+                        <div class="detail-title">ADDRESS DETAILS</div>
+                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td></tr></table></div>
+                    </div>
+                    <div class="detail-box">
+                        <div class="detail-title">EDUCATION DETAILS</div>
+                        <div class="detail-content"><table class="detail-table">
+                            <tr><td style="width:38%;">Previous School</td><td>${studentData.schoolName}</td></tr>
+                            <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td></tr>
+                        </table></div>
+                    </div>
+                </div>
+                <div class="terms-section"><div class="terms-box"><div class="terms-title">📜 नियम और शर्तें (Terms & Conditions)</div><div class="terms-list">${termsHtml}</div></div></div>
+                <div class="quote-card"><span class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</span><span class="quote-author">- Albert Einstein</span></div>
+                <div class="signatures-section">
+                    <div class="sig-card"><div class="sig-line">Parent / Guardian Signature</div></div>
+                    <div class="seal-card"><span>QUEST<br>COACHING<br>CENTRE</span><span class="seal-text">SEAL & SIGNATURE<br>OF DIRECTOR</span></div>
+                    <div class="sig-card"><div class="sig-line">Student Signature</div></div>
+                </div>
+                <div class="card-footer"><p>★ THANK YOU FOR CHOOSING QUEST COACHING CENTRE ★</p></div>
+            </div>
+        `;
+        
+        // Wait for images to load
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const element = tempDiv.querySelector('#pdfCard');
+        const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgWidth = 190;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+        const pdfBlob = pdf.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        
+        // Clean up
+        document.body.removeChild(tempDiv);
+        
+        return pdfUrl;
+    }
+    
+    async function generateAndSavePdf(studentData, photoUrl) {
+        const pdfUrl = await generatePdfBlobUrl(studentData, photoUrl);
+        const link = document.createElement('a');
+        link.href = pdfUrl;
+        link.download = `Admission_Form_${studentData.admissionNo}_${studentData.studentName}.pdf`;
+        link.click();
+        URL.revokeObjectURL(pdfUrl);
+        Swal.fire('Downloaded!', 'PDF downloaded successfully', 'success');
+    }
+    
     function displayAdmissionCard(studentData, photoUrl) {
         const admDate = new Date(studentData.admissionDate);
         const dobDate = new Date(studentData.dob);
@@ -904,7 +1027,7 @@
                         <div class="info-row"><span class="info-label">ACADEMIC SESSION</span><span class="info-value">${studentData.session}</span></div>
                         <div class="info-row"><span class="info-label">CLASS APPLYING</span><span class="info-value">${studentData.classApplying}</span></div>
                     </div>
-                    <div class="qr-card"><div class="qr-box"><div id="qrcode-view"></div></div><div class="qr-label-card">SCAN TO VERIFY</div></div>
+                    <div class="qr-card"><div class="qr-box" style="background:white; padding:10px; border:2px solid #c5a059; border-radius:16px;"><div id="qrcode-view"></div></div><div class="qr-label-card">SCAN TO VERIFY</div></div>
                 </div>
                 <div class="details-section">
                     <div class="detail-box">
@@ -952,7 +1075,7 @@
             <div class="action-buttons-card">
                 <button class="action-btn print" onclick="printAdmissionCardView()"><i class="fas fa-print"></i> Print Form</button>
                 <button class="action-btn share" onclick="shareAdmissionCardView()"><i class="fas fa-share-alt"></i> Share</button>
-                <button class="action-btn pdf" onclick="downloadAdmissionPDFView()"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                <button class="action-btn pdf" onclick="downloadAdmissionFromCard()"><i class="fas fa-file-pdf"></i> Download PDF</button>
                 <button class="action-btn" style="background:#1b4f9b; color:white;" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back</button>
             </div>
         `;
@@ -960,10 +1083,9 @@
         cardSection.innerHTML = cardHtml;
         cardSection.style.display = 'block';
         
-        setTimeout(() => {
-            const verifyText = `Verified Admission: ${studentData.admissionNo}\nStudent: ${studentData.studentName}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}`;
-            new QRCode(document.getElementById("qrcode-view"), { text: verifyText, width: 85, height: 85 });
-        }, 200);
+        // Generate QR Code that opens PDF download page
+        const pdfDownloadUrl = `https://${window.location.host}${window.location.pathname}?mode=pdf&id=${studentData.id}`;
+        new QRCode(document.getElementById("qrcode-view"), { text: pdfDownloadUrl, width: 85, height: 85 });
         
         window.printAdmissionCardView = () => {
             const printContent = document.getElementById('admissionCard').cloneNode(true);
@@ -979,17 +1101,8 @@
             else { navigator.clipboard.writeText(text); Swal.fire('Copied!', 'Details copied to clipboard', 'success'); }
         };
         
-        window.downloadAdmissionPDFView = async () => {
-            const element = document.getElementById('admissionCard');
-            const canvas = await html2canvas(element, { scale: 2, useCORS: true });
-            const imgData = canvas.toDataURL('image/png');
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const imgWidth = 190;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-            pdf.save(`Admission_Form_${studentData.admissionNo}_${studentData.studentName}.pdf`);
-            Swal.fire('Downloaded!', 'PDF downloaded successfully', 'success');
+        window.downloadAdmissionFromCard = async () => {
+            await generateAndSavePdf(studentData, photoUrl);
         };
     }
     </script>
