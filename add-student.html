@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>➕ Add Student · Fee Manager</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <style>
         *{ margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Roboto,sans-serif; }
         body{ background:#f0f5fa; padding:24px 16px; display:flex; flex-direction:column; align-items:center; }
@@ -48,67 +52,104 @@
         .success-toast{ position:fixed; bottom:25px; left:50%; transform:translateX(-50%); background:#1e6f3f; color:white; padding:12px 28px; border-radius:60px; font-weight:600; z-index:1000; opacity:0; transition:opacity 0.2s; pointer-events:none; }
         .class-warning{ background:#fff3cd; border-left:4px solid #ffc107; padding:10px 15px; border-radius:12px; margin-bottom:15px; font-size:0.85rem; color:#856404; display:none; }
         hr{ margin:10px 0; }
+        
+        /* Auth Loading Screen */
+        .auth-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 10000;
+        }
+        .auth-loading .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1b4f9b;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .main-content {
+            display: none;
+        }
+        
         @media (max-width:650px){ .form-card{ padding:24px 18px; } .subjects-grid{ grid-template-columns:1fr; } }
     </style>
 </head>
 <body>
-<div class="form-card">
-    <h2>📋 Add New Student</h2>
-    
-    <div class="field">
-        <label>🔢 Roll Number</label>
-        <input type="text" id="rollNumber" placeholder="e.g. 24" required>
+    <!-- Auth Loading Screen -->
+    <div id="authLoading" class="auth-loading">
+        <div class="spinner"></div>
+        <p style="margin-top: 15px; color: #1b4f9b; font-weight: 600;">Verifying access...</p>
     </div>
-    <div class="field">
-        <label>🧑 Student Name</label>
-        <input type="text" id="studentName" placeholder="Full name" required>
-    </div>
-    <div class="field">
-        <label>👨 Father Name</label>
-        <input type="text" id="fatherName" placeholder="Father's name" required>
-    </div>
-    <div class="field">
-        <label>📞 Phone Number</label>
-        <input type="tel" id="phoneNumber" placeholder="e.g. 9876543210" pattern="[0-9]{10}" title="Please enter 10 digit mobile number">
-    </div>
-    <div class="row2">
+
+    <!-- Main Content -->
+    <div id="mainContent" class="main-content">
+    <div class="form-card">
+        <h2>📋 Add New Student</h2>
+        
         <div class="field">
-            <label>📅 Session</label>
-            <select id="sessionSelect">
-                <option value="2024-25">2024-25</option>
-                <option value="2025-26">2025-26</option>
-                <option value="2026-27" selected>2026-27</option>
-            </select>
+            <label>🔢 Roll Number</label>
+            <input type="text" id="rollNumber" placeholder="e.g. 24" required>
         </div>
         <div class="field">
-            <label>🏫 Class</label>
-            <select id="classSelect">
-                <option value="Class 6">Class 6</option>
-                <option value="Class 7">Class 7</option>
-                <option value="Class 8">Class 8</option>
-                <option value="Class 9">Class 9</option>
-                <option value="Class 10">Class 10</option>
-                <option value="Class 11">Class 11</option>
-                <option value="Class 12">Class 12</option>
-            </select>
+            <label>🧑 Student Name</label>
+            <input type="text" id="studentName" placeholder="Full name" required>
         </div>
+        <div class="field">
+            <label>👨 Father Name</label>
+            <input type="text" id="fatherName" placeholder="Father's name" required>
+        </div>
+        <div class="field">
+            <label>📞 Phone Number</label>
+            <input type="tel" id="phoneNumber" placeholder="e.g. 9876543210" pattern="[0-9]{10}" title="Please enter 10 digit mobile number">
+        </div>
+        <div class="row2">
+            <div class="field">
+                <label>📅 Session</label>
+                <select id="sessionSelect">
+                    <option value="2024-25">2024-25</option>
+                    <option value="2025-26">2025-26</option>
+                    <option value="2026-27" selected>2026-27</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>🏫 Class</label>
+                <select id="classSelect">
+                    <option value="Class 6">Class 6</option>
+                    <option value="Class 7">Class 7</option>
+                    <option value="Class 8">Class 8</option>
+                    <option value="Class 9">Class 9</option>
+                    <option value="Class 10">Class 10</option>
+                    <option value="Class 11">Class 11</option>
+                    <option value="Class 12">Class 12</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="classWarning" class="class-warning">⚠️ For Class 11 & 12, fee will be calculated based on selected subjects & charges below.</div>
+
+        <div id="dynamicFeeSection"></div>
+
+        <button class="btn-submit" id="addStudentBtn">➕ Add Student & Save to Firebase</button>
+        <div class="info-note">↩ <a href="dashboard.html">Back to dashboard</a></div>
+        <div id="loadingMessage" class="loading">⏳ Saving to Firebase...</div>
+        <div id="errorMessage" class="error-msg"></div>
+    </div>
+    <div id="successToast" class="success-toast">✅ Student added successfully!</div>
     </div>
 
-    <div id="classWarning" class="class-warning">⚠️ For Class 11 & 12, fee will be calculated based on selected subjects & charges below.</div>
-
-    <div id="dynamicFeeSection"></div>
-
-    <button class="btn-submit" id="addStudentBtn">➕ Add Student & Save to Firebase</button>
-    <div class="info-note">↩ <a href="dashboard.html">Back to dashboard</a></div>
-    <div id="loadingMessage" class="loading">⏳ Saving to Firebase...</div>
-    <div id="errorMessage" class="error-msg"></div>
-</div>
-<div id="successToast" class="success-toast">✅ Student added successfully!</div>
-
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
-<script>
+    <script>
     const firebaseConfig = {
         apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
         authDomain: "quest-coaching.firebaseapp.com",
@@ -121,8 +162,35 @@
     
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+    const auth = firebase.auth();
     const feesCollection = db.collection('fees');
     const transactionsCollection = db.collection('transactions');
+
+    // Auth Elements
+    const authLoading = document.getElementById('authLoading');
+    const mainContent = document.getElementById('mainContent');
+
+    // ============ AUTHENTICATION CHECK ============
+    auth.onAuthStateChanged((user) => {
+        if (!user) {
+            alert('Please login from main page first!');
+            window.location.href = 'index.html';
+            return;
+        }
+        
+        authLoading.style.display = 'none';
+        mainContent.style.display = 'block';
+        
+        // Add logout button
+        const logoutBtn = document.createElement('button');
+        logoutBtn.innerHTML = '🚪 Logout';
+        logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+        logoutBtn.onclick = async () => {
+            await auth.signOut();
+            window.location.href = 'index.html';
+        };
+        document.body.appendChild(logoutBtn);
+    });
 
     const SUBJECTS = [
         { name: "PHYSICS", price: 3000 },
@@ -598,6 +666,6 @@
         const el = document.getElementById(id);
         if(el) el.addEventListener('keypress', (e) => { if(e.key === 'Enter') addBtn.click(); });
     });
-</script>
+    </script>
 </body>
 </html>
