@@ -300,159 +300,6 @@
             display: none;
         }
         
-        /* Admission Card Styles */
-        .admission-card {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-            font-family: 'Segoe UI', Roboto, sans-serif;
-        }
-        .card-header {
-            background: linear-gradient(135deg, #1e3a5f, #0f2b44);
-            color: white;
-            padding: 25px 30px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .logo-img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #f5a623;
-        }
-        .header-text {
-            flex: 1;
-        }
-        .header-text h1 {
-            font-size: 1.8rem;
-            margin-bottom: 5px;
-            letter-spacing: 1px;
-        }
-        .header-text p {
-            font-size: 0.85rem;
-            opacity: 0.9;
-        }
-        .admission-badge {
-            background: #f5a623;
-            color: #1e3a5f;
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: 800;
-            font-size: 0.9rem;
-        }
-        
-        .card-body {
-            padding: 30px;
-        }
-        
-        .photo-section-details {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 25px;
-        }
-        .student-photo-card {
-            width: 130px;
-            height: 130px;
-            border-radius: 16px;
-            object-fit: cover;
-            border: 4px solid #f5a623;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        
-        .info-section {
-            background: #f8fafc;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .info-section-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #1e3a5f;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #f5a623;
-            display: inline-block;
-        }
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-        .info-item {
-            display: flex;
-            align-items: baseline;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 8px 0;
-            border-bottom: 1px dashed #e2e8f0;
-        }
-        .info-label {
-            font-weight: 700;
-            color: #1e3a5f;
-            min-width: 130px;
-            font-size: 0.85rem;
-        }
-        .info-value {
-            color: #334155;
-            font-size: 0.85rem;
-            flex: 1;
-        }
-        
-        .signature-section-card {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 2px dashed #e2e8f0;
-        }
-        .signature-box-card {
-            text-align: center;
-            width: 45%;
-        }
-        .signature-line-card {
-            border-top: 1.5px solid #000;
-            width: 100%;
-            margin-top: 30px;
-        }
-        .signature-label-card {
-            font-size: 0.7rem;
-            color: #64748b;
-            margin-top: 8px;
-        }
-        
-        .btn-group-card {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            padding: 20px;
-            background: #f1f5f9;
-            border-top: 1px solid #e2e8f0;
-            flex-wrap: wrap;
-        }
-        .btn-card {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.2s;
-            font-size: 0.85rem;
-        }
-        .btn-print { background: #1b4f9b; color: white; }
-        .btn-share { background: #16a34a; color: white; }
-        .btn-pdf { background: #dc2626; color: white; }
-        .btn-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        
         @media (max-width: 700px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -469,24 +316,6 @@
             }
             .photo-section {
                 justify-content: center;
-            }
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-            .card-header {
-                flex-direction: column;
-                text-align: center;
-            }
-            .signature-section-card {
-                flex-direction: column;
-                align-items: center;
-                gap: 20px;
-            }
-            .signature-box-card {
-                width: 80%;
-            }
-            .btn-group-card {
-                flex-direction: column;
             }
         }
     </style>
@@ -606,8 +435,7 @@
     const firebaseConfig = {
         apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
         authDomain: "quest-coaching.firebaseapp.com",
-        projectId: "quest-coaching",
-        storageBucket: "quest-coaching.firebasestorage.app"
+        projectId: "quest-coaching"
     };
     
     firebase.initializeApp(firebaseConfig);
@@ -619,7 +447,6 @@
     const SUPABASE_ANON_KEY = 'sb_publishable_6a_9nxKSSLUZMmSGleyycg_kQ4a4BtI';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const STORAGE_BUCKET = 'student_photos';
-    const LOGO_URL = 'https://i.ibb.co/hF9tmnpB/20250903-202922.jpg';
     
     const authLoading = document.getElementById('authLoading');
     const mainContent = document.getElementById('mainContent');
@@ -733,129 +560,265 @@
         setTimeout(() => div.innerHTML = '', 4000);
     }
     
+    // ============ NEW DISPLAY ADMISSION CARD FUNCTION (A4 STYLE) ============
     function displayAdmissionCard(studentData, photoUrl) {
-        const admissionDate = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+        const admissionDate = new Date().toLocaleDateString('en-IN', {
+            day: 'numeric', month: 'long', year: 'numeric'
+        });
         
         const cardHtml = `
-            <div id="admissionCard" class="admission-card">
-                <div class="card-header">
-                    <img src="${LOGO_URL}" class="logo-img" onerror="this.src='https://via.placeholder.com/80'">
-                    <div class="header-text">
-                        <h1>QUEST COACHING CENTRE</h1>
-                        <p><i class="fas fa-map-marker-alt"></i> Block More, Gopalganj, Bihar - 841428</p>
-                        <p><i class="fas fa-phone"></i> +91 9708442525 | <i class="fas fa-envelope"></i> questcoachingcentre@gmail.com</p>
-                    </div>
-                    <div class="admission-badge">🎓 ADMISSION CARD</div>
-                </div>
-                <div class="card-body">
-                    <div class="photo-section-details">
-                        <img src="${photoUrl}" class="student-photo-card" onerror="this.src='https://via.placeholder.com/130'">
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-section-title"><i class="fas fa-user-graduate"></i> Personal Details</div>
-                        <div class="info-grid">
-                            <div class="info-item"><span class="info-label">Admission No:</span><span class="info-value"><strong>${studentData.admissionNo}</strong></span></div>
-                            <div class="info-item"><span class="info-label">Admission Date:</span><span class="info-value">${admissionDate}</span></div>
-                            <div class="info-item"><span class="info-label">Student Name:</span><span class="info-value">${studentData.studentName}</span></div>
-                            <div class="info-item"><span class="info-label">Date of Birth:</span><span class="info-value">${studentData.dob}</span></div>
-                            <div class="info-item"><span class="info-label">Gender:</span><span class="info-value">${studentData.gender}</span></div>
-                            <div class="info-item"><span class="info-label">Nationality:</span><span class="info-value">${studentData.nationality}</span></div>
-                        </div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-section-title"><i class="fas fa-users"></i> Parent Information</div>
-                        <div class="info-grid">
-                            <div class="info-item"><span class="info-label">Father's Name:</span><span class="info-value">${studentData.fatherName}</span></div>
-                            <div class="info-item"><span class="info-label">Mother's Name:</span><span class="info-value">${studentData.motherName || '-'}</span></div>
-                            <div class="info-item"><span class="info-label">Parent Mobile:</span><span class="info-value">${studentData.parentMobile}</span></div>
-                        </div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-section-title"><i class="fas fa-map-marker-alt"></i> Address & Contact</div>
-                        <div class="info-grid">
-                            <div class="info-item"><span class="info-label">Complete Address:</span><span class="info-value">${studentData.address}</span></div>
-                            <div class="info-item"><span class="info-label">Aadhar No:</span><span class="info-value">${studentData.aadhar || '-'}</span></div>
-                        </div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-section-title"><i class="fas fa-graduation-cap"></i> Education & Session</div>
-                        <div class="info-grid">
-                            <div class="info-item"><span class="info-label">Class Applying:</span><span class="info-value"><strong>${studentData.classApplying}</strong></span></div>
-                            <div class="info-item"><span class="info-label">Session:</span><span class="info-value">${studentData.session}</span></div>
-                            <div class="info-item"><span class="info-label">Previous School:</span><span class="info-value">${studentData.schoolName}</span></div>
-                            <div class="info-item"><span class="info-label">Know About QCC:</span><span class="info-value">${studentData.knowAbout || '-'}</span></div>
-                        </div>
-                    </div>
-                    
-                    <div class="info-section">
-                        <div class="info-section-title"><i class="fas fa-notes-medical"></i> Medical Information</div>
-                        <div class="info-item"><span class="info-label">Medical Info:</span><span class="info-value">${studentData.medicalInfo || 'None'}</span></div>
-                    </div>
-                    
-                    <div class="signature-section-card">
-                        <div class="signature-box-card">
-                            <div class="signature-line-card"></div>
-                            <div class="signature-label-card">Parent/Guardian Signature</div>
-                        </div>
-                        <div class="signature-box-card">
-                            <div class="signature-line-card"></div>
-                            <div class="signature-label-card">Student Signature</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="btn-group-card">
-                    <button class="btn-card btn-print" onclick="printAdmissionCard()"><i class="fas fa-print"></i> Print</button>
-                    <button class="btn-card btn-share" onclick="shareAdmissionCard()"><i class="fas fa-share-alt"></i> Share</button>
-                    <button class="btn-card btn-pdf" onclick="downloadAdmissionPDF()"><i class="fas fa-file-pdf"></i> Download PDF</button>
-                </div>
+        <style>
+        .admission-card {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            font-family: 'Segoe UI', sans-serif;
+            margin: auto;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        /* HEADER */
+        .card-header {
+            background: linear-gradient(135deg,#0f2b44,#1e3a5f);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-header h1 {
+            font-size: 22px;
+            margin: 0;
+        }
+        
+        .admission-badge {
+            background: #f5a623;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        /* BODY */
+        .card-body {
+            padding: 20px;
+        }
+        
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .photo {
+            width: 120px;
+            height: 140px;
+            object-fit: cover;
+            border: 3px solid #f5a623;
+            border-radius: 10px;
+        }
+        
+        .info-box {
+            flex: 1;
+            margin: 0 10px;
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        
+        /* GRID */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .section {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .section h3 {
+            margin-bottom: 8px;
+            border-bottom: 2px solid #f5a623;
+        }
+        
+        /* SIGN */
+        .sign {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .line {
+            border-top: 1px solid black;
+            margin-top: 40px;
+            width: 200px;
+        }
+        
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 12px;
+        }
+        </style>
+        
+        <div id="admissionCard" class="admission-card">
+        
+        <div class="card-header">
+            <div>
+                <h1>QUEST COACHING CENTRE</h1>
+                <small>Search for Knowledge</small>
             </div>
+            <div class="admission-badge">ADMISSION CARD</div>
+        </div>
+        
+        <div class="card-body">
+        
+        <div class="top-row">
+            <img src="${photoUrl}" class="photo">
+        
+            <div class="info-box">
+                <p><b>Admission No:</b> ${studentData.admissionNo}</p>
+                <p><b>Date:</b> ${admissionDate}</p>
+                <p><b>Class:</b> ${studentData.classApplying}</p>
+                <p><b>Session:</b> ${studentData.session}</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>Personal Details</h3>
+            <div class="grid-2">
+                <p>Name: ${studentData.studentName}</p>
+                <p>DOB: ${studentData.dob}</p>
+                <p>Gender: ${studentData.gender}</p>
+                <p>Nationality: ${studentData.nationality}</p>
+                <p>Aadhar: ${studentData.aadhar || '-'}</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>Parent Info</h3>
+            <div class="grid-2">
+                <p>Father: ${studentData.fatherName}</p>
+                <p>Mother: ${studentData.motherName || '-'}</p>
+                <p>Mobile: ${studentData.parentMobile}</p>
+                <p>School: ${studentData.schoolName}</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h3>Address</h3>
+            <p>${studentData.address}</p>
+        </div>
+        
+        <div class="section">
+            <h3>Medical Info</h3>
+            <p>${studentData.medicalInfo || 'None'}</p>
+        </div>
+        
+        <div class="sign">
+            <div>
+                <div class="line"></div>
+                Parent Signature
+            </div>
+            <div>
+                <div class="line"></div>
+                Student Signature
+            </div>
+        </div>
+        
+        <div class="footer">
+            "Education is not the learning of facts, but training of mind."
+        </div>
+        
+        </div>
+        </div>
         `;
         
         Swal.fire({
-            title: '✅ Admission Successful!',
             html: cardHtml,
+            width: 'auto',
             showConfirmButton: false,
             showCloseButton: true,
-            width: '1000px',
-            padding: '0',
-            customClass: { popup: 'admission-swal-popup' }
+            closeButtonHtml: '×',
+            didOpen: () => {
+                // Add print button and functionality
+                const printBtn = document.createElement('button');
+                printBtn.innerHTML = '<i class="fas fa-print"></i> Print';
+                printBtn.style.cssText = 'position:fixed; bottom:20px; left:20px; padding:10px 20px; background:#1b4f9b; color:white; border:none; border-radius:50px; cursor:pointer; z-index:10000; font-weight:bold;';
+                printBtn.onclick = () => {
+                    const printContent = document.getElementById('admissionCard').cloneNode(true);
+                    const win = window.open('', '_blank');
+                    win.document.write(`
+                        <html><head><title>Admission Card - ${studentData.studentName}</title>
+                        <style>
+                            body{font-family:'Segoe UI',sans-serif;padding:20px;}
+                            .admission-card{width:210mm;min-height:297mm;margin:auto;}
+                            .card-header{background:linear-gradient(135deg,#0f2b44,#1e3a5f);color:white;padding:20px;display:flex;justify-content:space-between;}
+                            .card-body{padding:20px;}
+                            .top-row{display:flex;margin-bottom:15px;}
+                            .photo{width:120px;height:140px;object-fit:cover;border:3px solid #f5a623;border-radius:10px;}
+                            .info-box{flex:1;margin:0 10px;background:#f8fafc;padding:10px;border-radius:10px;}
+                            .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+                            .section{background:#f8fafc;padding:12px;border-radius:10px;margin-bottom:10px;}
+                            .section h3{border-bottom:2px solid #f5a623;}
+                            .sign{display:flex;justify-content:space-between;margin-top:20px;}
+                            .line{border-top:1px solid black;margin-top:40px;width:200px;}
+                            .footer{text-align:center;margin-top:15px;font-size:12px;}
+                            @media print{button{display:none;}}
+                        </style>
+                        </head><body>${printContent.outerHTML}</body></html>
+                    `);
+                    win.document.close();
+                    win.print();
+                };
+                document.body.appendChild(printBtn);
+                
+                // Add download PDF button
+                const pdfBtn = document.createElement('button');
+                pdfBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Download PDF';
+                pdfBtn.style.cssText = 'position:fixed; bottom:20px; right:130px; padding:10px 20px; background:#dc2626; color:white; border:none; border-radius:50px; cursor:pointer; z-index:10000; font-weight:bold;';
+                pdfBtn.onclick = async () => {
+                    const element = document.getElementById('admissionCard');
+                    const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+                    const imgData = canvas.toDataURL('image/png');
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const imgWidth = 190;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+                    pdf.save(`Admission_${studentData.admissionNo}_${studentData.studentName}.pdf`);
+                    Swal.fire('Downloaded!', 'PDF downloaded successfully', 'success');
+                };
+                document.body.appendChild(pdfBtn);
+                
+                // Add share button
+                const shareBtn = document.createElement('button');
+                shareBtn.innerHTML = '<i class="fas fa-share-alt"></i> Share';
+                shareBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#16a34a; color:white; border:none; border-radius:50px; cursor:pointer; z-index:10000; font-weight:bold;';
+                shareBtn.onclick = () => {
+                    const text = `🎓 Admission Confirmation - Quest Coaching Centre\n\nStudent: ${studentData.studentName}\nAdmission No: ${studentData.admissionNo}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}\n\nThank you for choosing Quest Coaching Centre!`;
+                    if (navigator.share) navigator.share({ title: 'Admission Confirmation', text: text });
+                    else { navigator.clipboard.writeText(text); Swal.fire('Copied!', 'Details copied to clipboard', 'success'); }
+                };
+                document.body.appendChild(shareBtn);
+                
+                // Remove buttons when modal closes
+                const closeModal = () => {
+                    if (printBtn) printBtn.remove();
+                    if (pdfBtn) pdfBtn.remove();
+                    if (shareBtn) shareBtn.remove();
+                };
+                const closeBtn = document.querySelector('.swal2-close');
+                if (closeBtn) closeBtn.addEventListener('click', closeModal);
+                window.addEventListener('beforeunload', closeModal);
+            }
         });
-        
-        window.printAdmissionCard = () => {
-            const printContent = document.getElementById('admissionCard').cloneNode(true);
-            const win = window.open('', '_blank');
-            win.document.write(`
-                <html><head><title>Admission Card - ${studentData.studentName}</title>
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-                <style>body{font-family:'Segoe UI',sans-serif;padding:20px;} .btn-group-card{display:none;}</style>
-                </head><body>${printContent.outerHTML}</body></html>
-            `);
-            win.document.close();
-            win.print();
-        };
-        
-        window.shareAdmissionCard = () => {
-            const text = `🎓 Admission Confirmation - Quest Coaching Centre\n\nStudent: ${studentData.studentName}\nAdmission No: ${studentData.admissionNo}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}\n\nThank you for choosing Quest Coaching Centre!`;
-            if (navigator.share) navigator.share({ title: 'Admission Confirmation', text: text });
-            else { navigator.clipboard.writeText(text); Swal.fire('Copied!', 'Details copied to clipboard', 'success'); }
-        };
-        
-        window.downloadAdmissionPDF = async () => {
-            const element = document.getElementById('admissionCard');
-            const canvas = await html2canvas(element, { scale: 2, useCORS: true });
-            const imgData = canvas.toDataURL('image/png');
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const imgWidth = 190;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-            pdf.save(`Admission_${studentData.admissionNo}_${studentData.studentName}.pdf`);
-            Swal.fire('Downloaded!', 'PDF downloaded successfully', 'success');
-        };
     }
     
     document.getElementById('admissionForm').addEventListener('submit', async (e) => {
