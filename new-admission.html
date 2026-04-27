@@ -7,6 +7,9 @@
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -15,11 +18,8 @@
     <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     
-    <!-- jsPDF and html2canvas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <style>
         * {
             margin: 0;
@@ -300,6 +300,284 @@
             display: none;
         }
         
+        /* A4 Card Styles - Same as your design */
+        :root {
+            --navy: #001f3f;
+            --gold: #c5a059;
+            --light-gold: #f4e4bc;
+            --dark-blue: #001529;
+        }
+        
+        .admission-card-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        #printable-card {
+            width: 100%;
+            background: white;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            background: var(--dark-blue);
+            height: 180px;
+            position: relative;
+            color: white;
+            text-align: center;
+            overflow: hidden;
+        }
+        .header-bg-curve {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50px;
+            background: white;
+            border-top: 4px solid var(--gold);
+            border-radius: 100% 100% 0 0 / 100% 100% 0 0;
+        }
+        .logo-box {
+            position: absolute;
+            left: 30px;
+            top: 25px;
+            width: 100px;
+            height: 100px;
+            z-index: 2;
+        }
+        .logo-placeholder {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--navy);
+            font-size: 40px;
+            overflow: hidden;
+        }
+        .logo-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .header-text { padding-top: 30px; }
+        .header-text h3 { font-size: 14px; letter-spacing: 3px; margin: 0; color: #ddd; }
+        .header-text h1 { font-size: 42px; margin: 5px 0; letter-spacing: 1px; font-weight: 800; }
+        .header-text p { font-size: 14px; color: var(--gold); margin: 0; font-weight: bold; }
+        
+        .contact-strip {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            font-size: 11px;
+            flex-wrap: wrap;
+        }
+        .contact-item { display: flex; align-items: center; gap: 5px; }
+        .contact-item i { color: var(--gold); }
+        
+        .title-banner { text-align: center; margin: 25px 0 20px 0; }
+        .title-banner h2 { 
+            font-size: 32px; 
+            color: var(--navy); 
+            margin: 0; 
+            letter-spacing: 2px;
+            display: inline-block;
+            position: relative;
+        }
+        .title-banner h2::before, .title-banner h2::after {
+            content: "✦✦✦";
+            color: var(--gold);
+            font-size: 16px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .title-banner h2::before { left: -60px; }
+        .title-banner h2::after { right: -60px; }
+        
+        .top-info {
+            display: flex;
+            padding: 0 30px;
+            gap: 25px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .student-photo {
+            width: 130px;
+            height: 160px;
+            border: 2px solid var(--gold);
+            border-radius: 8px;
+            background: #f9f9f9;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .student-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .student-photo i { font-size: 60px; color: #ddd; }
+        
+        .id-details {
+            flex-grow: 1;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 12px;
+            background: #fdfdfd;
+        }
+        .id-row { display: flex; margin-bottom: 10px; font-size: 14px; border-bottom: 1px dashed #eee; padding-bottom: 5px; flex-wrap: wrap; }
+        .id-label { width: 140px; font-weight: bold; color: #555; text-transform: uppercase; font-size: 12px; }
+        .id-value { font-weight: bold; color: var(--navy); }
+        .adm-no-highlight { color: #d9534f; }
+        
+        .qr-section { width: 110px; text-align: center; }
+        #qrcode { margin: 0 auto; border: 1px solid var(--gold); padding: 5px; background: white; }
+        .qr-label { 
+            background: var(--gold); 
+            color: white; 
+            font-size: 9px; 
+            padding: 2px 0; 
+            margin-top: 5px; 
+            font-weight: bold; 
+            border-radius: 4px;
+        }
+        
+        .details-grid {
+            padding: 0 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .section-box {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            position: relative;
+            margin-top: 15px;
+        }
+        .section-header {
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: var(--navy);
+            color: white;
+            padding: 2px 15px;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        .section-content { padding: 18px 12px 12px 12px; }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table td { padding: 6px 0; font-size: 13px; vertical-align: top; }
+        .data-table .lbl { color: #666; font-weight: bold; width: 45%; text-transform: uppercase; font-size: 10px; }
+        .data-table .val { color: #111; font-weight: 600; }
+        
+        .full-section { margin: 20px 30px; }
+        
+        .declaration {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #444;
+            position: relative;
+        }
+        .dec-title { color: var(--gold); font-weight: bold; margin-right: 10px; }
+        
+        .quote-box {
+            margin: 20px 50px;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            text-align: center;
+            font-style: italic;
+            background: #fafafa;
+        }
+        .quote-text { font-size: 12px; color: #555; }
+        .quote-author { font-size: 11px; display: block; margin-top: 5px; font-weight: bold; }
+        
+        .bottom-section {
+            margin: 30px 30px 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .sig-box { text-align: center; width: 160px; }
+        .sig-line { border-top: 1px solid #333; margin-top: 40px; padding-top: 5px; font-size: 11px; font-weight: bold; }
+        
+        .seal-badge {
+            width: 90px;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .seal-text {
+            position: absolute;
+            transform: rotate(-15deg);
+            color: var(--gold);
+            font-weight: bold;
+            font-size: 10px;
+            text-align: center;
+            border: 2px solid var(--gold);
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .footer-banner {
+            margin-top: 30px;
+            width: 100%;
+            height: 40px;
+            background: var(--dark-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            border-top: 4px solid var(--gold);
+        }
+        
+        .btn-group-card {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 20px;
+            background: #f1f5f9;
+            border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+        .btn-card {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+            font-size: 0.85rem;
+        }
+        .btn-print { background: #1b4f9b; color: white; }
+        .btn-share { background: #16a34a; color: white; }
+        .btn-pdf { background: #dc2626; color: white; }
+        .btn-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        
         @media (max-width: 700px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -317,6 +595,27 @@
             .photo-section {
                 justify-content: center;
             }
+            .details-grid {
+                grid-template-columns: 1fr;
+                padding: 0 15px;
+            }
+            .top-info {
+                flex-direction: column;
+                align-items: center;
+                padding: 0 15px;
+            }
+            .title-banner h2::before, .title-banner h2::after {
+                display: none;
+            }
+            .bottom-section {
+                justify-content: center;
+            }
+        }
+        
+        @media print {
+            .no-print, .btn-group-card { display: none !important; }
+            #printable-card { box-shadow: none; margin: 0; }
+            body { background: white; padding: 0; }
         }
     </style>
 </head>
@@ -435,7 +734,8 @@
     const firebaseConfig = {
         apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
         authDomain: "quest-coaching.firebaseapp.com",
-        projectId: "quest-coaching"
+        projectId: "quest-coaching",
+        storageBucket: "quest-coaching.firebasestorage.app"
     };
     
     firebase.initializeApp(firebaseConfig);
@@ -447,6 +747,7 @@
     const SUPABASE_ANON_KEY = 'sb_publishable_6a_9nxKSSLUZMmSGleyycg_kQ4a4BtI';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const STORAGE_BUCKET = 'student_photos';
+    const LOGO_URL = 'https://i.ibb.co/hF9tmnpB/20250903-202922.jpg';
     
     const authLoading = document.getElementById('authLoading');
     const mainContent = document.getElementById('mainContent');
@@ -560,231 +861,167 @@
         setTimeout(() => div.innerHTML = '', 4000);
     }
     
-    // ============ NEW DISPLAY ADMISSION CARD FUNCTION (A4 STYLE) ============
     function displayAdmissionCard(studentData, photoUrl) {
-        const admissionDate = new Date().toLocaleDateString('en-IN', {
-            day: 'numeric', month: 'long', year: 'numeric'
-        });
+        const admDate = new Date(studentData.admissionDate);
+        const dobDate = new Date(studentData.dob);
+        const today = new Date();
         
         const cardHtml = `
-        <style>
-        .admission-card {
-            width: 210mm;
-            min-height: 297mm;
-            background: white;
-            font-family: 'Segoe UI', sans-serif;
-            margin: auto;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        
-        /* HEADER */
-        .card-header {
-            background: linear-gradient(135deg,#0f2b44,#1e3a5f);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .card-header h1 {
-            font-size: 22px;
-            margin: 0;
-        }
-        
-        .admission-badge {
-            background: #f5a623;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
-        
-        /* BODY */
-        .card-body {
-            padding: 20px;
-        }
-        
-        .top-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-        
-        .photo {
-            width: 120px;
-            height: 140px;
-            object-fit: cover;
-            border: 3px solid #f5a623;
-            border-radius: 10px;
-        }
-        
-        .info-box {
-            flex: 1;
-            margin: 0 10px;
-            background: #f8fafc;
-            padding: 10px;
-            border-radius: 10px;
-        }
-        
-        /* GRID */
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        
-        .section {
-            background: #f8fafc;
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .section h3 {
-            margin-bottom: 8px;
-            border-bottom: 2px solid #f5a623;
-        }
-        
-        /* SIGN */
-        .sign {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        
-        .line {
-            border-top: 1px solid black;
-            margin-top: 40px;
-            width: 200px;
-        }
-        
-        /* FOOTER */
-        .footer {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 12px;
-        }
-        </style>
-        
-        <div id="admissionCard" class="admission-card">
-        
-        <div class="card-header">
-            <div>
-                <h1>QUEST COACHING CENTRE</h1>
-                <small>Search for Knowledge</small>
+            <div id="admissionCardContainer" style="max-width: 1000px; margin: 0 auto;">
+                <div id="printable-card">
+                    <div class="card-header">
+                        <div class="logo-box">
+                            <div class="logo-placeholder">
+                                <img src="${LOGO_URL}" alt="Logo" onerror="this.src='https://via.placeholder.com/100'">
+                            </div>
+                        </div>
+                        <div class="header-text">
+                            <h3>|| SEARCH FOR KNOWLEDGE ||</h3>
+                            <h1>QUEST COACHING CENTRE</h1>
+                            <p>UNDER THE GUIDANCE OF MR. RAVI SIR</p>
+                            <div class="contact-strip">
+                                <div class="contact-item"><i class="fas fa-location-dot"></i> Block More, Gopalganj, Bihar - 841428</div>
+                                <div class="contact-item"><i class="fas fa-phone"></i> +91 9708442525</div>
+                                <div class="contact-item"><i class="fas fa-envelope"></i> questcoachingcentre@gmail.com</div>
+                            </div>
+                        </div>
+                        <div class="header-bg-curve"></div>
+                    </div>
+                    
+                    <div class="title-banner">
+                        <h2>ADMISSION CARD</h2>
+                    </div>
+                    
+                    <div class="top-info">
+                        <div class="student-photo" id="photo-display-card">
+                            <img src="${photoUrl}" alt="Student Photo" style="width:100%; height:100%; object-fit:cover;">
+                        </div>
+                        <div class="id-details">
+                            <div class="id-row"><span class="id-label">Admission No.</span><span class="id-value adm-no-highlight">${studentData.admissionNo}</span></div>
+                            <div class="id-row"><span class="id-label">Admission Date</span><span class="id-value">${admDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span></div>
+                            <div class="id-row"><span class="id-label">Session</span><span class="id-value">${studentData.session}</span></div>
+                            <div class="id-row"><span class="id-label">Class Applying</span><span class="id-value">${studentData.classApplying}</span></div>
+                        </div>
+                        <div class="qr-section">
+                            <div id="qrcode-card"></div>
+                            <div class="qr-label">SCAN TO VERIFY</div>
+                        </div>
+                    </div>
+                    
+                    <div class="details-grid">
+                        <div class="section-box">
+                            <div class="section-header">Personal Details</div>
+                            <div class="section-content">
+                                <table class="data-table">
+                                    <tr><td class="lbl">Student Name</td><td class="val">${studentData.studentName}</td></tr>
+                                    <tr><td class="lbl">Date of Birth</td><td class="val">${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
+                                    <tr><td class="lbl">Gender</td><td class="val">${studentData.gender}</td></tr>
+                                    <tr><td class="lbl">Nationality</td><td class="val">${studentData.nationality}</td></tr>
+                                    <tr><td class="lbl">Aadhar No.</td><td class="val">${studentData.aadhar || '-'}</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="section-box">
+                            <div class="section-header">Parent Details</div>
+                            <div class="section-content" style="padding-top: 18px;">
+                                <table class="data-table">
+                                    <tr><td class="lbl">Father's Name</td><td class="val">${studentData.fatherName}</td></tr>
+                                    <tr><td class="lbl">Mother's Name</td><td class="val">${studentData.motherName || '-'}</td></tr>
+                                    <tr><td class="lbl">Contact No.</td><td class="val">${studentData.parentMobile}</td></tr>
+                                    <tr><td class="lbl">Know About QCC</td><td class="val">${studentData.knowAbout || '-'}</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="details-grid">
+                        <div class="section-box">
+                            <div class="section-header">Address</div>
+                            <div class="section-content" style="font-size: 12px;">${studentData.address}</div>
+                        </div>
+                        <div class="section-box">
+                            <div class="section-header">Previous School</div>
+                            <div class="section-content" style="font-size: 12px;">${studentData.schoolName}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="full-section">
+                        <div class="declaration">
+                            <span class="dec-title">✦✦✦ DECLARATION ✦✦✦</span><br>
+                            I hereby declare that the information furnished in this form is true to the best of my/our knowledge and belief.
+                            <div style="margin-top: 10px; display: flex; gap: 30px; flex-wrap: wrap;">
+                                <span>DATE : <b>${today.toLocaleDateString('en-GB')}</b></span>
+                                <span>PLACE : <b>Gopalganj</b></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="quote-box">
+                        <span class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</span>
+                        <span class="quote-author">- Albert Einstein</span>
+                    </div>
+                    
+                    <div class="bottom-section">
+                        <div class="sig-box"><div class="sig-line">Parent / Guardian Signature</div></div>
+                        <div class="seal-badge"><div class="seal-text">ADMISSION<br>CONFIRMED</div></div>
+                        <div class="sig-box"><div class="sig-line">Student Signature</div></div>
+                    </div>
+                    
+                    <div class="footer-banner">
+                        ★ THANK YOU FOR CHOOSING QUEST COACHING CENTRE ★
+                    </div>
+                </div>
+                
+                <div class="btn-group-card">
+                    <button class="btn-card btn-print" onclick="printAdmissionCard()"><i class="fas fa-print"></i> Print</button>
+                    <button class="btn-card btn-share" onclick="shareAdmissionCard()"><i class="fas fa-share-alt"></i> Share</button>
+                    <button class="btn-card btn-pdf" onclick="downloadAdmissionPDF()"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                </div>
             </div>
-            <div class="admission-badge">ADMISSION CARD</div>
-        </div>
-        
-        <div class="card-body">
-        
-        <div class="top-row">
-            <img src="${photoUrl}" class="photo">
-        
-            <div class="info-box">
-                <p><b>Admission No:</b> ${studentData.admissionNo}</p>
-                <p><b>Date:</b> ${admissionDate}</p>
-                <p><b>Class:</b> ${studentData.classApplying}</p>
-                <p><b>Session:</b> ${studentData.session}</p>
-            </div>
-        </div>
-        
-        <div class="section">
-            <h3>Personal Details</h3>
-            <div class="grid-2">
-                <p>Name: ${studentData.studentName}</p>
-                <p>DOB: ${studentData.dob}</p>
-                <p>Gender: ${studentData.gender}</p>
-                <p>Nationality: ${studentData.nationality}</p>
-                <p>Aadhar: ${studentData.aadhar || '-'}</p>
-            </div>
-        </div>
-        
-        <div class="section">
-            <h3>Parent Info</h3>
-            <div class="grid-2">
-                <p>Father: ${studentData.fatherName}</p>
-                <p>Mother: ${studentData.motherName || '-'}</p>
-                <p>Mobile: ${studentData.parentMobile}</p>
-                <p>School: ${studentData.schoolName}</p>
-            </div>
-        </div>
-        
-        <div class="section">
-            <h3>Address</h3>
-            <p>${studentData.address}</p>
-        </div>
-        
-        <div class="section">
-            <h3>Medical Info</h3>
-            <p>${studentData.medicalInfo || 'None'}</p>
-        </div>
-        
-        <div class="sign">
-            <div>
-                <div class="line"></div>
-                Parent Signature
-            </div>
-            <div>
-                <div class="line"></div>
-                Student Signature
-            </div>
-        </div>
-        
-        <div class="footer">
-            "Education is not the learning of facts, but training of mind."
-        </div>
-        
-        </div>
-        </div>
         `;
         
         Swal.fire({
+            title: '✅ Admission Successful!',
             html: cardHtml,
-            width: 'auto',
             showConfirmButton: false,
             showCloseButton: true,
-            closeButtonHtml: '×',
+            width: '1050px',
+            padding: '0',
+            customClass: { popup: 'admission-swal-popup' },
             didOpen: () => {
-                // Add print button and functionality
-                const printBtn = document.createElement('button');
-                printBtn.innerHTML = '<i class="fas fa-print"></i> Print';
-                printBtn.style.cssText = 'position:fixed; bottom:20px; left:20px; padding:10px 20px; background:#1b4f9b; color:white; border:none; border-radius:50px; cursor:pointer; z-index:10000; font-weight:bold;';
-                printBtn.onclick = () => {
-                    const printContent = document.getElementById('admissionCard').cloneNode(true);
+                // Generate QR Code
+                new QRCode(document.getElementById("qrcode-card"), {
+                    text: "Verified Admission: " + studentData.admissionNo,
+                    width: 90,
+                    height: 90
+                });
+                
+                window.printAdmissionCard = () => {
+                    const printContent = document.getElementById('printable-card').cloneNode(true);
                     const win = window.open('', '_blank');
                     win.document.write(`
                         <html><head><title>Admission Card - ${studentData.studentName}</title>
+                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
                         <style>
                             body{font-family:'Segoe UI',sans-serif;padding:20px;}
-                            .admission-card{width:210mm;min-height:297mm;margin:auto;}
-                            .card-header{background:linear-gradient(135deg,#0f2b44,#1e3a5f);color:white;padding:20px;display:flex;justify-content:space-between;}
-                            .card-body{padding:20px;}
-                            .top-row{display:flex;margin-bottom:15px;}
-                            .photo{width:120px;height:140px;object-fit:cover;border:3px solid #f5a623;border-radius:10px;}
-                            .info-box{flex:1;margin:0 10px;background:#f8fafc;padding:10px;border-radius:10px;}
-                            .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-                            .section{background:#f8fafc;padding:12px;border-radius:10px;margin-bottom:10px;}
-                            .section h3{border-bottom:2px solid #f5a623;}
-                            .sign{display:flex;justify-content:space-between;margin-top:20px;}
-                            .line{border-top:1px solid black;margin-top:40px;width:200px;}
-                            .footer{text-align:center;margin-top:15px;font-size:12px;}
-                            @media print{button{display:none;}}
+                            .btn-group-card, .no-print{display:none;}
+                            .admission-card-container{margin:0;padding:0;}
+                            #printable-card{box-shadow:none;margin:0;max-width:1000px;margin:0 auto;}
                         </style>
                         </head><body>${printContent.outerHTML}</body></html>
                     `);
                     win.document.close();
                     win.print();
                 };
-                document.body.appendChild(printBtn);
                 
-                // Add download PDF button
-                const pdfBtn = document.createElement('button');
-                pdfBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Download PDF';
-                pdfBtn.style.cssText = 'position:fixed; bottom:20px; right:130px; padding:10px 20px; background:#dc2626; color:white; border:none; border-radius:50px; cursor:pointer; z-index:10000; font-weight:bold;';
-                pdfBtn.onclick = async () => {
-                    const element = document.getElementById('admissionCard');
+                window.shareAdmissionCard = () => {
+                    const text = `🎓 Admission Confirmation - Quest Coaching Centre\n\nStudent: ${studentData.studentName}\nAdmission No: ${studentData.admissionNo}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}\n\nThank you for choosing Quest Coaching Centre!`;
+                    if (navigator.share) navigator.share({ title: 'Admission Confirmation', text: text });
+                    else { navigator.clipboard.writeText(text); Swal.fire('Copied!', 'Details copied to clipboard', 'success'); }
+                };
+                
+                window.downloadAdmissionPDF = async () => {
+                    const element = document.getElementById('printable-card');
                     const canvas = await html2canvas(element, { scale: 2, useCORS: true });
                     const imgData = canvas.toDataURL('image/png');
                     const { jsPDF } = window.jspdf;
@@ -795,28 +1032,6 @@
                     pdf.save(`Admission_${studentData.admissionNo}_${studentData.studentName}.pdf`);
                     Swal.fire('Downloaded!', 'PDF downloaded successfully', 'success');
                 };
-                document.body.appendChild(pdfBtn);
-                
-                // Add share button
-                const shareBtn = document.createElement('button');
-                shareBtn.innerHTML = '<i class="fas fa-share-alt"></i> Share';
-                shareBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#16a34a; color:white; border:none; border-radius:50px; cursor:pointer; z-index:10000; font-weight:bold;';
-                shareBtn.onclick = () => {
-                    const text = `🎓 Admission Confirmation - Quest Coaching Centre\n\nStudent: ${studentData.studentName}\nAdmission No: ${studentData.admissionNo}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}\n\nThank you for choosing Quest Coaching Centre!`;
-                    if (navigator.share) navigator.share({ title: 'Admission Confirmation', text: text });
-                    else { navigator.clipboard.writeText(text); Swal.fire('Copied!', 'Details copied to clipboard', 'success'); }
-                };
-                document.body.appendChild(shareBtn);
-                
-                // Remove buttons when modal closes
-                const closeModal = () => {
-                    if (printBtn) printBtn.remove();
-                    if (pdfBtn) pdfBtn.remove();
-                    if (shareBtn) shareBtn.remove();
-                };
-                const closeBtn = document.querySelector('.swal2-close');
-                if (closeBtn) closeBtn.addEventListener('click', closeModal);
-                window.addEventListener('beforeunload', closeModal);
             }
         });
     }
