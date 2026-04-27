@@ -7,15 +7,15 @@
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Firebase SDK (Auth + Firestore) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     
-    <!-- Supabase SDK (Storage only) -->
+    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     
-    <!-- jsPDF and html2canvas for PDF -->
+    <!-- jsPDF and html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
@@ -271,7 +271,6 @@
             transition: width 0.3s ease;
         }
         
-        /* Auth Loading Screen */
         .auth-loading {
             position: fixed;
             top: 0;
@@ -303,96 +302,142 @@
         
         /* Admission Card Styles */
         .admission-card {
-            max-width: 900px;
-            margin: 20px auto;
+            max-width: 1000px;
+            margin: 0 auto;
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            border-radius: 24px;
             overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
             font-family: 'Segoe UI', Roboto, sans-serif;
         }
         .card-header {
-            background: linear-gradient(135deg, #1b4f9b, #0f3f7a);
+            background: linear-gradient(135deg, #1e3a5f, #0f2b44);
             color: white;
-            padding: 25px;
-            text-align: center;
+            padding: 25px 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
         }
-        .card-header h1 {
+        .logo-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #f5a623;
+        }
+        .header-text {
+            flex: 1;
+        }
+        .header-text h1 {
             font-size: 1.8rem;
             margin-bottom: 5px;
+            letter-spacing: 1px;
         }
-        .card-header p {
+        .header-text p {
             font-size: 0.85rem;
             opacity: 0.9;
         }
-        .card-body {
-            padding: 25px;
-        }
-        .info-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        .info-table tr {
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .info-table td {
-            padding: 12px 8px;
-            vertical-align: top;
-        }
-        .info-table td:first-child {
-            width: 35%;
-            font-weight: 700;
+        .admission-badge {
+            background: #f5a623;
             color: #1e3a5f;
-            background: #f8fafc;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 800;
+            font-size: 0.9rem;
         }
-        .info-table td:last-child {
-            width: 65%;
-            color: #334155;
+        
+        .card-body {
+            padding: 30px;
         }
-        .photo-section-card {
-            text-align: center;
-            margin-bottom: 20px;
+        
+        .photo-section-details {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 25px;
         }
         .student-photo-card {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
+            width: 130px;
+            height: 130px;
+            border-radius: 16px;
             object-fit: cover;
-            border: 4px solid #1b4f9b;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border: 4px solid #f5a623;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
-        .signature-section {
+        
+        .info-section {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .info-section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e3a5f;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f5a623;
+            display: inline-block;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .info-item {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .info-label {
+            font-weight: 700;
+            color: #1e3a5f;
+            min-width: 130px;
+            font-size: 0.85rem;
+        }
+        .info-value {
+            color: #334155;
+            font-size: 0.85rem;
+            flex: 1;
+        }
+        
+        .signature-section-card {
             display: flex;
             justify-content: space-between;
-            margin-top: 30px;
+            margin-top: 25px;
             padding-top: 20px;
             border-top: 2px dashed #e2e8f0;
         }
-        .signature-box {
+        .signature-box-card {
             text-align: center;
             width: 45%;
         }
-        .signature-line {
-            border-top: 1px solid #000;
+        .signature-line-card {
+            border-top: 1.5px solid #000;
             width: 100%;
             margin-top: 30px;
         }
-        .signature-label {
-            font-size: 0.75rem;
+        .signature-label-card {
+            font-size: 0.7rem;
             color: #64748b;
             margin-top: 8px;
         }
+        
         .btn-group-card {
             display: flex;
             gap: 12px;
             justify-content: center;
             padding: 20px;
-            background: #f8fafc;
+            background: #f1f5f9;
             border-top: 1px solid #e2e8f0;
+            flex-wrap: wrap;
         }
         .btn-card {
-            padding: 10px 20px;
+            padding: 10px 24px;
             border: none;
             border-radius: 40px;
             font-weight: 600;
@@ -401,23 +446,12 @@
             align-items: center;
             gap: 8px;
             transition: 0.2s;
+            font-size: 0.85rem;
         }
-        .btn-print {
-            background: #1b4f9b;
-            color: white;
-        }
-        .btn-share {
-            background: #16a34a;
-            color: white;
-        }
-        .btn-pdf {
-            background: #dc2626;
-            color: white;
-        }
-        .btn-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
+        .btn-print { background: #1b4f9b; color: white; }
+        .btn-share { background: #16a34a; color: white; }
+        .btn-pdf { background: #dc2626; color: white; }
+        .btn-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         
         @media (max-width: 700px) {
             .form-grid {
@@ -436,12 +470,19 @@
             .photo-section {
                 justify-content: center;
             }
-            .signature-section {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            .card-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .signature-section-card {
                 flex-direction: column;
                 align-items: center;
                 gap: 20px;
             }
-            .signature-box {
+            .signature-box-card {
                 width: 80%;
             }
             .btn-group-card {
@@ -451,13 +492,11 @@
     </style>
 </head>
 <body>
-    <!-- Auth Loading Screen -->
     <div id="authLoading" class="auth-loading">
         <div class="spinner"></div>
         <p style="margin-top: 15px; color: #1b4f9b; font-weight: 600;">Verifying access...</p>
     </div>
 
-    <!-- Main Content -->
     <div id="mainContent" class="main-content">
     <div class="container">
         <div class="header-bar">
@@ -564,15 +603,11 @@
     </div>
 
     <script>
-    // ============ FIREBASE CONFIG ============
     const firebaseConfig = {
         apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
         authDomain: "quest-coaching.firebaseapp.com",
-        databaseURL: "https://quest-coaching-default-rtdb.asia-southeast1.firebasedatabase.app",
         projectId: "quest-coaching",
-        storageBucket: "quest-coaching.firebasestorage.app",
-        messagingSenderId: "131948734089",
-        appId: "1:131948734089:web:f4ba25110c8b1298360858"
+        storageBucket: "quest-coaching.firebasestorage.app"
     };
     
     firebase.initializeApp(firebaseConfig);
@@ -580,16 +615,15 @@
     const auth = firebase.auth();
     const admissionsCollection = db.collection('admissions');
     
-    // ============ SUPABASE CONFIG ============
     const SUPABASE_URL = 'https://zjwvxqjmccqhyxsaeggw.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_6a_9nxKSSLUZMmSGleyycg_kQ4a4BtI';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const STORAGE_BUCKET = 'student_photos';
+    const LOGO_URL = 'https://i.ibb.co/hF9tmnpB/20250903-202922.jpg';
     
     const authLoading = document.getElementById('authLoading');
     const mainContent = document.getElementById('mainContent');
     
-    // Auth check
     auth.onAuthStateChanged((user) => {
         if (!user) {
             Swal.fire({
@@ -608,7 +642,7 @@
         
         const logoutBtn = document.createElement('button');
         logoutBtn.innerHTML = '🚪 Logout';
-        logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+        logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px;';
         logoutBtn.onclick = async () => {
             await auth.signOut();
             window.location.href = 'index.html';
@@ -618,7 +652,6 @@
     
     document.getElementById('declarationDate').value = new Date().toLocaleDateString('en-IN');
     
-    // Photo Upload
     const photoBox = document.getElementById('photoUploadBox');
     const photoInput = document.getElementById('studentPhoto');
     const photoPreview = document.getElementById('photoPreview');
@@ -649,7 +682,6 @@
         if (status) progressStatus.textContent = status;
     }
     
-    // ============ PHOTO COMPRESS FUNCTION (to ~300 KB) ============
     async function compressPhoto(file, maxWidth = 400, maxHeight = 400, quality = 0.75) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -659,60 +691,29 @@
                 img.src = e.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    
+                    let width = img.width, height = img.height;
                     if (width > height) {
-                        if (width > maxWidth) {
-                            height = (height * maxWidth) / width;
-                            width = maxWidth;
-                        }
+                        if (width > maxWidth) { height = (height * maxWidth) / width; width = maxWidth; }
                     } else {
-                        if (height > maxHeight) {
-                            width = (width * maxHeight) / height;
-                            height = maxHeight;
-                        }
+                        if (height > maxHeight) { width = (width * maxHeight) / height; height = maxHeight; }
                     }
-                    
-                    canvas.width = width;
-                    canvas.height = height;
+                    canvas.width = width; canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    
-                    canvas.toBlob((blob) => {
-                        resolve(blob);
-                    }, 'image/jpeg', quality);
+                    canvas.toBlob((blob) => resolve(blob), 'image/jpeg', quality);
                 };
             };
             reader.onerror = reject;
         });
     }
     
-    // ============ UPLOAD PHOTO TO SUPABASE ============
     async function uploadPhotoToSupabase(file, admissionNo) {
-        try {
-            const compressedBlob = await compressPhoto(file, 400, 400, 0.75);
-            const fileExt = 'jpg';
-            const fileName = `${admissionNo}_${Date.now()}.${fileExt}`;
-            
-            const { data, error } = await supabaseClient.storage
-                .from(STORAGE_BUCKET)
-                .upload(fileName, compressedBlob, {
-                    contentType: 'image/jpeg',
-                    cacheControl: '3600'
-                });
-            
-            if (error) throw error;
-            
-            const { data: urlData } = supabaseClient.storage
-                .from(STORAGE_BUCKET)
-                .getPublicUrl(fileName);
-            
-            return urlData.publicUrl;
-        } catch (error) {
-            console.error('Upload error:', error);
-            throw error;
-        }
+        const compressedBlob = await compressPhoto(file, 400, 400, 0.75);
+        const fileName = `${admissionNo}_${Date.now()}.jpg`;
+        const { error } = await supabaseClient.storage.from(STORAGE_BUCKET).upload(fileName, compressedBlob, { contentType: 'image/jpeg' });
+        if (error) throw error;
+        const { data: urlData } = supabaseClient.storage.from(STORAGE_BUCKET).getPublicUrl(fileName);
+        return urlData.publicUrl;
     }
     
     function getSelectedKnowAbout() {
@@ -729,51 +730,80 @@
     function showAlert(msg, type) {
         const div = document.getElementById('formAlert');
         div.innerHTML = `<div style="background:${type==='error'?'#fee2e2':'#d1fae5'}; color:${type==='error'?'#991b1b':'#065f46'}; padding:12px; border-radius:16px; margin-bottom:20px;">${msg}</div>`;
-        setTimeout(() => { if (div.innerHTML.includes(msg)) div.innerHTML = ''; }, 4000);
+        setTimeout(() => div.innerHTML = '', 4000);
     }
     
-    // ============ DISPLAY ADMISSION CARD ============
     function displayAdmissionCard(studentData, photoUrl) {
         const admissionDate = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
         
         const cardHtml = `
             <div id="admissionCard" class="admission-card">
                 <div class="card-header">
-                    <h1>🏫 QUEST COACHING CENTRE</h1>
-                    <p>Under the guidance of MR. RAVI SIR</p>
-                    <p>Block More, Gopalganj, Bihar - 841428 | 📞 +91 9708442525</p>
+                    <img src="${LOGO_URL}" class="logo-img" onerror="this.src='https://via.placeholder.com/80'">
+                    <div class="header-text">
+                        <h1>QUEST COACHING CENTRE</h1>
+                        <p><i class="fas fa-map-marker-alt"></i> Block More, Gopalganj, Bihar - 841428</p>
+                        <p><i class="fas fa-phone"></i> +91 9708442525 | <i class="fas fa-envelope"></i> questcoachingcentre@gmail.com</p>
+                    </div>
+                    <div class="admission-badge">🎓 ADMISSION CARD</div>
                 </div>
                 <div class="card-body">
-                    <div class="photo-section-card">
-                        <img src="${photoUrl}" class="student-photo-card" onerror="this.src='https://via.placeholder.com/120'">
+                    <div class="photo-section-details">
+                        <img src="${photoUrl}" class="student-photo-card" onerror="this.src='https://via.placeholder.com/130'">
                     </div>
-                    <h3 style="color: #1b4f9b; text-align: center; margin-bottom: 20px;">🎓 STUDENT ADMISSION FORM</h3>
-                    <table class="info-table">
-                        <tr><td><i class="fas fa-id-card"></i> Admission No:</td><td><strong>${studentData.admissionNo}</strong></td></tr>
-                        <tr><td><i class="fas fa-calendar-alt"></i> Admission Date:</td><td>${admissionDate}</td></tr>
-                        <tr><td><i class="fas fa-user-graduate"></i> Student Name:</td><td>${studentData.studentName}</td></tr>
-                        <tr><td><i class="fas fa-father"></i> Father's Name:</td><td>${studentData.fatherName}</td></tr>
-                        <tr><td><i class="fas fa-mother"></i> Mother's Name:</td><td>${studentData.motherName || '-'}</td></tr>
-                        <tr><td><i class="fas fa-calendar"></i> Date of Birth:</td><td>${studentData.dob}</td></tr>
-                        <tr><td><i class="fas fa-venus-mars"></i> Gender:</td><td>${studentData.gender}</td></tr>
-                        <tr><td><i class="fas fa-chalkboard"></i> Class:</td><td>${studentData.classApplying}</td></tr>
-                        <tr><td><i class="fas fa-school"></i> Present School/College:</td><td>${studentData.schoolName}</td></tr>
-                        <tr><td><i class="fas fa-map-marker-alt"></i> Address:</td><td>${studentData.address}</td></tr>
-                        <tr><td><i class="fas fa-phone"></i> Mobile Number:</td><td>${studentData.parentMobile}</td></tr>
-                        <tr><td><i class="fas fa-id-card"></i> Aadhar No:</td><td>${studentData.aadhar || '-'}</td></tr>
-                        <tr><td><i class="fas fa-globe"></i> Nationality:</td><td>${studentData.nationality}</td></tr>
-                        <tr><td><i class="fas fa-question-circle"></i> Know About QCC:</td><td>${studentData.knowAbout || '-'}</td></tr>
-                        <tr><td><i class="fas fa-notes-medical"></i> Medical Info:</td><td>${studentData.medicalInfo || 'None'}</td></tr>
-                    </table>
                     
-                    <div class="signature-section">
-                        <div class="signature-box">
-                            <div class="signature-line"></div>
-                            <div class="signature-label">Parent/Guardian Signature</div>
+                    <div class="info-section">
+                        <div class="info-section-title"><i class="fas fa-user-graduate"></i> Personal Details</div>
+                        <div class="info-grid">
+                            <div class="info-item"><span class="info-label">Admission No:</span><span class="info-value"><strong>${studentData.admissionNo}</strong></span></div>
+                            <div class="info-item"><span class="info-label">Admission Date:</span><span class="info-value">${admissionDate}</span></div>
+                            <div class="info-item"><span class="info-label">Student Name:</span><span class="info-value">${studentData.studentName}</span></div>
+                            <div class="info-item"><span class="info-label">Date of Birth:</span><span class="info-value">${studentData.dob}</span></div>
+                            <div class="info-item"><span class="info-label">Gender:</span><span class="info-value">${studentData.gender}</span></div>
+                            <div class="info-item"><span class="info-label">Nationality:</span><span class="info-value">${studentData.nationality}</span></div>
                         </div>
-                        <div class="signature-box">
-                            <div class="signature-line"></div>
-                            <div class="signature-label">Student Signature</div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-section-title"><i class="fas fa-users"></i> Parent Information</div>
+                        <div class="info-grid">
+                            <div class="info-item"><span class="info-label">Father's Name:</span><span class="info-value">${studentData.fatherName}</span></div>
+                            <div class="info-item"><span class="info-label">Mother's Name:</span><span class="info-value">${studentData.motherName || '-'}</span></div>
+                            <div class="info-item"><span class="info-label">Parent Mobile:</span><span class="info-value">${studentData.parentMobile}</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-section-title"><i class="fas fa-map-marker-alt"></i> Address & Contact</div>
+                        <div class="info-grid">
+                            <div class="info-item"><span class="info-label">Complete Address:</span><span class="info-value">${studentData.address}</span></div>
+                            <div class="info-item"><span class="info-label">Aadhar No:</span><span class="info-value">${studentData.aadhar || '-'}</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-section-title"><i class="fas fa-graduation-cap"></i> Education & Session</div>
+                        <div class="info-grid">
+                            <div class="info-item"><span class="info-label">Class Applying:</span><span class="info-value"><strong>${studentData.classApplying}</strong></span></div>
+                            <div class="info-item"><span class="info-label">Session:</span><span class="info-value">${studentData.session}</span></div>
+                            <div class="info-item"><span class="info-label">Previous School:</span><span class="info-value">${studentData.schoolName}</span></div>
+                            <div class="info-item"><span class="info-label">Know About QCC:</span><span class="info-value">${studentData.knowAbout || '-'}</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-section-title"><i class="fas fa-notes-medical"></i> Medical Information</div>
+                        <div class="info-item"><span class="info-label">Medical Info:</span><span class="info-value">${studentData.medicalInfo || 'None'}</span></div>
+                    </div>
+                    
+                    <div class="signature-section-card">
+                        <div class="signature-box-card">
+                            <div class="signature-line-card"></div>
+                            <div class="signature-label-card">Parent/Guardian Signature</div>
+                        </div>
+                        <div class="signature-box-card">
+                            <div class="signature-line-card"></div>
+                            <div class="signature-label-card">Student Signature</div>
                         </div>
                     </div>
                 </div>
@@ -785,78 +815,49 @@
             </div>
         `;
         
-        // Create temporary container
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = cardHtml;
-        document.body.appendChild(tempDiv);
-        
-        // Show in Swal
         Swal.fire({
             title: '✅ Admission Successful!',
             html: cardHtml,
             showConfirmButton: false,
             showCloseButton: true,
-            width: '950px',
+            width: '1000px',
             padding: '0',
-            customClass: {
-                popup: 'admission-swal-popup'
-            },
-            didOpen: () => {
-                // Add print/share/pdf functions to window
-                window.printAdmissionCard = function() {
-                    const printContent = document.getElementById('admissionCard').cloneNode(true);
-                    const printWindow = window.open('', '_blank');
-                    printWindow.document.write(`
-                        <html><head><title>Admission Card - ${studentData.studentName}</title>
-                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-                        <style>
-                            body { font-family: 'Segoe UI', Roboto, sans-serif; padding: 20px; }
-                            .admission-card { max-width: 900px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
-                            .card-header { background: linear-gradient(135deg, #1b4f9b, #0f3f7a); color: white; padding: 25px; text-align: center; }
-                            .card-body { padding: 25px; }
-                            .info-table { width: 100%; border-collapse: collapse; }
-                            .info-table td { padding: 10px 8px; border-bottom: 1px solid #e2e8f0; }
-                            .info-table td:first-child { font-weight: 700; background: #f8fafc; width: 35%; }
-                            .photo-section-card { text-align: center; margin-bottom: 20px; }
-                            .student-photo-card { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #1b4f9b; }
-                            .signature-section { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 2px dashed #e2e8f0; }
-                            .signature-box { text-align: center; width: 45%; }
-                            .signature-line { border-top: 1px solid #000; width: 100%; margin-top: 30px; }
-                            .btn-group-card { display: none; }
-                        </style>
-                        </head><body>${printContent.outerHTML}</body></html>
-                    `);
-                    printWindow.document.close();
-                    printWindow.print();
-                };
-                
-                window.shareAdmissionCard = function() {
-                    const text = `Admission Confirmation - Quest Coaching Centre\n\nStudent: ${studentData.studentName}\nAdmission No: ${studentData.admissionNo}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}\n\nThank you for choosing Quest Coaching Centre!`;
-                    if (navigator.share) {
-                        navigator.share({ title: 'Admission Confirmation', text: text });
-                    } else {
-                        navigator.clipboard.writeText(text);
-                        Swal.fire('Copied!', 'Details copied to clipboard', 'success');
-                    }
-                };
-                
-                window.downloadAdmissionPDF = async function() {
-                    const element = document.getElementById('admissionCard');
-                    const canvas = await html2canvas(element, { scale: 2, useCORS: true });
-                    const imgData = canvas.toDataURL('image/png');
-                    const { jsPDF } = window.jspdf;
-                    const pdf = new jsPDF('p', 'mm', 'a4');
-                    const imgWidth = 190;
-                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                    pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-                    pdf.save(`Admission_${studentData.admissionNo}_${studentData.studentName}.pdf`);
-                    Swal.fire('Downloaded!', 'PDF downloaded successfully', 'success');
-                };
-            }
+            customClass: { popup: 'admission-swal-popup' }
         });
+        
+        window.printAdmissionCard = () => {
+            const printContent = document.getElementById('admissionCard').cloneNode(true);
+            const win = window.open('', '_blank');
+            win.document.write(`
+                <html><head><title>Admission Card - ${studentData.studentName}</title>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                <style>body{font-family:'Segoe UI',sans-serif;padding:20px;} .btn-group-card{display:none;}</style>
+                </head><body>${printContent.outerHTML}</body></html>
+            `);
+            win.document.close();
+            win.print();
+        };
+        
+        window.shareAdmissionCard = () => {
+            const text = `🎓 Admission Confirmation - Quest Coaching Centre\n\nStudent: ${studentData.studentName}\nAdmission No: ${studentData.admissionNo}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}\n\nThank you for choosing Quest Coaching Centre!`;
+            if (navigator.share) navigator.share({ title: 'Admission Confirmation', text: text });
+            else { navigator.clipboard.writeText(text); Swal.fire('Copied!', 'Details copied to clipboard', 'success'); }
+        };
+        
+        window.downloadAdmissionPDF = async () => {
+            const element = document.getElementById('admissionCard');
+            const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgWidth = 190;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+            pdf.save(`Admission_${studentData.admissionNo}_${studentData.studentName}.pdf`);
+            Swal.fire('Downloaded!', 'PDF downloaded successfully', 'success');
+        };
     }
     
-    // ============ SUBMIT FORM ============
     document.getElementById('admissionForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         
@@ -873,32 +874,22 @@
         const address = document.getElementById('address').value.trim();
         const aadhar = document.getElementById('aadhar').value.trim();
         const presentSchool = document.getElementById('presentSchool').value.trim();
-        const sessionSelect = document.getElementById('sessionSelect').value;
+        const session = document.getElementById('sessionSelect').value;
         const knowAbout = getSelectedKnowAbout();
         const medicalInfo = document.getElementById('medicalInfo').value.trim();
         const declaration = document.getElementById('declaration').checked;
-        const declarationPlace = document.getElementById('declarationPlace').value.trim();
         const photoFile = document.getElementById('studentPhoto').files[0];
         
         const fullName = [firstName, middleName, lastName].filter(n => n).join(' ');
         
-        // Validation
         if (!firstName || !lastName || !nationality || !dob || !gender || !classVal || !fatherName || !studentMobile || !address || !presentSchool) {
-            showAlert('Please fill all required fields (*)', 'error');
-            return;
+            showAlert('Please fill all required fields (*)', 'error'); return;
         }
         if (studentMobile.length !== 10 || !/^\d+$/.test(studentMobile)) {
-            showAlert('Enter valid 10-digit mobile number', 'error');
-            return;
+            showAlert('Enter valid 10-digit mobile number', 'error'); return;
         }
-        if (!photoFile) {
-            showAlert('Please upload passport size photo', 'error');
-            return;
-        }
-        if (!declaration) {
-            showAlert('Please accept the declaration', 'error');
-            return;
-        }
+        if (!photoFile) { showAlert('Please upload passport size photo', 'error'); return; }
+        if (!declaration) { showAlert('Please accept the declaration', 'error'); return; }
         
         progressOverlay.style.display = 'flex';
         updateProgress(0, 'Starting...');
@@ -908,41 +899,18 @@
             const admissionNo = generateAdmissionNo();
             
             updateProgress(40, 'Compressing and uploading photo...');
-            let photoUrl = '';
-            try {
-                photoUrl = await uploadPhotoToSupabase(photoFile, admissionNo);
-                updateProgress(60, 'Photo uploaded successfully!');
-            } catch (uploadError) {
-                console.error('Photo upload error:', uploadError);
-                showAlert('Photo upload failed: ' + uploadError.message, 'error');
-                progressOverlay.style.display = 'none';
-                return;
-            }
+            let photoUrl = await uploadPhotoToSupabase(photoFile, admissionNo);
+            updateProgress(60, 'Photo uploaded successfully!');
             
-            updateProgress(80, 'Saving student data to database...');
-            
+            updateProgress(80, 'Saving student data...');
             const admissionData = {
-                admissionNo: admissionNo,
-                studentName: fullName,
-                fatherName: fatherName,
-                motherName: motherName || '',
-                dob: dob,
-                gender: gender,
-                classApplying: classVal,
-                schoolName: presentSchool,
-                address: address,
-                parentMobile: studentMobile,
-                aadhar: aadhar || '',
-                nationality: nationality,
-                knowAbout: knowAbout || '',
-                medicalInfo: medicalInfo || '',
-                photoUrl: photoUrl,
-                admissionDate: new Date().toISOString(),
-                session: sessionSelect,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                status: 'active'
+                admissionNo, studentName: fullName, fatherName, motherName: motherName || '',
+                dob, gender, classApplying: classVal, schoolName: presentSchool,
+                address, parentMobile: studentMobile, aadhar: aadhar || '',
+                nationality, knowAbout: knowAbout || '', medicalInfo: medicalInfo || '',
+                photoUrl, admissionDate: new Date().toISOString(), session,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(), status: 'active'
             };
-            
             await admissionsCollection.add(admissionData);
             updateProgress(100, 'Complete!');
             
@@ -950,10 +918,8 @@
                 progressOverlay.style.display = 'none';
                 displayAdmissionCard(admissionData, photoUrl);
             }, 500);
-            
         } catch (error) {
             progressOverlay.style.display = 'none';
-            console.error('Error:', error);
             showAlert('Error: ' + error.message, 'error');
         }
     });
