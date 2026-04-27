@@ -200,39 +200,33 @@
             --light-bg: #f8f9fc;
             --border: #e2e8f0;
             --text-dark: #2c3e50;
-            --text-light: #64748b;
-        }
-        
-        .card-print-container {
-            max-width: 100%;
-            margin: 0 auto;
         }
         
         .admission-card {
             background: white;
             width: 100%;
-            max-width: 950px;
+            max-width: 1100px;
             margin: 0 auto;
             border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
         }
         
-        /* Header Section - Fixed */
+        /* Header - Logo & Name Centered */
         .card-header {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            padding: 25px 35px 20px 35px;
-            position: relative;
+            padding: 25px 35px;
+            text-align: center;
         }
-        .header-flex {
+        .logo-center {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 25px;
-            flex-wrap: wrap;
+            justify-content: center;
         }
-        .logo-area-card {
-            width: 90px;
-            height: 90px;
+        .logo-img-card {
+            width: 100px;
+            height: 100px;
             background: white;
             border-radius: 50%;
             display: flex;
@@ -240,47 +234,46 @@
             justify-content: center;
             border: 3px solid var(--accent);
             overflow: hidden;
+            margin-bottom: 15px;
         }
-        .logo-area-card img {
+        .logo-img-card img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        .institution-info {
-            flex: 1;
-        }
-        .institution-info h1 {
+        .institution-name h1 {
             color: white;
-            font-size: 28px;
-            letter-spacing: 1px;
+            font-size: 32px;
+            letter-spacing: 2px;
             margin-bottom: 5px;
         }
-        .institution-info .tagline {
+        .institution-name .tagline {
             color: var(--accent);
-            font-size: 12px;
+            font-size: 13px;
             letter-spacing: 2px;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
-        .institution-info .under {
+        .institution-name .under {
             color: rgba(255,255,255,0.8);
-            font-size: 12px;
+            font-size: 13px;
         }
-        .contact-row {
+        .contact-strip-card {
             display: flex;
+            justify-content: center;
             flex-wrap: wrap;
-            gap: 20px;
-            margin-top: 12px;
+            gap: 25px;
+            margin-top: 15px;
             padding-top: 12px;
             border-top: 1px solid rgba(255,255,255,0.2);
         }
         .contact-item-card {
             color: rgba(255,255,255,0.85);
-            font-size: 11px;
+            font-size: 12px;
             display: flex;
             align-items: center;
             gap: 6px;
         }
-        .contact-item-card i { color: var(--accent); font-size: 12px; }
+        .contact-item-card i { color: var(--accent); }
         
         /* Title Banner */
         .title-banner {
@@ -306,7 +299,7 @@
         .title-banner h2:before { left: -35px; }
         .title-banner h2:after { right: -35px; }
         
-        /* Top Info Row */
+        /* Top Row */
         .top-row {
             display: flex;
             gap: 25px;
@@ -325,7 +318,6 @@
             justify-content: center;
         }
         .photo-card img { width: 100%; height: 100%; object-fit: cover; }
-        .photo-card i { font-size: 50px; color: #ccc; }
         
         .info-group {
             flex: 1;
@@ -336,40 +328,24 @@
         }
         .info-row {
             display: grid;
-            grid-template-columns: 150px 1fr;
+            grid-template-columns: 140px 1fr;
             padding: 8px 0;
             border-bottom: 1px dashed var(--border);
         }
         .info-row:last-child { border-bottom: none; }
-        .info-label { font-weight: 700; color: var(--text-dark); font-size: 12px; text-transform: uppercase; }
+        .info-label { font-weight: 700; color: var(--text-dark); font-size: 12px; }
         .info-value { font-weight: 600; color: var(--primary); font-size: 13px; }
         .adm-no { color: #d9534f; font-size: 14px; }
         
-        .qr-card {
-            text-align: center;
-            width: 110px;
-        }
-        .qr-box {
-            background: white;
-            padding: 8px;
-            border: 2px solid var(--accent);
-            border-radius: 12px;
-            margin-bottom: 5px;
-        }
-        .qr-label-card {
-            background: var(--accent);
-            color: white;
-            font-size: 9px;
-            padding: 4px;
-            border-radius: 20px;
-            font-weight: bold;
-        }
+        .qr-card { text-align: center; width: 120px; }
+        .qr-box { background: white; padding: 8px; border: 2px solid var(--accent); border-radius: 12px; margin-bottom: 5px; }
+        .qr-label-card { background: var(--accent); color: white; font-size: 9px; padding: 4px; border-radius: 20px; font-weight: bold; }
         
-        /* Details Grid - Balanced Sections */
+        /* Details Grid */
         .details-section {
             padding: 0 30px;
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
             margin-bottom: 20px;
         }
@@ -385,14 +361,9 @@
             padding: 10px 15px;
             font-size: 13px;
             font-weight: 700;
-            letter-spacing: 1px;
         }
-        .detail-content {
-            padding: 15px;
-        }
-        .detail-table {
-            width: 100%;
-        }
+        .detail-content { padding: 15px; }
+        .detail-table { width: 100%; }
         .detail-table td {
             padding: 8px 5px;
             font-size: 12px;
@@ -403,39 +374,64 @@
             color: var(--text-dark);
             width: 40%;
         }
-        .detail-table td:last-child {
-            color: var(--primary);
-            font-weight: 500;
-        }
+        .detail-table td:last-child { color: var(--primary); }
         .detail-table tr:last-child td { border-bottom: none; }
         
-        /* Full Width Sections */
-        .full-section-card {
+        /* Terms Section - Hindi */
+        .terms-section {
             padding: 0 30px;
-            margin-bottom: 20px;
+            margin: 20px 0;
         }
-        .declaration-card {
+        .terms-box {
             background: #fef9e6;
             border-left: 4px solid var(--accent);
+            border-radius: 12px;
             padding: 15px 20px;
-            border-radius: 10px;
-            font-size: 12px;
-            color: #555;
         }
-        .declaration-card strong { color: var(--primary); }
+        .terms-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .terms-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            font-size: 10px;
+            line-height: 1.4;
+            color: #444;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        .terms-list li {
+            list-style: none;
+            padding: 4px 0;
+            border-bottom: 1px dotted #e2e8f0;
+        }
+        .terms-list li:before {
+            content: "•";
+            color: var(--accent);
+            font-weight: bold;
+            margin-right: 6px;
+        }
         
+        /* Quote */
         .quote-card {
             background: linear-gradient(135deg, var(--light-bg), white);
-            padding: 12px 20px;
+            padding: 10px 20px;
             text-align: center;
             border-radius: 30px;
             margin: 0 30px 20px 30px;
             border: 1px solid var(--border);
         }
-        .quote-text-card { font-size: 12px; font-style: italic; color: var(--text-dark); }
-        .quote-author-card { font-size: 11px; font-weight: 700; color: var(--accent); margin-top: 5px; display: block; }
+        .quote-text { font-size: 12px; font-style: italic; color: var(--text-dark); }
+        .quote-author { font-size: 11px; font-weight: 700; color: var(--accent); margin-top: 4px; display: block; }
         
-        /* Bottom Signatures */
+        /* Signatures */
         .signatures-section {
             display: flex;
             justify-content: space-between;
@@ -443,18 +439,14 @@
             flex-wrap: wrap;
             gap: 20px;
         }
-        .sig-card {
-            text-align: center;
-            width: 200px;
-        }
-        .sig-line-card {
+        .sig-card { text-align: center; width: 200px; }
+        .sig-line {
             border-top: 1.5px solid var(--text-dark);
             width: 100%;
             margin-top: 30px;
             padding-top: 8px;
             font-size: 11px;
             font-weight: 600;
-            color: var(--text-dark);
         }
         .seal-card {
             width: 90px;
@@ -467,13 +459,7 @@
             flex-direction: column;
             background: #fef9e6;
         }
-        .seal-card span {
-            font-size: 9px;
-            font-weight: bold;
-            color: var(--accent);
-            text-align: center;
-            line-height: 1.3;
-        }
+        .seal-card span { font-size: 9px; font-weight: bold; color: var(--accent); text-align: center; line-height: 1.3; }
         
         /* Footer */
         .card-footer {
@@ -481,11 +467,7 @@
             padding: 12px;
             text-align: center;
         }
-        .card-footer p {
-            color: white;
-            font-size: 11px;
-            letter-spacing: 1px;
-        }
+        .card-footer p { color: white; font-size: 11px; letter-spacing: 1px; }
         
         /* Action Buttons */
         .action-buttons-card {
@@ -520,18 +502,19 @@
             .form-card { padding: 20px; }
             .photo-section { justify-content: center; }
             .details-section { grid-template-columns: 1fr; padding: 0 15px; }
-            .top-row { padding: 0 15px; flex-direction: column; align-items: center; }
+            .top-row { flex-direction: column; align-items: center; padding: 0 15px; }
             .signatures-section { justify-content: center; }
-            .header-flex { flex-direction: column; text-align: center; }
-            .institution-info h1 { font-size: 22px; }
+            .terms-list { grid-template-columns: 1fr; max-height: 300px; }
             .title-banner h2 { font-size: 22px; }
             .title-banner h2:before, .title-banner h2:after { display: none; }
+            .institution-name h1 { font-size: 24px; }
         }
         
         @media print {
             .no-print, .action-buttons-card { display: none !important; }
-            .admission-card { box-shadow: none; margin: 0; }
+            .admission-card { box-shadow: none; margin: 0; max-width: 100%; }
             body { background: white; padding: 0; }
+            .terms-list { max-height: none; overflow: visible; }
         }
     </style>
 </head>
@@ -665,6 +648,36 @@
     const STORAGE_BUCKET = 'student_photos';
     const LOGO_URL = 'https://i.ibb.co/hF9tmnpB/20250903-202922.jpg';
     
+    // Terms and Conditions in Hindi
+    const TERMS_LIST = [
+        "नामांकन फॉर्म के साथ हाल ही की दो पासपोर्ट साइज फोटो और आधार कार्ड लगाना अनिवार्य है।",
+        "माता-पिता का सही विवरण देना अनिवार्य है।",
+        "संस्थान द्वारा टेस्ट का परिणाम या कोई अन्य जानकारी SMS के माध्यम से भेजी जाएगी।",
+        "क्लास में मोबाइल फोन या आई-पॉड ले जाने की अनुमति नहीं है।",
+        "छात्रों को विनम्र, समय का पाबंद और नियमित होना चाहिए।",
+        "सारा होमवर्क समय पर पूरा करना चाहिए और सभी टेस्ट में शामिल होना चाहिए।",
+        "क्लास शुरू होने से कम से कम 5 मिनट पहले केंद्र पर पहुंचना चाहिए।",
+        "क्लास में किसी से बात न करें, केवल अपने शिक्षक से प्रश्न और शंकाएं पूछें।",
+        "अनुपस्थित रहने पर क्लास के समय से पहले शिक्षक को सूचित करें, अन्यथा ₹10 प्रतिदिन जुर्माना।",
+        "टेस्ट छोड़ने पर ₹50 का जुर्माना देना होगा।",
+        "सत्र के बीच में प्रवेश रद्द नहीं किया जा सकता।",
+        "एक बार जमा की गई फीस किसी भी परिस्थिति में वापस नहीं की जाएगी।",
+        "अभिभावक पूर्व नियुक्ति लेकर हर महीने प्रगति पर चर्चा कर सकते हैं।",
+        "गंभीर अनुशासनहीनता पर बिना रिफंड के प्रवेश रद्द कर दिया जाएगा।",
+        "10 मिनट से अधिक देरी से आने वाले छात्रों को प्रवेश की अनुमति नहीं दी जाएगी।",
+        "पते या मोबाइल नंबर में बदलाव की सूचना 5 दिनों के भीतर देनी होगी।",
+        "समय पर फीस न भरने पर क्लास में आने से रोक दिया जाएगा।",
+        "बिना सूचना के 3 सप्ताह से अधिक अनुपस्थित रहने पर नाम काट दिया जाएगा।",
+        "अनुशासनहीनता करने वाले छात्र को निकाला जा सकता है, निदेशक का निर्णय अंतिम होगा।",
+        "पंजीकरण राशि जमा करने के बाद कोई पैसा वापस नहीं किया जाएगा।",
+        "अभिभावक द्वारा स्टाफ के साथ दुर्व्यवहार करने पर छात्र को निकाला जा सकता है।",
+        "सत्र के अंत से पहले कोचिंग छोड़ने पर शेष फीस जब्त कर ली जाएगी।",
+        "केंद्र की संपत्ति को नुकसान पहुंचाने पर अभिभावक मरम्मत के खर्च के लिए जिम्मेदार होंगे।",
+        "QUEST COACHING CENTRE के पास कार्यक्रमों, स्थान या समय में बदलाव करने का अधिकार सुरक्षित है।",
+        "प्रबंध निदेशक का निर्णय अंतिम होगा।",
+        "किसी भी कानूनी विवाद की स्थिति में, न्यायिक क्षेत्राधिकार केवल जिला न्यायालय, गोपालगंज (बिहार) के अधीन होगा।"
+    ];
+    
     const authLoading = document.getElementById('authLoading');
     const mainContent = document.getElementById('mainContent');
     
@@ -782,23 +795,32 @@
         const dobDate = new Date(studentData.dob);
         const today = new Date();
         
+        // QR Data - Student all details
+        const qrData = `Student Details - Quest Coaching Centre\n\nAdmission No: ${studentData.admissionNo}\nStudent Name: ${studentData.studentName}\nFather Name: ${studentData.fatherName}\nMother Name: ${studentData.motherName || '-'}\nDate of Birth: ${dobDate.toLocaleDateString('en-GB')}\nGender: ${studentData.gender}\nClass: ${studentData.classApplying}\nSession: ${studentData.session}\nMobile: ${studentData.parentMobile}\nAddress: ${studentData.address}\nSchool: ${studentData.schoolName}\n\nQUEST COACHING CENTRE, Gopalganj`;
+        
+        // Terms HTML
+        let termsHtml = '';
+        TERMS_LIST.forEach(term => {
+            termsHtml += `<li>${term}</li>`;
+        });
+        
         const cardHtml = `
             <div id="admissionCard" class="admission-card">
-                <!-- Header Section -->
+                <!-- Header with Centered Logo and Name -->
                 <div class="card-header">
-                    <div class="header-flex">
-                        <div class="logo-area-card">
-                            <img src="${LOGO_URL}" alt="Quest Logo" onerror="this.src='https://via.placeholder.com/90'">
+                    <div class="logo-center">
+                        <div class="logo-img-card">
+                            <img src="${LOGO_URL}" alt="Quest Coaching Logo" onerror="this.src='https://via.placeholder.com/100'">
                         </div>
-                        <div class="institution-info">
+                        <div class="institution-name">
                             <h1>QUEST COACHING CENTRE</h1>
                             <div class="tagline">|| SEARCH FOR KNOWLEDGE ||</div>
                             <div class="under">Under the guidance of MR. RAVI SIR</div>
-                            <div class="contact-row">
-                                <div class="contact-item-card"><i class="fas fa-map-marker-alt"></i> Block More, Gopalganj - 841428</div>
-                                <div class="contact-item-card"><i class="fas fa-phone-alt"></i> +91 9708442525</div>
-                                <div class="contact-item-card"><i class="fas fa-envelope"></i> questcoachingcentre@gmail.com</div>
-                            </div>
+                        </div>
+                        <div class="contact-strip-card">
+                            <div class="contact-item-card"><i class="fas fa-map-marker-alt"></i> Block More, Gopalganj - 841428</div>
+                            <div class="contact-item-card"><i class="fas fa-phone-alt"></i> +91 9708442525</div>
+                            <div class="contact-item-card"><i class="fas fa-envelope"></i> questcoachingcentre@gmail.com</div>
                         </div>
                     </div>
                 </div>
@@ -811,7 +833,7 @@
                 <!-- Top Row: Photo, ID Details, QR -->
                 <div class="top-row">
                     <div class="photo-card">
-                        <img src="${photoUrl}" alt="Student Photo" onerror="this.parentElement.innerHTML='<i class=\'fas fa-user\'></i>'">
+                        <img src="${photoUrl}" alt="Student Photo" onerror="this.parentElement.innerHTML='<i class=\'fas fa-user fa-3x\'></i>'">
                     </div>
                     <div class="info-group">
                         <div class="info-row"><span class="info-label">ADMISSION NO.</span><span class="info-value adm-no">${studentData.admissionNo}</span></div>
@@ -827,17 +849,17 @@
                     </div>
                 </div>
                 
-                <!-- Details Grid - 2 Columns Balanced -->
+                <!-- Personal & Parent Details -->
                 <div class="details-section">
                     <div class="detail-box">
                         <div class="detail-title"><i class="fas fa-user-graduate"></i> PERSONAL DETAILS</div>
                         <div class="detail-content">
                             <table class="detail-table">
-                                <tr><td>Student Name<td><strong>${studentData.studentName}</strong></tr>
-                                <tr><td>Date of Birth<td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</tr>
-                                <tr><td>Gender<td>${studentData.gender}</tr>
-                                <tr><td>Nationality<td>${studentData.nationality}</tr>
-                                <tr><td>Aadhar Number<td>${studentData.aadhar || '-'}</tr>
+                                <tr><td>Student Name</td><td><strong>${studentData.studentName}</strong></td></tr>
+                                <tr><td>Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
+                                <tr><td>Gender</td><td>${studentData.gender}</td></tr>
+                                <tr><td>Nationality</td><td>${studentData.nationality}</td></tr>
+                                <tr><td>Aadhar Number</td><td>${studentData.aadhar || '-'}</td></tr>
                             </table>
                         </div>
                     </div>
@@ -845,64 +867,61 @@
                         <div class="detail-title"><i class="fas fa-users"></i> PARENT INFORMATION</div>
                         <div class="detail-content">
                             <table class="detail-table">
-                                <tr><td>Father's Name<td>${studentData.fatherName}</tr>
-                                <tr><td>Mother's Name<td>${studentData.motherName || '-'}</tr>
-                                <tr><td>Contact Number<td>${studentData.parentMobile}</tr>
-                                <tr><td>Know About QCC<td>${studentData.knowAbout || '-'}</tr>
+                                <tr><td>Father's Name</td><td>${studentData.fatherName}</td></tr>
+                                <tr><td>Mother's Name</td><td>${studentData.motherName || '-'}</td></tr>
+                                <tr><td>Contact Number</td><td>${studentData.parentMobile}</td></tr>
+                                <tr><td>Know About QCC</td><td>${studentData.knowAbout || '-'}</td></tr>
                             </table>
                         </div>
                     </div>
                 </div>
                 
+                <!-- Address & Education -->
                 <div class="details-section">
                     <div class="detail-box">
                         <div class="detail-title"><i class="fas fa-map-marker-alt"></i> ADDRESS DETAILS</div>
                         <div class="detail-content">
-                            <table class="detail-table">
-                                <tr><td>Complete Address<td>${studentData.address}</tr>
-                            </table>
+                            <table class="detail-table"><tr><td>Complete Address</td><td>${studentData.address}</td></tr></table>
                         </div>
                     </div>
                     <div class="detail-box">
                         <div class="detail-title"><i class="fas fa-school"></i> EDUCATION DETAILS</div>
                         <div class="detail-content">
                             <table class="detail-table">
-                                <tr><td>Previous School<td>${studentData.schoolName}</tr>
-                                <tr><td>Medical Information<td>${studentData.medicalInfo || 'None'}</tr>
+                                <tr><td>Previous School</td><td>${studentData.schoolName}</td></tr>
+                                <tr><td>Medical Information</td><td>${studentData.medicalInfo || 'None'}</td></tr>
                             </table>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Declaration Section -->
-                <div class="full-section-card">
-                    <div class="declaration-card">
-                        <strong>📜 DECLARATION</strong><br>
-                        I hereby declare that the information furnished in this form is true to the best of my/our knowledge and belief.
-                        <div style="margin-top: 10px; display: flex; gap: 30px; flex-wrap: wrap;">
-                            <span>📅 DATE: <strong>${today.toLocaleDateString('en-GB')}</strong></span>
-                            <span>📍 PLACE: <strong>Gopalganj</strong></span>
+                <!-- Terms and Conditions -->
+                <div class="terms-section">
+                    <div class="terms-box">
+                        <div class="terms-title"><i class="fas fa-file-contract"></i> 📜 नियम और शर्तें (Terms & Conditions)</div>
+                        <div class="terms-list">
+                            ${termsHtml}
                         </div>
                     </div>
                 </div>
                 
                 <!-- Quote -->
                 <div class="quote-card">
-                    <span class="quote-text-card">"Education is not the learning of facts, but the training of the mind to think."</span>
-                    <span class="quote-author-card">- Albert Einstein</span>
+                    <span class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</span>
+                    <span class="quote-author">- Albert Einstein</span>
                 </div>
                 
                 <!-- Signatures -->
                 <div class="signatures-section">
                     <div class="sig-card">
-                        <div class="sig-line-card">Parent / Guardian Signature</div>
+                        <div class="sig-line">Parent / Guardian Signature</div>
                     </div>
                     <div class="seal-card">
                         <span>ADMISSION</span>
                         <span>CONFIRMED</span>
                     </div>
                     <div class="sig-card">
-                        <div class="sig-line-card">Student Signature</div>
+                        <div class="sig-line">Student Signature</div>
                     </div>
                 </div>
                 
@@ -924,16 +943,16 @@
             html: cardHtml,
             showConfirmButton: false,
             showCloseButton: true,
-            width: '1100px',
+            width: '1150px',
             padding: '0',
             customClass: { popup: 'admission-swal-popup' }
         });
         
         setTimeout(() => {
             new QRCode(document.getElementById("qrcode-card"), {
-                text: "Admission Verified: " + studentData.admissionNo,
-                width: 80,
-                height: 80
+                text: qrData,
+                width: 85,
+                height: 85
             });
         }, 100);
         
@@ -946,7 +965,9 @@
                 <style>
                     body{font-family:'Segoe UI',sans-serif;padding:20px;margin:0;}
                     .action-buttons-card, .no-print{display:none;}
-                    .admission-card{max-width:950px;margin:0 auto;box-shadow:none;}
+                    .admission-card{max-width:1100px;margin:0 auto;box-shadow:none;}
+                    .terms-list{max-height:none;overflow:visible;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+                    @media print{.terms-list{grid-template-columns:repeat(2,1fr);}}
                 </style>
                 </head><body>${printContent.outerHTML}</body></html>
             `);
