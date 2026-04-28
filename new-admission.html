@@ -3,25 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>📝 Quest Coaching · Admission Form</title>
+    <title>📝 Quest Coaching · Admission Suite</title>
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
         body { background: #f0f4fa; padding: 16px 12px 32px; }
-        .container { max-width: 1000px; margin: 0 auto; }
-        
+        .container { max-width: 1100px; margin: 0 auto; }
         .header-bar {
             background: white;
             border-radius: 40px;
@@ -33,1139 +29,199 @@
             margin-bottom: 20px;
             box-shadow: 0 8px 18px rgba(0,20,40,0.08);
         }
-        .back-btn {
-            background: #e8f0fe;
+        .logo-area h1 { font-size: 1.5rem; color: #1e3a5f; }
+        .logo-area p { font-size: 0.7rem; color: #4b5563; }
+        .action-header-buttons { display: flex; gap: 12px; }
+        .new-admission-btn {
+            background: linear-gradient(135deg, #1b4f9b, #0f3f7a);
             border: none;
             padding: 8px 20px;
             border-radius: 40px;
             font-weight: 600;
-            color: #1b4f9b;
+            color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
+            transition: 0.2s;
         }
-        
-        .form-card {
-            background: white;
-            border-radius: 32px;
-            padding: 30px;
-            box-shadow: 0 15px 30px -12px rgba(0,0,0,0.1);
-        }
-        
-        .section-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #1e3a5f;
-            margin: 20px 0 15px 0;
-            padding-bottom: 8px;
-            border-bottom: 3px solid #c5a059;
-            display: inline-block;
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-        
+        .new-admission-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(27,79,155,0.4); }
+        .back-btn { background: #e8f0fe; border: none; padding: 8px 20px; border-radius: 40px; font-weight: 600; color: #1b4f9b; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .form-card { background: white; border-radius: 32px; padding: 30px; box-shadow: 0 15px 30px -12px rgba(0,0,0,0.1); }
+        .section-title { font-size: 1.2rem; font-weight: 700; color: #1e3a5f; margin: 20px 0 15px 0; padding-bottom: 8px; border-bottom: 3px solid #c5a059; display: inline-block; }
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
         .full-width { grid-column: span 2; }
         .form-group { margin-bottom: 5px; }
         label { display: block; font-weight: 600; color: #334155; margin-bottom: 6px; font-size: 0.8rem; }
         .required { color: #dc2626; }
-        
-        input, select, textarea {
-            width: 100%;
-            padding: 12px 14px;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            background: #fafbfc;
-        }
+        input, select, textarea { width: 100%; padding: 12px 14px; border: 2px solid #e2e8f0; border-radius: 16px; font-size: 0.9rem; transition: all 0.2s; background: #fafbfc; }
         input:focus, select:focus, textarea:focus { border-color: #1b4f9b; outline: none; background: white; }
         .name-boxes { display: flex; gap: 12px; }
         .name-box { flex: 1; }
-        
         .radio-group, .checkbox-group { display: flex; gap: 20px; flex-wrap: wrap; padding: 8px 0; }
         .radio-group label, .checkbox-group label { display: inline-flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; }
-        .radio-group input, .checkbox-group input { width: 16px; height: 16px; }
-        
         .photo-section { display: flex; justify-content: flex-end; margin-bottom: 20px; }
-        .photo-box {
-            width: 140px;
-            height: 160px;
-            border: 2px dashed #1b4f9b;
-            border-radius: 16px;
-            background: #f8fafc;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            overflow: hidden;
-        }
+        .photo-box { width: 140px; height: 160px; border: 2px dashed #1b4f9b; border-radius: 16px; background: #f8fafc; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.3s; overflow: hidden; }
         .photo-box:hover { border-color: #c5a059; background: #f1f5f9; }
         .photo-placeholder { text-align: center; padding: 15px; }
         .photo-placeholder i { font-size: 2rem; color: #1b4f9b; }
         .photo-preview { width: 100%; height: 100%; object-fit: cover; display: none; }
         #studentPhoto { display: none; }
-        
-        .declaration-box {
-            background: #f8fafc;
-            padding: 20px;
-            border-radius: 20px;
-            margin: 20px 0;
-            border: 1px solid #e2e8f0;
-        }
-        .declaration-text { font-style: italic; color: #334155; margin-bottom: 15px; font-size: 0.85rem; }
-        .signature-row { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px; }
-        .signature-item { flex: 1; }
-        
-        .btn-submit {
-            background: linear-gradient(135deg, #1b4f9b, #0f3f7a);
-            color: white;
-            padding: 16px 28px;
-            border: none;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s;
-        }
+        .declaration-box { background: #f8fafc; padding: 20px; border-radius: 20px; margin: 20px 0; border: 1px solid #e2e8f0; }
+        .btn-submit { background: linear-gradient(135deg, #1b4f9b, #0f3f7a); color: white; padding: 16px 28px; border: none; border-radius: 50px; font-size: 1rem; font-weight: 700; cursor: pointer; width: 100%; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s; }
         .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(27, 79, 155, 0.3); }
-        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
-        
-        .btn-update {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-        }
-        .btn-update:hover { background: linear-gradient(135deg, #d97706, #b45309); }
-        
-        .progress-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 9999;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-        .progress-card {
-            background: white;
-            padding: 35px;
-            border-radius: 30px;
-            text-align: center;
-            min-width: 280px;
-        }
+        .progress-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 9999; display: none; justify-content: center; align-items: center; flex-direction: column; }
+        .progress-card { background: white; padding: 35px; border-radius: 30px; text-align: center; min-width: 280px; }
         .progress-bar-container { width: 100%; height: 12px; background: #e2e8f0; border-radius: 20px; overflow: hidden; margin: 20px 0; }
         .progress-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #1b4f9b, #c5a059); border-radius: 20px; transition: width 0.3s ease; }
-        
-        .auth-loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 10000;
-        }
+        .auth-loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; display: flex; justify-content: center; align-items: center; flex-direction: column; z-index: 10000; }
         .auth-loading .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #1b4f9b; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .main-content { display: none; }
-        
-        .mode-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-left: 15px;
-        }
-        .mode-view { background: #16a34a; color: white; }
-        .mode-edit { background: #f59e0b; color: white; }
-        .mode-new { background: #1b4f9b; color: white; }
-        
-        .readonly-field {
-            background: #f1f5f9;
-            color: #334155;
-            cursor: not-allowed;
-        }
-        
-        .action-buttons-card {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            padding: 20px;
-            background: #f1f5f9;
-            flex-wrap: wrap;
-            border-radius: 16px;
-            margin-top: 20px;
-        }
-        .action-btn {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.2s;
-            font-size: 13px;
-        }
+        .mode-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-left: 15px; background: #1b4f9b; color: white; }
+        .action-buttons-card { display: flex; gap: 12px; justify-content: center; padding: 20px; background: #f1f5f9; flex-wrap: wrap; border-radius: 16px; margin-top: 20px; }
+        .action-btn { padding: 10px 24px; border: none; border-radius: 40px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; font-size: 13px; }
         .action-btn.print { background: #1b4f9b; color: white; }
         .action-btn.share { background: #16a34a; color: white; }
         .action-btn.pdf { background: #dc2626; color: white; }
-        .action-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        
-        /* ============ ADMISSION CARD STYLES (EXACTLY SAME) ============ */
-        :root {
-            --primary: #1a3a5c;
-            --primary-dark: #0f2b44;
-            --accent: #c5a059;
-            --light-bg: #f8f9fc;
-            --border: #e2e8f0;
-            --text-dark: #2c3e50;
-        }
-        
-        .admission-card {
-            background: white;
-            width: 100%;
-            max-width: 1100px;
-            margin: 20px auto;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-        }
-        .card-header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 25px 35px; text-align: center; }
+        .admission-card { background: white; width: 100%; max-width: 1100px; margin: 20px auto; border-radius: 20px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+        .card-header { background: linear-gradient(135deg, #1a3a5c, #0f2b44); padding: 25px 35px; text-align: center; }
         .logo-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .logo-img-card { width: 100px; height: 100px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid var(--accent); overflow: hidden; margin-bottom: 15px; }
+        .logo-img-card { width: 100px; height: 100px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #c5a059; overflow: hidden; margin-bottom: 15px; }
         .logo-img-card img { width: 100%; height: 100%; object-fit: cover; }
-        .institution-name h1 { color: white; font-size: 32px; letter-spacing: 2px; margin-bottom: 5px; }
-        .institution-name .tagline { color: var(--accent); font-size: 13px; letter-spacing: 2px; margin-bottom: 5px; }
-        .institution-name .under { color: rgba(255,255,255,0.8); font-size: 13px; }
+        .institution-name h1 { color: white; font-size: 32px; letter-spacing: 2px; }
+        .institution-name .tagline { color: #c5a059; font-size: 13px; }
         .contact-strip-card { display: flex; justify-content: center; flex-wrap: wrap; gap: 25px; margin-top: 15px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.2); }
         .contact-item-card { color: rgba(255,255,255,0.85); font-size: 12px; display: flex; align-items: center; gap: 6px; }
-        .contact-item-card i { color: var(--accent); }
-        
-        .title-banner { text-align: center; padding: 20px 0 10px 0; background: white; }
-        .title-banner h2 { font-size: 28px; color: var(--primary); letter-spacing: 3px; display: inline-block; position: relative; }
-        .title-banner h2:before, .title-banner h2:after { content: "✦"; color: var(--accent); font-size: 20px; position: absolute; top: 50%; transform: translateY(-50%); }
+        .title-banner { text-align: center; padding: 20px 0 10px; background: white; }
+        .title-banner h2 { font-size: 28px; color: #1a3a5c; letter-spacing: 3px; display: inline-block; position: relative; }
+        .title-banner h2:before, .title-banner h2:after { content: "✦"; color: #c5a059; font-size: 20px; position: absolute; top: 50%; transform: translateY(-50%); }
         .title-banner h2:before { left: -35px; }
         .title-banner h2:after { right: -35px; }
-        
         .top-row { display: flex; gap: 25px; padding: 0 30px 20px 30px; flex-wrap: wrap; }
-        .photo-card { width: 130px; height: 150px; border: 3px solid var(--accent); border-radius: 12px; overflow: hidden; background: #f5f5f5; display: flex; align-items: center; justify-content: center; }
+        .photo-card { width: 130px; height: 150px; border: 3px solid #c5a059; border-radius: 12px; overflow: hidden; background: #f5f5f5; display: flex; align-items: center; justify-content: center; }
         .photo-card img { width: 100%; height: 100%; object-fit: cover; }
-        .info-group { flex: 1; background: var(--light-bg); border-radius: 12px; padding: 15px 20px; border: 1px solid var(--border); }
-        .info-row { display: grid; grid-template-columns: 140px 1fr; padding: 10px 0; border-bottom: 1px dashed var(--border); }
-        .info-row:last-child { border-bottom: none; }
-        .info-label { font-weight: 700; color: var(--text-dark); font-size: 12px; }
-        .info-value { font-weight: 600; color: var(--primary); font-size: 13px; }
-        .adm-no { color: #d9534f; font-size: 14px; }
-        
+        .info-group { flex: 1; background: #f8f9fc; border-radius: 12px; padding: 15px 20px; border: 1px solid #e2e8f0; }
+        .info-row { display: grid; grid-template-columns: 140px 1fr; padding: 10px 0; border-bottom: 1px dashed #e2e8f0; }
+        .info-label { font-weight: 700; color: #2c3e50; font-size: 12px; }
+        .info-value { font-weight: 600; color: #1a3a5c; font-size: 13px; }
+        .adm-no { color: #d9534f; }
         .qr-card { text-align: center; width: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .qr-box { background: white; padding: 10px; border: 2px solid var(--accent); border-radius: 16px; margin-bottom: 8px; display: flex; justify-content: center; align-items: center; }
-        .qr-label-card { background: var(--accent); color: white; font-size: 10px; padding: 5px 10px; border-radius: 20px; font-weight: bold; }
-        
+        .qr-box { background: white; padding: 10px; border: 2px solid #c5a059; border-radius: 16px; margin-bottom: 8px; display: flex; justify-content: center; align-items: center; }
+        .qr-label-card { background: #c5a059; color: white; font-size: 10px; padding: 5px 10px; border-radius: 20px; font-weight: bold; }
         .details-section { padding: 0 30px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; margin-bottom: 25px; }
-        .detail-box { background: var(--light-bg); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
-        .detail-title { background: var(--primary); color: white; padding: 12px 18px; font-size: 14px; font-weight: 700; }
+        .detail-box { background: #f8f9fc; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
+        .detail-title { background: #1a3a5c; color: white; padding: 12px 18px; font-size: 14px; font-weight: 700; }
         .detail-content { padding: 18px; }
         .detail-table { width: 100%; }
-        .detail-table td { padding: 10px 8px; font-size: 12px; border-bottom: 1px dotted var(--border); }
-        .detail-table td:first-child { font-weight: 700; color: var(--text-dark); width: 38%; }
-        .detail-table td:last-child { color: var(--primary); }
-        .detail-table tr:last-child td { border-bottom: none; }
-        
+        .detail-table td { padding: 10px 8px; font-size: 12px; border-bottom: 1px dotted #e2e8f0; }
+        .detail-table td:first-child { font-weight: 700; width: 38%; }
         .terms-section { padding: 0 30px; margin: 20px 0; }
-        .terms-box { background: #fef9e6; border-left: 4px solid var(--accent); border-radius: 12px; padding: 18px 22px; }
-        .terms-title { font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .terms-box { background: #fef9e6; border-left: 4px solid #c5a059; border-radius: 12px; padding: 18px 22px; }
+        .terms-title { font-size: 16px; font-weight: 800; color: #1a3a5c; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
         .terms-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 30px; }
         .terms-col { list-style: none; padding: 0; margin: 0; }
-        .terms-col li { margin-bottom: 8px; font-size: 10.5px; line-height: 1.4; color: #333; text-align: left; }
-        
-        .quote-card { background: linear-gradient(135deg, var(--light-bg), white); padding: 12px 25px; text-align: center; border-radius: 40px; margin: 0 30px 20px 30px; border: 1px solid var(--border); }
-        .quote-text { font-size: 12px; font-style: italic; color: var(--text-dark); }
-        .quote-author { font-size: 11px; font-weight: 700; color: var(--accent); margin-top: 5px; display: block; }
-        
+        .terms-col li { margin-bottom: 8px; font-size: 10.5px; line-height: 1.4; color: #333; }
+        .quote-card { background: linear-gradient(135deg, #f8f9fc, white); padding: 12px 25px; text-align: center; border-radius: 40px; margin: 0 30px 20px 30px; border: 1px solid #e2e8f0; }
+        .quote-text { font-size: 12px; font-style: italic; }
         .signatures-section { display: flex; justify-content: space-between; align-items: center; padding: 0 30px 25px 30px; flex-wrap: wrap; gap: 20px; }
         .sig-card { text-align: center; width: 200px; }
-        .sig-line { border-top: 1.5px solid var(--text-dark); width: 100%; margin-top: 30px; padding-top: 8px; font-size: 11px; font-weight: 600; }
-        .seal-card { width: 100px; height: 100px; border: 2px solid var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; background: #fef9e6; }
-        .seal-card span { font-size: 9px; font-weight: bold; color: var(--accent); text-align: center; line-height: 1.3; }
-        .seal-card .seal-text { font-size: 8px; margin-top: 5px; }
-        
-        .card-footer { background: var(--primary-dark); padding: 12px; text-align: center; }
-        .card-footer p { color: white; font-size: 11px; letter-spacing: 1px; }
-        
+        .sig-line { border-top: 1.5px solid #2c3e50; width: 100%; margin-top: 30px; padding-top: 8px; font-size: 11px; font-weight: 600; }
+        .seal-card { width: 100px; height: 100px; border: 2px solid #c5a059; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; background: #fef9e6; }
+        .seal-card span { font-size: 9px; font-weight: bold; color: #c5a059; text-align: center; }
+        .card-footer { background: #0f2b44; padding: 12px; text-align: center; color: white; font-size: 11px; }
         @media (max-width: 700px) {
             .form-grid { grid-template-columns: 1fr; }
             .full-width { grid-column: span 1; }
-            .name-boxes { flex-direction: column; gap: 8px; }
-            .form-card { padding: 20px; }
-            .photo-section { justify-content: center; }
-            .details-section { grid-template-columns: 1fr; padding: 0 15px; }
-            .top-row { flex-direction: column; align-items: center; padding: 0 15px; }
-            .signatures-section { justify-content: center; flex-direction: column; align-items: center; }
-            .terms-list { grid-template-columns: 1fr; gap: 15px; }
-            .title-banner h2 { font-size: 22px; }
+            .name-boxes { flex-direction: column; }
+            .details-section { grid-template-columns: 1fr; }
+            .top-row { flex-direction: column; align-items: center; }
+            .terms-list { grid-template-columns: 1fr; }
             .title-banner h2:before, .title-banner h2:after { display: none; }
-            .institution-name h1 { font-size: 24px; }
         }
-        
         @media print {
-            .no-print, .action-buttons-card, .header-bar, .back-btn { display: none !important; }
-            .admission-card { box-shadow: none; margin: 0; max-width: 100%; }
+            .no-print, .action-buttons-card, .header-bar, .action-header-buttons { display: none !important; }
+            .admission-card { box-shadow: none; margin: 0; }
             body { background: white; padding: 0; }
-            .terms-list { grid-template-columns: 1fr 1fr; }
         }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .screen-card-container { background: #f0f4fa; padding: 10px 0 30px; }
     </style>
 </head>
 <body>
-    <div id="authLoading" class="auth-loading">
-        <div class="spinner"></div>
-        <p style="margin-top: 15px; color: #1b4f9b; font-weight: 600;">Verifying access...</p>
-    </div>
-
-    <div id="mainContent" class="main-content">
-    <div class="container">
-        <div class="header-bar">
-            <div class="logo-area">
-                <h1>🏫 Quest कोचिंग सेंटर</h1>
-                <p>search for knowledge | Under MR. RAVI SIR</p>
-            </div>
-            <button class="back-btn" id="backButton" onclick="goBack()">
-                <i class="fas fa-arrow-left"></i> Back
-            </button>
-        </div>
-        
-        <!-- Form Section (Only shown in NEW or EDIT mode) -->
-        <div id="formSection" class="form-card" style="display: none;">
-            <h2 style="color: #1e3a5f; margin-bottom: 20px;">
-                <i class="fas fa-user-plus"></i> Student Admission Form
-                <span id="modeBadge" class="mode-badge"></span>
-            </h2>
-            <div id="formAlert"></div>
-            
-            <div class="photo-section">
-                <div class="photo-box" id="photoUploadBox">
-                    <div class="photo-placeholder" id="photoPlaceholder">
-                        <i class="fas fa-camera"></i>
-                        <p>Passport Size Photo</p>
-                        <p style="font-size: 10px;">Click to upload</p>
-                    </div>
-                    <img id="photoPreview" class="photo-preview" alt="Preview">
-                </div>
-                <input type="file" id="studentPhoto" accept="image/*">
-            </div>
-            
-            <form id="admissionForm">
-                <div class="form-group">
-                    <label>1. Full Name of the Applicant <span class="required">*</span></label>
-                    <div class="name-boxes">
-                        <div class="name-box"><input type="text" id="firstName" placeholder="First Name" required></div>
-                        <div class="name-box"><input type="text" id="middleName" placeholder="Middle Name"></div>
-                        <div class="name-box"><input type="text" id="lastName" placeholder="Last Name" required></div>
-                    </div>
-                </div>
-                
-                <div class="form-grid">
-                    <div class="form-group"><label>2. Nationality <span class="required">*</span></label><input type="text" id="nationality" value="Indian" required></div>
-                    <div class="form-group"><label>3. Date of Birth <span class="required">*</span></label><input type="date" id="dob" required></div>
-                    <div class="form-group">
-                        <label>4. Sex <span class="required">*</span></label>
-                        <div class="radio-group"><label><input type="radio" name="gender" value="Male" required> Male</label><label><input type="radio" name="gender" value="Female"> Female</label></div>
-                    </div>
-                    <div class="form-group"><label>5. Class <span class="required">*</span></label>
-                        <select id="class" required>
-                            <option value="">Select Class</option>
-                            <option>6th</option><option>7th</option><option>8th</option>
-                            <option>9th</option><option>10th</option>
-                            <option>11th (Science)</option><option>11th (Commerce)</option>
-                            <option>11th (Arts)</option>
-                            <option>12th (Science)</option><option>12th (Commerce)</option>
-                            <option>12th (Arts)</option>
-                        </select>
-                    </div>
-                    <div class="form-group"><label>6. Roll Number <span class="required">*</span></label><input type="text" id="rollNumber" placeholder="e.g., 101" required></div>
-                    <div class="form-group"><label>7. Father's Name <span class="required">*</span></label><input type="text" id="fatherName" required></div>
-                    <div class="form-group"><label>8. Mother's Name</label><input type="text" id="motherName"></div>
-                    <div class="form-group"><label>9. Contact No. (Student's) <span class="required">*</span></label><input type="tel" id="studentMobile" maxlength="10" required></div>
-                    <div class="form-group full-width"><label>10. Complete Address <span class="required">*</span></label><textarea id="address" rows="2" required></textarea></div>
-                    <div class="form-group"><label>11. Aadhar No.</label><input type="text" id="aadhar" maxlength="12"></div>
-                    <div class="form-group"><label>12. Current School/College <span class="required">*</span></label><input type="text" id="presentSchool" required></div>
-                    <div class="form-group"><label>13. Session <span class="required">*</span></label>
-                        <select id="sessionSelect" required>
-                            <option value="2026-27" selected>2026-27</option>
-                            <option value="2027-28">2027-28</option>
-                            <option value="2028-29">2028-29</option>
-                            <option value="2029-30">2029-30</option>
-                        </select>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>14. How did you come to know about QCC</label>
-                        <div class="checkbox-group">
-                            <label><input type="checkbox" name="knowAbout" value="Google"> Google</label>
-                            <label><input type="checkbox" name="knowAbout" value="Teacher"> Teacher</label>
-                            <label><input type="checkbox" name="knowAbout" value="Friend/Relatives"> Friend / Relatives</label>
-                        </div>
-                    </div>
-                    <div class="form-group full-width"><label>15. Mention Information (Psychological/Physical) If Any</label><textarea id="medicalInfo" rows="2"></textarea></div>
-                </div>
-                
-                <div class="declaration-box">
-                    <div class="declaration-text"><i class="fas fa-file-signature"></i> <strong>DECLARATION</strong><br>I hereby declare that the information furnished in this form is true to the best of my/our knowledge and belief.</div>
-                    <div class="checkbox-group"><label><input type="checkbox" id="declaration" required> I Agree to the above declaration <span class="required">*</span></label></div>
-                    <div class="signature-row">
-                        <div class="signature-item"><label>Date:</label><input type="text" id="declarationDate" readonly></div>
-                        <div class="signature-item"><label>Place:</label><input type="text" id="declarationPlace" placeholder="e.g., Gopalganj"></div>
-                    </div>
-                </div>
-                
-                <div id="submitButtonContainer"></div>
-            </form>
-        </div>
-        
-        <!-- Card Section (Only shown in VIEW mode) -->
-        <div id="cardSection" style="display: none;"></div>
-    </div>
-    </div>
-
-    <div class="progress-overlay" id="progressOverlay">
-        <div class="progress-card">
-            <h3><i class="fas fa-spinner fa-spin"></i> Processing...</h3>
-            <div class="progress-bar-container"><div class="progress-bar-fill" id="progressFill"></div></div>
-            <div class="progress-status" id="progressStatus">Initializing...</div>
-            <div class="progress-percent" id="progressPercent">0%</div>
+<div id="authLoading" class="auth-loading"><div class="spinner"></div><p style="margin-top:15px;">Verifying access...</p></div>
+<div id="mainContent" class="main-content">
+<div class="container">
+    <div class="header-bar">
+        <div class="logo-area"><h1>🏫 QUEST COACHING CENTRE</h1><p>search for knowledge | Under MR. RAVI SIR</p></div>
+        <div class="action-header-buttons">
+            <button class="new-admission-btn" id="newAdmissionTopBtn"><i class="fas fa-plus-circle"></i> New Admission</button>
+            <button class="back-btn" id="backToListBtn"><i class="fas fa-arrow-left"></i> Back</button>
         </div>
     </div>
-
-    <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
-        authDomain: "quest-coaching.firebaseapp.com",
-        projectId: "quest-coaching",
-        storageBucket: "quest-coaching.firebasestorage.app"
-    };
-    
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-    const admissionsCollection = db.collection('admissions');
-    
-    const SUPABASE_URL = 'https://zjwvxqjmccqhyxsaeggw.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_6a_9nxKSSLUZMmSGleyycg_kQ4a4BtI';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const STORAGE_BUCKET = 'student_photos';
-    const LOGO_URL = 'https://i.ibb.co/hF9tmnpB/20250903-202922.jpg';
-    
-    const TERMS_LEFT = [
-        "नामांकन फॉर्म के साथ हाल ही की दो पासपोर्ट साइज फोटो और आधार कार्ड लगाना अनिवार्य है।",
-        "संस्थान द्वारा टेस्ट का परिणाम या कोई अन्य जानकारी SMS के माध्यम से भेजी जाएगी।",
-        "क्लास में मोबाइल फोन या आई-पॉड ले जाने की अनुमति नहीं है। यदि छात्र मोबाइल साथ लाता है, तो उसे बंद रखना होगा।",
-        "छात्रों को विनम्र, समय का पाबंद और नियमित होना चाहिए।",
-        "छात्रों को दिया गया सारा होमवर्क समय पर पूरा करना चाहिए और सभी टेस्ट में शामिल होना चाहिए।",
-        "यदि आप अनुपस्थित रहते हैं, तो क्लास के समय से पहले शिक्षक को सूचित करें, अन्यथा ₹10 प्रतिदिन अनुपस्थिति जुर्माना लिया जाएगा।",
-        "यदि आप कोई टेस्ट छोड़ते हैं, तो आपको ₹50 टेस्ट छोड़ने का जुर्माना देना होगा।",
-        "सत्र के बीच में प्रवेश रद्द नहीं किया जा सकता। प्रवेश रद्द करने से एक महीने पहले नोटिस देना अनिवार्य है।",
-        "एक बार जमा की गई फीस किसी भी परिस्थिति में वापस या समायोजित नहीं की जाएगी।",
-        "यदि अभिभावक अपने बच्चे का नाम वापस लेना चाहते हैं, तो उन्हें 4 सप्ताह पहले निदेशक से बात करनी होगी।",
-        "गंभीर अनुशासनहीनता के परिणामस्वरूप बिना किसी रिफंड के प्रवेश रद्द कर दिया जाएगा।"
-    ];
-    
-    const TERMS_RIGHT = [
-        "यदि कोई छात्र समय पर फीस नहीं भरता है, तो उसे क्लास में आने से रोक दिया जाएगा।",
-        "यदि कोई छात्र बिना किसी सूचना के 3 सप्ताह से अधिक अनुपस्थित रहता है, तो उसका नाम काट दिया जाएगा; पुनः प्रवेश के लिए ₹500 अतिरिक्त देने होंगे।",
-        "यदि शिक्षकों को लगता है कि छात्र मेहनत नहीं कर रहा, अनुशासनहीनता कर रहा है या पढ़ाई में ध्यान नहीं दे रहा, तो उसे निकाला जा सकता है। इस संबंध में निदेशक का निर्णय अंतिम होगा।",
-        "पंजीकरण राशि जमा करने के बाद, यदि छात्र नाम वापस लेना चाहता है, तो संस्थान कोई पैसा वापस नहीं करेगा।",
-        "यदि कोई अभिभावक संस्थान के स्टाफ के साथ दुर्व्यवहार करता है, तो छात्र को निकाला जा सकता है और कोई फीस वापस नहीं होगी।",
-        "यदि छात्र को निकाला जाता है या वह सत्र के अंत से पहले कोचिंग छोड़ देता है, तो शेष फीस जब्त कर ली जाएगी।",
-        "यदि छात्र केंद्र की संपत्ति को कोई नुकसान पहुंचाता है, तो अभिभावक मरम्मत के पूर्ण खर्च के लिए जिम्मेदार होंगे।",
-        "QUEST COACHING CENTRE के पास बिना किसी पूर्व सूचना के कार्यक्रमों, स्थान या समय में बदलाव करने का अधिकार सुरक्षित है। प्रबंध निदेशक का निर्णय अंतिम होगा।",
-        "किसी भी प्रकार के कानूनी विवाद या मतभेद की स्थिति में, न्यायिक क्षेत्राधिकार केवल जिला न्यायालय, गोपालगंज (बिहार) के अधीन होगा।"
-    ];
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const mode = urlParams.get('mode') || 'new';
-    const studentId = urlParams.get('id');
-    let currentStudentData = null;
-    let existingPhotoUrl = null;
-    
-    const authLoading = document.getElementById('authLoading');
-    const mainContent = document.getElementById('mainContent');
-    const formSection = document.getElementById('formSection');
-    const cardSection = document.getElementById('cardSection');
-    const backButton = document.getElementById('backButton');
-    const modeBadge = document.getElementById('modeBadge');
-    
-    function goBack() {
-        window.location.href = 'manage-students.html';
-    }
-    
-    // Check if this is a public view (no auth required)
-    const isPublicView = (mode === 'view' && studentId);
-    
-    auth.onAuthStateChanged((user) => {
-        // For public view (student card), don't require login
-        if (isPublicView) {
-            authLoading.style.display = 'none';
-            mainContent.style.display = 'block';
-            loadAndDisplayCard(studentId);
-            return;
-        }
-        
-        // For edit/new modes, require login
-        if (!user) {
-            Swal.fire({
-                title: 'Access Denied!',
-                text: 'Please login from main page first!',
-                icon: 'error',
-                confirmButtonColor: '#1b4f9b',
-                confirmButtonText: 'Go to Login'
-            }).then(() => { window.location.href = 'index.html'; });
-            return;
-        }
-        
-        authLoading.style.display = 'none';
-        mainContent.style.display = 'block';
-        
-        const logoutBtn = document.createElement('button');
-        logoutBtn.innerHTML = '🚪 Logout';
-        logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px;';
-        logoutBtn.onclick = async () => { await auth.signOut(); window.location.href = 'index.html'; };
-        document.body.appendChild(logoutBtn);
-        
-        if (mode === 'edit' && studentId) {
-            modeBadge.textContent = '✏️ EDIT MODE';
-            modeBadge.className = 'mode-badge mode-edit';
-            formSection.style.display = 'block';
-            cardSection.style.display = 'none';
-            loadStudentForEdit(studentId);
-        } else if (mode === 'new') {
-            modeBadge.textContent = '📝 NEW ADMISSION';
-            modeBadge.className = 'mode-badge mode-new';
-            formSection.style.display = 'block';
-            cardSection.style.display = 'none';
-            setupNewMode();
-            document.getElementById('admissionForm').addEventListener('submit', submitNewAdmission);
-        }
-    });
-    
-    async function loadAndDisplayCard(id) {
-        try {
-            const doc = await admissionsCollection.doc(id).get();
-            if (!doc.exists) {
-                Swal.fire('Error', 'Student not found!', 'error').then(() => { window.location.href = 'manage-students.html'; });
-                return;
-            }
-            currentStudentData = { id: doc.id, ...doc.data() };
-            displayAdmissionCard(currentStudentData, currentStudentData.photoUrl);
-        } catch (error) {
-            console.error('Error loading student:', error);
-            Swal.fire('Error', 'Failed to load student data', 'error');
-        }
-    }
-    
-    async function loadStudentForEdit(id) {
-        try {
-            const doc = await admissionsCollection.doc(id).get();
-            if (!doc.exists) {
-                Swal.fire('Error', 'Student not found!', 'error').then(() => { goBack(); });
-                return;
-            }
-            currentStudentData = { id: doc.id, ...doc.data() };
-            existingPhotoUrl = currentStudentData.photoUrl;
-            fillFormWithData(currentStudentData);
-            setupEditMode();
-        } catch (error) {
-            console.error('Error loading student:', error);
-            Swal.fire('Error', 'Failed to load student data', 'error');
-        }
-    }
-    
-    function fillFormWithData(data) {
-        const nameParts = (data.studentName || '').split(' ');
-        document.getElementById('firstName').value = nameParts[0] || '';
-        document.getElementById('middleName').value = nameParts.slice(1, -1).join(' ') || '';
-        document.getElementById('lastName').value = nameParts[nameParts.length - 1] || '';
-        
-        document.getElementById('nationality').value = data.nationality || 'Indian';
-        document.getElementById('dob').value = data.dob || '';
-        document.getElementById('rollNumber').value = data.rollNumber || '';
-        
-        if (data.gender === 'Male') {
-            document.querySelector('input[name="gender"][value="Male"]').checked = true;
-        } else if (data.gender === 'Female') {
-            document.querySelector('input[name="gender"][value="Female"]').checked = true;
-        }
-        
-        document.getElementById('class').value = data.classApplying || '';
-        document.getElementById('fatherName').value = data.fatherName || '';
-        document.getElementById('motherName').value = data.motherName || '';
-        document.getElementById('studentMobile').value = data.parentMobile || '';
-        document.getElementById('address').value = data.address || '';
-        document.getElementById('aadhar').value = data.aadhar || '';
-        document.getElementById('presentSchool').value = data.schoolName || '';
-        document.getElementById('sessionSelect').value = data.session || '2026-27';
-        document.getElementById('declarationPlace').value = 'Gopalganj';
-        document.getElementById('declarationDate').value = new Date().toLocaleDateString('en-IN');
-        
-        if (data.photoUrl) {
-            const photoPreview = document.getElementById('photoPreview');
-            const photoPlaceholder = document.getElementById('photoPlaceholder');
-            photoPreview.src = data.photoUrl;
-            photoPreview.style.display = 'block';
-            photoPlaceholder.style.display = 'none';
-        }
-    }
-    
-    function setupEditMode() {
-        const container = document.getElementById('submitButtonContainer');
-        container.innerHTML = `<button type="submit" class="btn-submit btn-update" id="updateStudentBtn"><i class="fas fa-save"></i> Update Student</button>`;
-        
-        const form = document.getElementById('admissionForm');
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            await updateStudent();
-        };
-    }
-    
-    function setupNewMode() {
-        const container = document.getElementById('submitButtonContainer');
-        container.innerHTML = `<button type="submit" class="btn-submit" id="submitBtn"><i class="fas fa-save"></i> Submit Admission</button>`;
-        document.getElementById('declarationDate').value = new Date().toLocaleDateString('en-IN');
-    }
-    
-    function getFormData() {
-        const firstName = document.getElementById('firstName').value.trim();
-        const middleName = document.getElementById('middleName').value.trim();
-        const lastName = document.getElementById('lastName').value.trim();
-        const fullName = [firstName, middleName, lastName].filter(n => n).join(' ');
-        
-        const knowAbout = Array.from(document.querySelectorAll('input[name="knowAbout"]:checked')).map(cb => cb.value).join(', ');
-        
-        return {
-            fullName, firstName, middleName, lastName,
-            nationality: document.getElementById('nationality').value.trim(),
-            dob: document.getElementById('dob').value,
-            rollNumber: document.getElementById('rollNumber').value.trim(),
-            gender: document.querySelector('input[name="gender"]:checked')?.value,
-            classVal: document.getElementById('class').value,
-            fatherName: document.getElementById('fatherName').value.trim(),
-            motherName: document.getElementById('motherName').value.trim(),
-            studentMobile: document.getElementById('studentMobile').value.trim(),
-            address: document.getElementById('address').value.trim(),
-            aadhar: document.getElementById('aadhar').value.trim(),
-            presentSchool: document.getElementById('presentSchool').value.trim(),
-            session: document.getElementById('sessionSelect').value,
-            knowAbout: knowAbout,
-            medicalInfo: document.getElementById('medicalInfo').value.trim(),
-            declaration: document.getElementById('declaration').checked,
-            declarationPlace: document.getElementById('declarationPlace').value.trim()
-        };
-    }
-    
-    function validateFormData(data) {
-        if (!data.firstName || !data.lastName || !data.nationality || !data.dob || !data.rollNumber || !data.gender || !data.classVal || !data.fatherName || !data.studentMobile || !data.address || !data.presentSchool) {
-            showAlert('Please fill all required fields (*)', 'error');
-            return false;
-        }
-        if (data.studentMobile.length !== 10 || !/^\d+$/.test(data.studentMobile)) {
-            showAlert('Enter valid 10-digit mobile number', 'error');
-            return false;
-        }
-        if (!data.declaration) {
-            showAlert('Please accept the declaration', 'error');
-            return false;
-        }
-        return true;
-    }
-    
-    function showAlert(msg, type) {
-        const div = document.getElementById('formAlert');
-        div.innerHTML = `<div style="background:${type==='error'?'#fee2e2':'#d1fae5'}; color:${type==='error'?'#991b1b':'#065f46'}; padding:12px; border-radius:16px; margin-bottom:20px;">${msg}</div>`;
-        setTimeout(() => div.innerHTML = '', 4000);
-    }
-    
-    document.getElementById('declarationDate').value = new Date().toLocaleDateString('en-IN');
-    
-    const photoBox = document.getElementById('photoUploadBox');
-    const photoInput = document.getElementById('studentPhoto');
-    const photoPreview = document.getElementById('photoPreview');
-    const photoPlaceholder = document.getElementById('photoPlaceholder');
-    
-    photoBox.addEventListener('click', () => { photoInput.click(); });
-    photoInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                photoPreview.src = event.target.result;
-                photoPreview.style.display = 'block';
-                photoPlaceholder.style.display = 'none';
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-    
-    const progressOverlay = document.getElementById('progressOverlay');
-    const progressFill = document.getElementById('progressFill');
-    const progressStatus = document.getElementById('progressStatus');
-    const progressPercent = document.getElementById('progressPercent');
-    
-    function updateProgress(percent, status) {
-        progressFill.style.width = percent + '%';
-        progressPercent.textContent = percent + '%';
-        if (status) progressStatus.textContent = status;
-    }
-    
-    async function compressPhoto(file, maxWidth = 400, maxHeight = 400, quality = 0.75) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (e) => {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width, height = img.height;
-                    if (width > height) {
-                        if (width > maxWidth) { height = (height * maxWidth) / width; width = maxWidth; }
-                    } else {
-                        if (height > maxHeight) { width = (width * maxHeight) / height; height = maxHeight; }
-                    }
-                    canvas.width = width; canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    canvas.toBlob((blob) => resolve(blob), 'image/jpeg', quality);
-                };
-            };
-            reader.onerror = reject;
-        });
-    }
-    
-    async function uploadPhotoToSupabase(file, admissionNo) {
-        const compressedBlob = await compressPhoto(file, 400, 400, 0.75);
-        const fileName = `${admissionNo}_${Date.now()}.jpg`;
-        const { error } = await supabaseClient.storage.from(STORAGE_BUCKET).upload(fileName, compressedBlob, { contentType: 'image/jpeg' });
-        if (error) throw error;
-        const { data: urlData } = supabaseClient.storage.from(STORAGE_BUCKET).getPublicUrl(fileName);
-        return urlData.publicUrl;
-    }
-    
-    function generateAdmissionNo() {
-        const year = new Date().getFullYear();
-        const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-        return `QCC/${year}/${random}`;
-    }
-    
-    async function updateStudent() {
-        const data = getFormData();
-        if (!validateFormData(data)) return;
-        
-        let photoUrl = existingPhotoUrl;
-        const photoFile = document.getElementById('studentPhoto').files[0];
-        
-        progressOverlay.style.display = 'flex';
-        updateProgress(0, 'Starting...');
-        
-        try {
-            if (photoFile) {
-                updateProgress(30, 'Uploading new photo...');
-                photoUrl = await uploadPhotoToSupabase(photoFile, currentStudentData.admissionNo);
-            }
-            
-            updateProgress(70, 'Updating student data...');
-            
-            const updateData = {
-                studentName: data.fullName,
-                rollNumber: data.rollNumber,
-                fatherName: data.fatherName,
-                motherName: data.motherName,
-                dob: data.dob,
-                gender: data.gender,
-                classApplying: data.classVal,
-                schoolName: data.presentSchool,
-                address: data.address,
-                parentMobile: data.studentMobile,
-                aadhar: data.aadhar,
-                nationality: data.nationality,
-                knowAbout: data.knowAbout,
-                medicalInfo: data.medicalInfo,
-                session: data.session,
-                photoUrl: photoUrl
-            };
-            
-            await admissionsCollection.doc(studentId).update(updateData);
-            updateProgress(100, 'Complete!');
-            
-            setTimeout(() => {
-                progressOverlay.style.display = 'none';
-                Swal.fire('Success!', 'Student data updated successfully!', 'success').then(() => {
-                    window.location.href = 'manage-students.html';
-                });
-            }, 500);
-        } catch (error) {
-            progressOverlay.style.display = 'none';
-            showAlert('Error: ' + error.message, 'error');
-        }
-    }
-    
-    async function submitNewAdmission(e) {
-        e.preventDefault();
-        
-        const data = getFormData();
-        if (!validateFormData(data)) return;
-        
-        const photoFile = document.getElementById('studentPhoto').files[0];
-        if (!photoFile) { showAlert('Please upload passport size photo', 'error'); return; }
-        
-        progressOverlay.style.display = 'flex';
-        updateProgress(0, 'Starting...');
-        
-        try {
-            updateProgress(20, 'Generating admission number...');
-            const admissionNo = generateAdmissionNo();
-            
-            updateProgress(40, 'Compressing and uploading photo...');
-            let photoUrl = await uploadPhotoToSupabase(photoFile, admissionNo);
-            updateProgress(60, 'Photo uploaded successfully!');
-            
-            updateProgress(80, 'Saving student data...');
-            const admissionData = {
-                admissionNo: admissionNo,
-                studentName: data.fullName,
-                rollNumber: data.rollNumber,
-                fatherName: data.fatherName,
-                motherName: data.motherName || '',
-                dob: data.dob,
-                gender: data.gender,
-                classApplying: data.classVal,
-                schoolName: data.presentSchool,
-                address: data.address,
-                parentMobile: data.studentMobile,
-                aadhar: data.aadhar || '',
-                nationality: data.nationality,
-                knowAbout: data.knowAbout || '',
-                medicalInfo: data.medicalInfo || '',
-                photoUrl: photoUrl,
-                admissionDate: new Date().toISOString(),
-                session: data.session,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                status: 'active'
-            };
-            await admissionsCollection.add(admissionData);
-            updateProgress(100, 'Complete!');
-            
-            // Display card immediately after submission
-            setTimeout(() => {
-                progressOverlay.style.display = 'none';
-                displayAdmissionCard(admissionData, photoUrl);
-            }, 500);
-            
-        } catch (error) {
-            progressOverlay.style.display = 'none';
-            showAlert('Error: ' + error.message, 'error');
-        }
-    }
-    
-    // Function to generate QR Code image URL for PDF
-    async function generateQRCodeImageUrl(text, size = 85) {
-        return new Promise((resolve) => {
-            const tempDiv = document.createElement('div');
-            tempDiv.style.position = 'absolute';
-            tempDiv.style.left = '-9999px';
-            tempDiv.style.top = '-9999px';
-            document.body.appendChild(tempDiv);
-            
-            const qrDiv = document.createElement('div');
-            tempDiv.appendChild(qrDiv);
-            
-            new QRCode(qrDiv, { text: text, width: size, height: size });
-            
-            setTimeout(() => {
-                const canvas = qrDiv.querySelector('canvas');
-                if (canvas) {
-                    const imgUrl = canvas.toDataURL('image/png');
-                    document.body.removeChild(tempDiv);
-                    resolve(imgUrl);
-                } else {
-                    document.body.removeChild(tempDiv);
-                    resolve(null);
-                }
-            }, 200);
-        });
-    }
-    
-    async function generatePdfBlobUrl(studentData, photoUrl) {
-        const tempDiv = document.createElement('div');
-        tempDiv.style.position = 'absolute';
-        tempDiv.style.left = '-9999px';
-        tempDiv.style.top = '-9999px';
-        tempDiv.style.width = '1100px';
-        document.body.appendChild(tempDiv);
-        
-        const admDate = new Date(studentData.admissionDate);
-        const dobDate = new Date(studentData.dob);
-        
-        // Generate QR code image for PDF
-        const publicUrl = `${window.location.origin}${window.location.pathname}?mode=view&id=${studentData.id}`;
-        const qrImageUrl = await generateQRCodeImageUrl(publicUrl, 85);
-        
-        let termsHtml = `
-            <ul class="terms-col">
-                ${TERMS_LEFT.map((term, i) => `<li><strong>${i+1}.</strong> ${term}</li>`).join('')}
-            </ul>
-            <ul class="terms-col">
-                ${TERMS_RIGHT.map((term, i) => `<li><strong>${i+12}.</strong> ${term}</li>`).join('')}
-            </ul>
-        `;
-        
-        tempDiv.innerHTML = `
-            <div id="pdfCard" class="admission-card">
-                <div class="card-header">
-                    <div class="logo-center">
-                        <div class="logo-img-card"><img src="${LOGO_URL}" alt="Logo"></div>
-                        <div class="institution-name">
-                            <h1>QUEST COACHING CENTRE</h1>
-                            <div class="tagline">|| SEARCH FOR KNOWLEDGE ||</div>
-                            <div class="under">Under the guidance of MR. RAVI SIR</div>
-                        </div>
-                        <div class="contact-strip-card">
-                            <div class="contact-item-card"><i class="fas fa-map-marker-alt"></i> Block More, Gopalganj - 841428</div>
-                            <div class="contact-item-card"><i class="fas fa-phone-alt"></i> +91 9708442525</div>
-                            <div class="contact-item-card"><i class="fas fa-envelope"></i> questcoachingcentre@gmail.com</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="title-banner"><h2>🎓 ADMISSION FORM 🎓</h2></div>
-                <div class="top-row">
-                    <div class="photo-card"><img src="${photoUrl}" alt="Photo"></div>
-                    <div class="info-group">
-                        <div class="info-row"><span class="info-label">ADMISSION NO.</span><span class="info-value adm-no">${studentData.admissionNo}</span></div>
-                        <div class="info-row"><span class="info-label">ROLL NO.</span><span class="info-value">${studentData.rollNumber || '-'}</span></div>
-                        <div class="info-row"><span class="info-label">ADMISSION DATE</span><span class="info-value">${admDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
-                        <div class="info-row"><span class="info-label">ACADEMIC SESSION</span><span class="info-value">${studentData.session}</span></div>
-                        <div class="info-row"><span class="info-label">CLASS APPLYING</span><span class="info-value">${studentData.classApplying}</span></div>
-                    </div>
-                    <div class="qr-card">
-                        <div class="qr-box">
-                            <img src="${qrImageUrl}" style="width:85px; height:85px;" alt="QR Code">
-                        </div>
-                        <div class="qr-label-card">SCAN TO VERIFY</div>
-                    </div>
-                </div>
-                <div class="details-section">
-                    <div class="detail-box">
-                        <div class="detail-title">PERSONAL DETAILS</div>
-                        <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td></tr>
-                            <tr><td style="width:38%;">Roll Number</td><td>${studentData.rollNumber || '-'}</td></tr>
-                            <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
-                            <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td></tr>
-                            <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td></tr>
-                            <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td></tr>
-                        </table></div>
-                    </div>
-                    <div class="detail-box">
-                        <div class="detail-title">PARENT INFORMATION</div>
-                        <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td></tr>
-                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td></tr>
-                            <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td></tr>
-                            <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td></tr>
-                        </table></div>
-                    </div>
-                </div>
-                <div class="details-section">
-                    <div class="detail-box">
-                        <div class="detail-title">ADDRESS DETAILS</div>
-                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td></tr></table></div>
-                    </div>
-                    <div class="detail-box">
-                        <div class="detail-title">EDUCATION DETAILS</div>
-                        <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Current School</td><td>${studentData.schoolName}</td></tr>
-                            <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td></tr>
-                        </table></div>
-                    </div>
-                </div>
-                <div class="terms-section"><div class="terms-box"><div class="terms-title">📜 नियम और शर्तें (Terms & Conditions)</div><div class="terms-list">${termsHtml}</div></div></div>
-                <div class="quote-card"><span class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</span><span class="quote-author">- Albert Einstein</span></div>
-                <div class="signatures-section">
-                    <div class="sig-card"><div class="sig-line">Parent / Guardian Signature</div></div>
-                    <div class="seal-card"><span>QUEST<br>COACHING<br>CENTRE</span><span class="seal-text">SEAL & SIGNATURE<br>OF DIRECTOR</span></div>
-                    <div class="sig-card"><div class="sig-line">Student Signature</div></div>
-                </div>
-                <div class="card-footer"><p>★ THANK YOU FOR CHOOSING QUEST COACHING CENTRE ★</p></div>
-            </div>
-        `;
-        
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        const element = tempDiv.querySelector('#pdfCard');
-        const canvas = await html2canvas(element, { scale: 2, useCORS: true, allowTaint: false, backgroundColor: '#ffffff' });
-        const imgData = canvas.toDataURL('image/png');
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgWidth = 190;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-        const pdfBlob = pdf.output('blob');
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        
-        document.body.removeChild(tempDiv);
-        
-        return pdfUrl;
-    }
-    
-    async function generateAndSavePdf(studentData, photoUrl) {
-        const pdfUrl = await generatePdfBlobUrl(studentData, photoUrl);
-        const link = document.createElement('a');
-        link.href = pdfUrl;
-        link.download = `Admission_Form_${studentData.admissionNo}_${studentData.studentName}.pdf`;
-        link.click();
-        URL.revokeObjectURL(pdfUrl);
-        Swal.fire('Downloaded!', 'PDF downloaded successfully', 'success');
-    }
-    
-    function displayAdmissionCard(studentData, photoUrl) {
-        const admDate = new Date(studentData.admissionDate);
-        const dobDate = new Date(studentData.dob);
-        
-        let termsHtml = `
-            <ul class="terms-col">
-                ${TERMS_LEFT.map((term, i) => `<li><strong>${i+1}.</strong> ${term}</li>`).join('')}
-            </ul>
-            <ul class="terms-col">
-                ${TERMS_RIGHT.map((term, i) => `<li><strong>${i+12}.</strong> ${term}</li>`).join('')}
-            </ul>
-        `;
-        
-        const cardHtml = `
-            <div id="admissionCard" class="admission-card">
-                <div class="card-header">
-                    <div class="logo-center">
-                        <div class="logo-img-card"><img src="${LOGO_URL}" alt="Logo"></div>
-                        <div class="institution-name">
-                            <h1>QUEST COACHING CENTRE</h1>
-                            <div class="tagline">|| SEARCH FOR KNOWLEDGE ||</div>
-                            <div class="under">Under the guidance of MR. RAVI SIR</div>
-                        </div>
-                        <div class="contact-strip-card">
-                            <div class="contact-item-card"><i class="fas fa-map-marker-alt"></i> Block More, Gopalganj - 841428</div>
-                            <div class="contact-item-card"><i class="fas fa-phone-alt"></i> +91 9708442525</div>
-                            <div class="contact-item-card"><i class="fas fa-envelope"></i> questcoachingcentre@gmail.com</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="title-banner"><h2>🎓 ADMISSION FORM 🎓</h2></div>
-                <div class="top-row">
-                    <div class="photo-card"><img src="${photoUrl}" alt="Photo"></div>
-                    <div class="info-group">
-                        <div class="info-row"><span class="info-label">ADMISSION NO.</span><span class="info-value adm-no">${studentData.admissionNo}</span></div>
-                        <div class="info-row"><span class="info-label">ROLL NO.</span><span class="info-value">${studentData.rollNumber || '-'}</span></div>
-                        <div class="info-row"><span class="info-label">ADMISSION DATE</span><span class="info-value">${admDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
-                        <div class="info-row"><span class="info-label">ACADEMIC SESSION</span><span class="info-value">${studentData.session}</span></div>
-                        <div class="info-row"><span class="info-label">CLASS APPLYING</span><span class="info-value">${studentData.classApplying}</span></div>
-                    </div>
-                    <div class="qr-card"><div class="qr-box"><div id="qrcode-view"></div></div><div class="qr-label-card">SCAN TO VERIFY</div></div>
-                </div>
-                <div class="details-section">
-                    <div class="detail-box">
-                        <div class="detail-title">PERSONAL DETAILS</div>
-                        <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td></tr>
-                            <tr><td style="width:38%;">Roll Number</td><td>${studentData.rollNumber || '-'}</td></tr>
-                            <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
-                            <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td></tr>
-                            <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td></tr>
-                            <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td></tr>
-                        </table></div>
-                    </div>
-                    <div class="detail-box">
-                        <div class="detail-title">PARENT INFORMATION</div>
-                        <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td></tr>
-                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td></tr>
-                            <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td></tr>
-                            <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td></tr>
-                        </table></div>
-                    </div>
-                </div>
-                <div class="details-section">
-                    <div class="detail-box">
-                        <div class="detail-title">ADDRESS DETAILS</div>
-                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td></tr></table></div>
-                    </div>
-                    <div class="detail-box">
-                        <div class="detail-title">EDUCATION DETAILS</div>
-                        <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Current School</td><td>${studentData.schoolName}</td></tr>
-                            <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td></tr>
-                        </table></div>
-                    </div>
-                </div>
-                <div class="terms-section"><div class="terms-box"><div class="terms-title">📜 नियम और शर्तें (Terms & Conditions)</div><div class="terms-list">${termsHtml}</div></div></div>
-                <div class="quote-card"><span class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</span><span class="quote-author">- Albert Einstein</span></div>
-                <div class="signatures-section">
-                    <div class="sig-card"><div class="sig-line">Parent / Guardian Signature</div></div>
-                    <div class="seal-card"><span>QUEST<br>COACHING<br>CENTRE</span><span class="seal-text">SEAL & SIGNATURE<br>OF DIRECTOR</span></div>
-                    <div class="sig-card"><div class="sig-line">Student Signature</div></div>
-                </div>
-                <div class="card-footer"><p>★ THANK YOU FOR CHOOSING QUEST COACHING CENTRE ★</p></div>
-            </div>
-            <div class="action-buttons-card">
-                <button class="action-btn print" onclick="printAdmissionCardView()"><i class="fas fa-print"></i> Print Form</button>
-                <button class="action-btn share" onclick="shareAdmissionCardView()"><i class="fas fa-share-alt"></i> Share</button>
-                <button class="action-btn pdf" onclick="downloadAdmissionFromCard()"><i class="fas fa-file-pdf"></i> Download PDF</button>
-            </div>
-        `;
-        
-        cardSection.innerHTML = cardHtml;
-        cardSection.style.display = 'block';
-        
-        // QR Code for web view
-        const publicUrl = `${window.location.origin}${window.location.pathname}?mode=view&id=${studentData.id}`;
-        setTimeout(() => {
-            new QRCode(document.getElementById("qrcode-view"), { text: publicUrl, width: 85, height: 85 });
-        }, 100);
-        
-        window.printAdmissionCardView = () => {
-            const printContent = document.getElementById('admissionCard').cloneNode(true);
-            const win = window.open('', '_blank');
-            win.document.write(`<html><head><title>Admission Form - ${studentData.studentName}</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>body{padding:20px;} .action-buttons-card { display: none; } .admission-card{max-width:1100px;margin:0 auto;box-shadow:none;}</style></head><body>${printContent.outerHTML}</body></html>`);
-            win.document.close();
-            win.print();
-        };
-        
-        window.shareAdmissionCardView = () => {
-            const text = `🎓 Quest Coaching Centre - Admission Form\n\nStudent: ${studentData.studentName}\nAdmission No: ${studentData.admissionNo}\nRoll No: ${studentData.rollNumber}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}`;
-            if (navigator.share) navigator.share({ title: 'Admission Form', text: text });
-            else { navigator.clipboard.writeText(text); Swal.fire('Copied!', 'Details copied to clipboard', 'success'); }
-        };
-        
-        window.downloadAdmissionFromCard = async () => {
-            await generateAndSavePdf(studentData, photoUrl);
-        };
-    }
-    </script>
+    <div id="formSection" class="form-card" style="display: none;"><h2><i class="fas fa-user-plus"></i> Student Admission Form <span id="modeBadge" class="mode-badge"></span></h2><div id="formAlert"></div>
+        <div class="photo-section"><div class="photo-box" id="photoUploadBox"><div class="photo-placeholder" id="photoPlaceholder"><i class="fas fa-camera"></i><p>Passport Size Photo</p><p style="font-size:10px;">Click to upload</p></div><img id="photoPreview" class="photo-preview"></div><input type="file" id="studentPhoto" accept="image/*"></div>
+        <form id="admissionForm"><div class="form-group"><label>Full Name <span class="required">*</span></label><div class="name-boxes"><div class="name-box"><input type="text" id="firstName" placeholder="First Name" required></div><div class="name-box"><input type="text" id="middleName" placeholder="Middle Name"></div><div class="name-box"><input type="text" id="lastName" placeholder="Last Name" required></div></div></div>
+        <div class="form-grid"><div class="form-group"><label>Nationality</label><input type="text" id="nationality" value="Indian"></div><div class="form-group"><label>Date of Birth <span class="required">*</span></label><input type="date" id="dob" required></div>
+        <div class="form-group"><label>Sex</label><div class="radio-group"><label><input type="radio" name="gender" value="Male" required> Male</label><label><input type="radio" name="gender" value="Female"> Female</label></div></div>
+        <div class="form-group"><label>Class <span class="required">*</span></label><select id="class" required><option value="">Select</option><option>6th</option><option>7th</option><option>8th</option><option>9th</option><option>10th</option><option>11th (Science)</option><option>11th (Commerce)</option><option>12th (Science)</option><option>12th (Commerce)</option></select></div>
+        <div class="form-group"><label>Roll Number <span class="required">*</span></label><input type="text" id="rollNumber" required></div>
+        <div class="form-group"><label>Father's Name <span class="required">*</span></label><input type="text" id="fatherName" required></div>
+        <div class="form-group"><label>Mother's Name</label><input type="text" id="motherName"></div>
+        <div class="form-group"><label>Contact No. <span class="required">*</span></label><input type="tel" id="studentMobile" maxlength="10" required></div>
+        <div class="form-group full-width"><label>Address <span class="required">*</span></label><textarea id="address" rows="2" required></textarea></div>
+        <div class="form-group"><label>Aadhar No.</label><input type="text" id="aadhar" maxlength="12"></div>
+        <div class="form-group"><label>Current School</label><input type="text" id="presentSchool" required></div>
+        <div class="form-group"><label>Session <span class="required">*</span></label><select id="sessionSelect" required><option value="2026-27" selected>2026-27</option><option>2027-28</option><option>2028-29</option></select></div>
+        <div class="form-group full-width"><label>How did you know about QCC</label><div class="checkbox-group"><label><input type="checkbox" name="knowAbout" value="Google"> Google</label><label><input type="checkbox" name="knowAbout" value="Teacher"> Teacher</label><label><input type="checkbox" name="knowAbout" value="Friend/Relatives"> Friend/Relatives</label></div></div>
+        <div class="form-group full-width"><label>Medical Info (if any)</label><textarea id="medicalInfo" rows="2"></textarea></div></div>
+        <div class="declaration-box"><div class="declaration-text"><i class="fas fa-file-signature"></i> <strong>DECLARATION</strong><br>I hereby declare that the information is true.</div><div class="checkbox-group"><label><input type="checkbox" id="declaration" required> I Agree <span class="required">*</span></label></div><div class="signature-row" style="display:flex; gap:16px; margin-top:12px;"><div><label>Date:</label><input type="text" id="declarationDate" readonly></div><div><label>Place:</label><input type="text" id="declarationPlace" placeholder="Gopalganj"></div></div></div>
+        <div id="submitButtonContainer"></div></form>
+    </div>
+    <div id="cardSection" style="display: none;" class="screen-card-container"></div>
+</div></div>
+<div class="progress-overlay" id="progressOverlay"><div class="progress-card"><h3><i class="fas fa-spinner fa-spin"></i> Processing...</h3><div class="progress-bar-container"><div class="progress-bar-fill" id="progressFill"></div></div><div class="progress-status" id="progressStatus">Initializing...</div><div class="progress-percent" id="progressPercent">0%</div></div></div>
+<script>
+const firebaseConfig = { apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg", authDomain: "quest-coaching.firebaseapp.com", projectId: "quest-coaching", storageBucket: "quest-coaching.firebasestorage.app" };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+const admissionsCollection = db.collection('admissions');
+const SUPABASE_URL = 'https://zjwvxqjmccqhyxsaeggw.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_6a_9nxKSSLUZMmSGleyycg_kQ4a4BtI';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const STORAGE_BUCKET = 'student_photos';
+const LOGO_URL = 'https://i.ibb.co/hF9tmnpB/20250903-202922.jpg';
+const TERMS_LEFT = ["नामांकन फॉर्म के साथ हाल ही की दो पासपोर्ट साइज फोटो और आधार कार्ड लगाना अनिवार्य है।","संस्थान द्वारा टेस्ट का परिणाम या कोई अन्य जानकारी SMS के माध्यम से भेजी जाएगी।","क्लास में मोबाइल फोन या आई-पॉड ले जाने की अनुमति नहीं है।","छात्रों को विनम्र, समय का पाबंद और नियमित होना चाहिए।","छात्रों को दिया गया सारा होमवर्क समय पर पूरा करना चाहिए।","यदि आप अनुपस्थित रहते हैं, तो क्लास के समय से पहले शिक्षक को सूचित करें, अन्यथा ₹10 प्रतिदिन अनुपस्थिति जुर्माना।","यदि आप कोई टेस्ट छोड़ते हैं, तो ₹50 टेस्ट छोड़ने का जुर्माना।","सत्र के बीच में प्रवेश रद्द नहीं किया जा सकता।","एक बार जमा की गई फीस किसी भी परिस्थिति में वापस नहीं की जाएगी।","यदि अभिभावक अपने बच्चे का नाम वापस लेना चाहते हैं, तो 4 सप्ताह पहले सूचित करें।","गंभीर अनुशासनहीनता पर बिना रिफंड प्रवेश रद्द।"];
+const TERMS_RIGHT = ["यदि कोई छात्र समय पर फीस नहीं भरता है, तो क्लास में प्रवेश वर्जित","बिना सूचना 3 सप्ताह अनुपस्थिति पर नाम कटेगा, पुनःप्रवेश शुल्क ₹500","अनुशासनहीनता पर निदेशक का निर्णय अंतिम।","पंजीकरण राशि वापस नहीं होगी।","अभिभावक द्वारा दुर्व्यवहार पर निष्कासन, फीस जब्त।","सत्र समाप्ति से पूर्व निकलने पर शेष फीस जब्त।","संपत्ति क्षति पूर्ण मरम्मत खर्च अभिभावक वहन करेंगे।","QUEST COACHING CENTRE के पास कार्यक्रम बदलने का अधिकार सुरक्षित।","कानूनी विवाद की स्थिति में क्षेत्राधिकार गोपालगंज (बिहार)।"];
+const urlParams = new URLSearchParams(window.location.search);
+let mode = urlParams.get('mode') || 'new';
+let studentId = urlParams.get('id');
+let currentStudentData = null, existingPhotoUrl = null;
+const authLoadingDiv = document.getElementById('authLoading'), mainContentDiv = document.getElementById('mainContent');
+const formSectionDiv = document.getElementById('formSection'), cardSectionDiv = document.getElementById('cardSection');
+const newAdmissionBtn = document.getElementById('newAdmissionTopBtn'), backBtn = document.getElementById('backToListBtn');
+function goBackToList() { window.location.href = 'manage-students.html'; }
+backBtn.onclick = goBackToList;
+const isPublicView = (mode === 'view' && studentId);
+async function compressPhoto(file, maxWidth=400, maxHeight=400, quality=0.75){ return new Promise((resolve)=>{ const reader=new FileReader(); reader.readAsDataURL(file); reader.onload=(e)=>{ const img=new Image(); img.src=e.target.result; img.onload=()=>{ const canvas=document.createElement('canvas'); let w=img.width, h=img.height; if(w>h){ if(w>maxWidth){ h=(h*maxWidth)/w; w=maxWidth; } }else{ if(h>maxHeight){ w=(w*maxHeight)/h; h=maxHeight; } } canvas.width=w; canvas.height=h; const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h); canvas.toBlob(blob=>resolve(blob),'image/jpeg',quality); }; }; }); }
+async function uploadPhotoToSupabase(file, admissionNo){ const blob=await compressPhoto(file); const fileName=`${admissionNo}_${Date.now()}.jpg`; const {error}=await supabaseClient.storage.from(STORAGE_BUCKET).upload(fileName,blob,{contentType:'image/jpeg'}); if(error) throw error; const {data:urlData}=supabaseClient.storage.from(STORAGE_BUCKET).getPublicUrl(fileName); return urlData.publicUrl; }
+function generateAdmissionNo(){ const year=new Date().getFullYear(); const random=Math.floor(Math.random()*10000).toString().padStart(4,'0'); return `QCC/${year}/${random}`; }
+function getFormData(){ const firstName=document.getElementById('firstName').value.trim(), middle=document.getElementById('middleName').value.trim(),last=document.getElementById('lastName').value.trim(), fullName=[firstName,middle,last].filter(n=>n).join(' '); const knowAbout=Array.from(document.querySelectorAll('input[name="knowAbout"]:checked')).map(cb=>cb.value).join(', '); return { fullName,firstName,middleName:middle,lastName:last, nationality:document.getElementById('nationality').value.trim(), dob:document.getElementById('dob').value, rollNumber:document.getElementById('rollNumber').value.trim(), gender:document.querySelector('input[name="gender"]:checked')?.value, classVal:document.getElementById('class').value, fatherName:document.getElementById('fatherName').value.trim(), motherName:document.getElementById('motherName').value.trim(), studentMobile:document.getElementById('studentMobile').value.trim(), address:document.getElementById('address').value.trim(), aadhar:document.getElementById('aadhar').value.trim(), presentSchool:document.getElementById('presentSchool').value.trim(), session:document.getElementById('sessionSelect').value, knowAbout, medicalInfo:document.getElementById('medicalInfo').value.trim(), declaration:document.getElementById('declaration').checked, declarationPlace:document.getElementById('declarationPlace').value.trim() }; }
+function validateFormData(data){ if(!data.firstName || !data.lastName || !data.dob || !data.rollNumber || !data.gender || !data.classVal || !data.fatherName || !data.studentMobile || !data.address || !data.presentSchool){ showAlert('Fill all required fields (*)','error'); return false; } if(data.studentMobile.length!==10 || !/^\d+$/.test(data.studentMobile)){ showAlert('Valid 10-digit mobile','error'); return false; } if(!data.declaration){ showAlert('Accept declaration','error'); return false; } return true; }
+function showAlert(msg,type){ const div=document.getElementById('formAlert'); div.innerHTML=`<div style="background:${type==='error'?'#fee2e2':'#d1fae5'};color:${type==='error'?'#991b1b':'#065f46'};padding:12px;border-radius:16px;margin-bottom:20px;">${msg}</div>`; setTimeout(()=>div.innerHTML='',4000); }
+async function afterSubmitShowCard(docId){ const doc=await admissionsCollection.doc(docId).get(); if(doc.exists){ const data={id:doc.id,...doc.data()}; displayAdmissionCard(data,data.photoUrl); formSectionDiv.style.display='none'; cardSectionDiv.style.display='block'; } }
+function resetFormToEmpty(){ document.getElementById('admissionForm').reset(); document.getElementById('firstName').value=''; document.getElementById('lastName').value=''; document.getElementById('middleName').value=''; document.getElementById('declarationDate').value=new Date().toLocaleDateString('en-IN'); document.getElementById('declarationPlace').value='Gopalganj'; document.getElementById('nationality').value='Indian'; const preview=document.getElementById('photoPreview'); const placeholderDiv=document.getElementById('photoPlaceholder'); preview.style.display='none'; preview.src=''; placeholderDiv.style.display='flex'; document.getElementById('studentPhoto').value=''; existingPhotoUrl=null; showAlert('Form cleared. Fill details for new admission.','success'); }
+async function submitNewAdmission(e){ e.preventDefault(); const data=getFormData(); if(!validateFormData(data)) return; const photoFile=document.getElementById('studentPhoto').files[0]; if(!photoFile){ showAlert('Upload passport photo','error'); return; } const progressOverlay=document.getElementById('progressOverlay'), progressFill=document.getElementById('progressFill'), progressStatus=document.getElementById('progressStatus'), progressPercent=document.getElementById('progressPercent'); progressOverlay.style.display='flex'; const setProgress=(p,msg)=>{ progressFill.style.width=p+'%'; progressPercent.textContent=p+'%'; if(msg) progressStatus.textContent=msg; }; setProgress(10,'Preparing...'); try{ const admissionNo=generateAdmissionNo(); setProgress(30,'Uploading photo...'); const photoUrl=await uploadPhotoToSupabase(photoFile,admissionNo); setProgress(70,'Saving record...'); const admissionData={ admissionNo, studentName:data.fullName, rollNumber:data.rollNumber, fatherName:data.fatherName, motherName:data.motherName, dob:data.dob, gender:data.gender, classApplying:data.classVal, schoolName:data.presentSchool, address:data.address, parentMobile:data.studentMobile, aadhar:data.aadhar, nationality:data.nationality, knowAbout:data.knowAbout, medicalInfo:data.medicalInfo, photoUrl, admissionDate:new Date().toISOString(), session:data.session, createdAt:firebase.firestore.FieldValue.serverTimestamp(), status:'active' }; const docRef=await admissionsCollection.add(admissionData); setProgress(100,'Complete!'); setTimeout(async()=>{ progressOverlay.style.display='none'; await afterSubmitShowCard(docRef.id); },500); }catch(err){ progressOverlay.style.display='none'; showAlert('Error: '+err.message,'error'); } }
+function setupNewMode(){ document.getElementById('submitButtonContainer').innerHTML=`<button type="submit" class="btn-submit" id="submitBtn"><i class="fas fa-save"></i> Submit Admission</button>`; const form=document.getElementById('admissionForm'); form.onsubmit=submitNewAdmission; resetFormToEmpty(); document.getElementById('modeBadge').textContent='📝 NEW ADMISSION'; formSectionDiv.style.display='block'; cardSectionDiv.style.display='none'; }
+async function generateQRCodeImageUrl(text,size=85){ return new Promise((resolve)=>{ const tempDiv=document.createElement('div'); tempDiv.style.cssText='position:absolute;left:-9999px;top:-9999px'; document.body.appendChild(tempDiv); const qrDiv=document.createElement('div'); tempDiv.appendChild(qrDiv); new QRCode(qrDiv,{text,width:size,height:size}); setTimeout(()=>{ const canvas=qrDiv.querySelector('canvas'); if(canvas){ resolve(canvas.toDataURL('image/png')); }else resolve(null); document.body.removeChild(tempDiv); },200); }); }
+async function generateAndSavePdf(studentData,photoUrl){ const pdfUrl=await generatePdfBlobUrl(studentData,photoUrl); const link=document.createElement('a'); link.href=pdfUrl; link.download=`Admission_${studentData.admissionNo}_${studentData.studentName}.pdf`; link.click(); URL.revokeObjectURL(pdfUrl); Swal.fire('Downloaded!','PDF ready','success'); }
+async function generatePdfBlobUrl(studentData,photoUrl){ const tempDiv=document.createElement('div'); tempDiv.style.cssText='position:absolute;left:-9999px;top:-9999px;width:1100px'; document.body.appendChild(tempDiv); const publicShareUrl=`${window.location.origin}${window.location.pathname}?mode=view&id=${studentData.id}`; const qrImg=await generateQRCodeImageUrl(publicShareUrl,85); const admDate=new Date(studentData.admissionDate), dobDate=new Date(studentData.dob); const termsHtml=`<ul class="terms-col">${TERMS_LEFT.map((t,i)=>`<li><strong>${i+1}.</strong> ${t}</li>`).join('')}</ul><ul class="terms-col">${TERMS_RIGHT.map((t,i)=>`<li><strong>${i+12}.</strong> ${t}</li>`).join('')}</ul>`; tempDiv.innerHTML=`<div id="pdfCard" class="admission-card"><div class="card-header"><div class="logo-center"><div class="logo-img-card"><img src="${LOGO_URL}"></div><div class="institution-name"><h1>QUEST COACHING CENTRE</h1><div class="tagline">|| SEARCH FOR KNOWLEDGE ||</div><div class="under">Under MR. RAVI SIR</div></div><div class="contact-strip-card"><div class="contact-item-card"><i class="fas fa-map-marker-alt"></i> Block More, Gopalganj</div><div class="contact-item-card"><i class="fas fa-phone-alt"></i> +91 9708442525</div></div></div></div><div class="title-banner"><h2>🎓 ADMISSION FORM 🎓</h2></div><div class="top-row"><div class="photo-card"><img src="${photoUrl}"></div><div class="info-group"><div class="info-row"><span class="info-label">ADMISSION NO.</span><span class="info-value adm-no">${studentData.admissionNo}</span></div><div class="info-row"><span class="info-label">ROLL NO.</span><span class="info-value">${studentData.rollNumber||'-'}</span></div><div class="info-row"><span class="info-label">SESSION</span><span class="info-value">${studentData.session}</span></div><div class="info-row"><span class="info-label">CLASS APPLYING</span><span class="info-value">${studentData.classApplying}</span></div></div><div class="qr-card"><div class="qr-box"><img src="${qrImg}" style="width:85px;height:85px;"></div><div class="qr-label-card">SCAN TO VERIFY</div></div></div><div class="details-section"><div class="detail-box"><div class="detail-title">PERSONAL DETAILS</div><div class="detail-content"><table class="detail-table"><tr><td>Student Name</td><td>${studentData.studentName}</td></tr><tr><td>DOB</td><td>${dobDate.toLocaleDateString()}</td></tr><tr><td>Gender</td><td>${studentData.gender}</td></tr><tr><td>Aadhar</td><td>${studentData.aadhar||'-'}</td></tr></table></div></div><div class="detail-box"><div class="detail-title">PARENT INFO</div><div class="detail-content"><table class="detail-table"><tr><td>Father</td><td>${studentData.fatherName}</td></tr><tr><td>Mother</td><td>${studentData.motherName||'-'}</td></tr><tr><td>Contact</td><td>${studentData.parentMobile}</td></tr></table></div></div></div><div class="terms-section"><div class="terms-box"><div class="terms-title">📜 नियम और शर्तें</div><div class="terms-list">${termsHtml}</div></div></div><div class="signatures-section"><div class="sig-card"><div class="sig-line">Parent Signature</div></div><div class="seal-card"><span>QUEST COACHING<br>CENTRE</span><span class="seal-text">DIRECTOR SEAL</span></div><div class="sig-card"><div class="sig-line">Student Signature</div></div></div><div class="card-footer"><p>★ THANK YOU ★</p></div></div>`; await new Promise(r=>setTimeout(r,600)); const element=tempDiv.querySelector('#pdfCard'); const canvas=await html2canvas(element,{scale:2,useCORS:true}); const imgData=canvas.toDataURL('image/png'); const {jsPDF}=window.jspdf; const pdf=new jsPDF('p','mm','a4'); const imgWidth=190; const imgHeight=(canvas.height*imgWidth)/canvas.width; pdf.addImage(imgData,'PNG',10,10,imgWidth,imgHeight); const blob=pdf.output('blob'); const url=URL.createObjectURL(blob); document.body.removeChild(tempDiv); return url; }
+function displayAdmissionCard(studentData,photoUrl){ const admDate=new Date(studentData.admissionDate||Date.now()), dobDate=new Date(studentData.dob); const termsHtml=`<ul class="terms-col">${TERMS_LEFT.map((t,i)=>`<li><strong>${i+1}.</strong> ${t}</li>`).join('')}</ul><ul class="terms-col">${TERMS_RIGHT.map((t,i)=>`<li><strong>${i+12}.</strong> ${t}</li>`).join('')}</ul>`; const shareableLink=`${window.location.origin}${window.location.pathname}?mode=view&id=${studentData.id}`; const cardHtml=`<div id="admissionCard" class="admission-card"><div class="card-header"><div class="logo-center"><div class="logo-img-card"><img src="${LOGO_URL}" alt="Logo"></div><div class="institution-name"><h1>QUEST COACHING CENTRE</h1><div class="tagline">|| SEARCH FOR KNOWLEDGE ||</div></div><div class="contact-strip-card"><div class="contact-item-card"><i class="fas fa-map-marker-alt"></i> Block More, Gopalganj</div><div class="contact-item-card"><i class="fas fa-phone-alt"></i> +91 9708442525</div></div></div></div><div class="title-banner"><h2>🎓 ADMISSION FORM 🎓</h2></div><div class="top-row"><div class="photo-card"><img src="${photoUrl}"></div><div class="info-group"><div class="info-row"><span class="info-label">ADMISSION NO.</span><span class="info-value adm-no">${studentData.admissionNo}</span></div><div class="info-row"><span class="info-label">ROLL NO.</span><span class="info-value">${studentData.rollNumber||'-'}</span></div><div class="info-row"><span class="info-label">ADMISSION DATE</span><span class="info-value">${admDate.toLocaleDateString()}</span></div><div class="info-row"><span class="info-label">CLASS</span><span class="info-value">${studentData.classApplying}</span></div></div><div class="qr-card"><div class="qr-box" id="qrcode-view"></div><div class="qr-label-card">SCAN TO VERIFY</div></div></div><div class="details-section"><div class="detail-box"><div class="detail-title">PERSONAL DETAILS</div><div class="detail-content"><table class="detail-table"><tr><td>Student Name</td><td>${studentData.studentName}</td></tr><tr><td>DOB</td><td>${dobDate.toLocaleDateString()}</td></tr><tr><td>Father</td><td>${studentData.fatherName}</td></tr><tr><td>Contact</td><td>${studentData.parentMobile}</td></tr></table></div></div><div class="detail-box"><div class="detail-title">OTHER DETAILS</div><div class="detail-content"><table class="detail-table"><tr><td>School</td><td>${studentData.schoolName||'-'}</td></tr><tr><td>Address</td><td>${studentData.address}</td></tr><tr><td>Know About</td><td>${studentData.knowAbout||'-'}</td></tr></table></div></div></div><div class="terms-section"><div class="terms-box"><div class="terms-title">📜 नियम और शर्तें</div><div class="terms-list">${termsHtml}</div></div></div><div class="signatures-section"><div class="sig-card"><div class="sig-line">Parent Signature</div></div><div class="seal-card"><span>QUEST COACHING<br>CENTRE</span><span class="seal-text">DIRECTOR</span></div><div class="sig-card"><div class="sig-line">Student Signature</div></div></div><div class="card-footer"><p>★ THANK YOU FOR CHOOSING QUEST COACHING CENTRE ★</p></div></div><div class="action-buttons-card"><button class="action-btn print" onclick="document.getElementById('admissionCard').closest('.screen-card-container').querySelector('#admissionCard').cloneNode(true); window.print();"><i class="fas fa-print"></i> Print</button><button class="action-btn share" id="shareCardBtn"><i class="fas fa-share-alt"></i> Share Link & Details</button><button class="action-btn pdf" id="downloadPdfBtn"><i class="fas fa-file-pdf"></i> PDF</button></div>`; cardSectionDiv.innerHTML=cardHtml; cardSectionDiv.style.display='block'; setTimeout(()=>{ new QRCode(document.getElementById("qrcode-view"),{text:shareableLink,width:85,height:85}); },100); document.getElementById('shareCardBtn').onclick=()=>{ const text=`🎓 Quest Coaching Admission\nStudent: ${studentData.studentName}\nAdmission No: ${studentData.admissionNo}\nRoll: ${studentData.rollNumber}\nClass: ${studentData.classApplying}\nLink: ${shareableLink}`; if(navigator.share) navigator.share({title:'Admission Card',text}); else { navigator.clipboard.writeText(text); Swal.fire('Copied!','Link & details copied','success'); } }; document.getElementById('downloadPdfBtn').onclick=()=>generateAndSavePdf(studentData,photoUrl); }
+auth.onAuthStateChanged((user)=>{ if(isPublicView){ authLoadingDiv.style.display='none'; mainContentDiv.style.display='block'; admissionsCollection.doc(studentId).get().then(doc=>{ if(doc.exists){ currentStudentData={id:doc.id,...doc.data()}; displayAdmissionCard(currentStudentData,currentStudentData.photoUrl); formSectionDiv.style.display='none'; cardSectionDiv.style.display='block'; } else { Swal.fire('Error','Student not found','error').then(()=>goBackToList()); } }).catch(()=>Swal.fire('Error','Failed to load','error')); return; } if(!user){ Swal.fire({title:'Access Denied',text:'Please login from main page',icon:'error',confirmButtonColor:'#1b4f9b'}).then(()=>{window.location.href='index.html';}); return; } authLoadingDiv.style.display='none'; mainContentDiv.style.display='block'; newAdmissionBtn.onclick=()=>{ setupNewMode(); }; if(mode==='edit'&&studentId){ document.getElementById('modeBadge').textContent='✏️ EDIT MODE'; formSectionDiv.style.display='block'; } else { setupNewMode(); } });
+document.getElementById('photoUploadBox').addEventListener('click',()=>document.getElementById('studentPhoto').click()); document.getElementById('studentPhoto').addEventListener('change',function(e){ if(e.target.files[0]){ const reader=new FileReader(); reader.onload=ev=>{ document.getElementById('photoPreview').src=ev.target.result; document.getElementById('photoPreview').style.display='block'; document.getElementById('photoPlaceholder').style.display='none'; }; reader.readAsDataURL(e.target.files[0]); } });
+document.getElementById('declarationDate').value=new Date().toLocaleDateString('en-IN');
+document.getElementById('declarationPlace').value='Gopalganj';
+</script>
 </body>
 </html>
