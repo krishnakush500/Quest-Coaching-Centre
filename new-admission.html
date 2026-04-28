@@ -123,6 +123,41 @@
         .signature-row { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px; }
         .signature-item { flex: 1; }
         
+        /* Roll Number Button */
+        .roll-section {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .roll-input-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .roll-input {
+            padding: 12px 20px;
+            font-size: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 50px;
+            width: 250px;
+            text-align: center;
+        }
+        .roll-btn {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .roll-btn:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+        }
+        
         .btn-submit {
             background: linear-gradient(135deg, #1b4f9b, #0f3f7a);
             color: white;
@@ -356,6 +391,14 @@
             </button>
         </div>
         
+        <!-- Roll Number Section -->
+        <div class="roll-section" id="rollSection">
+            <div class="roll-input-group">
+                <input type="text" id="rollNumberInput" class="roll-input" placeholder="Enter Roll Number" autocomplete="off">
+                <button class="roll-btn" id="fetchRollBtn"><i class="fas fa-search"></i> Search by Roll Number</button>
+            </div>
+        </div>
+        
         <!-- Form Section (Only shown in NEW or EDIT mode) -->
         <div id="formSection" class="form-card" style="display: none;">
             <h2 style="color: #1e3a5f; margin-bottom: 20px;">
@@ -378,12 +421,7 @@
             
             <form id="admissionForm">
                 <div class="form-group">
-                    <label>1. Roll Number <span class="required">*</span></label>
-                    <input type="text" id="rollNumber" placeholder="e.g., 24001" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>2. Full Name of the Applicant <span class="required">*</span></label>
+                    <label>1. Full Name of the Applicant <span class="required">*</span></label>
                     <div class="name-boxes">
                         <div class="name-box"><input type="text" id="firstName" placeholder="First Name" required></div>
                         <div class="name-box"><input type="text" id="middleName" placeholder="Middle Name"></div>
@@ -392,13 +430,13 @@
                 </div>
                 
                 <div class="form-grid">
-                    <div class="form-group"><label>3. Nationality <span class="required">*</span></label><input type="text" id="nationality" value="Indian" required></div>
-                    <div class="form-group"><label>4. Date of Birth <span class="required">*</span></label><input type="date" id="dob" required></div>
+                    <div class="form-group"><label>2. Nationality <span class="required">*</span></label><input type="text" id="nationality" value="Indian" required></div>
+                    <div class="form-group"><label>3. Date of Birth <span class="required">*</span></label><input type="date" id="dob" required></div>
                     <div class="form-group">
-                        <label>5. Sex <span class="required">*</span></label>
-                        <div class="radio-group"><label><input type="radio" name="gender" value="Male" required> Male</label><label><input type="radio"name="gender" value="Female"> Female</label></div>
+                        <label>4. Sex <span class="required">*</span></label>
+                        <div class="radio-group"><label><input type="radio" name="gender" value="Male" required> Male</label><label><input type="radio" name="gender" value="Female"> Female</label></div>
                     </div>
-                    <div class="form-group"><label>6. Class <span class="required">*</span></label>
+                    <div class="form-group"><label>5. Class <span class="required">*</span></label>
                         <select id="class" required>
                             <option value="">Select Class</option>
                             <option>6th</option><option>7th</option><option>8th</option>
@@ -409,13 +447,13 @@
                             <option>12th (Arts)</option>
                         </select>
                     </div>
-                    <div class="form-group"><label>7. Father's Name <span class="required">*</span></label><input type="text" id="fatherName" required></div>
-                    <div class="form-group"><label>8. Mother's Name</label><input type="text" id="motherName"></div>
-                    <div class="form-group"><label>9. Contact No. (Student's) <span class="required">*</span></label><input type="tel" id="studentMobile" maxlength="10" required></div>
-                    <div class="form-group full-width"><label>10. Complete Address <span class="required">*</span></label><textarea id="address" rows="2" required></textarea></div>
-                    <div class="form-group"><label>11. Aadhar No.</label><input type="text" id="aadhar" maxlength="12"></div>
-                    <div class="form-group"><label>12. Current School/College <span class="required">*</span></label><input type="text" id="presentSchool" required></div>
-                    <div class="form-group"><label>13. Session <span class="required">*</span></label>
+                    <div class="form-group"><label>6. Father's Name <span class="required">*</span></label><input type="text" id="fatherName" required></div>
+                    <div class="form-group"><label>7. Mother's Name</label><input type="text" id="motherName"></div>
+                    <div class="form-group"><label>8. Contact No. (Student's) <span class="required">*</span></label><input type="tel" id="studentMobile" maxlength="10" required></div>
+                    <div class="form-group full-width"><label>9. Complete Address <span class="required">*</span></label><textarea id="address" rows="2" required></textarea></div>
+                    <div class="form-group"><label>10. Aadhar No.</label><input type="text" id="aadhar" maxlength="12"></div>
+                    <div class="form-group"><label>11. Current School/College <span class="required">*</span></label><input type="text" id="presentSchool" required></div>
+                    <div class="form-group"><label>12. Session <span class="required">*</span></label>
                         <select id="sessionSelect" required>
                             <option value="2026-27" selected>2026-27</option>
                             <option value="2027-28">2027-28</option>
@@ -424,14 +462,14 @@
                         </select>
                     </div>
                     <div class="form-group full-width">
-                        <label>14. How did you come to know about QCC</label>
+                        <label>13. How did you come to know about QCC</label>
                         <div class="checkbox-group">
                             <label><input type="checkbox" name="knowAbout" value="Google"> Google</label>
                             <label><input type="checkbox" name="knowAbout" value="Teacher"> Teacher</label>
                             <label><input type="checkbox" name="knowAbout" value="Friend/Relatives"> Friend / Relatives</label>
                         </div>
                     </div>
-                    <div class="form-group full-width"><label>15. Mention Information (Psychological/Physical) If Any</label><textarea id="medicalInfo" rows="2"></textarea></div>
+                    <div class="form-group full-width"><label>14. Mention Information (Psychological/Physical) If Any</label><textarea id="medicalInfo" rows="2"></textarea></div>
                 </div>
                 
                 <div class="declaration-box">
@@ -516,6 +554,7 @@
     const mainContent = document.getElementById('mainContent');
     const formSection = document.getElementById('formSection');
     const cardSection = document.getElementById('cardSection');
+    const rollSection = document.getElementById('rollSection');
     const backButton = document.getElementById('backButton');
     const modeBadge = document.getElementById('modeBadge');
     
@@ -523,16 +562,268 @@
         window.location.href = 'manage-students.html';
     }
     
+    // Roll Number Search Function
+    async function searchByRollNumber() {
+        const rollNumber = document.getElementById('rollNumberInput').value.trim();
+        if (!rollNumber) {
+            Swal.fire('Info', 'Please enter roll number', 'info');
+            return;
+        }
+        
+        try {
+            const snapshot = await admissionsCollection.where('rollNumber', '==', rollNumber).get();
+            if (snapshot.empty) {
+                Swal.fire('Not Found', 'No student found with this roll number', 'error');
+                return;
+            }
+            const doc = snapshot.docs[0];
+            const student = { id: doc.id, ...doc.data() };
+            displayAdmissionCardInNewTab(student, student.photoUrl);
+        } catch (error) {
+            console.error('Error searching roll number:', error);
+            Swal.fire('Error', 'Failed to search student', 'error');
+        }
+    }
+    
+    // Display card in new tab
+    function displayAdmissionCardInNewTab(studentData, photoUrl) {
+        const win = window.open();
+        const doc = win.document;
+        
+        const admDate = new Date(studentData.admissionDate);
+        const dobDate = new Date(studentData.dob);
+        
+        let termsHtml = `
+            <ul class="terms-col">
+                ${TERMS_LEFT.map((term, i) => `<li><strong>${i+1}.</strong> ${term}</li>`).join('')}
+            </ul>
+            <ul class="terms-col">
+                ${TERMS_RIGHT.map((term, i) => `<li><strong>${i+12}.</strong> ${term}</li>`).join('')}
+            </ul>
+        `;
+        
+        const publicUrl = `${window.location.origin}${window.location.pathname}?mode=view&id=${studentData.id}`;
+        
+        doc.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Admission Form - ${studentData.studentName}</title>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"><\/script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>
+                <style>
+                    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+                    body { background: #f0f4fa; padding: 20px; display: flex; justify-content: center; }
+                    .admission-card {
+                        background: white;
+                        width: 100%;
+                        max-width: 1100px;
+                        margin: 20px auto;
+                        border-radius: 20px;
+                        overflow: hidden;
+                        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+                    }
+                    .card-header { background: linear-gradient(135deg, #1a3a5c, #0f2b44); padding: 25px 35px; text-align: center; }
+                    .logo-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+                    .logo-img-card { width: 100px; height: 100px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #c5a059; overflow: hidden; margin-bottom: 15px; }
+                    .logo-img-card img { width: 100%; height: 100%; object-fit: cover; }
+                    .institution-name h1 { color: white; font-size: 32px; letter-spacing: 2px; margin-bottom: 5px; }
+                    .institution-name .tagline { color: #c5a059; font-size: 13px; letter-spacing: 2px; margin-bottom: 5px; }
+                    .institution-name .under { color: rgba(255,255,255,0.8); font-size: 13px; }
+                    .contact-strip-card { display: flex; justify-content: center; flex-wrap: wrap; gap: 25px; margin-top: 15px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.2); }
+                    .contact-item-card { color: rgba(255,255,255,0.85); font-size: 12px; display: flex; align-items: center; gap: 6px; }
+                    .contact-item-card i { color: #c5a059; }
+                    .title-banner { text-align: center; padding: 20px 0 10px 0; background: white; }
+                    .title-banner h2 { font-size: 28px; color: #1a3a5c; letter-spacing: 3px; display: inline-block; position: relative; }
+                    .title-banner h2:before, .title-banner h2:after { content: "✦"; color: #c5a059; font-size: 20px; position: absolute; top: 50%; transform: translateY(-50%); }
+                    .title-banner h2:before { left: -35px; }
+                    .title-banner h2:after { right: -35px; }
+                    .top-row { display: flex; gap: 25px; padding: 0 30px 20px 30px; flex-wrap: wrap; }
+                    .photo-card { width: 130px; height: 150px; border: 3px solid #c5a059; border-radius: 12px; overflow: hidden; background: #f5f5f5; display: flex; align-items: center; justify-content: center; }
+                    .photo-card img { width: 100%; height: 100%; object-fit: cover; }
+                    .info-group { flex: 1; background: #f8f9fc; border-radius: 12px; padding: 15px 20px; border: 1px solid #e2e8f0; }
+                    .info-row { display: grid; grid-template-columns: 140px 1fr; padding: 10px 0; border-bottom: 1px dashed #e2e8f0; }
+                    .info-row:last-child { border-bottom: none; }
+                    .info-label { font-weight: 700; color: #2c3e50; font-size: 12px; }
+                    .info-value { font-weight: 600; color: #1a3a5c; font-size: 13px; }
+                    .adm-no { color: #d9534f; font-size: 14px; }
+                    .roll-number { color: #c5a059; font-weight: bold; }
+                    .qr-card { text-align: center; width: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+                    .qr-box { background: white; padding: 10px; border: 2px solid #c5a059; border-radius: 16px; margin-bottom: 8px; display: flex; justify-content: center; align-items: center; }
+                    .qr-label-card { background: #c5a059; color: white; font-size: 10px; padding: 5px 10px; border-radius: 20px; font-weight: bold; }
+                    .qr-box canvas, .qr-box img { width: 85px !important; height: 85px !important; }
+                    .details-section { padding: 0 30px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; margin-bottom: 25px; }
+                    .detail-box { background: #f8f9fc; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
+                    .detail-title { background: #1a3a5c; color: white; padding: 12px 18px; font-size: 14px; font-weight: 700; }
+                    .detail-content { padding: 18px; }
+                    .detail-table { width: 100%; }
+                    .detail-table td { padding: 10px 8px; font-size: 12px; border-bottom: 1px dotted #e2e8f0; }
+                    .detail-table td:first-child { font-weight: 700; color: #2c3e50; width: 38%; }
+                    .detail-table td:last-child { color: #1a3a5c; }
+                    .detail-table tr:last-child td { border-bottom: none; }
+                    .terms-section { padding: 0 30px; margin: 20px 0; }
+                    .terms-box { background: #fef9e6; border-left: 4px solid #c5a059; border-radius: 12px; padding: 18px 22px; }
+                    .terms-title { font-size: 16px; font-weight: 800; color: #1a3a5c; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+                    .terms-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 30px; }
+                    .terms-col { list-style: none; padding: 0; margin: 0; }
+                    .terms-col li { margin-bottom: 8px; font-size: 10.5px; line-height: 1.4; color: #333; text-align: left; }
+                    .quote-card { background: linear-gradient(135deg, #f8f9fc, white); padding: 12px 25px; text-align: center; border-radius: 40px; margin: 0 30px 20px 30px; border: 1px solid #e2e8f0; }
+                    .quote-text { font-size: 12px; font-style: italic; color: #2c3e50; }
+                    .quote-author { font-size: 11px; font-weight: 700; color: #c5a059; margin-top: 5px; display: block; }
+                    .signatures-section { display: flex; justify-content: space-between; align-items: center; padding: 0 30px 25px 30px; flex-wrap: wrap; gap: 20px; }
+                    .sig-card { text-align: center; width: 200px; }
+                    .sig-line { border-top: 1.5px solid #2c3e50; width: 100%; margin-top: 30px; padding-top: 8px; font-size: 11px; font-weight: 600; }
+                    .seal-card { width: 100px; height: 100px; border: 2px solid #c5a059; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; background: #fef9e6; }
+                    .seal-card span { font-size: 9px; font-weight: bold; color: #c5a059; text-align: center; line-height: 1.3; }
+                    .seal-card .seal-text { font-size: 8px; margin-top: 5px; }
+                    .card-footer { background: #0f2b44; padding: 12px; text-align: center; }
+                    .card-footer p { color: white; font-size: 11px; letter-spacing: 1px; }
+                    .action-buttons-card { display: flex; gap: 12px; justify-content: center; padding: 20px; background: #f1f5f9; flex-wrap: wrap; border-radius: 16px; margin-top: 20px; }
+                    .action-btn { padding: 10px 24px; border: none; border-radius: 40px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; font-size: 13px; }
+                    .action-btn.print { background: #1b4f9b; color: white; }
+                    .action-btn.share { background: #16a34a; color: white; }
+                    .action-btn.pdf { background: #dc2626; color: white; }
+                    .action-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+                    @media (max-width: 700px) {
+                        .details-section { grid-template-columns: 1fr; padding: 0 15px; }
+                        .top-row { flex-direction: column; align-items: center; padding: 0 15px; }
+                        .terms-list { grid-template-columns: 1fr; }
+                        .title-banner h2 { font-size: 22px; }
+                        .title-banner h2:before, .title-banner h2:after { display: none; }
+                        .institution-name h1 { font-size: 24px; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div id="admissionCard" class="admission-card">
+                    <div class="card-header">
+                        <div class="logo-center">
+                            <div class="logo-img-card"><img src="${LOGO_URL}" alt="Logo"></div>
+                            <div class="institution-name">
+                                <h1>QUEST COACHING CENTRE</h1>
+                                <div class="tagline">|| SEARCH FOR KNOWLEDGE ||</div>
+                                <div class="under">Under the guidance of MR. RAVI SIR</div>
+                            </div>
+                            <div class="contact-strip-card">
+                                <div class="contact-item-card"><i class="fas fa-map-marker-alt"></i> Block More, Gopalganj - 841428</div>
+                                <div class="contact-item-card"><i class="fas fa-phone-alt"></i> +91 9708442525</div>
+                                <div class="contact-item-card"><i class="fas fa-envelope"></i> questcoachingcentre@gmail.com</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="title-banner"><h2>🎓 ADMISSION FORM 🎓</h2></div>
+                    <div class="top-row">
+                        <div class="photo-card"><img src="${photoUrl}" alt="Photo"></div>
+                        <div class="info-group">
+                            <div class="info-row"><span class="info-label">ADMISSION NO.</span><span class="info-value adm-no">${studentData.admissionNo}</span></div>
+                            <div class="info-row"><span class="info-label">ROLL NUMBER</span><span class="info-value roll-number">${studentData.rollNumber || 'N/A'}</span></div>
+                            <div class="info-row"><span class="info-label">ADMISSION DATE</span><span class="info-value">${admDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
+                            <div class="info-row"><span class="info-label">ACADEMIC SESSION</span><span class="info-value">${studentData.session}</span></div>
+                            <div class="info-row"><span class="info-label">CLASS APPLYING</span><span class="info-value">${studentData.classApplying}</span></div>
+                        </div>
+                        <div class="qr-card"><div class="qr-box"><div id="qrcode-view"></div></div><div class="qr-label-card">SCAN TO VERIFY</div></div>
+                    </div>
+                    <div class="details-section">
+                        <div class="detail-box">
+                            <div class="detail-title">PERSONAL DETAILS</div>
+                            <div class="detail-content"><table class="detail-table">
+                                <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td></tr>
+                                <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
+                                <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td></tr>
+                                <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td></tr>
+                                <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td></tr>
+                            </table></div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-title">PARENT INFORMATION</div>
+                            <div class="detail-content"><table class="detail-table">
+                                <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td></tr>
+                                <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td></tr>
+                                <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td></tr>
+                                <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td></tr>
+                            </table></div>
+                        </div>
+                    </div>
+                    <div class="details-section">
+                        <div class="detail-box">
+                            <div class="detail-title">ADDRESS DETAILS</div>
+                            <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td></tr></table></div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-title">EDUCATION DETAILS</div>
+                            <div class="detail-content"><table class="detail-table">
+                                <tr><td style="width:38%;">Current School</td><td>${studentData.schoolName}</td></tr>
+                                <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td></tr>
+                            </table></div>
+                        </div>
+                    </div>
+                    <div class="terms-section"><div class="terms-box"><div class="terms-title">📜 नियम और शर्तें (Terms & Conditions)</div><div class="terms-list">${termsHtml}</div></div></div>
+                    <div class="quote-card"><span class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</span><span class="quote-author">- Albert Einstein</span></div>
+                    <div class="signatures-section">
+                        <div class="sig-card"><div class="sig-line">Parent / Guardian Signature</div></div>
+                        <div class="seal-card"><span>QUEST<br>COACHING<br>CENTRE</span><span class="seal-text">SEAL & SIGNATURE<br>OF DIRECTOR</span></div>
+                        <div class="sig-card"><div class="sig-line">Student Signature</div></div>
+                    </div>
+                    <div class="card-footer"><p>★ THANK YOU FOR CHOOSING QUEST COACHING CENTRE ★</p></div>
+                </div>
+                <div class="action-buttons-card">
+                    <button class="action-btn print" onclick="window.print()"><i class="fas fa-print"></i> Print Form</button>
+                    <button class="action-btn share" onclick="shareCard()"><i class="fas fa-share-alt"></i> Share</button>
+                    <button class="action-btn pdf" onclick="downloadCardPDF()"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                    <button class="action-btn" style="background:#1b4f9b; color:white;" onclick="window.close()"><i class="fas fa-times"></i> Close</button>
+                </div>
+                <script>
+                    // QR Code
+                    new QRCode(document.getElementById("qrcode-view"), { text: "${publicUrl}", width: 85, height: 85 });
+                    
+                    function shareCard() {
+                        const text = "🎓 Quest Coaching Centre - Admission Form\\n\\nStudent: ${studentData.studentName}\\nAdmission No: ${studentData.admissionNo}\\nRoll Number: ${studentData.rollNumber || 'N/A'}\\nClass: ${studentData.classApplying}\\nFather: ${studentData.fatherName}\\nMobile: ${studentData.parentMobile}";
+                        if (navigator.share) navigator.share({ title: 'Admission Form', text: text });
+                        else { navigator.clipboard.writeText(text); alert('Copied to clipboard!'); }
+                    }
+                    
+                    async function downloadCardPDF() {
+                        const element = document.getElementById('admissionCard');
+                        const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+                        const imgData = canvas.toDataURL('image/png');
+                        const { jsPDF } = window.jspdf;
+                        const pdf = new jsPDF('p', 'mm', 'a4');
+                        const imgWidth = 190;
+                        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+                        pdf.save('Admission_Form_${studentData.admissionNo}_${studentData.studentName}.pdf');
+                        alert('PDF downloaded successfully!');
+                    }
+                <\/script>
+            </body>
+            </html>
+        `);
+        win.document.close();
+    }
+    
+    // Roll number search button event
+    document.getElementById('fetchRollBtn').addEventListener('click', searchByRollNumber);
+    document.getElementById('rollNumberInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') searchByRollNumber();
+    });
+    
+    // Check if this is a public view (no auth required)
     const isPublicView = (mode === 'view' && studentId);
     
     auth.onAuthStateChanged((user) => {
+        // For public view (student card), don't require login
         if (isPublicView) {
             authLoading.style.display = 'none';
             mainContent.style.display = 'block';
+            rollSection.style.display = 'block';
             loadAndDisplayCard(studentId);
             return;
         }
         
+        // For edit/new modes, require login
         if (!user) {
             Swal.fire({
                 title: 'Access Denied!',
@@ -558,12 +849,14 @@
             modeBadge.className = 'mode-badge mode-edit';
             formSection.style.display = 'block';
             cardSection.style.display = 'none';
+            rollSection.style.display = 'none';
             loadStudentForEdit(studentId);
         } else if (mode === 'new') {
             modeBadge.textContent = '📝 NEW ADMISSION';
             modeBadge.className = 'mode-badge mode-new';
             formSection.style.display = 'block';
             cardSection.style.display = 'none';
+            rollSection.style.display = 'none';
             setupNewMode();
             document.getElementById('admissionForm').addEventListener('submit', submitNewAdmission);
         }
@@ -602,8 +895,6 @@
     }
     
     function fillFormWithData(data) {
-        document.getElementById('rollNumber').value = data.rollNumber || '';
-        
         const nameParts = (data.studentName || '').split(' ');
         document.getElementById('firstName').value = nameParts[0] || '';
         document.getElementById('middleName').value = nameParts.slice(1, -1).join(' ') || '';
@@ -656,7 +947,6 @@
     }
     
     function getFormData() {
-        const rollNumber = document.getElementById('rollNumber').value.trim();
         const firstName = document.getElementById('firstName').value.trim();
         const middleName = document.getElementById('middleName').value.trim();
         const lastName = document.getElementById('lastName').value.trim();
@@ -665,7 +955,7 @@
         const knowAbout = Array.from(document.querySelectorAll('input[name="knowAbout"]:checked')).map(cb => cb.value).join(', ');
         
         return {
-            rollNumber, fullName, firstName, middleName, lastName,
+            fullName, firstName, middleName, lastName,
             nationality: document.getElementById('nationality').value.trim(),
             dob: document.getElementById('dob').value,
             gender: document.querySelector('input[name="gender"]:checked')?.value,
@@ -685,7 +975,7 @@
     }
     
     function validateFormData(data) {
-        if (!data.rollNumber || !data.firstName || !data.lastName || !data.nationality || !data.dob || !data.gender || !data.classVal || !data.fatherName || !data.studentMobile || !data.address || !data.presentSchool) {
+        if (!data.firstName || !data.lastName || !data.nationality || !data.dob || !data.gender || !data.classVal || !data.fatherName || !data.studentMobile || !data.address || !data.presentSchool) {
             showAlert('Please fill all required fields (*)', 'error');
             return false;
         }
@@ -778,6 +1068,12 @@
         return `QCC/${year}/${random}`;
     }
     
+    function generateRollNumber() {
+        const year = new Date().getFullYear();
+        const random = Math.floor(Math.random() * 100000).toString().padStart(6, '0');
+        return `${year}${random}`;
+    }
+    
     async function updateStudent() {
         const data = getFormData();
         if (!validateFormData(data)) return;
@@ -797,7 +1093,6 @@
             updateProgress(70, 'Updating student data...');
             
             const updateData = {
-                rollNumber: data.rollNumber,
                 studentName: data.fullName,
                 fatherName: data.fatherName,
                 motherName: data.motherName,
@@ -845,6 +1140,7 @@
         try {
             updateProgress(20, 'Generating admission number...');
             const admissionNo = generateAdmissionNo();
+            const rollNumber = generateRollNumber();
             
             updateProgress(40, 'Compressing and uploading photo...');
             let photoUrl = await uploadPhotoToSupabase(photoFile, admissionNo);
@@ -852,196 +1148,32 @@
             
             updateProgress(80, 'Saving student data...');
             const admissionData = {
-                admissionNo: admissionNo,
-                rollNumber: data.rollNumber,
-                studentName: data.fullName,
-                fatherName: data.fatherName,
-                motherName: data.motherName || '',
-                dob: data.dob,
-                gender: data.gender,
-                classApplying: data.classVal,
-                schoolName: data.presentSchool,
-                address: data.address,
-                parentMobile: data.studentMobile,
-                aadhar: data.aadhar || '',
-                nationality: data.nationality,
-                knowAbout: data.knowAbout || '',
-                medicalInfo: data.medicalInfo || '',
-                photoUrl: photoUrl,
-                admissionDate: new Date().toISOString(),
-                session: data.session,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                status: 'active'
+                admissionNo, rollNumber, studentName: data.fullName, fatherName: data.fatherName, motherName: data.motherName || '',
+                dob: data.dob, gender: data.gender, classApplying: data.classVal, schoolName: data.presentSchool,
+                address: data.address, parentMobile: data.studentMobile, aadhar: data.aadhar || '',
+                nationality: data.nationality, knowAbout: data.knowAbout || '', medicalInfo: data.medicalInfo || '',
+                photoUrl, admissionDate: new Date().toISOString(), session: data.session,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(), status: 'active'
             };
             await admissionsCollection.add(admissionData);
             updateProgress(100, 'Complete!');
             
+            // Show admission card in new tab after successful submission
+            displayAdmissionCardInNewTab(admissionData, photoUrl);
+            
             setTimeout(() => {
                 progressOverlay.style.display = 'none';
-                // Show admission card immediately after submission
-                displayAdmissionCard(admissionData, photoUrl);
+                Swal.fire({
+                    title: '🎉 Admission Successful!',
+                    text: `Student ${data.fullName} has been admitted. Roll Number: ${rollNumber}`,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
             }, 500);
         } catch (error) {
             progressOverlay.style.display = 'none';
             showAlert('Error: ' + error.message, 'error');
         }
-    }
-    
-    async function generateQRCodeImageUrl(text, size = 85) {
-        return new Promise((resolve) => {
-            const tempDiv = document.createElement('div');
-            tempDiv.style.position = 'absolute';
-            tempDiv.style.left = '-9999px';
-            tempDiv.style.top = '-9999px';
-            document.body.appendChild(tempDiv);
-            
-            const qrDiv = document.createElement('div');
-            tempDiv.appendChild(qrDiv);
-            
-            new QRCode(qrDiv, { text: text, width: size, height: size });
-            
-            setTimeout(() => {
-                const canvas = qrDiv.querySelector('canvas');
-                if (canvas) {
-                    const imgUrl = canvas.toDataURL('image/png');
-                    document.body.removeChild(tempDiv);
-                    resolve(imgUrl);
-                } else {
-                    document.body.removeChild(tempDiv);
-                    resolve(null);
-                }
-            }, 200);
-        });
-    }
-    
-    async function generatePdfBlobUrl(studentData, photoUrl) {
-        const tempDiv = document.createElement('div');
-        tempDiv.style.position = 'absolute';
-        tempDiv.style.left = '-9999px';
-        tempDiv.style.top = '-9999px';
-        tempDiv.style.width = '1100px';
-        document.body.appendChild(tempDiv);
-        
-        const admDate = new Date(studentData.admissionDate);
-        const dobDate = new Date(studentData.dob);
-        
-        const publicUrl = `${window.location.origin}${window.location.pathname}?mode=view&id=${studentData.id}`;
-        const qrImageUrl = await generateQRCodeImageUrl(publicUrl, 85);
-        
-        let termsHtml = `
-            <ul class="terms-col">
-                ${TERMS_LEFT.map((term, i) => `<li><strong>${i+1}.</strong> ${term}</li>`).join('')}
-            </ul>
-            <ul class="terms-col">
-                ${TERMS_RIGHT.map((term, i) => `<li><strong>${i+12}.</strong> ${term}</li>`).join('')}
-            </ul>
-        `;
-        
-        tempDiv.innerHTML = `
-            <div id="pdfCard" class="admission-card">
-                <div class="card-header">
-                    <div class="logo-center">
-                        <div class="logo-img-card"><img src="${LOGO_URL}" alt="Logo"></div>
-                        <div class="institution-name">
-                            <h1>QUEST COACHING CENTRE</h1>
-                            <div class="tagline">|| SEARCH FOR KNOWLEDGE ||</div>
-                            <div class="under">Under the guidance of MR. RAVI SIR</div>
-                        </div>
-                        <div class="contact-strip-card">
-                            <div class="contact-item-card"><i class="fas fa-map-marker-alt"></i> Block More, Gopalganj - 841428</div>
-                            <div class="contact-item-card"><i class="fas fa-phone-alt"></i> +91 9708442525</div>
-                            <div class="contact-item-card"><i class="fas fa-envelope"></i> questcoachingcentre@gmail.com</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="title-banner"><h2>🎓 ADMISSION FORM 🎓</h2></div>
-                <div class="top-row">
-                    <div class="photo-card"><img src="${photoUrl}" alt="Photo"></div>
-                    <div class="info-group">
-                        <div class="info-row"><span class="info-label">ROLL NUMBER</span><span class="info-value adm-no">${studentData.rollNumber}</span></div>
-                        <div class="info-row"><span class="info-label">ADMISSION NO.</span><span class="info-value adm-no">${studentData.admissionNo}</span></div>
-                        <div class="info-row"><span class="info-label">ADMISSION DATE</span><span class="info-value">${admDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
-                        <div class="info-row"><span class="info-label">ACADEMIC SESSION</span><span class="info-value">${studentData.session}</span></div>
-                        <div class="info-row"><span class="info-label">CLASS APPLYING</span><span class="info-value">${studentData.classApplying}</span></div>
-                    </div>
-                    <div class="qr-card">
-                        <div class="qr-box">
-                            <img src="${qrImageUrl}" style="width:85px; height:85px;" alt="QR Code">
-                        </div>
-                        <div class="qr-label-card">SCAN TO VERIFY</div>
-                    </div>
-                </div>
-                <div class="details-section">
-                    <div class="detail-box">
-                        <div class="detail-title">PERSONAL DETAILS</div>
-                        <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td></tr>
-                            <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
-                            <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td></tr>
-                            <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td></tr>
-                            <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td></tr>
-                        </table></div>
-                    </div>
-                    <div class="detail-box">
-                        <div class="detail-title">PARENT INFORMATION</div>
-                        <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td></tr>
-                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td></tr>
-                            <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td></tr>
-                            <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td></tr>
-                        </table></div>
-                    </div>
-                </div>
-                <div class="details-section">
-                    <div class="detail-box">
-                        <div class="detail-title">ADDRESS DETAILS</div>
-                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td></tr></table></div>
-                    </div>
-                    <div class="detail-box">
-                        <div class="detail-title">EDUCATION DETAILS</div>
-                        <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Current School</td><td>${studentData.schoolName}</td></tr>
-                            <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td></tr>
-                        </table></div>
-                    </div>
-                </div>
-                <div class="terms-section"><div class="terms-box"><div class="terms-title">📜 नियम और शर्तें (Terms & Conditions)</div><div class="terms-list">${termsHtml}</div></div></div>
-                <div class="quote-card"><span class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</span><span class="quote-author">- Albert Einstein</span></div>
-                <div class="signatures-section">
-                    <div class="sig-card"><div class="sig-line">Parent / Guardian Signature</div></div>
-                    <div class="seal-card"><span>QUEST<br>COACHING<br>CENTRE</span><span class="seal-text">SEAL & SIGNATURE<br>OF DIRECTOR</span></div>
-                    <div class="sig-card"><div class="sig-line">Student Signature</div></div>
-                </div>
-                <div class="card-footer"><p>★ THANK YOU FOR CHOOSING QUEST COACHING CENTRE ★</p></div>
-            </div>
-        `;
-        
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        const element = tempDiv.querySelector('#pdfCard');
-        const canvas = await html2canvas(element, { scale: 2, useCORS: true, allowTaint: false, backgroundColor: '#ffffff' });
-        const imgData = canvas.toDataURL('image/png');
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgWidth = 190;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-        const pdfBlob = pdf.output('blob');
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        
-        document.body.removeChild(tempDiv);
-        
-        return pdfUrl;
-    }
-    
-    async function generateAndSavePdf(studentData, photoUrl) {
-        const pdfUrl = await generatePdfBlobUrl(studentData, photoUrl);
-        const link = document.createElement('a');
-        link.href = pdfUrl;
-        link.download = `Admission_Form_${studentData.admissionNo}_${studentData.studentName}.pdf`;
-        link.click();
-        URL.revokeObjectURL(pdfUrl);
-        Swal.fire('Downloaded!', 'PDF downloaded successfully', 'success');
     }
     
     function displayAdmissionCard(studentData, photoUrl) {
@@ -1078,8 +1210,8 @@
                 <div class="top-row">
                     <div class="photo-card"><img src="${photoUrl}" alt="Photo"></div>
                     <div class="info-group">
-                        <div class="info-row"><span class="info-label">ROLL NUMBER</span><span class="info-value adm-no">${studentData.rollNumber}</span></div>
                         <div class="info-row"><span class="info-label">ADMISSION NO.</span><span class="info-value adm-no">${studentData.admissionNo}</span></div>
+                        <div class="info-row"><span class="info-label">ROLL NUMBER</span><span class="info-value roll-number" style="color:#c5a059; font-weight:bold;">${studentData.rollNumber || 'N/A'}</span></div>
                         <div class="info-row"><span class="info-label">ADMISSION DATE</span><span class="info-value">${admDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
                         <div class="info-row"><span class="info-label">ACADEMIC SESSION</span><span class="info-value">${studentData.session}</span></div>
                         <div class="info-row"><span class="info-label">CLASS APPLYING</span><span class="info-value">${studentData.classApplying}</span></div>
@@ -1090,33 +1222,33 @@
                     <div class="detail-box">
                         <div class="detail-title">PERSONAL DETAILS</div>
                         <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td></tr>
-                            <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
-                            <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td></tr>
-                            <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td></tr>
-                            <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td></tr>
+                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td> </tr
+                            <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td> </tr
+                            <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td> </tr
+                            <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td> </tr
+                            <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td> </tr
                         </table></div>
                     </div>
                     <div class="detail-box">
                         <div class="detail-title">PARENT INFORMATION</div>
                         <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td></tr>
-                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td></tr>
-                            <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td></tr>
-                            <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td></tr>
+                            <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td> </tr
+                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td> </tr
+                            <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td> </tr
+                            <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td> </tr
                         </table></div>
                     </div>
                 </div>
                 <div class="details-section">
                     <div class="detail-box">
                         <div class="detail-title">ADDRESS DETAILS</div>
-                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td></tr></table></div>
+                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td> </tr></table></div>
                     </div>
                     <div class="detail-box">
                         <div class="detail-title">EDUCATION DETAILS</div>
                         <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Current School</td><td>${studentData.schoolName}</td></tr>
-                            <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td></tr>
+                            <tr><td style="width:38%;">Current School</td><td>${studentData.schoolName}</td> </tr
+                            <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td> </tr
                         </table></div>
                     </div>
                 </div>
@@ -1133,7 +1265,6 @@
                 <button class="action-btn print" onclick="printAdmissionCardView()"><i class="fas fa-print"></i> Print Form</button>
                 <button class="action-btn share" onclick="shareAdmissionCardView()"><i class="fas fa-share-alt"></i> Share</button>
                 <button class="action-btn pdf" onclick="downloadAdmissionFromCard()"><i class="fas fa-file-pdf"></i> Download PDF</button>
-                <button class="action-btn" style="background:#1b4f9b; color:white;" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back</button>
             </div>
         `;
         
@@ -1154,13 +1285,22 @@
         };
         
         window.shareAdmissionCardView = () => {
-            const text = `🎓 Quest Coaching Centre - Admission Form\n\nStudent: ${studentData.studentName}\nRoll No: ${studentData.rollNumber}\nAdmission No: ${studentData.admissionNo}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}`;
+            const text = `🎓 Quest Coaching Centre - Admission Form\n\nStudent: ${studentData.studentName}\nAdmission No: ${studentData.admissionNo}\nRoll Number: ${studentData.rollNumber || 'N/A'}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}`;
             if (navigator.share) navigator.share({ title: 'Admission Form', text: text });
             else { navigator.clipboard.writeText(text); Swal.fire('Copied!', 'Details copied to clipboard', 'success'); }
         };
         
         window.downloadAdmissionFromCard = async () => {
-            await generateAndSavePdf(studentData, photoUrl);
+            const element = document.getElementById('admissionCard');
+            const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgWidth = 190;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+            pdf.save(`Admission_Form_${studentData.admissionNo}_${studentData.studentName}.pdf`);
+            Swal.fire('Downloaded!', 'PDF downloaded successfully', 'success');
         };
     }
     </script>
