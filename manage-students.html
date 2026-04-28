@@ -6,6 +6,8 @@
     <title>📋 Quest Coaching · Manage Students</title>
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -37,6 +39,23 @@
             display: flex;
             align-items: center;
             gap: 8px;
+        }
+        .download-pdf-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .download-pdf-btn:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
         }
         
         .filter-card {
@@ -91,6 +110,8 @@
             .filter-card { flex-direction: column; }
             .action-buttons { flex-direction: column; }
             td, th { font-size: 0.7rem; padding: 8px 5px; }
+            .header-bar { flex-direction: column; gap: 10px; }
+            .back-btn, .download-pdf-btn { width: 100%; justify-content: center; }
         }
     </style>
 </head>
@@ -107,9 +128,14 @@
                 <h1>📋 Manage Students</h1>
                 <p>Quest Coaching Centre | Under MR. RAVI SIR</p>
             </div>
-            <button class="back-btn" onclick="window.location.href='student-dashboard.html'">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </button>
+            <div style="display: flex; gap: 12px;">
+                <button class="download-pdf-btn" id="downloadPdfBtn">
+                    <i class="fas fa-file-pdf"></i> Download PDF Report
+                </button>
+                <button class="back-btn" onclick="window.location.href='student-dashboard.html'">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </button>
+            </div>
         </div>
         
         <div class="filter-card">
@@ -143,10 +169,10 @@
         <div class="students-card">
             <table>
                 <thead>
-                    <tr><th>Photo</th><th>Admission No</th><th>Student Name</th><th>Father Name</th><th>Class</th><th>Gender</th><th>Mobile</th><th>Actions</th></tr>
+                    <tr><th>Photo</th><th>Admission No</th><th>Student Name</th><th>Roll No</th><th>Father Name</th><th>Class</th><th>Gender</th><th>Mobile</th><th>Actions</th></tr>
                 </thead>
                 <tbody id="studentsTableBody">
-                    <tr><td colspan="8" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading students...</td></tr>
+                    <tr><td colspan="9" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading students...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -168,6 +194,7 @@
 
     const authLoading = document.getElementById('authLoading');
     const mainContent = document.getElementById('mainContent');
+    const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 
     auth.onAuthStateChanged((user) => {
         if (!user) {
@@ -206,9 +233,15 @@
             snapshot.forEach(doc => {
                 allStudents.push({ id: doc.id, ...doc.data() });
             });
+            // Sort by admission date - latest first
+            allStudents.sort((a, b) => {
+                const dateA = a.admissionDate ? new Date(a.admissionDate) : new Date(0);
+                const dateB = b.admissionDate ? new Date(b.admissionDate) : new Date(0);
+                return dateB - dateA;
+            });
             filterStudents();
         } catch (error) {
-            document.getElementById('studentsTableBody').innerHTML = '<tr><td colspan="8" class="loading">❌ Error loading data</td></tr>';
+            document.getElementById('studentsTableBody').innerHTML = '<tr><td colspan="9" class="loading">❌ Error loading data</td></table>';
         }
     }
     
@@ -223,6 +256,7 @@
             filtered = filtered.filter(s => 
                 (s.studentName && s.studentName.toLowerCase().includes(searchTerm)) ||
                 (s.admissionNo && s.admissionNo.toLowerCase().includes(searchTerm)) ||
+                (s.rollNumber && s.rollNumber.toString().toLowerCase().includes(searchTerm)) ||
                 (s.parentMobile && s.parentMobile.includes(searchTerm))
             );
         }
@@ -239,7 +273,7 @@
     function displayStudents(students) {
         const tbody = document.getElementById('studentsTableBody');
         if (students.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="loading">No students found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" class="loading">No students found</td></table>';
             return;
         }
         
@@ -259,6 +293,7 @@
                 <td>${photoHtml}</td>
                 <td>${student.admissionNo || '-'}</td>
                 <td><strong>${student.studentName || '-'}</strong></td>
+                <td>${student.rollNumber || '-'}</td>
                 <td>${student.fatherName || '-'}</td>
                 <td>${student.classApplying || '-'}</td>
                 <td><span class="badge ${genderClass}">${genderText}</span></td>
@@ -302,6 +337,147 @@
             }
         });
     };
+    
+    // Download PDF Report
+    downloadPdfBtn.addEventListener('click', async () => {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const classFilter = document.getElementById('classFilter').value;
+        const sessionFilter = document.getElementById('sessionFilter').value;
+        
+        let filtered = [...allStudents];
+        
+        if (searchTerm) {
+            filtered = filtered.filter(s => 
+                (s.studentName && s.studentName.toLowerCase().includes(searchTerm)) ||
+                (s.admissionNo && s.admissionNo.toLowerCase().includes(searchTerm)) ||
+                (s.rollNumber && s.rollNumber.toString().toLowerCase().includes(searchTerm)) ||
+                (s.parentMobile && s.parentMobile.includes(searchTerm))
+            );
+        }
+        if (classFilter !== 'All') {
+            filtered = filtered.filter(s => s.classApplying === classFilter);
+        }
+        if (sessionFilter !== 'All') {
+            filtered = filtered.filter(s => s.session === sessionFilter);
+        }
+        
+        if (filtered.length === 0) {
+            Swal.fire('No Data', 'No students found to download', 'info');
+            return;
+        }
+        
+        Swal.fire({
+            title: 'Generating PDF...',
+            text: 'Please wait while we prepare your report',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        
+        try {
+            // Calculate summary
+            let totalStudents = filtered.length;
+            let totalBoys = filtered.filter(s => s.gender === 'Male').length;
+            let totalGirls = filtered.filter(s => s.gender === 'Female').length;
+            
+            // Create HTML for PDF
+            let tableRows = '';
+            filtered.forEach((student, index) => {
+                tableRows += `
+                    <tr style="border-bottom: 1px solid #e2e8f0;">
+                        <td style="padding: 8px; text-align: center;">${index + 1}</td>
+                        <td style="padding: 8px;">${student.admissionNo || '-'}</td>
+                        <td style="padding: 8px;">${student.studentName || '-'}</td>
+                        <td style="padding: 8px;">${student.rollNumber || '-'}</td>
+                        <td style="padding: 8px;">${student.fatherName || '-'}</td>
+                        <td style="padding: 8px;">${student.classApplying || '-'}</td>
+                        <td style="padding: 8px;">${student.gender || '-'}</td>
+                        <td style="padding: 8px;">${student.parentMobile || '-'}</td>
+                    </tr>
+                `;
+            });
+            
+            const currentDate = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+            const className = classFilter === 'All' ? 'All Classes' : classFilter;
+            const sessionName = sessionFilter === 'All' ? 'All Sessions' : sessionFilter;
+            
+            const pdfHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Student Report - Quest Coaching Centre</title>
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+                        body { padding: 30px 20px; background: white; }
+                        .container { max-width: 1200px; margin: 0 auto; }
+                        .header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #1b4f9b; padding-bottom: 15px; }
+                        .coaching-name { font-size: 24px; font-weight: 800; color: #1b4f9b; }
+                        .coaching-address { font-size: 11px; color: #4a5568; margin: 5px 0; }
+                        .report-title { font-size: 18px; font-weight: 700; color: #113a5e; text-align: center; margin: 15px 0 5px; }
+                        .report-meta { text-align: center; font-size: 11px; color: #64748b; margin-bottom: 20px; }
+                        .summary { background: linear-gradient(135deg, #1b4f9b, #2563eb); color: white; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-around; flex-wrap: wrap; }
+                        .summary-item { text-align: center; }
+                        .summary-label { font-size: 12px; opacity: 0.9; margin-bottom: 5px; }
+                        .summary-value { font-size: 22px; font-weight: 800; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 11px; }
+                        th { background: #1b4f9b; color: white; padding: 10px 8px; font-weight: 600; text-align: left; }
+                        td { padding: 8px; }
+                        .footer { margin-top: 25px; padding-top: 15px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 10px; color: #64748b; }
+                        .signatures { display: flex; justify-content: space-between; margin-top: 30px; }
+                        .signature-line { border-top: 1px solid #000; width: 200px; margin-top: 30px; }
+                        .signature-text { font-size: 10px; text-align: center; margin-top: 5px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <div class="coaching-name">QUEST COACHING CENTRE</div>
+                            <div class="coaching-address">Block More, Gopalganj, Bihar - 841428 | Ph: +91 9708442525</div>
+                            <div class="coaching-address">Under the guidance of MR. RAVI SIR</div>
+                        </div>
+                        <div class="report-title">📊 STUDENTS REPORT</div>
+                        <div class="report-meta">Session: ${sessionName} | Class: ${className} | Date: ${currentDate} | Total Students: ${totalStudents}</div>
+                        
+                        <div class="summary">
+                            <div class="summary-item"><div class="summary-label">👨‍🎓 Total Students</div><div class="summary-value">${totalStudents}</div></div>
+                            <div class="summary-item"><div class="summary-label">👦 Boys</div><div class="summary-value">${totalBoys}</div></div>
+                            <div class="summary-item"><div class="summary-label">👧 Girls</div><div class="summary-value">${totalGirls}</div></div>
+                        </div>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th><th>Admission No</th><th>Student Name</th><th>Roll No</th><th>Father Name</th><th>Class</th><th>Gender</th><th>Mobile</th>
+                                </tr>
+                            </thead>
+                            <tbody>${tableRows}</tbody>
+                        </table>
+                        
+                        <div class="signatures">
+                            <div><div class="signature-line"></div><div class="signature-text">Authorized Signatory</div></div>
+                            <div><div class="signature-line"></div><div class="signature-text">Principal / Director</div></div>
+                        </div>
+                        <div class="footer">This is a computer generated report | Generated by Quest Coaching Management System</div>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            // Create PDF
+            const win = window.open('', '_blank');
+            win.document.write(pdfHtml);
+            win.document.close();
+            win.print();
+            
+            Swal.close();
+            Swal.fire('Success!', 'PDF report generated successfully', 'success');
+        } catch (error) {
+            Swal.close();
+            Swal.fire('Error!', 'Failed to generate PDF: ' + error.message, 'error');
+        }
+    });
     
     document.getElementById('searchInput').addEventListener('keyup', filterStudents);
     document.getElementById('classFilter').addEventListener('change', filterStudents);
