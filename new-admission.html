@@ -13,29 +13,14 @@
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
         body { background: #f0f4fa; padding: 16px 12px 32px; }
         .container { max-width: 1000px; margin: 0 auto; }
-        
-        /* Auth Loading - Only for edit/new mode */
-        .auth-loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 10000;
-        }
-        .auth-loading .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #1b4f9b; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         .header-bar {
             background: white;
@@ -68,11 +53,22 @@
             box-shadow: 0 15px 30px -12px rgba(0,0,0,0.1);
         }
         
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e3a5f;
+            margin: 20px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #c5a059;
+            display: inline-block;
+        }
+        
         .form-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
         }
+        
         .full-width { grid-column: span 2; }
         .form-group { margin-bottom: 5px; }
         label { display: block; font-weight: 600; color: #334155; margin-bottom: 6px; font-size: 0.8rem; }
@@ -93,6 +89,7 @@
         
         .radio-group, .checkbox-group { display: flex; gap: 20px; flex-wrap: wrap; padding: 8px 0; }
         .radio-group label, .checkbox-group label { display: inline-flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; }
+        .radio-group input, .checkbox-group input { width: 16px; height: 16px; }
         
         .photo-section { display: flex; justify-content: flex-end; margin-bottom: 20px; }
         .photo-box {
@@ -122,6 +119,7 @@
             margin: 20px 0;
             border: 1px solid #e2e8f0;
         }
+        .declaration-text { font-style: italic; color: #334155; margin-bottom: 15px; font-size: 0.85rem; }
         .signature-row { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px; }
         .signature-item { flex: 1; }
         
@@ -142,10 +140,14 @@
             gap: 10px;
             transition: all 0.3s;
         }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(27, 79, 155, 0.3); }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+        
         .btn-update {
             background: linear-gradient(135deg, #f59e0b, #d97706);
             color: white;
         }
+        .btn-update:hover { background: linear-gradient(135deg, #d97706, #b45309); }
         
         .progress-overlay {
             position: fixed;
@@ -169,6 +171,23 @@
         }
         .progress-bar-container { width: 100%; height: 12px; background: #e2e8f0; border-radius: 20px; overflow: hidden; margin: 20px 0; }
         .progress-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #1b4f9b, #c5a059); border-radius: 20px; transition: width 0.3s ease; }
+        
+        .auth-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 10000;
+        }
+        .auth-loading .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #1b4f9b; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .main-content { display: none; }
         
         .mode-badge {
             display: inline-block;
@@ -215,7 +234,7 @@
         .action-btn.pdf { background: #dc2626; color: white; }
         .action-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         
-        /* Admission Card Styles */
+        /* ============ ADMISSION CARD STYLES ============ */
         :root {
             --primary: #1a3a5c;
             --primary-dark: #0f2b44;
@@ -248,6 +267,8 @@
         .title-banner { text-align: center; padding: 20px 0 10px 0; background: white; }
         .title-banner h2 { font-size: 28px; color: var(--primary); letter-spacing: 3px; display: inline-block; position: relative; }
         .title-banner h2:before, .title-banner h2:after { content: "✦"; color: var(--accent); font-size: 20px; position: absolute; top: 50%; transform: translateY(-50%); }
+        .title-banner h2:before { left: -35px; }
+        .title-banner h2:after { right: -35px; }
         
         .top-row { display: flex; gap: 25px; padding: 0 30px 20px 30px; flex-wrap: wrap; }
         .photo-card { width: 130px; height: 150px; border: 3px solid var(--accent); border-radius: 12px; overflow: hidden; background: #f5f5f5; display: flex; align-items: center; justify-content: center; }
@@ -294,11 +315,17 @@
         .card-footer { background: var(--primary-dark); padding: 12px; text-align: center; }
         .card-footer p { color: white; font-size: 11px; letter-spacing: 1px; }
         
+        /* Public View Mode - No Header Bar */
+        .public-view .header-bar { display: none; }
+        .public-view .back-btn { display: none; }
+        .public-view .container { padding-top: 0; }
+        
         @media (max-width: 700px) {
             .form-grid { grid-template-columns: 1fr; }
             .full-width { grid-column: span 1; }
             .name-boxes { flex-direction: column; gap: 8px; }
             .form-card { padding: 20px; }
+            .photo-section { justify-content: center; }
             .details-section { grid-template-columns: 1fr; padding: 0 15px; }
             .top-row { flex-direction: column; align-items: center; padding: 0 15px; }
             .signatures-section { justify-content: center; flex-direction: column; align-items: center; }
@@ -317,15 +344,14 @@
     </style>
 </head>
 <body>
-    <!-- Auth Loading - Only shown when needed -->
     <div id="authLoading" class="auth-loading">
         <div class="spinner"></div>
         <p style="margin-top: 15px; color: #1b4f9b; font-weight: 600;">Verifying access...</p>
     </div>
 
-    <div id="mainContent" style="display: none;">
+    <div id="mainContent" class="main-content">
     <div class="container">
-        <div id="headerBar" class="header-bar" style="display: none;">
+        <div class="header-bar">
             <div class="logo-area">
                 <h1>🏫 Quest कोचिंग सेंटर</h1>
                 <p>search for knowledge | Under MR. RAVI SIR</p>
@@ -385,7 +411,7 @@
                     </div>
                     <div class="form-group"><label>6. Father's Name <span class="required">*</span></label><input type="text" id="fatherName" required></div>
                     <div class="form-group"><label>7. Mother's Name</label><input type="text" id="motherName"></div>
-                    <div class="form-group"><label>8. Contact No. <span class="required">*</span></label><input type="tel" id="studentMobile" maxlength="10" required></div>
+                    <div class="form-group"><label>8. Contact No. (Student's) <span class="required">*</span></label><input type="tel" id="studentMobile" maxlength="10" required></div>
                     <div class="form-group full-width"><label>9. Complete Address <span class="required">*</span></label><textarea id="address" rows="2" required></textarea></div>
                     <div class="form-group"><label>10. Aadhar No.</label><input type="text" id="aadhar" maxlength="12"></div>
                     <div class="form-group"><label>11. Current School/College <span class="required">*</span></label><input type="text" id="presentSchool" required></div>
@@ -454,33 +480,30 @@
     const STORAGE_BUCKET = 'student_photos';
     const LOGO_URL = 'https://i.ibb.co/hF9tmnpB/20250903-202922.jpg';
     
-    // Terms and Conditions
     const TERMS_LEFT = [
         "नामांकन फॉर्म के साथ हाल ही की दो पासपोर्ट साइज फोटो और आधार कार्ड लगाना अनिवार्य है।",
         "संस्थान द्वारा टेस्ट का परिणाम या कोई अन्य जानकारी SMS के माध्यम से भेजी जाएगी।",
-        "क्लास में मोबाइल फोन या आई-पॉड ले जाने की अनुमति नहीं है।",
+        "क्लास में मोबाइल फोन या आई-पॉड ले जाने की अनुमति नहीं है। यदि छात्र मोबाइल साथ लाता है, तो उसे बंद रखना होगा।",
         "छात्रों को विनम्र, समय का पाबंद और नियमित होना चाहिए।",
-        "छात्रों को दिया गया सारा होमवर्क समय पर पूरा करना चाहिए।",
-        "अनुपस्थित रहने पर क्लास के समय से पहले शिक्षक को सूचित करें।",
-        "टेस्ट छोड़ने पर ₹50 का जुर्माना देना होगा।",
-        "सत्र के बीच में प्रवेश रद्द नहीं किया जा सकता।",
-        "एक बार जमा की गई फीस किसी भी परिस्थिति में वापस नहीं की जाएगी।",
-        "अभिभावक पूर्व नियुक्ति लेकर प्रगति पर चर्चा कर सकते हैं।",
-        "गंभीर अनुशासनहीनता पर बिना रिफंड के प्रवेश रद्द कर दिया जाएगा।"
+        "छात्रों को दिया गया सारा होमवर्क समय पर पूरा करना चाहिए और सभी टेस्ट में शामिल होना चाहिए।",
+        "यदि आप अनुपस्थित रहते हैं, तो क्लास के समय से पहले शिक्षक को सूचित करें, अन्यथा ₹10 प्रतिदिन अनुपस्थिति जुर्माना लिया जाएगा।",
+        "यदि आप कोई टेस्ट छोड़ते हैं, तो आपको ₹50 टेस्ट छोड़ने का जुर्माना देना होगा।",
+        "सत्र के बीच में प्रवेश रद्द नहीं किया जा सकता। प्रवेश रद्द करने से एक महीने पहले नोटिस देना अनिवार्य है।",
+        "एक बार जमा की गई फीस किसी भी परिस्थिति में वापस या समायोजित नहीं की जाएगी।",
+        "यदि अभिभावक अपने बच्चे का नाम वापस लेना चाहते हैं, तो उन्हें 4 सप्ताह पहले निदेशक से बात करनी होगी।",
+        "गंभीर अनुशासनहीनता के परिणामस्वरूप बिना किसी रिफंड के प्रवेश रद्द कर दिया जाएगा।"
     ];
     
     const TERMS_RIGHT = [
-        "10 मिनट से अधिक देरी से आने वाले छात्रों को प्रवेश नहीं दिया जाएगा।",
-        "पते या मोबाइल नंबर में बदलाव की सूचना 5 दिनों के भीतर देनी होगी।",
-        "समय पर फीस न भरने पर क्लास में आने से रोक दिया जाएगा।",
-        "बिना सूचना के 3 सप्ताह से अधिक अनुपस्थित रहने पर नाम काट दिया जाएगा।",
-        "अनुशासनहीनता करने वाले छात्र को निकाला जा सकता है।",
-        "पंजीकरण राशि जमा करने के बाद कोई पैसा वापस नहीं किया जाएगा।",
-        "अभिभावक द्वारा स्टाफ के साथ दुर्व्यवहार करने पर छात्र को निकाला जा सकता है।",
-        "सत्र के अंत से पहले कोचिंग छोड़ने पर शेष फीस जब्त कर ली जाएगी।",
-        "केंद्र की संपत्ति को नुकसान पहुंचाने पर अभिभावक जिम्मेदार होंगे।",
-        "QUEST COACHING CENTRE के पास बदलाव करने का अधिकार सुरक्षित है।",
-        "कानूनी विवाद की स्थिति में न्यायिक क्षेत्राधिकार गोपालगंज (बिहार) होगा।"
+        "यदि कोई छात्र समय पर फीस नहीं भरता है, तो उसे क्लास में आने से रोक दिया जाएगा।",
+        "यदि कोई छात्र बिना किसी सूचना के 3 सप्ताह से अधिक अनुपस्थित रहता है, तो उसका नाम काट दिया जाएगा; पुनः प्रवेश के लिए ₹500 अतिरिक्त देने होंगे।",
+        "यदि शिक्षकों को लगता है कि छात्र मेहनत नहीं कर रहा, अनुशासनहीनता कर रहा है या पढ़ाई में ध्यान नहीं दे रहा, तो उसे निकाला जा सकता है। इस संबंध में निदेशक का निर्णय अंतिम होगा।",
+        "पंजीकरण राशि जमा करने के बाद, यदि छात्र नाम वापस लेना चाहता है, तो संस्थान कोई पैसा वापस नहीं करेगा।",
+        "यदि कोई अभिभावक संस्थान के स्टाफ के साथ दुर्व्यवहार करता है, तो छात्र को निकाला जा सकता है और कोई फीस वापस नहीं होगी।",
+        "यदि छात्र को निकाला जाता है या वह सत्र के अंत से पहले कोचिंग छोड़ देता है, तो शेष फीस जब्त कर ली जाएगी।",
+        "यदि छात्र केंद्र की संपत्ति को कोई नुकसान पहुंचाता है, तो अभिभावक मरम्मत के पूर्ण खर्च के लिए जिम्मेदार होंगे।",
+        "QUEST COACHING CENTRE के पास बिना किसी पूर्व सूचना के कार्यक्रमों, स्थान या समय में बदलाव करने का अधिकार सुरक्षित है। प्रबंध निदेशक का निर्णय अंतिम होगा।",
+        "किसी भी प्रकार के कानूनी विवाद या मतभेद की स्थिति में, न्यायिक क्षेत्राधिकार केवल जिला न्यायालय, गोपालगंज (बिहार) के अधीन होगा।"
     ];
     
     const urlParams = new URLSearchParams(window.location.search);
@@ -491,71 +514,76 @@
     
     const authLoading = document.getElementById('authLoading');
     const mainContent = document.getElementById('mainContent');
-    const headerBar = document.getElementById('headerBar');
     const formSection = document.getElementById('formSection');
     const cardSection = document.getElementById('cardSection');
+    const backButton = document.getElementById('backButton');
     const modeBadge = document.getElementById('modeBadge');
     
     function goBack() {
         window.location.href = 'manage-students.html';
     }
     
-    // Check if this is a public view (QR scan) - no auth required
-    if (mode === 'view' && studentId) {
-        // Public view - no auth needed, directly show card
-        authLoading.style.display = 'none';
-        mainContent.style.display = 'block';
-        headerBar.style.display = 'none'; // Hide back button for public view
-        formSection.style.display = 'none';
-        cardSection.style.display = 'block';
-        loadAndDisplayCard(studentId);
-    } else {
-        // Edit or New mode - require authentication
-        authLoading.style.display = 'flex';
-        auth.onAuthStateChanged((user) => {
-            if (!user) {
-                Swal.fire({
-                    title: 'Access Denied!',
-                    text: 'Please login from main page first!',
-                    icon: 'error',
-                    confirmButtonColor: '#1b4f9b',
-                    confirmButtonText: 'Go to Login'
-                }).then(() => { window.location.href = 'index.html'; });
-                return;
-            }
+    // Check if this is a public view (no auth required)
+    const isPublicView = (mode === 'view' && studentId);
+    
+    auth.onAuthStateChanged((user) => {
+        // For public view (student card), don't require login
+        if (isPublicView) {
             authLoading.style.display = 'none';
             mainContent.style.display = 'block';
-            headerBar.style.display = 'flex';
-            
-            if (mode === 'edit' && studentId) {
-                modeBadge.textContent = '✏️ EDIT MODE';
-                modeBadge.className = 'mode-badge mode-edit';
-                formSection.style.display = 'block';
-                cardSection.style.display = 'none';
-                loadStudentForEdit(studentId);
-            } else {
-                modeBadge.textContent = '📝 NEW ADMISSION';
-                modeBadge.className = 'mode-badge mode-new';
-                formSection.style.display = 'block';
-                cardSection.style.display = 'none';
-                setupNewMode();
-                document.getElementById('admissionForm').addEventListener('submit', submitNewAdmission);
-            }
-        });
-    }
+            loadAndDisplayCard(studentId);
+            return;
+        }
+        
+        // For edit/new modes, require login
+        if (!user) {
+            Swal.fire({
+                title: 'Access Denied!',
+                text: 'Please login from main page first!',
+                icon: 'error',
+                confirmButtonColor: '#1b4f9b',
+                confirmButtonText: 'Go to Login'
+            }).then(() => { window.location.href = 'index.html'; });
+            return;
+        }
+        
+        authLoading.style.display = 'none';
+        mainContent.style.display = 'block';
+        
+        const logoutBtn = document.createElement('button');
+        logoutBtn.innerHTML = '🚪 Logout';
+        logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px;';
+        logoutBtn.onclick = async () => { await auth.signOut(); window.location.href = 'index.html'; };
+        document.body.appendChild(logoutBtn);
+        
+        if (mode === 'edit' && studentId) {
+            modeBadge.textContent = '✏️ EDIT MODE';
+            modeBadge.className = 'mode-badge mode-edit';
+            formSection.style.display = 'block';
+            cardSection.style.display = 'none';
+            loadStudentForEdit(studentId);
+        } else if (mode === 'new') {
+            modeBadge.textContent = '📝 NEW ADMISSION';
+            modeBadge.className = 'mode-badge mode-new';
+            formSection.style.display = 'block';
+            cardSection.style.display = 'none';
+            setupNewMode();
+            document.getElementById('admissionForm').addEventListener('submit', submitNewAdmission);
+        }
+    });
     
     async function loadAndDisplayCard(id) {
         try {
             const doc = await admissionsCollection.doc(id).get();
             if (!doc.exists) {
-                document.getElementById('cardSection').innerHTML = '<div class="form-card" style="text-align:center; padding:40px;"><h3>Student not found!</h3><button class="btn-submit" onclick="window.close()">Close</button></div>';
+                Swal.fire('Error', 'Student not found!', 'error').then(() => { window.location.href = 'manage-students.html'; });
                 return;
             }
             currentStudentData = { id: doc.id, ...doc.data() };
             displayAdmissionCard(currentStudentData, currentStudentData.photoUrl);
         } catch (error) {
             console.error('Error loading student:', error);
-            document.getElementById('cardSection').innerHTML = '<div class="form-card" style="text-align:center; padding:40px;"><h3>Error loading data!</h3><button class="btn-submit" onclick="window.close()">Close</button></div>';
+            Swal.fire('Error', 'Failed to load student data', 'error');
         }
     }
     
@@ -614,6 +642,7 @@
     function setupEditMode() {
         const container = document.getElementById('submitButtonContainer');
         container.innerHTML = `<button type="submit" class="btn-submit btn-update" id="updateStudentBtn"><i class="fas fa-save"></i> Update Student</button>`;
+        
         const form = document.getElementById('admissionForm');
         form.onsubmit = async (e) => {
             e.preventDefault();
@@ -632,6 +661,7 @@
         const middleName = document.getElementById('middleName').value.trim();
         const lastName = document.getElementById('lastName').value.trim();
         const fullName = [firstName, middleName, lastName].filter(n => n).join(' ');
+        
         const knowAbout = Array.from(document.querySelectorAll('input[name="knowAbout"]:checked')).map(cb => cb.value).join(', ');
         
         return {
@@ -676,26 +706,26 @@
         setTimeout(() => div.innerHTML = '', 4000);
     }
     
+    document.getElementById('declarationDate').value = new Date().toLocaleDateString('en-IN');
+    
     const photoBox = document.getElementById('photoUploadBox');
     const photoInput = document.getElementById('studentPhoto');
     const photoPreview = document.getElementById('photoPreview');
     const photoPlaceholder = document.getElementById('photoPlaceholder');
     
-    if (photoBox) {
-        photoBox.addEventListener('click', () => { photoInput.click(); });
-        photoInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    photoPreview.src = event.target.result;
-                    photoPreview.style.display = 'block';
-                    photoPlaceholder.style.display = 'none';
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
+    photoBox.addEventListener('click', () => { photoInput.click(); });
+    photoInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                photoPreview.src = event.target.result;
+                photoPreview.style.display = 'block';
+                photoPlaceholder.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
     
     const progressOverlay = document.getElementById('progressOverlay');
     const progressFill = document.getElementById('progressFill');
@@ -843,6 +873,127 @@
         }
     }
     
+    async function generatePdfBlobUrl(studentData, photoUrl) {
+        const tempDiv = document.createElement('div');
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.left = '-9999px';
+        tempDiv.style.top = '-9999px';
+        tempDiv.style.width = '1100px';
+        document.body.appendChild(tempDiv);
+        
+        const admDate = new Date(studentData.admissionDate);
+        const dobDate = new Date(studentData.dob);
+        
+        let termsHtml = `
+            <ul class="terms-col">
+                ${TERMS_LEFT.map((term, i) => `<li><strong>${i+1}.</strong> ${term}</li>`).join('')}
+            </ul>
+            <ul class="terms-col">
+                ${TERMS_RIGHT.map((term, i) => `<li><strong>${i+12}.</strong> ${term}</li>`).join('')}
+            </ul>
+        `;
+        
+        tempDiv.innerHTML = `
+            <div id="pdfCard" class="admission-card">
+                <div class="card-header">
+                    <div class="logo-center">
+                        <div class="logo-img-card"><img src="${LOGO_URL}" alt="Logo"></div>
+                        <div class="institution-name">
+                            <h1>QUEST COACHING CENTRE</h1>
+                            <div class="tagline">|| SEARCH FOR KNOWLEDGE ||</div>
+                            <div class="under">Under the guidance of MR. RAVI SIR</div>
+                        </div>
+                        <div class="contact-strip-card">
+                            <div class="contact-item-card"><i class="fas fa-map-marker-alt"></i> Block More, Gopalganj - 841428</div>
+                            <div class="contact-item-card"><i class="fas fa-phone-alt"></i> +91 9708442525</div>
+                            <div class="contact-item-card"><i class="fas fa-envelope"></i> questcoachingcentre@gmail.com</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="title-banner"><h2>🎓 ADMISSION FORM 🎓</h2></div>
+                <div class="top-row">
+                    <div class="photo-card"><img src="${photoUrl}" alt="Photo"></div>
+                    <div class="info-group">
+                        <div class="info-row"><span class="info-label">ADMISSION NO.</span><span class="info-value adm-no">${studentData.admissionNo}</span></div>
+                        <div class="info-row"><span class="info-label">ADMISSION DATE</span><span class="info-value">${admDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
+                        <div class="info-row"><span class="info-label">ACADEMIC SESSION</span><span class="info-value">${studentData.session}</span></div>
+                        <div class="info-row"><span class="info-label">CLASS APPLYING</span><span class="info-value">${studentData.classApplying}</span></div>
+                    </div>
+                    <div class="qr-card"><div class="qr-box"><div id="pdfQrCode"></div></div><div class="qr-label-card">SCAN TO VERIFY</div></div>
+                </div>
+                <div class="details-section">
+                    <div class="detail-box">
+                        <div class="detail-title">PERSONAL DETAILS</div>
+                        <div class="detail-content"><table class="detail-table">
+                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td> </tr
+                            <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
+                            <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td></tr>
+                            <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td></tr>
+                            <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td></tr>
+                        </table></div>
+                    </div>
+                    <div class="detail-box">
+                        <div class="detail-title">PARENT INFORMATION</div>
+                        <div class="detail-content"><table class="detail-table">
+                            <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td></tr>
+                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td></tr>
+                            <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td></tr>
+                            <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td></tr>
+                        </table></div>
+                    </div>
+                </div>
+                <div class="details-section">
+                    <div class="detail-box">
+                        <div class="detail-title">ADDRESS DETAILS</div>
+                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td></tr></table></div>
+                    </div>
+                    <div class="detail-box">
+                        <div class="detail-title">EDUCATION DETAILS</div>
+                        <div class="detail-content"><table class="detail-table">
+                            <tr><td style="width:38%;">Current School</td><td>${studentData.schoolName}</td></tr>
+                            <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td></tr>
+                        </table></div>
+                    </div>
+                </div>
+                <div class="terms-section"><div class="terms-box"><div class="terms-title">📜 नियम और शर्तें (Terms & Conditions)</div><div class="terms-list">${termsHtml}</div></div></div>
+                <div class="quote-card"><span class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</span><span class="quote-author">- Albert Einstein</span></div>
+                <div class="signatures-section">
+                    <div class="sig-card"><div class="sig-line">Parent / Guardian Signature</div></div>
+                    <div class="seal-card"><span>QUEST<br>COACHING<br>CENTRE</span><span class="seal-text">SEAL & SIGNATURE<br>OF DIRECTOR</span></div>
+                    <div class="sig-card"><div class="sig-line">Student Signature</div></div>
+                </div>
+                <div class="card-footer"><p>★ THANK YOU FOR CHOOSING QUEST COACHING CENTRE ★</p></div>
+            </div>
+        `;
+        
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const element = tempDiv.querySelector('#pdfCard');
+        const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgWidth = 190;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+        const pdfBlob = pdf.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        
+        document.body.removeChild(tempDiv);
+        
+        return pdfUrl;
+    }
+    
+    async function generateAndSavePdf(studentData, photoUrl) {
+        const pdfUrl = await generatePdfBlobUrl(studentData, photoUrl);
+        const link = document.createElement('a');
+        link.href = pdfUrl;
+        link.download = `Admission_Form_${studentData.admissionNo}_${studentData.studentName}.pdf`;
+        link.click();
+        URL.revokeObjectURL(pdfUrl);
+        Swal.fire('Downloaded!', 'PDF downloaded successfully', 'success');
+    }
+    
     function displayAdmissionCard(studentData, photoUrl) {
         const admDate = new Date(studentData.admissionDate);
         const dobDate = new Date(studentData.dob);
@@ -888,7 +1039,7 @@
                     <div class="detail-box">
                         <div class="detail-title">PERSONAL DETAILS</div>
                         <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td></tr>
+                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td> </tr
                             <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
                             <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td></tr>
                             <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td></tr>
@@ -931,15 +1082,17 @@
                 <button class="action-btn print" onclick="printAdmissionCardView()"><i class="fas fa-print"></i> Print Form</button>
                 <button class="action-btn share" onclick="shareAdmissionCardView()"><i class="fas fa-share-alt"></i> Share</button>
                 <button class="action-btn pdf" onclick="downloadAdmissionFromCard()"><i class="fas fa-file-pdf"></i> Download PDF</button>
-                <button class="action-btn" style="background:#1b4f9b; color:white;" onclick="window.close()"><i class="fas fa-times"></i> Close</button>
             </div>
         `;
         
         cardSection.innerHTML = cardHtml;
+        cardSection.style.display = 'block';
         
-        // Generate QR Code with the same page URL (public view)
+        // QR Code that opens this same page (public view)
         const publicUrl = `${window.location.origin}${window.location.pathname}?mode=view&id=${studentData.id}`;
-        new QRCode(document.getElementById("qrcode-view"), { text: publicUrl, width: 85, height: 85 });
+        setTimeout(() => {
+            new QRCode(document.getElementById("qrcode-view"), { text: publicUrl, width: 85, height: 85 });
+        }, 100);
         
         window.printAdmissionCardView = () => {
             const printContent = document.getElementById('admissionCard').cloneNode(true);
@@ -956,16 +1109,7 @@
         };
         
         window.downloadAdmissionFromCard = async () => {
-            const element = document.getElementById('admissionCard');
-            const canvas = await html2canvas(element, { scale: 2, useCORS: true });
-            const imgData = canvas.toDataURL('image/png');
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const imgWidth = 190;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-            pdf.save(`Admission_Form_${studentData.admissionNo}_${studentData.studentName}.pdf`);
-            Swal.fire('Downloaded!', 'PDF downloaded successfully', 'success');
+            await generateAndSavePdf(studentData, photoUrl);
         };
     }
     </script>
