@@ -868,130 +868,152 @@
         }
     }
     
-    async function generatePdfBlobUrl(studentData, photoUrl) {
-        return new Promise(async (resolve) => {
+    // Function to generate QR Code image URL for PDF
+    async function generateQRCodeImageUrl(text, size = 85) {
+        return new Promise((resolve) => {
             const tempDiv = document.createElement('div');
             tempDiv.style.position = 'absolute';
             tempDiv.style.left = '-9999px';
             tempDiv.style.top = '-9999px';
-            tempDiv.style.width = '1100px';
             document.body.appendChild(tempDiv);
             
-            const admDate = new Date(studentData.admissionDate);
-            const dobDate = new Date(studentData.dob);
+            const qrDiv = document.createElement('div');
+            tempDiv.appendChild(qrDiv);
             
-            let termsHtml = `
-                <ul class="terms-col">
-                    ${TERMS_LEFT.map((term, i) => `<li><strong>${i+1}.</strong> ${term}</li>`).join('')}
-                </ul>
-                <ul class="terms-col">
-                    ${TERMS_RIGHT.map((term, i) => `<li><strong>${i+12}.</strong> ${term}</li>`).join('')}
-                </ul>
-            `;
+            new QRCode(qrDiv, { text: text, width: size, height: size });
             
-            tempDiv.innerHTML = `
-                <div id="pdfCard" class="admission-card">
-                    <div class="card-header">
-                        <div class="logo-center">
-                            <div class="logo-img-card"><img src="${LOGO_URL}" alt="Logo"></div>
-                            <div class="institution-name">
-                                <h1>QUEST COACHING CENTRE</h1>
-                                <div class="tagline">|| SEARCH FOR KNOWLEDGE ||</div>
-                                <div class="under">Under the guidance of MR. RAVI SIR</div>
-                            </div>
-                            <div class="contact-strip-card">
-                                <div class="contact-item-card"><i class="fas fa-map-marker-alt"></i> Block More, Gopalganj - 841428</div>
-                                <div class="contact-item-card"><i class="fas fa-phone-alt"></i> +91 9708442525</div>
-                                <div class="contact-item-card"><i class="fas fa-envelope"></i> questcoachingcentre@gmail.com</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="title-banner"><h2>🎓 ADMISSION FORM 🎓</h2></div>
-                    <div class="top-row">
-                        <div class="photo-card"><img src="${photoUrl}" alt="Photo"></div>
-                        <div class="info-group">
-                            <div class="info-row"><span class="info-label">ADMISSION NO.</span><span class="info-value adm-no">${studentData.admissionNo}</span></div>
-                            <div class="info-row"><span class="info-label">ADMISSION DATE</span><span class="info-value">${admDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
-                            <div class="info-row"><span class="info-label">ACADEMIC SESSION</span><span class="info-value">${studentData.session}</span></div>
-                            <div class="info-row"><span class="info-label">CLASS APPLYING</span><span class="info-value">${studentData.classApplying}</span></div>
-                        </div>
-                        <div class="qr-card">
-                            <div class="qr-box" id="pdfQrContainer"></div>
-                            <div class="qr-label-card">SCAN TO VERIFY</div>
-                        </div>
-                    </div>
-                    <div class="details-section">
-                        <div class="detail-box">
-                            <div class="detail-title">PERSONAL DETAILS</div>
-                            <div class="detail-content"><table class="detail-table">
-                                <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td> </tr
-                                <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td> </tr
-                                <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td> </tr
-                                <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td> </tr
-                                <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td> </tr
-                            </table></div>
-                        </div>
-                        <div class="detail-box">
-                            <div class="detail-title">PARENT INFORMATION</div>
-                            <div class="detail-content"><table class="detail-table">
-                                <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td> </tr
-                                <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td> </tr
-                                <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td> </tr
-                                <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td> </tr
-                            </table></div>
-                        </div>
-                    </div>
-                    <div class="details-section">
-                        <div class="detail-box">
-                            <div class="detail-title">ADDRESS DETAILS</div>
-                            <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td> </tr might</div>
-                        </div>
-                        <div class="detail-box">
-                            <div class="detail-title">EDUCATION DETAILS</div>
-                            <div class="detail-content"><table class="detail-table">
-                                <tr><td style="width:38%;">Current School</td><td>${studentData.schoolName}</td> </tr
-                                <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td> </tr
-                            </table></div>
-                        </div>
-                    </div>
-                    <div class="terms-section"><div class="terms-box"><div class="terms-title">📜 नियम और शर्तें (Terms & Conditions)</div><div class="terms-list">${termsHtml}</div></div></div>
-                    <div class="quote-card"><span class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</span><span class="quote-author">- Albert Einstein</span></div>
-                    <div class="signatures-section">
-                        <div class="sig-card"><div class="sig-line">Parent / Guardian Signature</div></div>
-                        <div class="seal-card"><span>QUEST<br>COACHING<br>CENTRE</span><span class="seal-text">SEAL & SIGNATURE<br>OF DIRECTOR</span></div>
-                        <div class="sig-card"><div class="sig-line">Student Signature</div></div>
-                    </div>
-                    <div class="card-footer"><p>★ THANK YOU FOR CHOOSING QUEST COACHING CENTRE ★</p></div>
-                </div>
-            `;
-            
-            // Wait for DOM to render
-            await new Promise(r => setTimeout(r, 300));
-            
-            // Generate QR code inside the temp div
-            const publicUrl = `${window.location.origin}${window.location.pathname}?mode=view&id=${studentData.id}`;
-            const qrContainer = tempDiv.querySelector('#pdfQrContainer');
-            if (qrContainer) {
-                new QRCode(qrContainer, { text: publicUrl, width: 85, height: 85 });
-            }
-            
-            // Wait for QR to generate
-            await new Promise(r => setTimeout(r, 500));
-            
-            const element = tempDiv.querySelector('#pdfCard');
-            const canvas = await html2canvas(element, { scale: 2, useCORS: true });
-            const imgData = canvas.toDataURL('image/png');
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const imgWidth = 190;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-            const pdfBlob = pdf.output('blob');
-            const pdfUrl = URL.createObjectURL(pdfBlob);
-            
-            document.body.removeChild(tempDiv);
-            resolve(pdfUrl);
+            setTimeout(() => {
+                const canvas = qrDiv.querySelector('canvas');
+                if (canvas) {
+                    const imgUrl = canvas.toDataURL('image/png');
+                    document.body.removeChild(tempDiv);
+                    resolve(imgUrl);
+                } else {
+                    document.body.removeChild(tempDiv);
+                    resolve(null);
+                }
+            }, 200);
         });
+    }
+    
+    async function generatePdfBlobUrl(studentData, photoUrl) {
+        const tempDiv = document.createElement('div');
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.left = '-9999px';
+        tempDiv.style.top = '-9999px';
+        tempDiv.style.width = '1100px';
+        document.body.appendChild(tempDiv);
+        
+        const admDate = new Date(studentData.admissionDate);
+        const dobDate = new Date(studentData.dob);
+        
+        // Generate QR code image for PDF
+        const publicUrl = `${window.location.origin}${window.location.pathname}?mode=view&id=${studentData.id}`;
+        const qrImageUrl = await generateQRCodeImageUrl(publicUrl, 85);
+        
+        let termsHtml = `
+            <ul class="terms-col">
+                ${TERMS_LEFT.map((term, i) => `<li><strong>${i+1}.</strong> ${term}</li>`).join('')}
+            </ul>
+            <ul class="terms-col">
+                ${TERMS_RIGHT.map((term, i) => `<li><strong>${i+12}.</strong> ${term}</li>`).join('')}
+            </ul>
+        `;
+        
+        tempDiv.innerHTML = `
+            <div id="pdfCard" class="admission-card">
+                <div class="card-header">
+                    <div class="logo-center">
+                        <div class="logo-img-card"><img src="${LOGO_URL}" alt="Logo"></div>
+                        <div class="institution-name">
+                            <h1>QUEST COACHING CENTRE</h1>
+                            <div class="tagline">|| SEARCH FOR KNOWLEDGE ||</div>
+                            <div class="under">Under the guidance of MR. RAVI SIR</div>
+                        </div>
+                        <div class="contact-strip-card">
+                            <div class="contact-item-card"><i class="fas fa-map-marker-alt"></i> Block More, Gopalganj - 841428</div>
+                            <div class="contact-item-card"><i class="fas fa-phone-alt"></i> +91 9708442525</div>
+                            <div class="contact-item-card"><i class="fas fa-envelope"></i> questcoachingcentre@gmail.com</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="title-banner"><h2>🎓 ADMISSION FORM 🎓</h2></div>
+                <div class="top-row">
+                    <div class="photo-card"><img src="${photoUrl}" alt="Photo"></div>
+                    <div class="info-group">
+                        <div class="info-row"><span class="info-label">ADMISSION NO.</span><span class="info-value adm-no">${studentData.admissionNo}</span></div>
+                        <div class="info-row"><span class="info-label">ADMISSION DATE</span><span class="info-value">${admDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
+                        <div class="info-row"><span class="info-label">ACADEMIC SESSION</span><span class="info-value">${studentData.session}</span></div>
+                        <div class="info-row"><span class="info-label">CLASS APPLYING</span><span class="info-value">${studentData.classApplying}</span></div>
+                    </div>
+                    <div class="qr-card">
+                        <div class="qr-box">
+                            <img src="${qrImageUrl}" style="width:85px; height:85px;" alt="QR Code">
+                        </div>
+                        <div class="qr-label-card">SCAN TO VERIFY</div>
+                    </div>
+                </div>
+                <div class="details-section">
+                    <div class="detail-box">
+                        <div class="detail-title">PERSONAL DETAILS</div>
+                        <div class="detail-content"><table class="detail-table">
+                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td></tr>
+                            <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
+                            <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td></tr>
+                            <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td></tr>
+                            <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td></tr>
+                        </table></div>
+                    </div>
+                    <div class="detail-box">
+                        <div class="detail-title">PARENT INFORMATION</div>
+                        <div class="detail-content"><table class="detail-table">
+                            <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td></tr>
+                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td></tr>
+                            <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td></tr>
+                            <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td></tr>
+                        </table></div>
+                    </div>
+                </div>
+                <div class="details-section">
+                    <div class="detail-box">
+                        <div class="detail-title">ADDRESS DETAILS</div>
+                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td></tr></table></div>
+                    </div>
+                    <div class="detail-box">
+                        <div class="detail-title">EDUCATION DETAILS</div>
+                        <div class="detail-content"><table class="detail-table">
+                            <tr><td style="width:38%;">Current School</td><td>${studentData.schoolName}</td></tr>
+                            <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td></tr>
+                        </table></div>
+                    </div>
+                </div>
+                <div class="terms-section"><div class="terms-box"><div class="terms-title">📜 नियम और शर्तें (Terms & Conditions)</div><div class="terms-list">${termsHtml}</div></div></div>
+                <div class="quote-card"><span class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</span><span class="quote-author">- Albert Einstein</span></div>
+                <div class="signatures-section">
+                    <div class="sig-card"><div class="sig-line">Parent / Guardian Signature</div></div>
+                    <div class="seal-card"><span>QUEST<br>COACHING<br>CENTRE</span><span class="seal-text">SEAL & SIGNATURE<br>OF DIRECTOR</span></div>
+                    <div class="sig-card"><div class="sig-line">Student Signature</div></div>
+                </div>
+                <div class="card-footer"><p>★ THANK YOU FOR CHOOSING QUEST COACHING CENTRE ★</p></div>
+            </div>
+        `;
+        
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        const element = tempDiv.querySelector('#pdfCard');
+        const canvas = await html2canvas(element, { scale: 2, useCORS: true, allowTaint: false, backgroundColor: '#ffffff' });
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgWidth = 190;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+        const pdfBlob = pdf.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        
+        document.body.removeChild(tempDiv);
+        
+        return pdfUrl;
     }
     
     async function generateAndSavePdf(studentData, photoUrl) {
@@ -1043,43 +1065,40 @@
                         <div class="info-row"><span class="info-label">ACADEMIC SESSION</span><span class="info-value">${studentData.session}</span></div>
                         <div class="info-row"><span class="info-label">CLASS APPLYING</span><span class="info-value">${studentData.classApplying}</span></div>
                     </div>
-                    <div class="qr-card">
-                        <div class="qr-box" id="webQrContainer"></div>
-                        <div class="qr-label-card">SCAN TO VERIFY</div>
-                    </div>
+                    <div class="qr-card"><div class="qr-box"><div id="qrcode-view"></div></div><div class="qr-label-card">SCAN TO VERIFY</div></div>
                 </div>
                 <div class="details-section">
                     <div class="detail-box">
                         <div class="detail-title">PERSONAL DETAILS</div>
                         <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td> </tr
-                            <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td> </tr
-                            <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td> </tr
-                            <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td> </tr
-                            <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td> </tr
+                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td></tr>
+                            <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
+                            <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td></tr>
+                            <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td></tr>
+                            <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td></tr>
                         </table></div>
                     </div>
                     <div class="detail-box">
                         <div class="detail-title">PARENT INFORMATION</div>
                         <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td> </tr
-                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td> </tr
-                            <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td> </tr
-                            <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td> </tr
+                            <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td></tr>
+                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td></tr>
+                            <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td></tr>
+                            <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td></tr>
                         </table></div>
                     </div>
                 </div>
                 <div class="details-section">
                     <div class="detail-box">
                         <div class="detail-title">ADDRESS DETAILS</div>
-                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td> </tr might</div>
+                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td></tr></table></div>
                     </div>
                     <div class="detail-box">
                         <div class="detail-title">EDUCATION DETAILS</div>
                         <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Current School</td><td>${studentData.schoolName}</td> </tr
-                            <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td> </tr
-                            </table></div>
+                            <tr><td style="width:38%;">Current School</td><td>${studentData.schoolName}</td></tr>
+                            <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td></tr>
+                        </table></div>
                     </div>
                 </div>
                 <div class="terms-section"><div class="terms-box"><div class="terms-title">📜 नियम और शर्तें (Terms & Conditions)</div><div class="terms-list">${termsHtml}</div></div></div>
@@ -1104,10 +1123,7 @@
         // QR Code for web view
         const publicUrl = `${window.location.origin}${window.location.pathname}?mode=view&id=${studentData.id}`;
         setTimeout(() => {
-            const webQrContainer = document.getElementById('webQrContainer');
-            if (webQrContainer) {
-                new QRCode(webQrContainer, { text: publicUrl, width: 85, height: 85 });
-            }
+            new QRCode(document.getElementById("qrcode-view"), { text: publicUrl, width: 85, height: 85 });
         }, 100);
         
         window.printAdmissionCardView = () => {
