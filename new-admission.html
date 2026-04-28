@@ -234,7 +234,7 @@
         .action-btn.pdf { background: #dc2626; color: white; }
         .action-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         
-        /* ============ ADMISSION CARD STYLES (EXACTLY SAME) ============ */
+        /* ============ ADMISSION CARD STYLES ============ */
         :root {
             --primary: #1a3a5c;
             --primary-dark: #0f2b44;
@@ -507,6 +507,7 @@
     const studentId = urlParams.get('id');
     let currentStudentData = null;
     let existingPhotoUrl = null;
+    let currentPdfBlobUrl = null;
     
     const authLoading = document.getElementById('authLoading');
     const mainContent = document.getElementById('mainContent');
@@ -517,6 +518,42 @@
     
     function goBack() {
         window.location.href = 'manage-students.html';
+    }
+    
+    function resetNewForm() {
+        // Reset all form fields
+        document.getElementById('firstName').value = '';
+        document.getElementById('middleName').value = '';
+        document.getElementById('lastName').value = '';
+        document.getElementById('nationality').value = 'Indian';
+        document.getElementById('dob').value = '';
+        document.getElementById('rollNumber').value = '';
+        document.getElementById('class').value = '';
+        document.getElementById('fatherName').value = '';
+        document.getElementById('motherName').value = '';
+        document.getElementById('studentMobile').value = '';
+        document.getElementById('address').value = '';
+        document.getElementById('aadhar').value = '';
+        document.getElementById('presentSchool').value = '';
+        document.getElementById('sessionSelect').value = '2026-27';
+        document.getElementById('medicalInfo').value = '';
+        document.getElementById('declarationPlace').value = '';
+        document.getElementById('declarationDate').value = new Date().toLocaleDateString('en-IN');
+        
+        // Reset gender radio
+        document.querySelectorAll('input[name="gender"]').forEach(radio => radio.checked = false);
+        
+        // Reset checkboxes
+        document.querySelectorAll('input[name="knowAbout"]').forEach(cb => cb.checked = false);
+        
+        // Reset photo
+        document.getElementById('studentPhoto').value = '';
+        document.getElementById('photoPreview').style.display = 'none';
+        document.getElementById('photoPreview').src = '';
+        document.getElementById('photoPlaceholder').style.display = 'flex';
+        
+        // Reset declaration checkbox
+        document.getElementById('declaration').checked = false;
     }
     
     // Check if this is a public view (no auth required)
@@ -564,6 +601,7 @@
             formSection.style.display = 'block';
             cardSection.style.display = 'none';
             setupNewMode();
+            resetNewForm();
             document.getElementById('admissionForm').addEventListener('submit', submitNewAdmission);
         }
     });
@@ -626,6 +664,7 @@
         document.getElementById('sessionSelect').value = data.session || '2026-27';
         document.getElementById('declarationPlace').value = 'Gopalganj';
         document.getElementById('declarationDate').value = new Date().toLocaleDateString('en-IN');
+        document.getElementById('declaration').checked = true;
         
         if (data.photoUrl) {
             const photoPreview = document.getElementById('photoPreview');
@@ -651,6 +690,7 @@
         const container = document.getElementById('submitButtonContainer');
         container.innerHTML = `<button type="submit" class="btn-submit" id="submitBtn"><i class="fas fa-save"></i> Submit Admission</button>`;
         document.getElementById('declarationDate').value = new Date().toLocaleDateString('en-IN');
+        document.getElementById('declaration').checked = false;
     }
     
     function getFormData() {
@@ -874,6 +914,9 @@
             await admissionsCollection.add(admissionData);
             updateProgress(100, 'Complete!');
             
+            // Reset form for next admission
+            resetNewForm();
+            
             // Display card immediately after submission
             setTimeout(() => {
                 progressOverlay.style.display = 'none';
@@ -886,7 +929,6 @@
         }
     }
     
-    // Function to generate QR Code image URL for PDF
     async function generateQRCodeImageUrl(text, size = 85) {
         return new Promise((resolve) => {
             const tempDiv = document.createElement('div');
@@ -925,7 +967,6 @@
         const admDate = new Date(studentData.admissionDate);
         const dobDate = new Date(studentData.dob);
         
-        // Generate QR code image for PDF
         const publicUrl = `${window.location.origin}${window.location.pathname}?mode=view&id=${studentData.id}`;
         const qrImageUrl = await generateQRCodeImageUrl(publicUrl, 85);
         
@@ -976,35 +1017,35 @@
                     <div class="detail-box">
                         <div class="detail-title">PERSONAL DETAILS</div>
                         <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td></tr>
-                            <tr><td style="width:38%;">Roll Number</td><td>${studentData.rollNumber || '-'}</td></tr>
-                            <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
-                            <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td></tr>
-                            <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td></tr>
-                            <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td></tr>
-                        </table></div>
+                            <tr><td style="width:38%;">Student Name</td<td>${studentData.studentName}</td> </tr
+                            <tr><td style="width:38%;">Roll Number</td<td>${studentData.rollNumber || '-'}</td> </tr
+                            <tr><td style="width:38%;">Date of Birth</td<td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td> </tr
+                            <tr><td style="width:38%;">Gender</td<td>${studentData.gender}</td> </tr
+                            <tr><td style="width:38%;">Nationality</td<td>${studentData.nationality}</td> </tr
+                            <tr><td style="width:38%;">Aadhar Number</td<td>${studentData.aadhar || '-'}</td> </tr
+                        </table</div>
                     </div>
                     <div class="detail-box">
                         <div class="detail-title">PARENT INFORMATION</div>
                         <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td></tr>
-                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td></tr>
-                            <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td></tr>
-                            <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td></tr>
-                        </table></div>
+                            <tr><td style="width:38%;">Father's Name</td<td>${studentData.fatherName}</td> </tr
+                            <tr><td style="width:38%;">Mother's Name</td<td>${studentData.motherName || '-'}</td> </tr
+                            <tr><td style="width:38%;">Contact Number</td<td>${studentData.parentMobile}</td> </tr
+                            <tr><td style="width:38%;">Know About QCC</td<td>${studentData.knowAbout || '-'}</td> </tr
+                        </table</div>
                     </div>
                 </div>
                 <div class="details-section">
                     <div class="detail-box">
                         <div class="detail-title">ADDRESS DETAILS</div>
-                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td></tr></table></div>
+                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td<td>${studentData.address}</td> </tr</table</div>
                     </div>
                     <div class="detail-box">
                         <div class="detail-title">EDUCATION DETAILS</div>
                         <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Current School</td><td>${studentData.schoolName}</td></tr>
-                            <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td></tr>
-                        </table></div>
+                            <tr><td style="width:38%;">Current School</td<td>${studentData.schoolName}</td> </tr
+                            <tr><td style="width:38%;">Medical Information</td<td>${studentData.medicalInfo || 'None'}</td> </tr
+                        </table</div>
                     </div>
                 </div>
                 <div class="terms-section"><div class="terms-box"><div class="terms-title">📜 नियम और शर्तें (Terms & Conditions)</div><div class="terms-list">${termsHtml}</div></div></div>
@@ -1092,35 +1133,35 @@
                     <div class="detail-box">
                         <div class="detail-title">PERSONAL DETAILS</div>
                         <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td></tr>
-                            <tr><td style="width:38%;">Roll Number</td><td>${studentData.rollNumber || '-'}</td></tr>
-                            <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
-                            <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td></tr>
-                            <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td></tr>
-                            <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td></tr>
-                        </table></div>
+                            <tr><td style="width:38%;">Student Name</td<td>${studentData.studentName}</td> </tr
+                            <tr><td style="width:38%;">Roll Number</td<td>${studentData.rollNumber || '-'}</td> </tr
+                            <tr><td style="width:38%;">Date of Birth</td<td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td> </tr
+                            <tr><td style="width:38%;">Gender</td<td>${studentData.gender}</td> </tr
+                            <tr><td style="width:38%;">Nationality</td<td>${studentData.nationality}</td> </tr
+                            <tr><td style="width:38%;">Aadhar Number</td<td>${studentData.aadhar || '-'}</td> </tr
+                        </table</div>
                     </div>
                     <div class="detail-box">
                         <div class="detail-title">PARENT INFORMATION</div>
                         <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td></tr>
-                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td></tr>
-                            <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td></tr>
-                            <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td></tr>
-                        </table></div>
+                            <tr><td style="width:38%;">Father's Name</td<td>${studentData.fatherName}</td> </tr
+                            <tr><td style="width:38%;">Mother's Name</td<td>${studentData.motherName || '-'}</td> </tr
+                            <tr><td style="width:38%;">Contact Number</td<td>${studentData.parentMobile}</td> </tr
+                            <tr><td style="width:38%;">Know About QCC</td<td>${studentData.knowAbout || '-'}</td> </tr
+                        </table</div>
                     </div>
                 </div>
                 <div class="details-section">
                     <div class="detail-box">
                         <div class="detail-title">ADDRESS DETAILS</div>
-                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td></tr></table></div>
+                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td<td>${studentData.address}</td> </tr</table</div>
                     </div>
                     <div class="detail-box">
                         <div class="detail-title">EDUCATION DETAILS</div>
                         <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Current School</td><td>${studentData.schoolName}</td></tr>
-                            <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td></tr>
-                        </table></div>
+                            <tr><td style="width:38%;">Current School</td<td>${studentData.schoolName}</td> </tr
+                            <tr><td style="width:38%;">Medical Information</td<td>${studentData.medicalInfo || 'None'}</td> </tr
+                        </table</div>
                     </div>
                 </div>
                 <div class="terms-section"><div class="terms-box"><div class="terms-title">📜 नियम और शर्तें (Terms & Conditions)</div><div class="terms-list">${termsHtml}</div></div></div>
@@ -1142,7 +1183,6 @@
         cardSection.innerHTML = cardHtml;
         cardSection.style.display = 'block';
         
-        // QR Code for web view
         const publicUrl = `${window.location.origin}${window.location.pathname}?mode=view&id=${studentData.id}`;
         setTimeout(() => {
             new QRCode(document.getElementById("qrcode-view"), { text: publicUrl, width: 85, height: 85 });
@@ -1157,9 +1197,14 @@
         };
         
         window.shareAdmissionCardView = () => {
-            const text = `🎓 Quest Coaching Centre - Admission Form\n\nStudent: ${studentData.studentName}\nAdmission No: ${studentData.admissionNo}\nRoll No: ${studentData.rollNumber}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}`;
-            if (navigator.share) navigator.share({ title: 'Admission Form', text: text });
-            else { navigator.clipboard.writeText(text); Swal.fire('Copied!', 'Details copied to clipboard', 'success'); }
+            const publicUrlForShare = `${window.location.origin}${window.location.pathname}?mode=view&id=${studentData.id}`;
+            const text = `🎓 Quest Coaching Centre - Admission Form\n\nStudent: ${studentData.studentName}\nAdmission No: ${studentData.admissionNo}\nRoll No: ${studentData.rollNumber}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}\n\nView Details: ${publicUrlForShare}`;
+            if (navigator.share) {
+                navigator.share({ title: 'Admission Form', text: text });
+            } else {
+                navigator.clipboard.writeText(text);
+                Swal.fire('Copied!', 'Link copied to clipboard', 'success');
+            }
         };
         
         window.downloadAdmissionFromCard = async () => {
