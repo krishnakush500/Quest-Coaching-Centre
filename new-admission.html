@@ -378,7 +378,12 @@
             
             <form id="admissionForm">
                 <div class="form-group">
-                    <label>1. Full Name of the Applicant <span class="required">*</span></label>
+                    <label>1. Roll Number <span class="required">*</span></label>
+                    <input type="text" id="rollNumber" placeholder="e.g., 24001" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>2. Full Name of the Applicant <span class="required">*</span></label>
                     <div class="name-boxes">
                         <div class="name-box"><input type="text" id="firstName" placeholder="First Name" required></div>
                         <div class="name-box"><input type="text" id="middleName" placeholder="Middle Name"></div>
@@ -387,13 +392,13 @@
                 </div>
                 
                 <div class="form-grid">
-                    <div class="form-group"><label>2. Nationality <span class="required">*</span></label><input type="text" id="nationality" value="Indian" required></div>
-                    <div class="form-group"><label>3. Date of Birth <span class="required">*</span></label><input type="date" id="dob" required></div>
+                    <div class="form-group"><label>3. Nationality <span class="required">*</span></label><input type="text" id="nationality" value="Indian" required></div>
+                    <div class="form-group"><label>4. Date of Birth <span class="required">*</span></label><input type="date" id="dob" required></div>
                     <div class="form-group">
-                        <label>4. Sex <span class="required">*</span></label>
-                        <div class="radio-group"><label><input type="radio" name="gender" value="Male" required> Male</label><label><input type="radio" name="gender" value="Female"> Female</label></div>
+                        <label>5. Sex <span class="required">*</span></label>
+                        <div class="radio-group"><label><input type="radio" name="gender" value="Male" required> Male</label><label><input type="radio"name="gender" value="Female"> Female</label></div>
                     </div>
-                    <div class="form-group"><label>5. Class <span class="required">*</span></label>
+                    <div class="form-group"><label>6. Class <span class="required">*</span></label>
                         <select id="class" required>
                             <option value="">Select Class</option>
                             <option>6th</option><option>7th</option><option>8th</option>
@@ -404,13 +409,13 @@
                             <option>12th (Arts)</option>
                         </select>
                     </div>
-                    <div class="form-group"><label>6. Father's Name <span class="required">*</span></label><input type="text" id="fatherName" required></div>
-                    <div class="form-group"><label>7. Mother's Name</label><input type="text" id="motherName"></div>
-                    <div class="form-group"><label>8. Contact No. (Student's) <span class="required">*</span></label><input type="tel" id="studentMobile" maxlength="10" required></div>
-                    <div class="form-group full-width"><label>9. Complete Address <span class="required">*</span></label><textarea id="address" rows="2" required></textarea></div>
-                    <div class="form-group"><label>10. Aadhar No.</label><input type="text" id="aadhar" maxlength="12"></div>
-                    <div class="form-group"><label>11. Current School/College <span class="required">*</span></label><input type="text" id="presentSchool" required></div>
-                    <div class="form-group"><label>12. Session <span class="required">*</span></label>
+                    <div class="form-group"><label>7. Father's Name <span class="required">*</span></label><input type="text" id="fatherName" required></div>
+                    <div class="form-group"><label>8. Mother's Name</label><input type="text" id="motherName"></div>
+                    <div class="form-group"><label>9. Contact No. (Student's) <span class="required">*</span></label><input type="tel" id="studentMobile" maxlength="10" required></div>
+                    <div class="form-group full-width"><label>10. Complete Address <span class="required">*</span></label><textarea id="address" rows="2" required></textarea></div>
+                    <div class="form-group"><label>11. Aadhar No.</label><input type="text" id="aadhar" maxlength="12"></div>
+                    <div class="form-group"><label>12. Current School/College <span class="required">*</span></label><input type="text" id="presentSchool" required></div>
+                    <div class="form-group"><label>13. Session <span class="required">*</span></label>
                         <select id="sessionSelect" required>
                             <option value="2026-27" selected>2026-27</option>
                             <option value="2027-28">2027-28</option>
@@ -419,14 +424,14 @@
                         </select>
                     </div>
                     <div class="form-group full-width">
-                        <label>13. How did you come to know about QCC</label>
+                        <label>14. How did you come to know about QCC</label>
                         <div class="checkbox-group">
                             <label><input type="checkbox" name="knowAbout" value="Google"> Google</label>
                             <label><input type="checkbox" name="knowAbout" value="Teacher"> Teacher</label>
                             <label><input type="checkbox" name="knowAbout" value="Friend/Relatives"> Friend / Relatives</label>
                         </div>
                     </div>
-                    <div class="form-group full-width"><label>14. Mention Information (Psychological/Physical) If Any</label><textarea id="medicalInfo" rows="2"></textarea></div>
+                    <div class="form-group full-width"><label>15. Mention Information (Psychological/Physical) If Any</label><textarea id="medicalInfo" rows="2"></textarea></div>
                 </div>
                 
                 <div class="declaration-box">
@@ -518,11 +523,9 @@
         window.location.href = 'manage-students.html';
     }
     
-    // Check if this is a public view (no auth required)
     const isPublicView = (mode === 'view' && studentId);
     
     auth.onAuthStateChanged((user) => {
-        // For public view (student card), don't require login
         if (isPublicView) {
             authLoading.style.display = 'none';
             mainContent.style.display = 'block';
@@ -530,7 +533,6 @@
             return;
         }
         
-        // For edit/new modes, require login
         if (!user) {
             Swal.fire({
                 title: 'Access Denied!',
@@ -600,6 +602,8 @@
     }
     
     function fillFormWithData(data) {
+        document.getElementById('rollNumber').value = data.rollNumber || '';
+        
         const nameParts = (data.studentName || '').split(' ');
         document.getElementById('firstName').value = nameParts[0] || '';
         document.getElementById('middleName').value = nameParts.slice(1, -1).join(' ') || '';
@@ -652,6 +656,7 @@
     }
     
     function getFormData() {
+        const rollNumber = document.getElementById('rollNumber').value.trim();
         const firstName = document.getElementById('firstName').value.trim();
         const middleName = document.getElementById('middleName').value.trim();
         const lastName = document.getElementById('lastName').value.trim();
@@ -660,7 +665,7 @@
         const knowAbout = Array.from(document.querySelectorAll('input[name="knowAbout"]:checked')).map(cb => cb.value).join(', ');
         
         return {
-            fullName, firstName, middleName, lastName,
+            rollNumber, fullName, firstName, middleName, lastName,
             nationality: document.getElementById('nationality').value.trim(),
             dob: document.getElementById('dob').value,
             gender: document.querySelector('input[name="gender"]:checked')?.value,
@@ -680,7 +685,7 @@
     }
     
     function validateFormData(data) {
-        if (!data.firstName || !data.lastName || !data.nationality || !data.dob || !data.gender || !data.classVal || !data.fatherName || !data.studentMobile || !data.address || !data.presentSchool) {
+        if (!data.rollNumber || !data.firstName || !data.lastName || !data.nationality || !data.dob || !data.gender || !data.classVal || !data.fatherName || !data.studentMobile || !data.address || !data.presentSchool) {
             showAlert('Please fill all required fields (*)', 'error');
             return false;
         }
@@ -792,6 +797,7 @@
             updateProgress(70, 'Updating student data...');
             
             const updateData = {
+                rollNumber: data.rollNumber,
                 studentName: data.fullName,
                 fatherName: data.fatherName,
                 motherName: data.motherName,
@@ -846,21 +852,34 @@
             
             updateProgress(80, 'Saving student data...');
             const admissionData = {
-                admissionNo, studentName: data.fullName, fatherName: data.fatherName, motherName: data.motherName || '',
-                dob: data.dob, gender: data.gender, classApplying: data.classVal, schoolName: data.presentSchool,
-                address: data.address, parentMobile: data.studentMobile, aadhar: data.aadhar || '',
-                nationality: data.nationality, knowAbout: data.knowAbout || '', medicalInfo: data.medicalInfo || '',
-                photoUrl, admissionDate: new Date().toISOString(), session: data.session,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(), status: 'active'
+                admissionNo: admissionNo,
+                rollNumber: data.rollNumber,
+                studentName: data.fullName,
+                fatherName: data.fatherName,
+                motherName: data.motherName || '',
+                dob: data.dob,
+                gender: data.gender,
+                classApplying: data.classVal,
+                schoolName: data.presentSchool,
+                address: data.address,
+                parentMobile: data.studentMobile,
+                aadhar: data.aadhar || '',
+                nationality: data.nationality,
+                knowAbout: data.knowAbout || '',
+                medicalInfo: data.medicalInfo || '',
+                photoUrl: photoUrl,
+                admissionDate: new Date().toISOString(),
+                session: data.session,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                status: 'active'
             };
             await admissionsCollection.add(admissionData);
             updateProgress(100, 'Complete!');
             
             setTimeout(() => {
                 progressOverlay.style.display = 'none';
-                Swal.fire('🎉 Admission Successful!', `Student ${data.fullName} has been admitted.`, 'success').then(() => {
-                    window.location.href = 'manage-students.html';
-                });
+                // Show admission card immediately after submission
+                displayAdmissionCard(admissionData, photoUrl);
             }, 500);
         } catch (error) {
             progressOverlay.style.display = 'none';
@@ -868,7 +887,6 @@
         }
     }
     
-    // Function to generate QR Code image URL for PDF
     async function generateQRCodeImageUrl(text, size = 85) {
         return new Promise((resolve) => {
             const tempDiv = document.createElement('div');
@@ -907,7 +925,6 @@
         const admDate = new Date(studentData.admissionDate);
         const dobDate = new Date(studentData.dob);
         
-        // Generate QR code image for PDF
         const publicUrl = `${window.location.origin}${window.location.pathname}?mode=view&id=${studentData.id}`;
         const qrImageUrl = await generateQRCodeImageUrl(publicUrl, 85);
         
@@ -941,6 +958,7 @@
                 <div class="top-row">
                     <div class="photo-card"><img src="${photoUrl}" alt="Photo"></div>
                     <div class="info-group">
+                        <div class="info-row"><span class="info-label">ROLL NUMBER</span><span class="info-value adm-no">${studentData.rollNumber}</span></div>
                         <div class="info-row"><span class="info-label">ADMISSION NO.</span><span class="info-value adm-no">${studentData.admissionNo}</span></div>
                         <div class="info-row"><span class="info-label">ADMISSION DATE</span><span class="info-value">${admDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
                         <div class="info-row"><span class="info-label">ACADEMIC SESSION</span><span class="info-value">${studentData.session}</span></div>
@@ -1060,6 +1078,7 @@
                 <div class="top-row">
                     <div class="photo-card"><img src="${photoUrl}" alt="Photo"></div>
                     <div class="info-group">
+                        <div class="info-row"><span class="info-label">ROLL NUMBER</span><span class="info-value adm-no">${studentData.rollNumber}</span></div>
                         <div class="info-row"><span class="info-label">ADMISSION NO.</span><span class="info-value adm-no">${studentData.admissionNo}</span></div>
                         <div class="info-row"><span class="info-label">ADMISSION DATE</span><span class="info-value">${admDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
                         <div class="info-row"><span class="info-label">ACADEMIC SESSION</span><span class="info-value">${studentData.session}</span></div>
@@ -1114,13 +1133,13 @@
                 <button class="action-btn print" onclick="printAdmissionCardView()"><i class="fas fa-print"></i> Print Form</button>
                 <button class="action-btn share" onclick="shareAdmissionCardView()"><i class="fas fa-share-alt"></i> Share</button>
                 <button class="action-btn pdf" onclick="downloadAdmissionFromCard()"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                <button class="action-btn" style="background:#1b4f9b; color:white;" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back</button>
             </div>
         `;
         
         cardSection.innerHTML = cardHtml;
         cardSection.style.display = 'block';
         
-        // QR Code for web view
         const publicUrl = `${window.location.origin}${window.location.pathname}?mode=view&id=${studentData.id}`;
         setTimeout(() => {
             new QRCode(document.getElementById("qrcode-view"), { text: publicUrl, width: 85, height: 85 });
@@ -1135,7 +1154,7 @@
         };
         
         window.shareAdmissionCardView = () => {
-            const text = `🎓 Quest Coaching Centre - Admission Form\n\nStudent: ${studentData.studentName}\nAdmission No: ${studentData.admissionNo}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}`;
+            const text = `🎓 Quest Coaching Centre - Admission Form\n\nStudent: ${studentData.studentName}\nRoll No: ${studentData.rollNumber}\nAdmission No: ${studentData.admissionNo}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}`;
             if (navigator.share) navigator.share({ title: 'Admission Form', text: text });
             else { navigator.clipboard.writeText(text); Swal.fire('Copied!', 'Details copied to clipboard', 'success'); }
         };
