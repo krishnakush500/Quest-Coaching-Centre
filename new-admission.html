@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>📝 Quest Coaching · Admission Form</title>
+    <title>📝 Quest Coaching · Registration Form</title>
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -278,7 +278,7 @@
         .info-row:last-child { border-bottom: none; }
         .info-label { font-weight: 700; color: var(--text-dark); font-size: 12px; }
         .info-value { font-weight: 600; color: var(--primary); font-size: 13px; }
-        .adm-no { color: #d9534f; font-size: 14px; }
+        .reg-no { color: #d9534f; font-size: 14px; }
         
         .qr-card { text-align: center; width: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .qr-box { background: white; padding: 10px; border: 2px solid var(--accent); border-radius: 16px; margin-bottom: 8px; display: flex; justify-content: center; align-items: center; }
@@ -288,7 +288,7 @@
         .detail-box { background: var(--light-bg); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
         .detail-title { background: var(--primary); color: white; padding: 12px 18px; font-size: 14px; font-weight: 700; }
         .detail-content { padding: 18px; }
-        .detail-table { width: 100%; }
+        .detail-table { width: 100%; border-collapse: collapse; }
         .detail-table td { padding: 10px 8px; font-size: 12px; border-bottom: 1px dotted var(--border); }
         .detail-table td:first-child { font-weight: 700; color: var(--text-dark); width: 38%; }
         .detail-table td:last-child { color: var(--primary); }
@@ -358,7 +358,7 @@
         
         <div id="formSection" class="form-card" style="display: none;">
             <h2 style="color: #1e3a5f; margin-bottom: 20px;">
-                <i class="fas fa-user-plus"></i> Student Admission Form
+                <i class="fas fa-user-plus"></i> Student Registration Form
                 <span id="modeBadge" class="mode-badge"></span>
             </h2>
             <div id="formAlert"></div>
@@ -551,19 +551,16 @@
         resetForm();
         formSection.style.display = 'block';
         cardSection.style.display = 'none';
-        document.getElementById('modeBadge').textContent = '📝 NEW ADMISSION';
+        document.getElementById('modeBadge').textContent = '📝 NEW REGISTRATION';
         document.getElementById('modeBadge').className = 'mode-badge mode-new';
     }
     
-    // For public view - no admin access
     const isPublicView = (mode === 'view' && studentId);
     
     auth.onAuthStateChanged((user) => {
         if (isPublicView) {
-            // Public view - no login required, show only card
             authLoading.style.display = 'none';
             mainContent.style.display = 'block';
-            // Hide header bar buttons for public view
             const headerBar = document.querySelector('.header-bar');
             if (headerBar) {
                 const backBtn = headerBar.querySelector('.back-btn');
@@ -600,7 +597,7 @@
             cardSection.style.display = 'none';
             loadStudentForEdit(studentId);
         } else if (mode === 'new') {
-            modeBadge.textContent = '📝 NEW ADMISSION';
+            modeBadge.textContent = '📝 NEW REGISTRATION';
             modeBadge.className = 'mode-badge mode-new';
             formSection.style.display = 'block';
             cardSection.style.display = 'none';
@@ -619,7 +616,7 @@
                 return;
             }
             currentStudentData = { id: doc.id, ...doc.data() };
-            displayAdmissionCard(currentStudentData, currentStudentData.photoUrl);
+            displayRegistrationCard(currentStudentData, currentStudentData.photoUrl);
         } catch (error) {
             console.error('Error loading student:', error);
             Swal.fire('Error', 'Failed to load student data', 'error');
@@ -692,7 +689,7 @@
     
     function setupNewMode() {
         const container = document.getElementById('submitButtonContainer');
-        container.innerHTML = `<button type="submit" class="btn-submit" id="submitBtn"><i class="fas fa-save"></i> Submit Admission</button>`;
+        container.innerHTML = `<button type="submit" class="btn-submit" id="submitBtn"><i class="fas fa-save"></i> Submit Registration</button>`;
         document.getElementById('declarationDate').value = new Date().toLocaleDateString('en-IN');
         
         const form = document.getElementById('admissionForm');
@@ -890,7 +887,7 @@
         updateProgress(0, 'Starting...');
         
         try {
-            updateProgress(20, 'Generating admission number...');
+            updateProgress(20, 'Generating registration number...');
             const admissionNo = generateAdmissionNo();
             
             updateProgress(40, 'Compressing and uploading photo...');
@@ -923,12 +920,11 @@
             await admissionsCollection.add(admissionData);
             updateProgress(100, 'Complete!');
             
-            // Reset form after successful submission
             resetForm();
             
             setTimeout(() => {
                 progressOverlay.style.display = 'none';
-                displayAdmissionCard(admissionData, photoUrl);
+                displayRegistrationCard(admissionData, photoUrl);
             }, 500);
             
         } catch (error) {
@@ -1008,9 +1004,9 @@
                 <div class="top-row">
                     <div class="photo-card"><img src="${photoUrl}" alt="Photo"></div>
                     <div class="info-group">
-                        <div class="info-row"><span class="info-label">ADMISSION NO.</span><span class="info-value adm-no">${studentData.admissionNo}</span></div>
+                        <div class="info-row"><span class="info-label">REGISTRATION NO.</span><span class="info-value reg-no">${studentData.admissionNo}</span></div>
                         <div class="info-row"><span class="info-label">ROLL NO.</span><span class="info-value">${studentData.rollNumber || '-'}</span></div>
-                        <div class="info-row"><span class="info-label">ADMISSION DATE</span><span class="info-value">${admDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
+                        <div class="info-row"><span class="info-label">REGISTRATION DATE</span><span class="info-value">${admDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
                         <div class="info-row"><span class="info-label">ACADEMIC SESSION</span><span class="info-value">${studentData.session}</span></div>
                         <div class="info-row"><span class="info-label">CLASS APPLYING</span><span class="info-value">${studentData.classApplying}</span></div>
                     </div>
@@ -1098,7 +1094,7 @@
         Swal.fire('Downloaded!', 'PDF downloaded successfully', 'success');
     }
     
-    function displayAdmissionCard(studentData, photoUrl) {
+    function displayRegistrationCard(studentData, photoUrl) {
         const admDate = new Date(studentData.admissionDate);
         const dobDate = new Date(studentData.dob);
         
@@ -1132,9 +1128,9 @@
                 <div class="top-row">
                     <div class="photo-card"><img src="${photoUrl}" alt="Photo"></div>
                     <div class="info-group">
-                        <div class="info-row"><span class="info-label">ADMISSION NO.</span><span class="info-value adm-no">${studentData.admissionNo}</span></div>
+                        <div class="info-row"><span class="info-label">REGISTRATION NO.</span><span class="info-value reg-no">${studentData.admissionNo}</span></div>
                         <div class="info-row"><span class="info-label">ROLL NO.</span><span class="info-value">${studentData.rollNumber || '-'}</span></div>
-                        <div class="info-row"><span class="info-label">ADMISSION DATE</span><span class="info-value">${admDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
+                        <div class="info-row"><span class="info-label">REGISTRATION DATE</span><span class="info-value">${admDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
                         <div class="info-row"><span class="info-label">ACADEMIC SESSION</span><span class="info-value">${studentData.session}</span></div>
                         <div class="info-row"><span class="info-label">CLASS APPLYING</span><span class="info-value">${studentData.classApplying}</span></div>
                     </div>
@@ -1145,7 +1141,7 @@
                         <div class="detail-title">PERSONAL DETAILS</div>
                         <div class="detail-content"><table class="detail-table">
                             <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td> </tr
-                            </td><td style="width:38%;">Roll Number</td><td>${studentData.rollNumber || '-'}</td> </tr
+                            <tr><td style="width:38%;">Roll Number</td><td>${studentData.rollNumber || '-'}</td> </tr
                             <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td> </tr
                             <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td> </tr
                             <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td> </tr
@@ -1167,7 +1163,7 @@
             <div class="details-section">
                 <div class="detail-box">
                     <div class="detail-title">ADDRESS DETAILS</div>
-                    <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td> </tr </table></div>
+                    <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td> </tr <table></div>
                 </div>
                 <div class="detail-box">
                     <div class="detail-title">EDUCATION DETAILS</div>
@@ -1191,7 +1187,7 @@
                 <button class="action-btn print" onclick="printAdmissionCardView()"><i class="fas fa-print"></i> Print Form</button>
                 <button class="action-btn share" onclick="shareAdmissionCardView()"><i class="fas fa-share-alt"></i> Share</button>
                 <button class="action-btn pdf" onclick="downloadAdmissionFromCard()"><i class="fas fa-file-pdf"></i> Download PDF</button>
-                ${!isPublicView ? `<button class="action-btn new-admission-btn" onclick="openNewAdmissionForm()"><i class="fas fa-plus"></i> New Admission</button>` : ''}
+                ${!isPublicView ? `<button class="action-btn new-admission-btn" onclick="openNewAdmissionForm()"><i class="fas fa-plus"></i> New Registration</button>` : ''}
             </div>
         `;
         
@@ -1213,7 +1209,7 @@
         };
         
         window.shareAdmissionCardView = () => {
-            const shareText = `🎓 Quest Coaching Centre - Registration Form\n\nStudent: ${studentData.studentName}\nAdmission No: ${studentData.admissionNo}\nRoll No: ${studentData.rollNumber || '-'}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}\n\nThank you for choosing Quest Coaching Centre! 📚`;
+            const shareText = `🎓 Quest Coaching Centre - Registration Form\n\nStudent: ${studentData.studentName}\nRegistration No: ${studentData.admissionNo}\nRoll No: ${studentData.rollNumber || '-'}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}\n\nThank you for choosing Quest Coaching Centre! 📚`;
             
             if (navigator.share) {
                 navigator.share({
