@@ -241,7 +241,7 @@
             });
             filterStudents();
         } catch (error) {
-            document.getElementById('studentsTableBody').innerHTML = '<tr><td colspan="9" class="loading">❌ Error loading data</td></table>';
+            document.getElementById('studentsTableBody').innerHTML = '<td><td colspan="9" class="loading">❌ Error loading data</td></tr>';
         }
     }
     
@@ -273,7 +273,7 @@
     function displayStudents(students) {
         const tbody = document.getElementById('studentsTableBody');
         if (students.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" class="loading">No students found</td></table>';
+            tbody.innerHTML = '<tr><td colspan="9" class="loading">No students found</td></tr>';
             return;
         }
         
@@ -338,7 +338,7 @@
         });
     };
     
-    // Download PDF Report
+    // Download PDF Report with Photos
     downloadPdfBtn.addEventListener('click', async () => {
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         const classFilter = document.getElementById('classFilter').value;
@@ -368,7 +368,7 @@
         
         Swal.fire({
             title: 'Generating PDF...',
-            text: 'Please wait while we prepare your report',
+            text: 'Please wait while we prepare your report with photos',
             allowOutsideClick: false,
             didOpen: () => {
                 Swal.showLoading();
@@ -376,105 +376,110 @@
         });
         
         try {
+            // Create a temporary div to render the report with photos
+            const tempDiv = document.createElement('div');
+            tempDiv.style.position = 'absolute';
+            tempDiv.style.left = '-9999px';
+            tempDiv.style.top = '-9999px';
+            tempDiv.style.width = '1200px';
+            document.body.appendChild(tempDiv);
+            
             // Calculate summary
             let totalStudents = filtered.length;
             let totalBoys = filtered.filter(s => s.gender === 'Male').length;
             let totalGirls = filtered.filter(s => s.gender === 'Female').length;
             
-            // Create HTML for PDF
-            let tableRows = '';
-            filtered.forEach((student, index) => {
-                tableRows += `
-                    <tr style="border-bottom: 1px solid #e2e8f0;">
-                        <td style="padding: 8px; text-align: center;">${index + 1}</td>
-                        <td style="padding: 8px;">${student.admissionNo || '-'}</td>
-                        <td style="padding: 8px;">${student.studentName || '-'}</td>
-                        <td style="padding: 8px;">${student.rollNumber || '-'}</td>
-                        <td style="padding: 8px;">${student.fatherName || '-'}</td>
-                        <td style="padding: 8px;">${student.classApplying || '-'}</td>
-                        <td style="padding: 8px;">${student.gender || '-'}</td>
-                        <td style="padding: 8px;">${student.parentMobile || '-'}</td>
-                    </tr>
-                `;
-            });
-            
             const currentDate = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
             const className = classFilter === 'All' ? 'All Classes' : classFilter;
             const sessionName = sessionFilter === 'All' ? 'All Sessions' : sessionFilter;
             
-            const pdfHtml = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Student Report - Quest Coaching Centre</title>
-                    <style>
-                        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
-                        body { padding: 30px 20px; background: white; }
-                        .container { max-width: 1200px; margin: 0 auto; }
-                        .header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #1b4f9b; padding-bottom: 15px; }
-                        .coaching-name { font-size: 24px; font-weight: 800; color: #1b4f9b; }
-                        .coaching-address { font-size: 11px; color: #4a5568; margin: 5px 0; }
-                        .report-title { font-size: 18px; font-weight: 700; color: #113a5e; text-align: center; margin: 15px 0 5px; }
-                        .report-meta { text-align: center; font-size: 11px; color: #64748b; margin-bottom: 20px; }
-                        .summary { background: linear-gradient(135deg, #1b4f9b, #2563eb); color: white; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-around; flex-wrap: wrap; }
-                        .summary-item { text-align: center; }
-                        .summary-label { font-size: 12px; opacity: 0.9; margin-bottom: 5px; }
-                        .summary-value { font-size: 22px; font-weight: 800; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 11px; }
-                        th { background: #1b4f9b; color: white; padding: 10px 8px; font-weight: 600; text-align: left; }
-                        td { padding: 8px; }
-                        .footer { margin-top: 25px; padding-top: 15px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 10px; color: #64748b; }
-                        .signatures { display: flex; justify-content: space-between; margin-top: 30px; }
-                        .signature-line { border-top: 1px solid #000; width: 200px; margin-top: 30px; }
-                        .signature-text { font-size: 10px; text-align: center; margin-top: 5px; }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="header">
-                            <div class="coaching-name">QUEST COACHING CENTRE</div>
-                            <div class="coaching-address">Block More, Gopalganj, Bihar - 841428 | Ph: +91 9708442525</div>
-                            <div class="coaching-address">Under the guidance of MR. RAVI SIR</div>
-                        </div>
-                        <div class="report-title">📊 STUDENTS REPORT</div>
-                        <div class="report-meta">Session: ${sessionName} | Class: ${className} | Date: ${currentDate} | Total Students: ${totalStudents}</div>
-                        
-                        <div class="summary">
-                            <div class="summary-item"><div class="summary-label">👨‍🎓 Total Students</div><div class="summary-value">${totalStudents}</div></div>
-                            <div class="summary-item"><div class="summary-label">👦 Boys</div><div class="summary-value">${totalBoys}</div></div>
-                            <div class="summary-item"><div class="summary-label">👧 Girls</div><div class="summary-value">${totalGirls}</div></div>
-                        </div>
-                        
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>#</th><th>Admission No</th><th>Student Name</th><th>Roll No</th><th>Father Name</th><th>Class</th><th>Gender</th><th>Mobile</th>
-                                </tr>
-                            </thead>
-                            <tbody>${tableRows}</tbody>
-                        </table>
-                        
-                        <div class="signatures">
-                            <div><div class="signature-line"></div><div class="signature-text">Authorized Signatory</div></div>
-                            <div><div class="signature-line"></div><div class="signature-text">Principal / Director</div></div>
-                        </div>
-                        <div class="footer">This is a computer generated report | Generated by Quest Coaching Management System</div>
+            // Build table rows with photos
+            let tableRows = '';
+            for (let i = 0; i < filtered.length; i++) {
+                const student = filtered[i];
+                // Create a placeholder for photo that will be loaded as image
+                const photoHtml = student.photoUrl ? `<img src="${student.photoUrl}" style="width:45px; height:45px; border-radius:50%; object-fit:cover;" onerror="this.src='https://via.placeholder.com/45'">` : '<div style="width:45px; height:45px; border-radius:50%; background:#e2e8f0; display:flex; align-items:center; justify-content:center;"><i class="fas fa-user" style="color:#64748b;"></i></div>';
+                
+                tableRows += `
+                    <tr style="border-bottom: 1px solid #e2e8f0;">
+                        <td style="padding: 10px 8px; text-align: center;">${i + 1}</td>
+                        <td style="padding: 10px 8px; text-align: center;">${photoHtml}</td>
+                        <td style="padding: 10px 8px;">${student.admissionNo || '-'}</td>
+                        <td style="padding: 10px 8px;"><strong>${student.studentName || '-'}</strong></td>
+                        <td style="padding: 10px 8px;">${student.rollNumber || '-'}</td>
+                        <td style="padding: 10px 8px;">${student.fatherName || '-'}</td>
+                        <td style="padding: 10px 8px;">${student.classApplying || '-'}</td>
+                        <td style="padding: 10px 8px;">${student.gender || '-'}</td>
+                        <td style="padding: 10px 8px;">${student.parentMobile || '-'}</td>
+                    </tr>
+                `;
+            }
+            
+            tempDiv.innerHTML = `
+                <div id="reportContainer" style="padding: 30px; background: white; font-family: 'Segoe UI', Roboto, sans-serif;">
+                    <div style="text-align: center; margin-bottom: 25px; border-bottom: 2px solid #1b4f9b; padding-bottom: 15px;">
+                        <div style="font-size: 24px; font-weight: 800; color: #1b4f9b;">QUEST COACHING CENTRE</div>
+                        <div style="font-size: 11px; color: #4a5568; margin: 5px 0;">Block More, Gopalganj, Bihar - 841428 | Ph: +91 9708442525</div>
+                        <div style="font-size: 11px; color: #4a5568;">Under the guidance of MR. RAVI SIR</div>
                     </div>
-                </body>
-                </html>
+                    <div style="font-size: 18px; font-weight: 700; color: #113a5e; text-align: center; margin: 15px 0 5px;">📊 STUDENTS REPORT</div>
+                    <div style="text-align: center; font-size: 11px; color: #64748b; margin-bottom: 20px;">Session: ${sessionName} | Class: ${className} | Date: ${currentDate} | Total Students: ${totalStudents}</div>
+                    
+                    <div style="background: linear-gradient(135deg, #1b4f9b, #2563eb); color: white; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-around; flex-wrap: wrap;">
+                        <div style="text-align: center;"><div style="font-size: 12px; opacity: 0.9;">👨‍🎓 Total Students</div><div style="font-size: 22px; font-weight: 800;">${totalStudents}</div></div>
+                        <div style="text-align: center;"><div style="font-size: 12px; opacity: 0.9;">👦 Boys</div><div style="font-size: 22px; font-weight: 800;">${totalBoys}</div></div>
+                        <div style="text-align: center;"><div style="font-size: 12px; opacity: 0.9;">👧 Girls</div><div style="font-size: 22px; font-weight: 800;">${totalGirls}</div></div>
+                    </div>
+                    
+                    <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+                        <thead>
+                            <tr style="background: #1b4f9b; color: white;">
+                                <th style="padding: 10px 8px; text-align: center;">#</th>
+                                <th style="padding: 10px 8px; text-align: center;">Photo</th>
+                                <th style="padding: 10px 8px;">Admission No</th>
+                                <th style="padding: 10px 8px;">Student Name</th>
+                                <th style="padding: 10px 8px;">Roll No</th>
+                                <th style="padding: 10px 8px;">Father Name</th>
+                                <th style="padding: 10px 8px;">Class</th>
+                                <th style="padding: 10px 8px;">Gender</th>
+                                <th style="padding: 10px 8px;">Mobile</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                    
+                    <div style="display: flex; justify-content: space-between; margin-top: 30px;">
+                        <div><div style="border-top: 1px solid #000; width: 200px; margin-top: 30px;"></div><div style="font-size: 10px; text-align: center; margin-top: 5px;">Authorized Signatory</div></div>
+                        <div><div style="border-top: 1px solid #000; width: 200px; margin-top: 30px;"></div><div style="font-size: 10px; text-align: center; margin-top: 5px;">Principal / Director</div></div>
+                    </div>
+                    <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 10px; color: #64748b;">This is a computer generated report | Generated by Quest Coaching Management System</div>
+                </div>
             `;
             
-            // Create PDF
-            const win = window.open('', '_blank');
-            win.document.write(pdfHtml);
-            win.document.close();
-            win.print();
+            // Wait for images to load
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            const element = tempDiv.querySelector('#reportContainer');
+            const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgWidth = 190;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+            
+            // Clean up
+            document.body.removeChild(tempDiv);
+            
+            pdf.save(`Students_Report_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.pdf`);
             
             Swal.close();
-            Swal.fire('Success!', 'PDF report generated successfully', 'success');
+            Swal.fire('Success!', 'PDF report with photos generated successfully', 'success');
         } catch (error) {
             Swal.close();
+            console.error('PDF Error:', error);
             Swal.fire('Error!', 'Failed to generate PDF: ' + error.message, 'error');
         }
     });
