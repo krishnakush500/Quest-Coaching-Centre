@@ -244,7 +244,8 @@
             --text-dark: #2c3e50;
         }
         
-        .admission-card {
+        /* REGISTRATION CARD STYLES - FIXED LAYOUT */
+        .registration-card {
             background: white;
             width: 100%;
             max-width: 1100px;
@@ -284,15 +285,49 @@
         .qr-box { background: white; padding: 10px; border: 2px solid var(--accent); border-radius: 16px; margin-bottom: 8px; display: flex; justify-content: center; align-items: center; }
         .qr-label-card { background: var(--accent); color: white; font-size: 10px; padding: 5px 10px; border-radius: 20px; font-weight: bold; }
         
-        .details-section { padding: 0 30px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; margin-bottom: 25px; }
-        .detail-box { background: var(--light-bg); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
-        .detail-title { background: var(--primary); color: white; padding: 12px 18px; font-size: 14px; font-weight: 700; }
-        .detail-content { padding: 18px; }
-        .detail-table { width: 100%; border-collapse: collapse; }
-        .detail-table td { padding: 10px 8px; font-size: 12px; border-bottom: 1px dotted var(--border); }
-        .detail-table td:first-child { font-weight: 700; color: var(--text-dark); width: 38%; }
-        .detail-table td:last-child { color: var(--primary); }
-        .detail-table tr:last-child td { border-bottom: none; }
+        /* FIXED LAYOUT - Details Section */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            padding: 0 30px;
+            margin-bottom: 25px;
+        }
+        .detail-box {
+            background: var(--light-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        .detail-title {
+            background: var(--primary);
+            color: white;
+            padding: 12px 18px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .detail-content {
+            padding: 18px;
+        }
+        .detail-table {
+            width: 100%;
+        }
+        .detail-table td {
+            padding: 10px 8px;
+            font-size: 12px;
+            border-bottom: 1px dotted var(--border);
+        }
+        .detail-table td:first-child {
+            font-weight: 700;
+            color: var(--text-dark);
+            width: 38%;
+        }
+        .detail-table td:last-child {
+            color: var(--primary);
+        }
+        .detail-table tr:last-child td {
+            border-bottom: none;
+        }
         
         .terms-section { padding: 0 30px; margin: 20px 0; }
         .terms-box { background: #fef9e6; border-left: 4px solid var(--accent); border-radius: 12px; padding: 18px 22px; }
@@ -321,7 +356,7 @@
             .name-boxes { flex-direction: column; gap: 8px; }
             .form-card { padding: 20px; }
             .photo-section { justify-content: center; }
-            .details-section { grid-template-columns: 1fr; padding: 0 15px; }
+            .details-grid { grid-template-columns: 1fr; padding: 0 15px; }
             .top-row { flex-direction: column; align-items: center; padding: 0 15px; }
             .signatures-section { justify-content: center; flex-direction: column; align-items: center; }
             .terms-list { grid-template-columns: 1fr; gap: 15px; }
@@ -332,7 +367,7 @@
         
         @media print {
             .no-print, .action-buttons-card, .header-bar, .back-btn { display: none !important; }
-            .admission-card { box-shadow: none; margin: 0; max-width: 100%; }
+            .registration-card { box-shadow: none; margin: 0; max-width: 100%; }
             body { background: white; padding: 0; }
             .terms-list { grid-template-columns: 1fr 1fr; }
         }
@@ -816,7 +851,7 @@
         return urlData.publicUrl;
     }
     
-    function generateAdmissionNo() {
+    function generateRegNo() {
         const year = new Date().getFullYear();
         const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
         return `QCC/${year}/${random}`;
@@ -888,15 +923,15 @@
         
         try {
             updateProgress(20, 'Generating registration number...');
-            const admissionNo = generateAdmissionNo();
+            const regNo = generateRegNo();
             
             updateProgress(40, 'Compressing and uploading photo...');
-            let photoUrl = await uploadPhotoToSupabase(photoFile, admissionNo);
+            let photoUrl = await uploadPhotoToSupabase(photoFile, regNo);
             updateProgress(60, 'Photo uploaded successfully!');
             
             updateProgress(80, 'Saving student data...');
             const admissionData = {
-                admissionNo: admissionNo,
+                admissionNo: regNo,
                 studentName: data.fullName,
                 rollNumber: data.rollNumber,
                 fatherName: data.fatherName,
@@ -984,7 +1019,7 @@
         `;
         
         tempDiv.innerHTML = `
-            <div id="pdfCard" class="admission-card">
+            <div id="pdfCard" class="registration-card">
                 <div class="card-header">
                     <div class="logo-center">
                         <div class="logo-img-card"><img src="${LOGO_URL}" alt="Logo"></div>
@@ -1017,44 +1052,41 @@
                         <div class="qr-label-card">SCAN TO VERIFY</div>
                     </div>
                 </div>
-                <div class="details-section">
+                <div class="details-grid">
                     <div class="detail-box">
                         <div class="detail-title">PERSONAL DETAILS</div>
                         <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td> </tr
-                            <tr><td style="width:38%;">Roll Number</td><td>${studentData.rollNumber || '-'}</td> </tr
-                            <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td> </tr
-                            <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td> </tr
-                            <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td> </tr
-                            <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td> </tr
-                        </table>
+                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td></tr>
+                            <tr><td style="width:38%;">Roll Number</td><td>${studentData.rollNumber || '-'}</td></tr>
+                            <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
+                            <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td></tr>
+                            <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td></tr>
+                            <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td></tr>
+                        </table></div>
+                    </div>
+                    <div class="detail-box">
+                        <div class="detail-title">PARENT INFORMATION</div>
+                        <div class="detail-content"><table class="detail-table">
+                            <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td></tr>
+                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td></tr>
+                            <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td></tr>
+                            <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td></tr>
+                        </table></div>
                     </div>
                 </div>
-                <div class="detail-box">
-                    <div class="detail-title">PARENT INFORMATION</div>
-                    <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td> </tr
-                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td> </tr
-                            <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td> </tr
-                            <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td> </tr
-                        </table>
+                <div class="details-grid">
+                    <div class="detail-box">
+                        <div class="detail-title">ADDRESS DETAILS</div>
+                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td></tr></table></div>
+                    </div>
+                    <div class="detail-box">
+                        <div class="detail-title">EDUCATION DETAILS</div>
+                        <div class="detail-content"><table class="detail-table">
+                            <tr><td style="width:38%;">Current School</td><td>${studentData.schoolName}</td></tr>
+                            <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td></tr>
+                        </table></div>
                     </div>
                 </div>
-            </div>
-            <div class="details-section">
-                <div class="detail-box">
-                    <div class="detail-title">ADDRESS DETAILS</div>
-                    <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td> </tr </table></div>
-                </div>
-                <div class="detail-box">
-                    <div class="detail-title">EDUCATION DETAILS</div>
-                    <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Current School</td><td>${studentData.schoolName}</td> </tr
-                            <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td> </tr
-                        </table>
-                    </div>
-                </div>
-            </div>
                 <div class="terms-section"><div class="terms-box"><div class="terms-title">📜 नियम और शर्तें (Terms & Conditions)</div><div class="terms-list">${termsHtml}</div></div></div>
                 <div class="quote-card"><span class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</span><span class="quote-author">- Albert Einstein</span></div>
                 <div class="signatures-section">
@@ -1108,7 +1140,7 @@
         `;
         
         const cardHtml = `
-            <div class="admission-card" id="admissionCard">
+            <div class="registration-card" id="registrationCard">
                 <div class="card-header">
                     <div class="logo-center">
                         <div class="logo-img-card"><img src="${LOGO_URL}" alt="Logo"></div>
@@ -1136,44 +1168,41 @@
                     </div>
                     <div class="qr-card"><div class="qr-box"><div id="qrcode-view" style="width:85px;height:85px;"></div></div><div class="qr-label-card">SCAN TO VERIFY</div></div>
                 </div>
-                <div class="details-section">
+                <div class="details-grid">
                     <div class="detail-box">
                         <div class="detail-title">PERSONAL DETAILS</div>
                         <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td> </tr
-                            <tr><td style="width:38%;">Roll Number</td><td>${studentData.rollNumber || '-'}</td> </tr
-                            <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td> </tr
-                            <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td> </tr
-                            <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td> </tr
-                            <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td> </tr
-                        </table>
+                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td></tr>
+                            <tr><td style="width:38%;">Roll Number</td><td>${studentData.rollNumber || '-'}</td></tr>
+                            <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
+                            <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td></tr>
+                            <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td></tr>
+                            <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td></tr>
+                        </table></div>
+                    </div>
+                    <div class="detail-box">
+                        <div class="detail-title">PARENT INFORMATION</div>
+                        <div class="detail-content"><table class="detail-table">
+                            <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td></tr>
+                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td></tr>
+                            <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td></tr>
+                            <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td></tr>
+                        </table></div>
                     </div>
                 </div>
-                <div class="detail-box">
-                    <div class="detail-title">PARENT INFORMATION</div>
-                    <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td> </tr
-                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td> </tr
-                            <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td> </tr
-                            <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td> </tr
-                        </table>
+                <div class="details-grid">
+                    <div class="detail-box">
+                        <div class="detail-title">ADDRESS DETAILS</div>
+                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td></tr></table></div>
+                    </div>
+                    <div class="detail-box">
+                        <div class="detail-title">EDUCATION DETAILS</div>
+                        <div class="detail-content"><table class="detail-table">
+                            <tr><td style="width:38%;">Current School</td><td>${studentData.schoolName}</td></tr>
+                            <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td></tr>
+                        </table></div>
                     </div>
                 </div>
-            </div>
-            <div class="details-section">
-                <div class="detail-box">
-                    <div class="detail-title">ADDRESS DETAILS</div>
-                    <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td> </tr <table></div>
-                </div>
-                <div class="detail-box">
-                    <div class="detail-title">EDUCATION DETAILS</div>
-                    <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Current School</td><td>${studentData.schoolName}</td> </tr
-                            <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td> </tr
-                        </table>
-                    </div>
-                </div>
-            </div>
                 <div class="terms-section"><div class="terms-box"><div class="terms-title">📜 नियम और शर्तें (Terms & Conditions)</div><div class="terms-list">${termsHtml}</div></div></div>
                 <div class="quote-card"><span class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</span><span class="quote-author">- Albert Einstein</span></div>
                 <div class="signatures-section">
@@ -1184,9 +1213,9 @@
                 <div class="card-footer"><p>★ THANK YOU FOR CHOOSING QUEST COACHING CENTRE ★</p></div>
             </div>
             <div class="action-buttons-card">
-                <button class="action-btn print" onclick="printAdmissionCardView()"><i class="fas fa-print"></i> Print Form</button>
-                <button class="action-btn share" onclick="shareAdmissionCardView()"><i class="fas fa-share-alt"></i> Share</button>
-                <button class="action-btn pdf" onclick="downloadAdmissionFromCard()"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                <button class="action-btn print" onclick="printRegistrationCard()"><i class="fas fa-print"></i> Print Form</button>
+                <button class="action-btn share" onclick="shareRegistrationCard()"><i class="fas fa-share-alt"></i> Share</button>
+                <button class="action-btn pdf" onclick="downloadRegistrationPDF()"><i class="fas fa-file-pdf"></i> Download PDF</button>
                 ${!isPublicView ? `<button class="action-btn new-admission-btn" onclick="openNewAdmissionForm()"><i class="fas fa-plus"></i> New Registration</button>` : ''}
             </div>
         `;
@@ -1200,15 +1229,15 @@
             new QRCode(document.getElementById("qrcode-view"), { text: publicUrl, width: 85, height: 85 });
         }, 100);
         
-        window.printAdmissionCardView = () => {
-            const printContent = document.getElementById('admissionCard').cloneNode(true);
+        window.printRegistrationCard = () => {
+            const printContent = document.getElementById('registrationCard').cloneNode(true);
             const win = window.open('', '_blank');
-            win.document.write(`<html><head><title>Registration Form - ${studentData.studentName}</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>body{padding:20px;} .action-buttons-card { display: none; } .admission-card{max-width:1100px;margin:0 auto;box-shadow:none;}</style></head><body>${printContent.outerHTML}</body></html>`);
+            win.document.write(`<html><head><title>Registration Form - ${studentData.studentName}</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>body{padding:20px;} .action-buttons-card { display: none; } .registration-card{max-width:1100px;margin:0 auto;box-shadow:none;}</style></head><body>${printContent.outerHTML}</body></html>`);
             win.document.close();
             win.print();
         };
         
-        window.shareAdmissionCardView = () => {
+        window.shareRegistrationCard = () => {
             const shareText = `🎓 Quest Coaching Centre - Registration Form\n\nStudent: ${studentData.studentName}\nRegistration No: ${studentData.admissionNo}\nRoll No: ${studentData.rollNumber || '-'}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}\n\nThank you for choosing Quest Coaching Centre! 📚`;
             
             if (navigator.share) {
@@ -1226,7 +1255,7 @@
             }
         };
         
-        window.downloadAdmissionFromCard = async () => {
+        window.downloadRegistrationPDF = async () => {
             await generateAndSavePdf(studentData, photoUrl);
         };
     }
