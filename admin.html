@@ -118,6 +118,21 @@
             width: 180px;
             padding: 10px 15px;
         }
+        /* Admit Card Button */
+        .admit-card-btn {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            color: white;
+            width: 100%;
+            padding: 12px;
+            border-radius: 50px;
+            font-weight: 700;
+            border: none;
+            transition: 0.2s;
+        }
+        .admit-card-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(139,92,246,0.3);
+        }
         /* PDF download button */
         .pdf-download-btn {
             background-color: #dc3545;
@@ -168,6 +183,26 @@
             display: flex;
             justify-content: center;
             width: 100%;
+        }
+        /* Admit Card Row */
+        .admit-card-row {
+            margin-top: 20px;
+        }
+        .admit-card-card {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            color: white;
+        }
+        .admit-card-card .card-title, .admit-card-card .card-text {
+            color: white;
+        }
+        .admit-card-card .btn {
+            background: white;
+            color: #6d28d9;
+            border: none;
+        }
+        .admit-card-card .btn:hover {
+            background: #f3f4f6;
+            transform: translateY(-2px);
         }
     </style>
 </head>
@@ -255,6 +290,21 @@
                                     <p class="card-text">Manage student fees, add students, update payments</p>
                                     <div class="card-btn-wrapper">
                                         <button id="feeManagementBtn" class="btn fee-management-btn">📊 Fee Management Dashboard</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NEW ROW: Admit Card Generator -->
+                    <div class="row admit-card-row">
+                        <div class="col-md-12 mb-4">
+                            <div class="card text-center dashboard-card admit-card-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">🎫 Admit Card Generator</h5>
+                                    <p class="card-text">Generate professional admit cards for students</p>
+                                    <div class="card-btn-wrapper">
+                                        <button id="admitCardGeneratorBtn" class="btn">📄 Generate Admit Card</button>
                                     </div>
                                 </div>
                             </div>
@@ -401,7 +451,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Language Switch -->
                     <div class="language-switch text-center mb-3">
                         <div class="btn-group" role="group">
                             <button type="button" class="btn btn-outline-primary active" id="englishHelpBtn">English</button>
@@ -409,7 +458,6 @@
                         </div>
                     </div>
                     
-                    <!-- English Instructions -->
                     <div id="englishInstructions">
                         <h6 class="text-primary">Step 1: Make New Result</h6>
                         <div class="help-step">
@@ -471,9 +519,15 @@
                             <div class="simple-instruction">"Fee Management Dashboard": Click to open fee management system</div>
                             <div class="simple-instruction">Manage student fees, add students, update payments</div>
                         </div>
+
+                        <h6 class="text-primary mt-4">Admit Card Generator</h6>
+                        <div class="help-step">
+                            <div class="simple-instruction">"Admit Card Generator": Click to generate admit cards for students</div>
+                            <div class="simple-instruction">Enter exam details and student roll number</div>
+                            <div class="simple-instruction">Generate, print, or download PDF</div>
+                        </div>
                     </div>
                     
-                    <!-- Hindi Instructions -->
                     <div id="hindiInstructions" style="display: none;">
                         <h6 class="text-primary">चरण 1: नया रिजल्ट बनाएं</h6>
                         <div class="help-step">
@@ -535,6 +589,13 @@
                             <div class="simple-instruction">"Fee Management Dashboard": फीस प्रबंधन प्रणाली खोलने के लिए क्लिक करें</div>
                             <div class="simple-instruction">dashboard.html नई टैब में खुलेगा</div>
                             <div class="simple-instruction">छात्रों की फीस प्रबंधित करें, नए छात्र जोड़ें, भुगतान अपडेट करें</div>
+                        </div>
+
+                        <h6 class="text-primary mt-4">एडमिट कार्ड जनरेटर</h6>
+                        <div class="help-step">
+                            <div class="simple-instruction">"Admit Card Generator": छात्रों के एडमिट कार्ड बनाने के लिए क्लिक करें</div>
+                            <div class="simple-instruction">परीक्षा विवरण और छात्र का रोल नंबर भरें</div>
+                            <div class="simple-instruction">जनरेट करें, प्रिंट करें या PDF डाउनलोड करें</div>
                         </div>
                     </div>
                 </div>
@@ -621,7 +682,7 @@
     <script type="module">
         // Import Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
         import { 
             getFirestore, 
             collection, 
@@ -652,16 +713,24 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // ============ AUTHENTICATION CHECK - SIRF YEH ADD KIYA HAI ============
-        // Check if user is logged in, if not redirect to index
+        // ============ AUTHENTICATION CHECK ============
         onAuthStateChanged(auth, (user) => {
             if (!user) {
                 alert('Please login from main page first!');
                 window.location.href = 'index.html';
                 return;
             }
+            
+            // Add logout button
+            const logoutBtn = document.createElement('button');
+            logoutBtn.innerHTML = '🚪 Logout';
+            logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px;';
+            logoutBtn.onclick = async () => {
+                await signOut(auth);
+                window.location.href = 'index.html';
+            };
+            document.body.appendChild(logoutBtn);
         });
-        // ============ AUTHENTICATION CHECK END ============
 
         // DOM Elements
         const dashboardSection = document.getElementById('dashboardSection');
@@ -674,7 +743,10 @@
         const oldResultsBtn = document.getElementById('oldResultsBtn');
         const onlineTestBtn = document.getElementById('onlineTestBtn');
         
-        // NEW: Admission Management Button
+        // Admit Card Generator Button
+        const admitCardGeneratorBtn = document.getElementById('admitCardGeneratorBtn');
+        
+        // Admission Management Button
         const admissionManagementBtn = document.getElementById('admissionManagementBtn');
         
         const backToDashboardBtn = document.getElementById('backToDashboardBtn');
@@ -746,11 +818,17 @@
         let currentResultDataForPdf = null;
         let currentExamNameForPdf = '';
 
-        // NEW: Admission Management Button Handler
+        // Admit Card Generator Button Handler
+        if (admitCardGeneratorBtn) {
+            admitCardGeneratorBtn.addEventListener('click', () => {
+                window.location.href = 'admit-card.html';
+            });
+        }
+
+        // Admission Management Button Handler
         if (admissionManagementBtn) {
             admissionManagementBtn.addEventListener('click', () => {
-                window.open('student-dashboard.html', '_blank');
-                showToast('Opening Student Admission Dashboard...');
+                window.location.href = 'student-dashboard.html';
             });
         }
 
@@ -1758,7 +1836,7 @@
                     resultHtml += `
                             <td><strong>${totalMarks}/${totalMaxMarks}</strong></td>
                             <td><strong>${percentage}%</strong></td>
-                        </tr>
+                        <tr>
                     `;
                 });
                 
