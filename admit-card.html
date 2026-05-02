@@ -152,56 +152,9 @@
             display: none;
         }
         .student-preview.show { display: block; }
-        .preview-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #c1d6f0; }
         .loading-spinner { display: none; text-align: center; padding: 20px; }
         .loading-spinner.show { display: block; }
         .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #1b4f9b; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 20000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: white;
-            border-radius: 24px;
-            width: 90%;
-            max-width: 1000px;
-            max-height: 85vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-        .modal-header {
-            padding: 20px;
-            background: linear-gradient(135deg, #1a3a5c, #0f2b44);
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .modal-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
-        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
-        .search-box { margin-bottom: 20px; }
-        .search-box input { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 16px; }
-        .admit-card-item {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 15px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .btn-view-card { background: #1b4f9b; color: white; padding: 8px 16px; border: none; border-radius: 30px; cursor: pointer; margin-left: 10px; }
-        .btn-delete-card { background: #dc2626; color: white; padding: 8px 16px; border: none; border-radius: 30px; cursor: pointer; margin-left: 10px; }
         .logout-btn {
             position: fixed;
             bottom: 20px;
@@ -217,10 +170,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         @media (max-width: 700px) {
-            .basic-info { grid-template-columns: 1fr; }
             .subject-row { flex-direction: column; align-items: stretch; }
-            .admit-card-item { flex-direction: column; text-align: center; }
-            .admit-card-actions { margin-top: 10px; }
         }
     </style>
 </head>
@@ -243,17 +193,7 @@
                 <div class="loading-spinner" id="loadingSpinner"><div class="spinner"></div><p>Fetching student details...</p></div>
                 
                 <button class="btn-generate" id="generateBtn"><i class="fas fa-ticket-alt"></i> Generate Admit Card</button>
-                <button class="btn-view-cards" id="viewCardsBtn"><i class="fas fa-history"></i> View Previous Admit Cards</button>
-            </div>
-        </div>
-        
-        <div id="cardsModal" class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header"><h3><i class="fas fa-id-card"></i> All Admit Cards</h3><button class="modal-close" onclick="closeCardsModal()">&times;</button></div>
-                <div class="modal-body">
-                    <div class="search-box"><input type="text" id="searchRollInput" placeholder="🔍 Search by Roll Number..." onkeyup="filterCards()"></div>
-                    <div id="cardsModalBody"><div style="text-align: center; padding: 20px;">Loading...</div></div>
-                </div>
+                <button class="btn-view-cards" id="viewCardsBtn" onclick="window.location.href='previous-cards.html'"><i class="fas fa-history"></i> View Previous Admit Cards</button>
             </div>
         </div>
     </div>
@@ -273,22 +213,8 @@
     const examConfigCollection = db.collection('exam_config');
     const admitCardsCollection = db.collection('admit_cards');
     
-    const LOGO_URL = 'https://i.ibb.co/hF9tmnpB/20250903-202922.jpg';
+    let currentStudentData = null, subjects = [];
     
-    const RULES_LIST = [
-        "परीक्षा केंद्र पर परीक्षार्थी परीक्षा प्रारम्भ होने से आधा घंटा पूर्व पहुँच जाए।",
-        "परीक्षा प्रारम्भ होने के बाद परीक्षार्थियों को परीक्षा हॉल में प्रवेश की अनुमति नहीं दी जाएगी।",
-        "परीक्षार्थी अपने निर्धारित स्थान/सीट पर ही बैठेंगे।",
-        "प्रवेश-पत्र (Admit Card) के अतिरिक्त कोई अन्य कागजात परीक्षा हॉल में लाना वर्जित है।",
-        "उत्तरपुस्तिका के आवरण पृष्ठ पर अपना रोलकोड, क्रमांक, पंजीयन संख्या, परीक्षा का विषय, लिपि, परीक्षा की तिथि एवं प्रश्नपत्र सेट नंबर, अपने हस्ताक्षर आदि अवश्य अंकित करें।",
-        "परीक्षार्थी को प्रत्येक विषय की परीक्षा के लिए केवल एक ही उत्तरपुस्तिका मिलेगी। अतिरिक्त उत्तरपुस्तिका नहीं दी जाएगी।",
-        "परीक्षा हॉल में एक दूसरे से मदद लेना या देना अथवा किसी प्रकार का कदाचार अपनाने के प्रयास में पकड़े गए परीक्षार्थी को परीक्षा से निष्कासित कर दिया जाएगा।",
-        "परीक्षा हॉल में किसी भी प्रकार का इलेक्ट्रॉनिक उपकरण जैसे: मोबाइल, घड़ी, कैलकुलेटर, ब्लूटूथ, इत्यादि लाना वर्जित है।"
-    ];
-    
-    let currentStudentData = null, subjects = [], allCards = [];
-    
-    // Auth Elements
     const authLoading = document.getElementById('authLoading');
     const mainContent = document.getElementById('mainContent');
     
@@ -307,7 +233,6 @@
         document.body.appendChild(logoutBtn);
         
         loadExamConfig();
-        getAllAdmitCards();
     });
     
     async function loadExamConfig() {
@@ -320,10 +245,10 @@
                 document.getElementById('classSelect').value = d.studentClass || '';
                 document.getElementById('rollCodeInput').value = d.rollCode || '55075';
                 subjects = d.subjects || [];
-                if (subjects.length === 0) subjects = [{ code: "101", name: "हिन्दी", date: "13/07/2025", startTime: "05:00", endTime: "08:15", ampm: "AM" }, { code: "105", name: "संस्कृत", date: "14/07/2025", startTime: "05:00", endTime: "08:15", ampm: "AM" }, { code: "110", name: "गणित", date: "10/07/2025", startTime: "05:00", endTime: "08:15", ampm: "AM" }, { code: "112", name: "विज्ञान", date: "11/07/2025", startTime: "05:00", endTime: "08:15", ampm: "AM" }, { code: "111", name: "सामाजिक विज्ञान", date: "12/07/2025", startTime: "05:00", endTime: "08:15", ampm: "AM" }, { code: "113", name: "अंग्रेजी", date: "15/07/2025", startTime: "05:00", endTime: "08:15", ampm: "AM" }];
+                if (subjects.length === 0) subjects = [{ code: "101", name: "हिन्दी", date: "13/07/2025", startTime: "05:00", endTime: "08:15", ampm: "AM" }];
                 renderSubjects();
             } else {
-                subjects = [{ code: "101", name: "हिन्दी", date: "13/07/2025", startTime: "05:00", endTime: "08:15", ampm: "AM" }, { code: "105", name: "संस्कृत", date: "14/07/2025", startTime: "05:00", endTime: "08:15", ampm: "AM" }, { code: "110", name: "गणित", date: "10/07/2025", startTime: "05:00", endTime: "08:15", ampm: "AM" }, { code: "112", name: "विज्ञान", date: "11/07/2025", startTime: "05:00", endTime: "08:15", ampm: "AM" }, { code: "111", name: "सामाजिक विज्ञान", date: "12/07/2025", startTime: "05:00", endTime: "08:15", ampm: "AM" }, { code: "113", name: "अंग्रेजी", date: "15/07/2025", startTime: "05:00", endTime: "08:15", ampm: "AM" }];
+                subjects = [{ code: "101", name: "हिन्दी", date: "13/07/2025", startTime: "05:00", endTime: "08:15", ampm: "AM" }];
                 renderSubjects();
             }
         } catch (error) { console.error(error); }
@@ -403,58 +328,6 @@
         return ref.id;
     }
     
-    async function getAllAdmitCards() {
-        const snap = await admitCardsCollection.orderBy('createdAt', 'desc').get();
-        const cards = [];
-        snap.forEach(d => cards.push({ id: d.id, ...d.data() }));
-        allCards = cards;
-        return cards;
-    }
-    
-    function openCardsModal() { document.getElementById('cardsModal').style.display = 'flex'; loadCardsModal(); }
-    function closeCardsModal() { document.getElementById('cardsModal').style.display = 'none'; }
-    
-    function filterCards() {
-        const search = document.getElementById('searchRollInput').value.trim().toLowerCase();
-        const filtered = allCards.filter(c => c.rollNumber?.toString().toLowerCase().includes(search));
-        displayCardsInModal(filtered);
-    }
-    
-    function displayCardsInModal(cards) {
-        const modalBody = document.getElementById('cardsModalBody');
-        if (cards.length === 0) { modalBody.innerHTML = '<div style="text-align: center; padding: 20px;">No admit cards found</div>'; return; }
-        let html = '';
-        cards.forEach(card => {
-            const date = card.createdAt ? new Date(card.createdAt.toDate()).toLocaleDateString('en-IN') : 'Unknown date';
-            html += `<div class="admit-card-item"><div><strong>${card.studentName || 'N/A'}</strong> | Roll: ${card.rollNumber || 'N/A'}<br>Exam: ${card.examName || 'N/A'} | Date: ${date}</div><div><button class="btn-view-card" onclick="viewAdmitCard('${card.id}')"><i class="fas fa-eye"></i> View</button><button class="btn-delete-card" onclick="deleteAdmitCard('${card.id}')"><i class="fas fa-trash"></i> Delete</button></div></div>`;
-        });
-        modalBody.innerHTML = html;
-    }
-    
-    async function loadCardsModal() {
-        const modalBody = document.getElementById('cardsModalBody');
-        modalBody.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="spinner"></div><p>Loading admit cards...</p></div>';
-        const cards = await getAllAdmitCards();
-        displayCardsInModal(cards);
-    }
-    
-    window.viewAdmitCard = async function (cardId) {
-        const card = allCards.find(c => c.id === cardId);
-        if (!card) { Swal.fire('Error', 'Admit card not found', 'error'); return; }
-        // Open in new tab with view-card.html
-        window.open(`view-card.html?id=${cardId}`, '_blank');
-        closeCardsModal();
-    };
-    
-    window.deleteAdmitCard = async function (cardId) {
-        const result = await Swal.fire({ title: 'Are you sure?', text: 'This admit card will be permanently deleted!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#dc2626', confirmButtonText: 'Yes, delete' });
-        if (result.isConfirmed) {
-            await admitCardsCollection.doc(cardId).delete();
-            Swal.fire('Deleted!', 'Admit card has been deleted.', 'success');
-            await loadCardsModal();
-        }
-    };
-    
     document.getElementById('generateBtn')?.addEventListener('click', async () => {
         const roll = document.getElementById('rollNumberInput').value.trim();
         const examName = document.getElementById('examName').value.trim();
@@ -474,13 +347,10 @@
         if (cardId) {
             Swal.fire('Success!', 'Admit Card generated and saved successfully!', 'success');
             window.open(`view-card.html?id=${cardId}`, '_blank');
-            await getAllAdmitCards();
         } else {
             Swal.fire('Error', 'Failed to save admit card.', 'error');
         }
     });
-    
-    document.getElementById('viewCardsBtn')?.addEventListener('click', openCardsModal);
     </script>
 </body>
 </html>
