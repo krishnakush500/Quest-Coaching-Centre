@@ -48,7 +48,24 @@
         }
         .error-container i { font-size: 50px; margin-bottom: 20px; }
         
-        /* Action Buttons */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #64748b;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: 0.2s;
+            text-decoration: none;
+        }
+        .back-btn:hover { background: #475569; transform: translateY(-2px); }
+        
         .action-buttons {
             display: flex;
             gap: 10px;
@@ -103,16 +120,51 @@
         .share-dropdown a:hover { background: #f0f0f0; }
         .share-dropdown.show { display: block; }
         
-        /* Admit Card Styles */
-        .admit-card { width: 210mm; min-height: 297mm; background: white; margin: 0 auto; position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3); overflow: hidden; font-family: 'Segoe UI', 'Poppins', sans-serif; }
-        .card-border { position: absolute; top: 12px; left: 12px; right: 12px; bottom: 12px; border: 2px solid #c5a059; border-radius: 16px; pointer-events: none; z-index: 2; }
-        .card-header { background: linear-gradient(135deg, #1a3a5c, #0f2b44); padding: 20px 25px; text-align: center; position: relative; z-index: 1; margin: 12px 12px 0 12px; border-radius: 16px 16px 0 0; }
+        /* Admit Card Styles - Gold Border from header to footer */
+        .admit-card {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3);
+            font-family: 'Segoe UI', 'Poppins', sans-serif;
+        }
+        .card-border {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            border: 2px solid #c5a059;
+            border-radius: 16px;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #1a3a5c, #0f2b44);
+            padding: 20px 25px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            margin: 12px 12px 0 12px;
+            border-radius: 16px 16px 0 0;
+        }
         .header-flex { display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap; }
         .logo-circle { width: 70px; height: 70px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #c5a059; overflow: hidden; }
         .logo-circle img { width: 100%; height: 100%; object-fit: cover; }
         .header-text h1 { color: white; font-size: 22px; letter-spacing: 1px; }
         .header-text p { color: #c5a059; font-size: 11px; margin: 2px 0; }
-        .exam-title-bar { background: #c5a059; color: #1a3a5c; text-align: center; padding: 10px; margin: 0 12px; font-size: 18px; font-weight: 800; letter-spacing: 2px; }
+        .exam-title-bar {
+            background: #c5a059;
+            color: #1a3a5c;
+            text-align: center;
+            padding: 10px;
+            margin: 0 12px;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
         .admit-title { text-align: center; margin: 8px 12px 5px 12px; padding: 5px; }
         .admit-title h2 { font-size: 18px; font-weight: 800; color: #1a3a5c; letter-spacing: 2px; }
         .card-body { padding: 15px 22px; display: flex; flex-direction: column; gap: 12px; margin: 0 12px; }
@@ -147,8 +199,16 @@
         .stamp-box { text-align: center; }
         .stamp { width: 60px; height: 60px; border: 2px solid #c5a059; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; background: #fef9e6; }
         .stamp span { font-size: 6px; font-weight: bold; color: #c5a059; text-align: center; }
-        .footer { background: #0f2b44; padding: 5px; text-align: center; margin: 0 12px 12px 12px; border-radius: 0 0 16px 16px; }
-        .footer p { color: white; font-size: 6px; }
+        .footer {
+            background: #0f2b44;
+            padding: 8px;
+            text-align: center;
+            margin: 0 12px 12px 12px;
+            border-radius: 0 0 16px 16px;
+            position: relative;
+            z-index: 1;
+        }
+        .footer p { color: white; font-size: 7px; }
         
         @media (max-width: 700px) {
             .basic-info { grid-template-columns: 1fr; gap: 4px; }
@@ -157,7 +217,7 @@
             .admit-card { width: 100%; min-height: auto; }
         }
         @media print {
-            .action-buttons { display: none !important; }
+            .action-buttons, .back-btn { display: none !important; }
             .admit-card { box-shadow: none; margin: 0; width: 100%; }
             body { background: white; padding: 0; }
         }
@@ -222,7 +282,6 @@
                 `;
                 return;
             }
-            
             const student = { id: doc.id, ...doc.data() };
             displayAdmitCard(student);
         } catch (error) {
@@ -234,6 +293,14 @@
                     <p>Please try again later.</p>
                 </div>
             `;
+        }
+    }
+    
+    function generateQRCode(elementId, url, size = 75) {
+        const qrDiv = document.getElementById(elementId);
+        if (qrDiv) {
+            qrDiv.innerHTML = "";
+            new QRCode(qrDiv, { text: url, width: size, height: size });
         }
     }
     
@@ -249,7 +316,6 @@
             `<img src="${student.photoUrl}" style="width:100%;height:100%;object-fit:cover;">` : 
             '<i class="fas fa-user" style="font-size:35px;color:#999;"></i>';
         
-        // Build schedule HTML
         let scheduleHtml = '';
         if (student.subjects && student.subjects.length > 0) {
             student.subjects.forEach(sub => {
@@ -257,8 +323,8 @@
                     `${sub.startTime} ${sub.ampm || 'AM'} – ${sub.endTime} ${sub.ampm || 'AM'}` : '-';
                 scheduleHtml += `
                     <tr>
-                        <td style="padding:4px 6px;">${sub.code || '-'}</td>
-                        <td style="padding:4px 6px;">${sub.name}</td>
+                        <td style="padding:4px 6px;">${sub.code || '-'}<tr>
+                        <td style="padding:4px 6px;">${sub.name}<td>
                         <td style="padding:4px 6px;">${sub.date || '-'}</td>
                         <td style="padding:4px 6px;">${timeDisplay}</td>
                     </tr>
@@ -273,6 +339,11 @@
         
         const cardHtml = `
             <div style="max-width: 800px; margin: 0 auto;">
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <button class="back-btn" onclick="window.location.href='previous-cards.html'">
+                        <i class="fas fa-arrow-left"></i> Back to Previous Cards
+                    </button>
+                </div>
                 <div class="admit-card" id="admitCard">
                     <div class="card-border"></div>
                     <div class="card-header">
@@ -310,9 +381,7 @@
                         <div class="subjects-schedule">
                             <div class="section-title"><i class="fas fa-calendar-alt"></i> 📅 परीक्षा कार्यक्रम (Exam Schedule)</div>
                             <table class="schedule-table">
-                                <thead>
-                                    <tr><th>विषय कोड</th><th>विषय का नाम</th><th>परीक्षा की तिथि</th><th>परीक्षा का समय</th></tr>
-                                </thead>
+                                <thead><tr><th>विषय कोड</th><th>विषय का नाम</th><th>परीक्षा की तिथि</th><th>परीक्षा का समय</th></tr></thead>
                                 <tbody>${scheduleHtml}</tbody>
                             </table>
                         </div>
@@ -352,13 +421,8 @@
         contentDiv.style.display = 'block';
         contentDiv.innerHTML = cardHtml;
         
-        // Generate QR Code - ensure it works even after PDF download
         setTimeout(() => {
-            const qrDiv = document.getElementById("qrcode-card");
-            if (qrDiv) {
-                qrDiv.innerHTML = "";
-                new QRCode(qrDiv, { text: publicShareUrl, width: 75, height: 75 });
-            }
+            generateQRCode("qrcode-card", publicShareUrl, 75);
         }, 100);
         
         window.currentShareUrl = publicShareUrl;
@@ -372,7 +436,7 @@
                     <title>Admit Card - ${student.studentName}</title>
                     <style>
                         body { margin: 0; padding: 0; }
-                        .action-buttons { display: none !important; }
+                        .action-buttons, .back-btn { display: none !important; }
                         .admit-card { box-shadow: none; margin: 0; width: 100%; }
                     </style>
                 </head>
