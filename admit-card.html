@@ -182,18 +182,7 @@
         .logo-circle img { width: 100%; height: 100%; object-fit: cover; }
         .header-text h1 { color: white; font-size: 22px; letter-spacing: 1px; }
         .header-text p { color: #c5a059; font-size: 11px; margin: 2px 0; }
-        .exam-title-bar { background: #c5a059; color: #1a3a5c; text-align: center; padding: 10px; margin: 0 12px; font-size: 18px; font-weight: 800; letter-spacing: 1px; }
-        .admit-title-outside {
-            text-align: center;
-            margin: 5px 12px 0px 12px;
-            padding: 5px;
-        }
-        .admit-title-outside h3 {
-            font-size: 16px;
-            font-weight: 700;
-            color: #1a3a5c;
-            letter-spacing: 1px;
-        }
+        .exam-title-bar { background: #c5a059; color: #1a3a5c; text-align: center; padding: 12px; margin: 0 12px; font-size: 18px; font-weight: 800; letter-spacing: 1px; }
         .card-body { padding: 16px 22px; display: flex; flex-direction: column; gap: 12px; margin: 0 12px; }
         .top-info-row { display: flex; gap: 18px; flex-wrap: wrap; }
         .photo-section { width: 110px; text-align: center; }
@@ -318,7 +307,6 @@
             font-weight: bold;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-        .hide-for-public { display: none; }
         @media (max-width: 700px) {
             .basic-info { grid-template-columns: 1fr; }
             .rules-list { grid-template-columns: 1fr; font-size: 10px; }
@@ -336,7 +324,7 @@
 <body>
     <div id="authLoading" class="auth-loading"><div class="spinner"></div><p>Loading system...</p></div>
     <div id="progressOverlay" class="progress-overlay"><div class="progress-container"><div id="progressBar" class="progress-bar"></div></div><div id="progressText" class="progress-text">0%</div></div>
-    <div id="mainContent" class="main-content"><div class="container"><div class="form-card" id="teacherFormCard"><div class="form-title"><i class="fas fa-id-card"></i><span>Admit Card Generator</span></div>
+    <div id="mainContent" class="main-content"><div class="container"><div class="form-card"><div class="form-title"><i class="fas fa-id-card"></i><span>Admit Card Generator</span></div>
         <div class="form-group"><label>📝 Exam Name</label><input type="text" id="examName" placeholder="e.g., Annual Exam 2025-26"></div>
         <div class="form-group"><label>📍 Examination Centre</label><input type="text" id="examCentre" placeholder="e.g., QUEST COACHING CENTRE"></div>
         <div class="form-group"><label>🏫 Class</label><select id="classSelect"><option value="">Select Class</option><option>6th</option><option>7th</option><option>8th</option><option>9th</option><option>10th</option><option>11th (Science)</option><option>11th (Commerce)</option><option>11th (Arts)</option><option>12th (Science)</option><option>12th (Commerce)</option><option>12th (Arts)</option></select></div>
@@ -368,7 +356,6 @@
         "परीक्षा हॉल में किसी भी प्रकार का इलेक्ट्रॉनिक उपकरण जैसे: मोबाइल, घड़ी, कैलकुलेटर, ब्लूटूथ, इत्यादि लाना वर्जित है।"
     ];
     let currentStudentData = null, subjects = [], allCards = [], progressInterval = null;
-    let isTeacherMode = false;
 
     function showProgress() { 
         document.getElementById('progressOverlay').style.display = 'flex'; 
@@ -394,7 +381,6 @@
     }
 
     async function loadExamConfig() {
-        if(!isTeacherMode) return;
         showProgress();
         try {
             const snap = await examConfigCollection.doc('current_exam').get();
@@ -414,8 +400,8 @@
         } catch(e){ console.error(e); subjects = [{ code:"101", name:"हिन्दी", date:"13/07/2025", startTime:"05:00", endTime:"08:15", ampm:"AM" }]; renderSubjects(); }
         hideProgress();
     }
+    
     async function saveExamConfig() { 
-        if(!isTeacherMode) return;
         try { 
             await examConfigCollection.doc('current_exam').set({ 
                 examName:document.getElementById('examName').value, 
@@ -426,65 +412,38 @@
             }); 
         } catch(e){} 
     }
-    function renderSubjects(){ 
-        if(!isTeacherMode) return;
-        const cont=document.getElementById('subjectsContainer'); 
-        if(!cont)return; 
-        cont.innerHTML=''; 
-        subjects.forEach((sub,idx)=>{ 
-            let row=document.createElement('div'); 
-            row.className='subject-row'; 
-            row.innerHTML=`<input type="text" placeholder="Code" value="${sub.code||''}" class="subject-code"><input type="text" placeholder="Subject Name" value="${sub.name||''}" class="subject-name"><input type="text" placeholder="Date (DD/MM/YYYY)" value="${sub.date||''}" class="subject-date"><div class="time-group"><input type="text" placeholder="Start" value="${sub.startTime||''}" class="start-time"><input type="text" placeholder="End" value="${sub.endTime||''}" class="end-time"><select class="ampm-select"><option ${sub.ampm==='AM'?'selected':''}>AM</option><option ${sub.ampm==='PM'?'selected':''}>PM</option></select></div><button class="btn-remove-subject" data-idx="${idx}"><i class="fas fa-trash"></i></button>`; 
-            cont.appendChild(row); 
-            row.querySelectorAll('input,select').forEach(inp=>inp.addEventListener('change',()=>{ 
-                subjects[idx].code=row.querySelector('.subject-code')?.value||''; 
-                subjects[idx].name=row.querySelector('.subject-name')?.value||''; 
-                subjects[idx].date=row.querySelector('.subject-date')?.value||''; 
-                subjects[idx].startTime=row.querySelector('.start-time')?.value||''; 
-                subjects[idx].endTime=row.querySelector('.end-time')?.value||''; 
-                subjects[idx].ampm=row.querySelector('.ampm-select')?.value||'AM'; 
-                saveExamConfig(); 
-            })); 
-            row.querySelector('.btn-remove-subject').addEventListener('click',()=>{ 
-                subjects.splice(idx,1); 
-                renderSubjects(); 
-                saveExamConfig(); 
-            }); 
-        }); 
-    }
     
-    if(document.getElementById('addSubjectBtn')) document.getElementById('addSubjectBtn')?.addEventListener('click',()=>{ subjects.push({code:"",name:"",date:"",startTime:"",endTime:"",ampm:"AM"}); renderSubjects(); saveExamConfig(); });
-    if(document.getElementById('examName')) document.getElementById('examName')?.addEventListener('input',saveExamConfig);
-    if(document.getElementById('examCentre')) document.getElementById('examCentre')?.addEventListener('input',saveExamConfig);
-    if(document.getElementById('classSelect')) document.getElementById('classSelect')?.addEventListener('change',saveExamConfig);
-    if(document.getElementById('rollCodeInput')) document.getElementById('rollCodeInput')?.addEventListener('input',saveExamConfig);
+    function renderSubjects(){ const cont=document.getElementById('subjectsContainer'); if(!cont)return; cont.innerHTML=''; subjects.forEach((sub,idx)=>{ let row=document.createElement('div'); row.className='subject-row'; row.innerHTML=`<input type="text" placeholder="Code" value="${sub.code||''}" class="subject-code"><input type="text" placeholder="Subject Name" value="${sub.name||''}" class="subject-name"><input type="text" placeholder="Date (DD/MM/YYYY)" value="${sub.date||''}" class="subject-date"><div class="time-group"><input type="text" placeholder="Start" value="${sub.startTime||''}" class="start-time"><input type="text" placeholder="End" value="${sub.endTime||''}" class="end-time"><select class="ampm-select"><option ${sub.ampm==='AM'?'selected':''}>AM</option><option ${sub.ampm==='PM'?'selected':''}>PM</option></select></div><button class="btn-remove-subject" data-idx="${idx}"><i class="fas fa-trash"></i></button>`; cont.appendChild(row); row.querySelectorAll('input,select').forEach(inp=>inp.addEventListener('change',()=>{ subjects[idx].code=row.querySelector('.subject-code')?.value||''; subjects[idx].name=row.querySelector('.subject-name')?.value||''; subjects[idx].date=row.querySelector('.subject-date')?.value||''; subjects[idx].startTime=row.querySelector('.start-time')?.value||''; subjects[idx].endTime=row.querySelector('.end-time')?.value||''; subjects[idx].ampm=row.querySelector('.ampm-select')?.value||'AM'; saveExamConfig(); })); row.querySelector('.btn-remove-subject').addEventListener('click',()=>{ subjects.splice(idx,1); renderSubjects(); saveExamConfig(); }); }); }
     
-    if(document.getElementById('rollNumberInput')) {
-        document.getElementById('rollNumberInput')?.addEventListener('input', async function(){ 
-            if(!isTeacherMode) return;
-            let roll=this.value.trim(); 
-            let previewDiv=document.getElementById('studentPreview'), loader=document.getElementById('loadingSpinner'); 
-            if(roll.length<2){ previewDiv.classList.remove('show'); currentStudentData=null; return; } 
-            loader.classList.add('show'); 
-            try{ 
-                let snap=await admissionsCollection.where('rollNumber','==',roll).get(); 
-                if(!snap.empty){ 
-                    let student=null; 
-                    snap.forEach(d=>{ student={id:d.id,...d.data()}; }); 
-                    currentStudentData=student; 
-                    previewDiv.innerHTML=`<div style="display:flex; gap:15px;"><div style="width:50px;height:50px;border-radius:50%;overflow:hidden;border:1px solid #c5a059;">${student.photoUrl?`<img src="${student.photoUrl}" style="width:100%;height:100%;object-fit:cover;">`:'<i class="fas fa-user" style="line-height:50px;"></i>'}</div><div><strong>${student.studentName||'N/A'}</strong><br>Reg: ${student.admissionNo||'N/A'}<br>Roll: ${student.rollNumber}</div></div>`; 
-                    previewDiv.classList.add('show'); 
-                } else { 
-                    previewDiv.innerHTML=`<div style="color:#dc2626;">❌ Student not found</div>`; 
-                    previewDiv.classList.add('show'); 
-                    currentStudentData=null; 
-                } 
-            } catch(e){ 
-                previewDiv.innerHTML=`<div style="color:#dc2626;">Error fetching data</div>`; 
+    document.getElementById('addSubjectBtn')?.addEventListener('click',()=>{ subjects.push({code:"",name:"",date:"",startTime:"",endTime:"",ampm:"AM"}); renderSubjects(); saveExamConfig(); });
+    document.getElementById('examName')?.addEventListener('input',saveExamConfig);
+    document.getElementById('examCentre')?.addEventListener('input',saveExamConfig);
+    document.getElementById('classSelect')?.addEventListener('change',saveExamConfig);
+    document.getElementById('rollCodeInput')?.addEventListener('input',saveExamConfig);
+    
+    document.getElementById('rollNumberInput')?.addEventListener('input', async function(){ 
+        let roll=this.value.trim(); 
+        let previewDiv=document.getElementById('studentPreview'), loader=document.getElementById('loadingSpinner'); 
+        if(roll.length<2){ previewDiv.classList.remove('show'); currentStudentData=null; return; } 
+        loader.classList.add('show'); 
+        try{ 
+            let snap=await admissionsCollection.where('rollNumber','==',roll).get(); 
+            if(!snap.empty){ 
+                let student=null; 
+                snap.forEach(d=>{ student={id:d.id,...d.data()}; }); 
+                currentStudentData=student; 
+                previewDiv.innerHTML=`<div style="display:flex; gap:15px;"><div style="width:50px;height:50px;border-radius:50%;overflow:hidden;border:1px solid #c5a059;">${student.photoUrl?`<img src="${student.photoUrl}" style="width:100%;height:100%;object-fit:cover;">`:'<i class="fas fa-user" style="line-height:50px;"></i>'}</div><div><strong>${student.studentName||'N/A'}</strong><br>Reg: ${student.admissionNo||'N/A'}<br>Roll: ${student.rollNumber}</div></div>`; 
                 previewDiv.classList.add('show'); 
-            } finally{ loader.classList.remove('show'); } 
-        });
-    }
+            } else { 
+                previewDiv.innerHTML=`<div style="color:#dc2626;">❌ Student not found</div>`; 
+                previewDiv.classList.add('show'); 
+                currentStudentData=null; 
+            } 
+        } catch(e){ 
+            previewDiv.innerHTML=`<div style="color:#dc2626;">Error fetching data</div>`; 
+            previewDiv.classList.add('show'); 
+        } finally{ loader.classList.remove('show'); } 
+    });
     
     async function saveAdmitCardToFirebase(student, examName, examCentre, studentClass, rollCode, subjectsData){ 
         let admitData={ 
@@ -516,17 +475,10 @@
         return cards; 
     }
     
-    function openCardsModal(){ 
-        if(!isTeacherMode) return;
-        document.getElementById('cardsModal').style.display='flex'; 
-        loadCardsModal(); 
-    }
+    function openCardsModal(){ document.getElementById('cardsModal').style.display='flex'; loadCardsModal(); }
     function closeCardsModal(){ document.getElementById('cardsModal').style.display='none'; }
-    function filterCards(){ 
-        let search=document.getElementById('searchRollInput').value.trim().toLowerCase(); 
-        let filtered=allCards.filter(c=>c.rollNumber?.toString().toLowerCase().includes(search)); 
-        displayCardsInModal(filtered); 
-    }
+    function filterCards(){ let search=document.getElementById('searchRollInput').value.trim().toLowerCase(); let filtered=allCards.filter(c=>c.rollNumber?.toString().toLowerCase().includes(search)); displayCardsInModal(filtered); }
+    
     function displayCardsInModal(cards){ 
         let modalBody=document.getElementById('cardsModalBody'); 
         if(!cards.length){ modalBody.innerHTML='<div style="text-align:center;">No admit cards found</div>'; return; } 
@@ -541,32 +493,28 @@
     window.viewCardById=async function(id){ 
         let card=allCards.find(c=>c.id===id); 
         if(card) {
-            if(isTeacherMode){
-                displayGeneratedAdmitCard(card, false);
-            } else {
-                displayGeneratedAdmitCard(card, true);
-            }
-            closeCardsModal(); 
+            document.querySelector('.form-card').style.display = 'none';
+            await displayGeneratedAdmitCard(card, true); 
         }
+        closeCardsModal(); 
     };
     
     window.deleteCardById=async function(id){ 
-        Swal.fire({
+        const result = await Swal.fire({
             title: 'Are you sure?',
-            text: "This admit card will be permanently deleted!",
+            text: 'This admit card will be permanently deleted!',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#dc2626',
             cancelButtonColor: '#3085d6',
             confirmButtonText: 'Yes, delete it!'
-        }).then(async (result) => {
-            if(result.isConfirmed){
-                await admitCardsCollection.doc(id).delete(); 
-                Swal.fire('Deleted!', 'Admit card has been deleted.', 'success'); 
-                await getAllAdmitCards(); 
-                loadCardsModal(); 
-            }
         });
+        if(result.isConfirmed){ 
+            await admitCardsCollection.doc(id).delete(); 
+            Swal.fire('Deleted!','Admit card has been deleted','success'); 
+            await getAllAdmitCards(); 
+            loadCardsModal(); 
+        } 
     };
     
     async function loadCardsModal(){ 
@@ -613,15 +561,7 @@
         let rulesHtml=RULES_LIST.map(r=>`<li>${r}</li>`).join('');
         let publicShareUrl = window.location.origin + window.location.pathname + '?viewCard=' + student.id;
         
-        // For public view - hide teacher buttons
-        let actionButtonsHtml = '';
-        if(!isViewOnly) {
-            actionButtonsHtml = `<div class="action-buttons no-print"><button class="action-btn print" onclick="window.printAdmitCardFn()"><i class="fas fa-print"></i> Print</button><button class="action-btn pdf" onclick="window.downloadPdfFn()"><i class="fas fa-file-pdf"></i> PDF</button><div class="share-options"><button class="action-btn share" onclick="toggleShareOptions()" id="shareMainBtn"><i class="fas fa-share-alt"></i> Share</button><div class="share-dropdown" id="shareDropdown"><a href="#" onclick="shareOnWhatsApp(); return false;"><i class="fab fa-whatsapp" style="color:#25D366;"></i> WhatsApp</a><a href="#" onclick="shareOnTelegram(); return false;"><i class="fab fa-telegram" style="color:#0088cc;"></i> Telegram</a><a href="#" onclick="copyShareLink(); return false;"><i class="fas fa-link"></i> Copy Link</a><a href="#" onclick="shareOnEmail(); return false;"><i class="fas fa-envelope"></i> Email</a></div></div></div>`;
-        } else {
-            actionButtonsHtml = `<div class="action-buttons no-print"><button class="action-btn print" onclick="window.printAdmitCardFn()"><i class="fas fa-print"></i> Print</button><button class="action-btn pdf" onclick="window.downloadPdfFn()"><i class="fas fa-file-pdf"></i> PDF</button><div class="share-options"><button class="action-btn share" onclick="toggleShareOptions()" id="shareMainBtn"><i class="fas fa-share-alt"></i> Share</button><div class="share-dropdown" id="shareDropdown"><a href="#" onclick="shareOnWhatsApp(); return false;"><i class="fab fa-whatsapp" style="color:#25D366;"></i> WhatsApp</a><a href="#" onclick="shareOnTelegram(); return false;"><i class="fab fa-telegram" style="color:#0088cc;"></i> Telegram</a><a href="#" onclick="copyShareLink(); return false;"><i class="fas fa-link"></i> Copy Link</a><a href="#" onclick="shareOnEmail(); return false;"><i class="fas fa-envelope"></i> Email</a></div></div></div>`;
-        }
-        
-        let cardHtml=`<div class="admit-card" id="admitCard"><div class="card-border"></div><div class="card-header"><div class="header-flex"><div class="logo-circle"><img src="${LOGO_URL}"></div><div class="header-text"><h1>QUEST COACHING CENTRE</h1><p>Block More, Gopalganj - 841428 | Ph: +91 9708442525</p><p>Under the guidance of MR. RAVI SIR</p></div></div></div><div class="exam-title-bar">🎓 ${examName} 🎓</div><div class="admit-title-outside"><h3>📜 प्रवेश पत्र (ADMIT CARD) 📜</h3></div><div class="card-body"><div class="top-info-row"><div class="photo-section"><div class="student-photo">${photoHtml}</div></div><div class="basic-info"><div class="info-item"><div class="info-label">STUDENT NAME</div><div class="info-value">${student.studentName||'N/A'}</div></div><div class="info-item"><div class="info-label">CLASS</div><div class="info-value">${studentClass}</div></div><div class="info-item"><div class="info-label">ROLL NUMBER</div><div class="info-value">${student.rollNumber||'N/A'}</div></div><div class="info-item"><div class="info-label">ROLL CODE</div><div class="info-value">${rollCode}</div></div><div class="info-item"><div class="info-label">FATHER'S NAME</div><div class="info-value">${student.fatherName||'N/A'}</div></div><div class="info-item"><div class="info-label">MOTHER'S NAME</div><div class="info-value">${motherName}</div></div><div class="info-item"><div class="info-label">DATE OF BIRTH</div><div class="info-value">${dob}</div></div><div class="info-item"><div class="info-label">GENDER</div><div class="info-value">${gender}</div></div><div class="info-item"><div class="info-label">REGISTRATION NO.</div><div class="info-value">${student.registrationNo||student.admissionNo||'N/A'}</div></div><div class="info-item"><div class="info-label">EXAM CENTRE</div><div class="info-value">${examCentre}</div></div></div><div class="qr-section"><div class="qr-box"><div id="qrcode-card" style="width:80px;height:80px;"></div></div><div class="qr-label">SCAN TO VERIFY</div></div></div><div class="subjects-schedule"><div class="section-title"><i class="fas fa-calendar-alt"></i> 📅 परीक्षा कार्यक्रम (Exam Schedule)</div><table class="schedule-table"><thead><tr><th>विषय कोड</th><th>विषय का नाम</th><th>परीक्षा की तिथि</th><th>परीक्षा का समय</th></tr></thead><tbody>${scheduleHtml||'<tr><td colspan="4" style="text-align:center;">No subjects added</td></tr>'}</tbody>}</div><div class="rules-section"><div class="rules-title"><i class="fas fa-file-alt"></i> 📜 परीक्षार्थियों के लिए निर्देश</div><div class="rules-list"><ul style="margin:0; padding-left:0; display:contents;">${rulesHtml}</ul></div></div><div class="quote-section"><div class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</div><div class="quote-author">- MR. RAVI SIR (Director, Quest Coaching Centre)</div></div><div class="signatures"><div class="sign-box"><div class="sign-line"></div><div class="sign-label">Director Signature</div></div><div class="stamp-box"><div class="stamp"><span>QUEST</span><span>COACHING</span><span>CENTRE</span><span style="font-size:5px;">AUTHORISED</span></div></div><div class="sign-box"><div class="sign-line"></div><div class="sign-label">Student Signature</div></div></div></div><div class="footer"><p>★ THIS IS A SYSTEM GENERATED ADMIT CARD | VALID FOR EXAMINATION PURPOSE ONLY ★</p></div></div>${actionButtonsHtml}`;
+        let cardHtml=`<div class="admit-card" id="admitCard"><div class="card-border"></div><div class="card-header"><div class="header-flex"><div class="logo-circle"><img src="${LOGO_URL}"></div><div class="header-text"><h1>QUEST COACHING CENTRE</h1><p>Block More, Gopalganj - 841428 | Ph: +91 9708442525</p><p>Under the guidance of MR. RAVI SIR</p></div></div></div><div class="exam-title-bar">🎓 ${examName} 🎓</div><div class="card-body"><div class="top-info-row"><div class="photo-section"><div class="student-photo">${photoHtml}</div></div><div class="basic-info"><div class="info-item"><div class="info-label">STUDENT NAME</div><div class="info-value">${student.studentName||'N/A'}</div></div><div class="info-item"><div class="info-label">CLASS</div><div class="info-value">${studentClass}</div></div><div class="info-item"><div class="info-label">ROLL NUMBER</div><div class="info-value">${student.rollNumber||'N/A'}</div></div><div class="info-item"><div class="info-label">ROLL CODE</div><div class="info-value">${rollCode}</div></div><div class="info-item"><div class="info-label">FATHER'S NAME</div><div class="info-value">${student.fatherName||'N/A'}</div></div><div class="info-item"><div class="info-label">MOTHER'S NAME</div><div class="info-value">${motherName}</div></div><div class="info-item"><div class="info-label">DATE OF BIRTH</div><div class="info-value">${dob}</div></div><div class="info-item"><div class="info-label">GENDER</div><div class="info-value">${gender}</div></div><div class="info-item"><div class="info-label">REGISTRATION NO.</div><div class="info-value">${student.registrationNo||student.admissionNo||'N/A'}</div></div><div class="info-item"><div class="info-label">EXAM CENTRE</div><div class="info-value">${examCentre}</div></div></div><div class="qr-section"><div class="qr-box"><div id="qrcode-card" style="width:80px;height:80px;"></div></div><div class="qr-label">SCAN TO VERIFY</div></div></div><div class="subjects-schedule"><div class="section-title"><i class="fas fa-calendar-alt"></i> 📅 परीक्षा कार्यक्रम (Exam Schedule)</div><table class="schedule-table"><thead><tr><th>विषय कोड</th><th>विषय का नाम</th><th>परीक्षा की तिथि</th><th>परीक्षा का समय</th><tr></thead><tbody>${scheduleHtml||'<tr><td colspan="4" style="text-align:center;">No subjects added</td></tr>'}</tbody></table></div><div class="rules-section"><div class="rules-title"><i class="fas fa-file-alt"></i> 📜 परीक्षार्थियों के लिए निर्देश</div><div class="rules-list"><ul style="margin:0; padding-left:0; display:contents;">${rulesHtml}</ul></div></div><div class="quote-section"><div class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</div><div class="quote-author">- MR. RAVI SIR (Director, Quest Coaching Centre)</div></div><div class="signatures"><div class="sign-box"><div class="sign-line"></div><div class="sign-label">Director Signature</div></div><div class="stamp-box"><div class="stamp"><span>QUEST</span><span>COACHING</span><span>CENTRE</span><span style="font-size:5px;">AUTHORISED</span></div></div><div class="sign-box"><div class="sign-line"></div><div class="sign-label">Student Signature</div></div></div></div><div class="footer"><p>★ THIS IS A SYSTEM GENERATED ADMIT CARD | VALID FOR EXAMINATION PURPOSE ONLY ★</p></div></div><div class="action-buttons no-print"><button class="action-btn print" onclick="window.printAdmitCardFn()"><i class="fas fa-print"></i> Print Admit Card</button><button class="action-btn pdf" onclick="window.downloadPdfFn()"><i class="fas fa-file-pdf"></i> Download PDF</button><div class="share-options"><button class="action-btn share" onclick="toggleShareOptions()" id="shareMainBtn"><i class="fas fa-share-alt"></i> Share</button><div class="share-dropdown" id="shareDropdown"><a href="#" onclick="shareOnWhatsApp(); return false;"><i class="fab fa-whatsapp" style="color:#25D366;"></i> WhatsApp</a><a href="#" onclick="shareOnTelegram(); return false;"><i class="fab fa-telegram" style="color:#0088cc;"></i> Telegram</a><a href="#" onclick="copyShareLink(); return false;"><i class="fas fa-link"></i> Copy Link</a><a href="#" onclick="shareOnEmail(); return false;"><i class="fas fa-envelope"></i> Email</a><a href="#" onclick="shareOnMessenger(); return false;"><i class="fab fa-facebook-messenger"></i> Messenger</a></div></div></div>`;
         
         document.getElementById('admitCardContainer').innerHTML = cardHtml;
         document.getElementById('admitCardContainer').style.display = 'block';
@@ -667,7 +607,7 @@
         };
         
         window.shareOnWhatsApp = () => {
-            let text = `📄 *ADMIT CARD* 📄\n\n👤 *Name:* ${student.studentName}\n🎫 *Roll No:* ${student.rollNumber}\n🏫 *Class:* ${studentClass}\n📚 *Exam:* ${examName}\n📍 *Centre:* ${examCentre}\n\n🔗 *View Admit Card:* ${publicShareUrl}`;
+            let text = `📄 *ADMIT CARD* 📄\n\n👤 *Name:* ${student.studentName}\n🎫 *Roll No:* ${student.rollNumber}\n🏫 *Class:* ${studentClass}\n🔢 *Roll Code:* ${rollCode}\n📚 *Exam:* ${examName}\n📍 *Centre:* ${examCentre}\n\n🔗 *View Full Admit Card:* ${publicShareUrl}`;
             let url = `https://wa.me/?text=${encodeURIComponent(text)}`;
             window.open(url, '_blank');
             let dropdown = document.getElementById('shareDropdown');
@@ -691,61 +631,63 @@
         
         window.shareOnEmail = () => {
             let subject = `Admit Card for ${student.studentName}`;
-            let body = `Please find the admit card details below:\n\nName: ${student.studentName}\nRoll Number: ${student.rollNumber}\nClass: ${studentClass}\nExam: ${examName}\nCentre: ${examCentre}\n\nClick here to view full admit card: ${publicShareUrl}`;
+            let body = `Please find the admit card details below:\n\nName: ${student.studentName}\nRoll Number: ${student.rollNumber}\nRoll Code: ${rollCode}\nClass: ${studentClass}\nExam: ${examName}\nCentre: ${examCentre}\n\nClick here to view full admit card: ${publicShareUrl}`;
             window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            let dropdown = document.getElementById('shareDropdown');
+            if(dropdown) dropdown.classList.remove('show');
+        };
+        
+        window.shareOnMessenger = () => {
+            let url = `https://www.facebook.com/dialog/send?link=${encodeURIComponent(publicShareUrl)}&app_id=123456789&redirect_uri=${encodeURIComponent(publicShareUrl)}`;
+            window.open(url, '_blank');
             let dropdown = document.getElementById('shareDropdown');
             if(dropdown) dropdown.classList.remove('show');
         };
     }
     
-    if(document.getElementById('generateBtn')) {
-        document.getElementById('generateBtn')?.addEventListener('click', async () => { 
-            if(!isTeacherMode) return;
-            let roll = document.getElementById('rollNumberInput').value.trim(); 
-            let examName = document.getElementById('examName').value.trim(); 
-            let examCentre = document.getElementById('examCentre').value.trim(); 
-            let studentClass = document.getElementById('classSelect').value;
-            let rollCode = document.getElementById('rollCodeInput').value.trim();
-            if(!roll || !currentStudentData) return Swal.fire('Error','Please enter valid Roll Number','error'); 
-            if(!examName||!examCentre) return Swal.fire('Error','Exam Name & Centre required','error'); 
-            let validSubjects = subjects.filter(s=>s.name?.trim()); 
-            Swal.fire({ title:'Generating...', allowOutsideClick:false, didOpen:()=>{ Swal.showLoading(); } }); 
-            let cardId = await saveAdmitCardToFirebase(currentStudentData, examName, examCentre, studentClass, rollCode, validSubjects); 
-            if(cardId){ 
-                let fullData = {...currentStudentData, examName, examCentre, studentClass, rollCode, subjects:validSubjects, id:cardId }; 
-                await getAllAdmitCards(); 
-                Swal.fire('Success!','Admit Card generated!','success'); 
-                displayGeneratedAdmitCard(fullData, false); 
-            } else Swal.fire('Error','Failed','error'); 
-        });
-    }
+    document.getElementById('generateBtn')?.addEventListener('click', async () => { 
+        let roll = document.getElementById('rollNumberInput').value.trim(); 
+        let examName = document.getElementById('examName').value.trim(); 
+        let examCentre = document.getElementById('examCentre').value.trim(); 
+        let studentClass = document.getElementById('classSelect').value;
+        let rollCode = document.getElementById('rollCodeInput').value.trim();
+        if(!roll || !currentStudentData) return Swal.fire('Error','Please enter valid Roll Number','error'); 
+        if(!examName||!examCentre) return Swal.fire('Error','Exam Name & Centre required','error'); 
+        let validSubjects = subjects.filter(s=>s.name?.trim()); 
+        Swal.fire({ title:'Generating...', allowOutsideClick:false, didOpen:()=>{ Swal.showLoading(); } }); 
+        let cardId = await saveAdmitCardToFirebase(currentStudentData, examName, examCentre, studentClass, rollCode, validSubjects); 
+        if(cardId){ 
+            let fullData = {...currentStudentData, examName, examCentre, studentClass, rollCode, subjects:validSubjects, id:cardId }; 
+            await getAllAdmitCards(); 
+            Swal.fire('Success!','Admit Card generated!','success'); 
+            document.querySelector('.form-card').style.display = 'none';
+            await displayGeneratedAdmitCard(fullData, false); 
+        } else Swal.fire('Error','Failed to save','error'); 
+    });
     
-    if(document.getElementById('viewCardsBtn')) {
-        document.getElementById('viewCardsBtn')?.addEventListener('click', openCardsModal);
-    }
+    document.getElementById('viewCardsBtn')?.addEventListener('click', openCardsModal);
     
     async function handlePublicAccess() { 
         const urlParams = new URLSearchParams(window.location.search); 
         const cardId = urlParams.get('viewCard'); 
         if(cardId){ 
-            isTeacherMode = false;
             document.getElementById('authLoading').style.display='none'; 
             document.getElementById('mainContent').style.display='block'; 
-            let teacherForm = document.getElementById('teacherFormCard');
-            if(teacherForm) teacherForm.style.display = 'none';
             try{ 
                 let doc = await admitCardsCollection.doc(cardId).get(); 
                 if(doc.exists){ 
                     let card = {id:doc.id, ...doc.data()}; 
+                    let formCard = document.querySelector('.form-card');
+                    if(formCard) formCard.style.display = 'none'; 
                     await displayGeneratedAdmitCard(card, true); 
                 } else { 
-                    document.getElementById('admitCardContainer').innerHTML = '<div style="text-align:center;padding:40px;background:white;border-radius:16px;">❌ Invalid or expired admit card link.</div>';
-                    document.getElementById('admitCardContainer').style.display = 'block';
+                    let formCard = document.querySelector('.form-card');
+                    if(formCard) formCard.innerHTML = '<div style="text-align:center;padding:40px">❌ Invalid or expired admit card link.</div>'; 
                 } 
             } catch(e){ 
                 console.error("Error:", e);
-                document.getElementById('admitCardContainer').innerHTML = '<div style="text-align:center;padding:40px;background:white;border-radius:16px;">Error loading admit card. Please try again.</div>';
-                document.getElementById('admitCardContainer').style.display = 'block';
+                let formCard = document.querySelector('.form-card');
+                if(formCard) formCard.innerHTML = '<div style="text-align:center;padding:40px">Error loading card</div>'; 
             } 
             return true; 
         } 
@@ -758,8 +700,7 @@
         if(!user) { 
             Swal.fire({ title:'Access Denied!', text:'Please login from main page first!', icon:'error', confirmButtonColor:'#1b4f9b', confirmButtonText:'Go to Login' }).then(()=>{ window.location.href='index.html'; }); 
             return; 
-        }
-        isTeacherMode = true;
+        } 
         document.getElementById('authLoading').style.display='none'; 
         document.getElementById('mainContent').style.display='block'; 
         const logoutBtn = document.createElement('button'); 
@@ -767,8 +708,8 @@
         logoutBtn.className='logout-btn'; 
         logoutBtn.onclick=async()=>{ await auth.signOut(); window.location.href='index.html'; }; 
         document.body.appendChild(logoutBtn); 
-        loadExamConfig(); 
-        getAllAdmitCards(); 
+        await loadExamConfig(); 
+        await getAllAdmitCards(); 
     });
     </script>
 </body>
