@@ -183,6 +183,17 @@
         .header-text h1 { color: white; font-size: 22px; letter-spacing: 1px; }
         .header-text p { color: #c5a059; font-size: 11px; margin: 2px 0; }
         .exam-title-bar { background: #c5a059; color: #1a3a5c; text-align: center; padding: 12px; margin: 0 12px; font-size: 18px; font-weight: 800; letter-spacing: 1px; }
+        .admit-title-outside {
+            text-align: center;
+            margin: 8px 12px 5px 12px;
+            padding: 5px;
+        }
+        .admit-title-outside h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a3a5c;
+            letter-spacing: 1px;
+        }
         .card-body { padding: 16px 22px; display: flex; flex-direction: column; gap: 12px; margin: 0 12px; }
         .top-info-row { display: flex; gap: 18px; flex-wrap: wrap; }
         .photo-section { width: 110px; text-align: center; }
@@ -222,10 +233,7 @@
         .action-btn.print { background: #1b4f9b; color: white; }
         .action-btn.pdf { background: #dc2626; color: white; }
         .action-btn.share { background: #25D366; color: white; }
-        .share-options {
-            position: relative;
-            display: inline-block;
-        }
+        .share-options { position: relative; display: inline-block; }
         .share-dropdown {
             display: none;
             position: absolute;
@@ -430,7 +438,23 @@
     function filterCards(){ let search=document.getElementById('searchRollInput').value.trim().toLowerCase(); let filtered=allCards.filter(c=>c.rollNumber?.toString().toLowerCase().includes(search)); displayCardsInModal(filtered); }
     function displayCardsInModal(cards){ let modalBody=document.getElementById('cardsModalBody'); if(!cards.length){ modalBody.innerHTML='<div style="text-align:center;">No admit cards found</div>'; return; } let html=''; cards.forEach(card=>{ let date=card.createdAt?new Date(card.createdAt.toDate()).toLocaleDateString():'Unknown'; html+=`<div class="admit-card-item"><div><strong>${card.studentName||'N/A'}</strong> (Roll: ${card.rollNumber})<br>Exam: ${card.examName}<br>${date}</div><div><button class="btn-view-card" onclick="viewCardById('${card.id}')">👁️ View</button><button class="btn-delete-card" onclick="deleteCardById('${card.id}')">🗑️ Delete</button></div></div>`; }); modalBody.innerHTML=html; }
     window.viewCardById=async function(id){ let card=allCards.find(c=>c.id===id); if(card) displayGeneratedAdmitCard(card, true); closeCardsModal(); };
-    window.deleteCardById=async function(id){ let confirm=await Swal.fire({title:'Delete?',text:'This admit card will be permanently deleted!',icon:'warning',showCancelButton:true,confirmButtonColor:'#dc2626'}); if(confirm.isConfirmed){ await admitCardsCollection.doc(id).delete(); Swal.fire('Deleted!','Admit card has been deleted','success'); await getAllAdmitCards(); loadCardsModal(); } };
+    window.deleteCardById=async function(id){ 
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'This admit card will be permanently deleted!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        });
+        if(result.isConfirmed){ 
+            await admitCardsCollection.doc(id).delete(); 
+            Swal.fire('Deleted!','Admit card has been deleted','success'); 
+            await getAllAdmitCards(); 
+            displayCardsInModal(allCards);
+        } 
+    };
     async function loadCardsModal(){ let modalBody=document.getElementById('cardsModalBody'); modalBody.innerHTML='<div class="spinner"></div>'; await getAllAdmitCards(); displayCardsInModal(allCards); }
     
     function generateQRCode(elementId, url, size=85) {
@@ -466,7 +490,7 @@
         let rulesHtml=RULES_LIST.map(r=>`<li>${r}</li>`).join('');
         let publicShareUrl = window.location.origin + window.location.pathname + '?viewCard=' + student.id;
         
-        let cardHtml=`<div class="admit-card" id="admitCard"><div class="card-border"></div><div class="card-header"><div class="header-flex"><div class="logo-circle"><img src="${LOGO_URL}"></div><div class="header-text"><h1>QUEST COACHING CENTRE</h1><p>Block More, Gopalganj - 841428 | Ph: +91 9708442525</p><p>Under the guidance of MR. RAVI SIR</p></div></div></div><div class="exam-title-bar">🎓 ${examName} 🎓</div><div class="card-body"><div class="top-info-row"><div class="photo-section"><div class="student-photo">${photoHtml}</div></div><div class="basic-info"><div class="info-item"><div class="info-label">STUDENT NAME</div><div class="info-value">${student.studentName||'N/A'}</div></div><div class="info-item"><div class="info-label">CLASS</div><div class="info-value">${studentClass}</div></div><div class="info-item"><div class="info-label">ROLL NUMBER</div><div class="info-value">${student.rollNumber||'N/A'}</div></div><div class="info-item"><div class="info-label">ROLL CODE</div><div class="info-value">${rollCode}</div></div><div class="info-item"><div class="info-label">FATHER'S NAME</div><div class="info-value">${student.fatherName||'N/A'}</div></div><div class="info-item"><div class="info-label">MOTHER'S NAME</div><div class="info-value">${motherName}</div></div><div class="info-item"><div class="info-label">DATE OF BIRTH</div><div class="info-value">${dob}</div></div><div class="info-item"><div class="info-label">GENDER</div><div class="info-value">${gender}</div></div><div class="info-item"><div class="info-label">REGISTRATION NO.</div><div class="info-value">${student.registrationNo||student.admissionNo||'N/A'}</div></div><div class="info-item"><div class="info-label">EXAM CENTRE</div><div class="info-value">${examCentre}</div></div></div><div class="qr-section"><div class="qr-box"><div id="qrcode-card" style="width:80px;height:80px;"></div></div><div class="qr-label">SCAN TO VERIFY</div></div></div><div class="subjects-schedule"><div class="section-title"><i class="fas fa-calendar-alt"></i> 📅 परीक्षा कार्यक्रम (Exam Schedule)</div><table class="schedule-table"><thead><tr><th>विषय कोड</th><th>विषय का नाम</th><th>परीक्षा की तिथि</th><th>परीक्षा का समय</th></tr></thead><tbody>${scheduleHtml||'<tr><td colspan="4" style="text-align:center;">No subjects added</td></tr>'}</tbody></table></div><div class="rules-section"><div class="rules-title"><i class="fas fa-file-alt"></i> 📜 परीक्षार्थियों के लिए निर्देश</div><div class="rules-list"><ul style="margin:0; padding-left:0; display:contents;">${rulesHtml}</ul></div></div><div class="quote-section"><div class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</div><div class="quote-author">- MR. RAVI SIR (Director, Quest Coaching Centre)</div></div><div class="signatures"><div class="sign-box"><div class="sign-line"></div><div class="sign-label">Director Signature</div></div><div class="stamp-box"><div class="stamp"><span>QUEST</span><span>COACHING</span><span>CENTRE</span><span style="font-size:5px;">AUTHORISED</span></div></div><div class="sign-box"><div class="sign-line"></div><div class="sign-label">Student Signature</div></div></div></div><div class="footer"><p>★ THIS IS A SYSTEM GENERATED ADMIT CARD | VALID FOR EXAMINATION PURPOSE ONLY ★</p></div></div><div class="action-buttons no-print"><button class="action-btn print" onclick="window.printAdmitCardFn()"><i class="fas fa-print"></i> Print</button><button class="action-btn pdf" onclick="window.downloadPdfFn()"><i class="fas fa-file-pdf"></i> PDF</button><div class="share-options"><button class="action-btn share" onclick="toggleShareOptions()" id="shareMainBtn"><i class="fas fa-share-alt"></i> Share</button><div class="share-dropdown" id="shareDropdown"><a href="#" onclick="shareOnWhatsApp(); return false;"><i class="fab fa-whatsapp" style="color:#25D366;"></i> WhatsApp</a><a href="#" onclick="shareOnTelegram(); return false;"><i class="fab fa-telegram" style="color:#0088cc;"></i> Telegram</a><a href="#" onclick="copyShareLink(); return false;"><i class="fas fa-link"></i> Copy Link</a><a href="#" onclick="shareOnEmail(); return false;"><i class="fas fa-envelope"></i> Email</a><a href="#" onclick="shareOnMessenger(); return false;"><i class="fab fa-facebook-messenger"></i> Messenger</a></div></div></div>`;
+        let cardHtml=`<div class="admit-card" id="admitCard"><div class="card-border"></div><div class="card-header"><div class="header-flex"><div class="logo-circle"><img src="${LOGO_URL}"></div><div class="header-text"><h1>QUEST COACHING CENTRE</h1><p>Block More, Gopalganj - 841428 | Ph: +91 9708442525</p><p>Under the guidance of MR. RAVI SIR</p></div></div></div><div class="exam-title-bar">🎓 ${examName} 🎓</div><div class="admit-title-outside"><h3>📜 प्रवेश पत्र (ADMIT CARD) 📜</h3></div><div class="card-body"><div class="top-info-row"><div class="photo-section"><div class="student-photo">${photoHtml}</div></div><div class="basic-info"><div class="info-item"><div class="info-label">STUDENT NAME</div><div class="info-value">${student.studentName||'N/A'}</div></div><div class="info-item"><div class="info-label">CLASS</div><div class="info-value">${studentClass}</div></div><div class="info-item"><div class="info-label">ROLL NUMBER</div><div class="info-value">${student.rollNumber||'N/A'}</div></div><div class="info-item"><div class="info-label">ROLL CODE</div><div class="info-value">${rollCode}</div></div><div class="info-item"><div class="info-label">FATHER'S NAME</div><div class="info-value">${student.fatherName||'N/A'}</div></div><div class="info-item"><div class="info-label">MOTHER'S NAME</div><div class="info-value">${motherName}</div></div><div class="info-item"><div class="info-label">DATE OF BIRTH</div><div class="info-value">${dob}</div></div><div class="info-item"><div class="info-label">GENDER</div><div class="info-value">${gender}</div></div><div class="info-item"><div class="info-label">REGISTRATION NO.</div><div class="info-value">${student.registrationNo||student.admissionNo||'N/A'}</div></div><div class="info-item"><div class="info-label">EXAM CENTRE</div><div class="info-value">${examCentre}</div></div></div><div class="qr-section"><div class="qr-box"><div id="qrcode-card" style="width:80px;height:80px;"></div></div><div class="qr-label">SCAN TO VERIFY</div></div></div><div class="subjects-schedule"><div class="section-title"><i class="fas fa-calendar-alt"></i> 📅 परीक्षा कार्यक्रम (Exam Schedule)</div><table class="schedule-table"><thead><tr><th>विषय कोड</th><th>विषय का नाम</th><th>परीक्षा की तिथि</th><th>परीक्षा का समय</th></tr></thead><tbody>${scheduleHtml||'<tr><td colspan="4" style="text-align:center;">No subjects added</td></tr>'}</tbody>}</table></div><div class="rules-section"><div class="rules-title"><i class="fas fa-file-alt"></i> 📜 परीक्षार्थियों के लिए निर्देश</div><div class="rules-list"><ul style="margin:0; padding-left:0; display:contents;">${rulesHtml}</ul></div></div><div class="quote-section"><div class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</div><div class="quote-author">- MR. RAVI SIR (Director, Quest Coaching Centre)</div></div><div class="signatures"><div class="sign-box"><div class="sign-line"></div><div class="sign-label">Director Signature</div></div><div class="stamp-box"><div class="stamp"><span>QUEST</span><span>COACHING</span><span>CENTRE</span><span style="font-size:5px;">AUTHORISED</span></div></div><div class="sign-box"><div class="sign-line"></div><div class="sign-label">Student Signature</div></div></div></div><div class="footer"><p>★ THIS IS A SYSTEM GENERATED ADMIT CARD | VALID FOR EXAMINATION PURPOSE ONLY ★</p></div></div><div class="action-buttons no-print"><button class="action-btn print" onclick="window.printAdmitCardFn()"><i class="fas fa-print"></i> Print</button><button class="action-btn pdf" onclick="window.downloadPdfFn()"><i class="fas fa-file-pdf"></i> PDF</button><div class="share-options"><button class="action-btn share" onclick="toggleShareOptions()" id="shareMainBtn"><i class="fas fa-share-alt"></i> Share</button><div class="share-dropdown" id="shareDropdown"><a href="#" onclick="shareOnWhatsApp(); return false;"><i class="fab fa-whatsapp" style="color:#25D366;"></i> WhatsApp</a><a href="#" onclick="shareOnTelegram(); return false;"><i class="fab fa-telegram" style="color:#0088cc;"></i> Telegram</a><a href="#" onclick="copyShareLink(); return false;"><i class="fas fa-link"></i> Copy Link</a><a href="#" onclick="shareOnEmail(); return false;"><i class="fas fa-envelope"></i> Email</a></div></div></div>`;
         document.getElementById('admitCardContainer').innerHTML = cardHtml;
         document.getElementById('admitCardContainer').style.display = 'block';
         document.getElementById('admitCardContainer').scrollIntoView({ behavior:'smooth' });
@@ -528,11 +552,6 @@
             let subject = `Admit Card for ${student.studentName}`;
             let body = `Please find the admit card details below:\n\nName: ${student.studentName}\nRoll Number: ${student.rollNumber}\nClass: ${studentClass}\nExam: ${examName}\nCentre: ${examCentre}\n\nClick here to view full admit card: ${publicShareUrl}`;
             window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        };
-        
-        window.shareOnMessenger = () => {
-            let url = `https://www.facebook.com/dialog/send?link=${encodeURIComponent(publicShareUrl)}&app_id=123456789&redirect_uri=${encodeURIComponent(publicShareUrl)}`;
-            window.open(url, '_blank');
         };
     }
     
