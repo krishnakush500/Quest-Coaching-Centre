@@ -436,25 +436,29 @@
     function openCardsModal(){ document.getElementById('cardsModal').style.display='flex'; loadCardsModal(); }
     function closeCardsModal(){ document.getElementById('cardsModal').style.display='none'; }
     function filterCards(){ let search=document.getElementById('searchRollInput').value.trim().toLowerCase(); let filtered=allCards.filter(c=>c.rollNumber?.toString().toLowerCase().includes(search)); displayCardsInModal(filtered); }
-    function displayCardsInModal(cards){ let modalBody=document.getElementById('cardsModalBody'); if(!cards.length){ modalBody.innerHTML='<div style="text-align:center;">No admit cards found</div>'; return; } let html=''; cards.forEach(card=>{ let date=card.createdAt?new Date(card.createdAt.toDate()).toLocaleDateString():'Unknown'; html+=`<div class="admit-card-item"><div><strong>${card.studentName||'N/A'}</strong> (Roll: ${card.rollNumber})<br>Exam: ${card.examName}<br>${date}</div><div><button class="btn-view-card" onclick="viewCardById('${card.id}')">👁️ View</button><button class="btn-delete-card" onclick="deleteCardById('${card.id}')">🗑️ Delete</button></div></div>`; }); modalBody.innerHTML=html; }
+    function displayCardsInModal(cards){ let modalBody=document.getElementById('cardsModalBody'); if(!cards.length){ modalBody.innerHTML='<div style="text-align:center;">No admit cards found</div>'; return; } let html=''; cards.forEach(card=>{ let date=card.createdAt?new Date(card.createdAt.toDate()).toLocaleDateString():'Unknown'; html+=`<div class="admit-card-item"><div><strong>${card.studentName||'N/A'}</strong><br>Roll: ${card.rollNumber}<br>Exam: ${card.examName}<br>${date}</div><div><button class="btn-view-card" onclick="viewCardById('${card.id}')">👁️ View</button><button class="btn-delete-card" onclick="deleteCardWithConfirm('${card.id}')">🗑️ Delete</button></div></div>`; }); modalBody.innerHTML=html; }
+    
     window.viewCardById=async function(id){ let card=allCards.find(c=>c.id===id); if(card) displayGeneratedAdmitCard(card, true); closeCardsModal(); };
-    window.deleteCardById=async function(id){ 
-        const result = await Swal.fire({
+    
+    window.deleteCardWithConfirm=async function(id){ 
+        let result = await Swal.fire({
             title: 'Are you sure?',
-            text: 'This admit card will be permanently deleted!',
+            text: "This admit card will be permanently deleted!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#dc2626',
             cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!'
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
         });
         if(result.isConfirmed){ 
             await admitCardsCollection.doc(id).delete(); 
             Swal.fire('Deleted!','Admit card has been deleted','success'); 
             await getAllAdmitCards(); 
-            displayCardsInModal(allCards);
+            loadCardsModal(); 
         } 
     };
+    
     async function loadCardsModal(){ let modalBody=document.getElementById('cardsModalBody'); modalBody.innerHTML='<div class="spinner"></div>'; await getAllAdmitCards(); displayCardsInModal(allCards); }
     
     function generateQRCode(elementId, url, size=85) {
@@ -490,7 +494,13 @@
         let rulesHtml=RULES_LIST.map(r=>`<li>${r}</li>`).join('');
         let publicShareUrl = window.location.origin + window.location.pathname + '?viewCard=' + student.id;
         
-        let cardHtml=`<div class="admit-card" id="admitCard"><div class="card-border"></div><div class="card-header"><div class="header-flex"><div class="logo-circle"><img src="${LOGO_URL}"></div><div class="header-text"><h1>QUEST COACHING CENTRE</h1><p>Block More, Gopalganj - 841428 | Ph: +91 9708442525</p><p>Under the guidance of MR. RAVI SIR</p></div></div></div><div class="exam-title-bar">🎓 ${examName} 🎓</div><div class="admit-title-outside"><h3>📜 प्रवेश पत्र (ADMIT CARD) 📜</h3></div><div class="card-body"><div class="top-info-row"><div class="photo-section"><div class="student-photo">${photoHtml}</div></div><div class="basic-info"><div class="info-item"><div class="info-label">STUDENT NAME</div><div class="info-value">${student.studentName||'N/A'}</div></div><div class="info-item"><div class="info-label">CLASS</div><div class="info-value">${studentClass}</div></div><div class="info-item"><div class="info-label">ROLL NUMBER</div><div class="info-value">${student.rollNumber||'N/A'}</div></div><div class="info-item"><div class="info-label">ROLL CODE</div><div class="info-value">${rollCode}</div></div><div class="info-item"><div class="info-label">FATHER'S NAME</div><div class="info-value">${student.fatherName||'N/A'}</div></div><div class="info-item"><div class="info-label">MOTHER'S NAME</div><div class="info-value">${motherName}</div></div><div class="info-item"><div class="info-label">DATE OF BIRTH</div><div class="info-value">${dob}</div></div><div class="info-item"><div class="info-label">GENDER</div><div class="info-value">${gender}</div></div><div class="info-item"><div class="info-label">REGISTRATION NO.</div><div class="info-value">${student.registrationNo||student.admissionNo||'N/A'}</div></div><div class="info-item"><div class="info-label">EXAM CENTRE</div><div class="info-value">${examCentre}</div></div></div><div class="qr-section"><div class="qr-box"><div id="qrcode-card" style="width:80px;height:80px;"></div></div><div class="qr-label">SCAN TO VERIFY</div></div></div><div class="subjects-schedule"><div class="section-title"><i class="fas fa-calendar-alt"></i> 📅 परीक्षा कार्यक्रम (Exam Schedule)</div><table class="schedule-table"><thead><tr><th>विषय कोड</th><th>विषय का नाम</th><th>परीक्षा की तिथि</th><th>परीक्षा का समय</th></tr></thead><tbody>${scheduleHtml||'<tr><td colspan="4" style="text-align:center;">No subjects added</td></tr>'}</tbody>}</table></div><div class="rules-section"><div class="rules-title"><i class="fas fa-file-alt"></i> 📜 परीक्षार्थियों के लिए निर्देश</div><div class="rules-list"><ul style="margin:0; padding-left:0; display:contents;">${rulesHtml}</ul></div></div><div class="quote-section"><div class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</div><div class="quote-author">- MR. RAVI SIR (Director, Quest Coaching Centre)</div></div><div class="signatures"><div class="sign-box"><div class="sign-line"></div><div class="sign-label">Director Signature</div></div><div class="stamp-box"><div class="stamp"><span>QUEST</span><span>COACHING</span><span>CENTRE</span><span style="font-size:5px;">AUTHORISED</span></div></div><div class="sign-box"><div class="sign-line"></div><div class="sign-label">Student Signature</div></div></div></div><div class="footer"><p>★ THIS IS A SYSTEM GENERATED ADMIT CARD | VALID FOR EXAMINATION PURPOSE ONLY ★</p></div></div><div class="action-buttons no-print"><button class="action-btn print" onclick="window.printAdmitCardFn()"><i class="fas fa-print"></i> Print</button><button class="action-btn pdf" onclick="window.downloadPdfFn()"><i class="fas fa-file-pdf"></i> PDF</button><div class="share-options"><button class="action-btn share" onclick="toggleShareOptions()" id="shareMainBtn"><i class="fas fa-share-alt"></i> Share</button><div class="share-dropdown" id="shareDropdown"><a href="#" onclick="shareOnWhatsApp(); return false;"><i class="fab fa-whatsapp" style="color:#25D366;"></i> WhatsApp</a><a href="#" onclick="shareOnTelegram(); return false;"><i class="fab fa-telegram" style="color:#0088cc;"></i> Telegram</a><a href="#" onclick="copyShareLink(); return false;"><i class="fas fa-link"></i> Copy Link</a><a href="#" onclick="shareOnEmail(); return false;"><i class="fas fa-envelope"></i> Email</a></div></div></div>`;
+        let cardHtml=`<div class="admit-card" id="admitCard"><div class="card-border"></div><div class="card-header"><div class="header-flex"><div class="logo-circle"><img src="${LOGO_URL}"></div><div class="header-text"><h1>QUEST COACHING CENTRE</h1><p>Block More, Gopalganj - 841428 | Ph: +91 9708442525</p><p>Under the guidance of MR. RAVI SIR</p></div></div></div><div class="exam-title-bar">🎓 ${examName} 🎓</div><div class="admit-title-outside"><h3>📜 प्रवेश पत्र (ADMIT CARD) 📜</h3></div><div class="card-body"><div class="top-info-row"><div class="photo-section"><div class="student-photo">${photoHtml}</div></div><div class="basic-info"><div class="info-item"><div class="info-label">STUDENT NAME</div><div class="info-value">${student.studentName||'N/A'}</div></div><div class="info-item"><div class="info-label">CLASS</div><div class="info-value">${studentClass}</div></div><div class="info-item"><div class="info-label">ROLL NUMBER</div><div class="info-value">${student.rollNumber||'N/A'}</div></div><div class="info-item"><div class="info-label">ROLL CODE</div><div class="info-value">${rollCode}</div></div><div class="info-item"><div class="info-label">FATHER'S NAME</div><div class="info-value">${student.fatherName||'N/A'}</div></div><div class="info-item"><div class="info-label">MOTHER'S NAME</div><div class="info-value">${motherName}</div></div><div class="info-item"><div class="info-label">DATE OF BIRTH</div><div class="info-value">${dob}</div></div><div class="info-item"><div class="info-label">GENDER</div><div class="info-value">${gender}</div></div><div class="info-item"><div class="info-label">REGISTRATION NO.</div><div class="info-value">${student.registrationNo||student.admissionNo||'N/A'}</div></div><div class="info-item"><div class="info-label">EXAM CENTRE</div><div class="info-value">${examCentre}</div></div></div><div class="qr-section"><div class="qr-box"><div id="qrcode-card" style="width:80px;height:80px;"></div></div><div class="qr-label">SCAN TO VERIFY</div></div></div><div class="subjects-schedule"><div class="section-title"><i class="fas fa-calendar-alt"></i> 📅 परीक्षा कार्यक्रम (Exam Schedule)</div><table class="schedule-table"><thead><tr><th>विषय कोड</th><th>विषय का नाम</th><th>परीक्षा की तिथि</th><th>परीक्षा का समय</th></tr></thead><tbody>${scheduleHtml||'<tr><td colspan="4" style="text-align:center;">No subjects added</td></tr>'}</tbody></table></div><div class="rules-section"><div class="rules-title"><i class="fas fa-file-alt"></i> 📜 परीक्षार्थियों के लिए निर्देश</div><div class="rules-list"><ul style="margin:0; padding-left:0; display:contents;">${rulesHtml}</ul></div></div><div class="quote-section"><div class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</div><div class="quote-author">- MR. RAVI SIR (Director, Quest Coaching Centre)</div></div><div class="signatures"><div class="sign-box"><div class="sign-line"></div><div class="sign-label">Director Signature</div></div><div class="stamp-box"><div class="stamp"><span>QUEST</span><span>COACHING</span><span>CENTRE</span><span style="font-size:5px;">AUTHORISED</span></div></div><div class="sign-box"><div class="sign-line"></div><div class="sign-label">Student Signature</div></div></div></div><div class="footer"><p>★ THIS IS A SYSTEM GENERATED ADMIT CARD | VALID FOR EXAMINATION PURPOSE ONLY ★</p></div></div>`;
+        
+        // Only show action buttons for teacher (not for public view)
+        if(!isViewOnly){
+            cardHtml += `<div class="action-buttons no-print"><button class="action-btn print" onclick="window.printAdmitCardFn()"><i class="fas fa-print"></i> Print</button><button class="action-btn pdf" onclick="window.downloadPdfFn()"><i class="fas fa-file-pdf"></i> PDF</button><div class="share-options"><button class="action-btn share" onclick="toggleShareOptions()" id="shareMainBtn"><i class="fas fa-share-alt"></i> Share</button><div class="share-dropdown" id="shareDropdown"><a href="#" onclick="shareOnWhatsApp(); return false;"><i class="fab fa-whatsapp" style="color:#25D366;"></i> WhatsApp</a><a href="#" onclick="shareOnTelegram(); return false;"><i class="fab fa-telegram" style="color:#0088cc;"></i> Telegram</a><a href="#" onclick="copyShareLink(); return false;"><i class="fas fa-link"></i> Copy Link</a><a href="#" onclick="shareOnEmail(); return false;"><i class="fas fa-envelope"></i> Email</a><a href="#" onclick="shareOnMessenger(); return false;"><i class="fab fa-facebook-messenger"></i> Messenger</a></div></div></div>`;
+        }
+        
         document.getElementById('admitCardContainer').innerHTML = cardHtml;
         document.getElementById('admitCardContainer').style.display = 'block';
         document.getElementById('admitCardContainer').scrollIntoView({ behavior:'smooth' });
@@ -500,59 +510,74 @@
         window.currentShareUrl = publicShareUrl;
         window.currentStudent = student;
         
-        window.printAdmitCardFn = ()=>{ let printWin=window.open('','_blank'); printWin.document.write(`<html><head><title>Admit Card - ${student.studentName}</title><style>body{margin:0;padding:0;} .action-buttons{display:none;} @media print{body{margin:0;}}</style></head><body>${document.getElementById('admitCard').cloneNode(true).outerHTML}</body></html>`); printWin.document.close(); printWin.print(); };
-        
-        window.downloadPdfFn = async ()=>{ 
-            let element = document.getElementById('admitCard'); 
-            let canvas = await html2canvas(element,{ scale:2, useCORS:true, backgroundColor:'#ffffff' }); 
-            let imgData = canvas.toDataURL('image/png'); 
-            let { jsPDF } = window.jspdf; 
-            let pdf = new jsPDF('p','mm','a4'); 
-            let imgWidth = 210; 
-            let imgHeight = (canvas.height * imgWidth) / canvas.width; 
-            pdf.addImage(imgData,'PNG',0,0,imgWidth,imgHeight); 
-            pdf.save(`AdmitCard_${student.rollNumber}_${student.studentName}.pdf`); 
-            Swal.fire('Downloaded!','PDF downloaded successfully','success'); 
-        };
-        
-        window.toggleShareOptions = () => {
-            let dropdown = document.getElementById('shareDropdown');
-            if(dropdown) dropdown.classList.toggle('show');
-            setTimeout(() => {
-                document.addEventListener('click', function closeDropdown(e) {
-                    if(!e.target.closest('.share-options')) {
-                        let dd = document.getElementById('shareDropdown');
-                        if(dd) dd.classList.remove('show');
-                        document.removeEventListener('click', closeDropdown);
-                    }
-                });
-            }, 100);
-        };
-        
-        window.shareOnWhatsApp = () => {
-            let text = `📄 *ADMIT CARD* 📄\n\n👤 *Name:* ${student.studentName}\n🎫 *Roll No:* ${student.rollNumber}\n🏫 *Class:* ${studentClass}\n📚 *Exam:* ${examName}\n📍 *Centre:* ${examCentre}\n\n🔗 *View Admit Card:* ${publicShareUrl}`;
-            let url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-            window.open(url, '_blank');
-        };
-        
-        window.shareOnTelegram = () => {
-            let text = `📄 *ADMIT CARD*\n\nName: ${student.studentName}\nRoll No: ${student.rollNumber}\nClass: ${studentClass}\nExam: ${examName}\n\nView: ${publicShareUrl}`;
-            let url = `https://t.me/share/url?url=${encodeURIComponent(publicShareUrl)}&text=${encodeURIComponent(text)}`;
-            window.open(url, '_blank');
-        };
-        
-        window.copyShareLink = async () => {
-            await navigator.clipboard.writeText(publicShareUrl);
-            Swal.fire('Link Copied!','Share this link to view admit card','success');
-            let dropdown = document.getElementById('shareDropdown');
-            if(dropdown) dropdown.classList.remove('show');
-        };
-        
-        window.shareOnEmail = () => {
-            let subject = `Admit Card for ${student.studentName}`;
-            let body = `Please find the admit card details below:\n\nName: ${student.studentName}\nRoll Number: ${student.rollNumber}\nClass: ${studentClass}\nExam: ${examName}\nCentre: ${examCentre}\n\nClick here to view full admit card: ${publicShareUrl}`;
-            window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        };
+        if(!isViewOnly){
+            window.printAdmitCardFn = ()=>{ let printWin=window.open('','_blank'); printWin.document.write(`<html><head><title>Admit Card - ${student.studentName}</title><style>body{margin:0;padding:0;} .action-buttons{display:none;} @media print{body{margin:0;}}</style></head><body>${document.getElementById('admitCard').cloneNode(true).outerHTML}</body></html>`); printWin.document.close(); printWin.print(); };
+            
+            window.downloadPdfFn = async ()=>{ 
+                let element = document.getElementById('admitCard'); 
+                let canvas = await html2canvas(element,{ scale:2, useCORS:true, backgroundColor:'#ffffff' }); 
+                let imgData = canvas.toDataURL('image/png'); 
+                let { jsPDF } = window.jspdf; 
+                let pdf = new jsPDF('p','mm','a4'); 
+                let imgWidth = 210; 
+                let imgHeight = (canvas.height * imgWidth) / canvas.width; 
+                pdf.addImage(imgData,'PNG',0,0,imgWidth,imgHeight); 
+                pdf.save(`AdmitCard_${student.rollNumber}_${student.studentName}.pdf`); 
+                Swal.fire('Downloaded!','PDF downloaded successfully','success'); 
+            };
+            
+            window.toggleShareOptions = () => {
+                let dropdown = document.getElementById('shareDropdown');
+                if(dropdown) dropdown.classList.toggle('show');
+                setTimeout(() => {
+                    document.addEventListener('click', function closeDropdown(e) {
+                        if(!e.target.closest('.share-options')) {
+                            let dd = document.getElementById('shareDropdown');
+                            if(dd) dd.classList.remove('show');
+                            document.removeEventListener('click', closeDropdown);
+                        }
+                    });
+                }, 100);
+            };
+            
+            window.shareOnWhatsApp = () => {
+                let text = `📄 *ADMIT CARD* 📄\n\n👤 *Name:* ${student.studentName}\n🎫 *Roll No:* ${student.rollNumber}\n🏫 *Class:* ${studentClass}\n📚 *Exam:* ${examName}\n📍 *Centre:* ${examCentre}\n\n🔗 *View Admit Card:* ${publicShareUrl}`;
+                let url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+                window.open(url, '_blank');
+                let dropdown = document.getElementById('shareDropdown');
+                if(dropdown) dropdown.classList.remove('show');
+            };
+            
+            window.shareOnTelegram = () => {
+                let text = `📄 *ADMIT CARD*\n\nName: ${student.studentName}\nRoll No: ${student.rollNumber}\nClass: ${studentClass}\nExam: ${examName}\n\nView: ${publicShareUrl}`;
+                let url = `https://t.me/share/url?url=${encodeURIComponent(publicShareUrl)}&text=${encodeURIComponent(text)}`;
+                window.open(url, '_blank');
+                let dropdown = document.getElementById('shareDropdown');
+                if(dropdown) dropdown.classList.remove('show');
+            };
+            
+            window.copyShareLink = async () => {
+                await navigator.clipboard.writeText(publicShareUrl);
+                Swal.fire('Link Copied!','Share this link to view admit card','success');
+                let dropdown = document.getElementById('shareDropdown');
+                if(dropdown) dropdown.classList.remove('show');
+            };
+            
+            window.shareOnEmail = () => {
+                let subject = `Admit Card for ${student.studentName}`;
+                let body = `Please find the admit card details below:\n\nName: ${student.studentName}\nRoll Number: ${student.rollNumber}\nClass: ${studentClass}\nExam: ${examName}\nCentre: ${examCentre}\n\nClick here to view full admit card: ${publicShareUrl}`;
+                window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                let dropdown = document.getElementById('shareDropdown');
+                if(dropdown) dropdown.classList.remove('show');
+            };
+            
+            window.shareOnMessenger = () => {
+                let url = `https://www.facebook.com/dialog/send?link=${encodeURIComponent(publicShareUrl)}&app_id=123456789&redirect_uri=${encodeURIComponent(publicShareUrl)}`;
+                window.open(url, '_blank');
+                let dropdown = document.getElementById('shareDropdown');
+                if(dropdown) dropdown.classList.remove('show');
+            };
+        }
     }
     
     document.getElementById('generateBtn')?.addEventListener('click', async () => { 
