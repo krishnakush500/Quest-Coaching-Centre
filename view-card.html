@@ -129,27 +129,28 @@
             position: relative;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3);
             font-family: 'Segoe UI', 'Poppins', sans-serif;
+            overflow: hidden;
         }
-        /* Gold Border - exactly inside the card */
+        /* Gold Border - inside the card */
         .card-border {
             position: absolute;
-            top: 12px;
-            left: 12px;
-            right: 12px;
-            bottom: 12px;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
             border: 2px solid #c5a059;
-            border-radius: 16px;
+            border-radius: 20px;
             pointer-events: none;
             z-index: 2;
         }
-        /* Header inside border */
+        /* Header - completely inside border */
         .card-header {
             background: linear-gradient(135deg, #1a3a5c, #0f2b44);
             padding: 20px 25px;
             text-align: center;
             position: relative;
             z-index: 1;
-            margin: 12px 12px 0 12px;
+            margin: 8px 8px 0 8px;
             border-radius: 16px 16px 0 0;
         }
         .header-flex { display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap; }
@@ -163,15 +164,15 @@
             color: #1a3a5c;
             text-align: center;
             padding: 10px;
-            margin: 0 12px;
+            margin: 0 8px;
             font-size: 18px;
             font-weight: 800;
             letter-spacing: 2px;
         }
-        .admit-title { text-align: center; margin: 8px 12px 5px 12px; padding: 5px; }
+        .admit-title { text-align: center; margin: 8px 8px 5px 8px; padding: 5px; }
         .admit-title h2 { font-size: 18px; font-weight: 800; color: #1a3a5c; letter-spacing: 2px; }
         
-        .card-body { padding: 15px 22px; display: flex; flex-direction: column; gap: 12px; margin: 0 12px; }
+        .card-body { padding: 15px 20px; display: flex; flex-direction: column; gap: 12px; margin: 0 8px; }
         
         .top-info-row { display: flex; gap: 15px; flex-wrap: wrap; }
         .photo-section { width: 110px; text-align: center; }
@@ -185,7 +186,7 @@
         .qr-box { background: white; padding: 6px; border: 2px solid #c5a059; border-radius: 12px; display: flex; justify-content: center; align-items: center; margin: 0 auto; width: 85px; height: 85px; }
         .qr-label { font-size: 7px; font-weight: bold; color: #c5a059; margin-top: 4px; }
         
-        /* Exam Schedule Table - Fixed Layout */
+        /* Exam Schedule Table */
         .subjects-schedule { background: #fef9e6; border-radius: 14px; padding: 12px; border-left: 4px solid #c5a059; }
         .section-title { font-size: 13px; font-weight: 800; color: #1a3a5c; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
         .schedule-table { width: 100%; border-collapse: collapse; font-size: 10px; }
@@ -216,7 +217,7 @@
             background: #0f2b44;
             padding: 8px;
             text-align: center;
-            margin: 0 12px 12px 12px;
+            margin: 0 8px 8px 8px;
             border-radius: 0 0 16px 16px;
             position: relative;
             z-index: 1;
@@ -313,7 +314,12 @@
         const qrDiv = document.getElementById(elementId);
         if (qrDiv) {
             qrDiv.innerHTML = "";
-            new QRCode(qrDiv, { text: url, width: size, height: size });
+            try {
+                new QRCode(qrDiv, { text: url, width: size, height: size });
+                console.log("QR Code generated for:", url);
+            } catch(e) {
+                console.error("QR Error:", e);
+            }
         }
     }
     
@@ -329,7 +335,7 @@
             `<img src="${student.photoUrl}" style="width:100%;height:100%;object-fit:cover;">` : 
             '<i class="fas fa-user" style="font-size:35px;color:#999;"></i>';
         
-        // Build schedule HTML - proper table layout
+        // Build schedule HTML
         let scheduleHtml = '';
         if (student.subjects && student.subjects.length > 0) {
             student.subjects.forEach(sub => {
@@ -442,9 +448,10 @@
         contentDiv.style.display = 'block';
         contentDiv.innerHTML = cardHtml;
         
+        // Generate QR code
         setTimeout(() => {
             generateQRCode("qrcode-card", publicShareUrl, 75);
-        }, 100);
+        }, 200);
         
         window.currentShareUrl = publicShareUrl;
         window.currentStudent = student;
