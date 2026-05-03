@@ -48,24 +48,6 @@
         }
         .error-container i { font-size: 50px; margin-bottom: 20px; }
         
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #64748b;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 50px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 20px;
-            transition: 0.2s;
-            text-decoration: none;
-        }
-        .back-btn:hover { background: #475569; transform: translateY(-2px); }
-        
         .action-buttons {
             display: flex;
             gap: 10px;
@@ -227,7 +209,7 @@
             .admit-card { width: 100%; min-height: auto; }
         }
         @media print {
-            .action-buttons, .back-btn { display: none !important; }
+            .action-buttons { display: none !important; }
             .admit-card { box-shadow: none; margin: 0; width: 100%; }
             body { background: white; padding: 0; }
         }
@@ -273,9 +255,6 @@
                 <i class="fas fa-exclamation-triangle"></i>
                 <h2>Invalid Request</h2>
                 <p>No admit card ID provided.</p>
-                <button class="back-btn" onclick="window.location.href='admit-card.html'" style="margin-top: 20px;">
-                    <i class="fas fa-arrow-left"></i> Back to Generator
-                </button>
             </div>
         `;
     } else {
@@ -291,9 +270,6 @@
                         <i class="fas fa-search"></i>
                         <h2>Admit Card Not Found</h2>
                         <p>The requested admit card does not exist or has been deleted.</p>
-                        <button class="back-btn" onclick="window.location.href='admit-card.html'" style="margin-top: 20px;">
-                            <i class="fas fa-arrow-left"></i> Back to Generator
-                        </button>
                     </div>
                 `;
                 return;
@@ -307,9 +283,6 @@
                     <i class="fas fa-exclamation-circle"></i>
                     <h2>Error Loading Admit Card</h2>
                     <p>Please try again later.</p>
-                    <button class="back-btn" onclick="window.location.href='admit-card.html'" style="margin-top: 20px;">
-                        <i class="fas fa-arrow-left"></i> Back to Generator
-                    </button>
                 </div>
             `;
         }
@@ -356,21 +329,15 @@
                 `;
             });
         } else {
-            scheduleHtml = '<tr><td colspan="4" style="text-align:center;">No subjects added</td></tr>';
+            scheduleHtml = '<tr><td colspan="4" style="text-align:center;">No subjects added</td><\/tr>';
         }
         
         const rulesHtml = RULES_LIST.map(r => `<li>${r}</li>`).join('');
-        // Get the correct base URL
-        const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/');
-        const publicShareUrl = `${baseUrl}view-card.html?id=${student.id}`;
+        // Get the correct base URL for QR code
+        const publicShareUrl = `${window.location.origin}${window.location.pathname}?id=${student.id}`;
         
         const cardHtml = `
             <div style="max-width: 800px; margin: 0 auto;">
-                <div style="text-align: center; margin-bottom: 15px;">
-                    <button class="back-btn" onclick="window.location.href='previous-cards.html'">
-                        <i class="fas fa-arrow-left"></i> Back to Previous Cards
-                    </button>
-                </div>
                 <div class="admit-card" id="admitCard">
                     <div class="card-border"></div>
                     <div class="card-header">
@@ -471,7 +438,7 @@
                     <title>Admit Card - ${student.studentName}</title>
                     <style>
                         body { margin: 0; padding: 0; }
-                        .action-buttons, .back-btn { display: none !important; }
+                        .action-buttons { display: none !important; }
                         .admit-card { box-shadow: none; margin: 0; width: 100%; }
                     </style>
                 </head>
