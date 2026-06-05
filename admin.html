@@ -2,121 +2,189 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quest Coaching Centre - Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Quest Coaching - Admin Panel</title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .section {
-            display: none;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .active {
-            display: block;
+        body {
+            background: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
         }
-        .coaching-name {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #0d6efd;
+        /* Main Container */
+        .admin-container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+        /* Welcome Card */
+        .welcome-card {
+            background: white;
+            border-radius: 25px;
+            padding: 25px 30px;
+            margin-bottom: 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        .welcome-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #1a237e, #0d6efd, #20c997, #dc3545);
+        }
+        .welcome-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a237e;
+            margin-bottom: 5px;
+        }
+        .welcome-sub {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        .coaching-badge {
+            background: #e9ecef;
+            border-radius: 50px;
+            padding: 5px 15px;
+            display: inline-block;
+            font-size: 0.85rem;
+            color: #1a237e;
+            font-weight: 500;
+        }
+        /* Dashboard Cards Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 22px;
+            margin-bottom: 30px;
+        }
+        /* Card Design */
+        .admin-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 15px;
             text-align: center;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: 1px solid #f0f0f0;
+            cursor: pointer;
         }
-        .dashboard-card {
-            transition: transform 0.3s, box-shadow 0.3s;
-            height: 100%;
-            min-height: 200px;
+        .admin-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 30px rgba(0,0,0,0.1);
         }
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        .dashboard-card .card-body {
+        /* Card Icon */
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 15px;
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
             align-items: center;
-            text-align: center;
-            height: 100%;
+            justify-content: center;
+            border-radius: 20px;
+            font-size: 28px;
         }
-        .dashboard-card .btn {
-            margin-top: 15px;
-            min-width: 200px;
-            padding: 10px 20px;
-            font-weight: 600;
-        }
-        /* Result Management Button - Special Style */
-        .result-management-btn {
-            background: linear-gradient(135deg, #1a237e, #283593);
-            color: white;
+        /* Different Colors for each card */
+        .card-1 .card-icon { background: #e8eafe; color: #1a237e; }
+        .card-2 .card-icon { background: #d1fae5; color: #10b981; }
+        .card-3 .card-icon { background: #fee2e2; color: #dc3545; }
+        .card-4 .card-icon { background: #e0f2fe; color: #0ea5e9; }
+        .card-5 .card-icon { background: #f3e8ff; color: #8b5cf6; }
+        
+        .card-title {
             font-size: 1.1rem;
-            padding: 12px 25px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1e293b;
+        }
+        .card-desc {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 15px;
+        }
+        .card-btn {
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 600;
             border: none;
+            background: #f8fafc;
+            transition: all 0.2s;
+            color: #1e293b;
         }
-        .result-management-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(26,35,126,0.3);
-            background: linear-gradient(135deg, #283593, #303f9f);
-        }
-        .fee-management-btn {
-            background-color: #dc3545;
-            border-color: #dc3545;
+        .admin-card:hover .card-btn {
+            background: #1a237e;
             color: white;
         }
-        .fee-management-btn:hover {
-            background-color: #bb2d3b;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(220,53,69,0.3);
-        }
-        .admission-management-btn {
-            background-color: #198754;
-            border-color: #198754;
-            color: white;
-        }
-        .admission-management-btn:hover {
-            background-color: #157347;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(25,135,84,0.3);
-        }
-        .online-test-btn {
-            background-color: #0dcaf0;
-            border-color: #0dcaf0;
-            color: #000;
-        }
-        .online-test-btn:hover {
-            background-color: #0bb5d8;
-            transform: translateY(-3px);
-        }
-        .admit-card-btn {
-            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
-            color: white;
-            border: none;
-        }
-        .admit-card-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(139,92,246,0.3);
-        }
-        .fixed-help-btn {
+        /* Specific button colors on hover keep original */
+        .card-1:hover .card-btn { background: #1a237e; }
+        .card-2:hover .card-btn { background: #10b981; }
+        .card-3:hover .card-btn { background: #dc3545; }
+        .card-4:hover .card-btn { background: #0ea5e9; }
+        .card-5:hover .card-btn { background: #8b5cf6; }
+        
+        /* Logout Button */
+        .logout-btn {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            bottom: 25px;
+            right: 25px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 22px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(220,53,69,0.3);
+            transition: 0.2s;
             z-index: 1000;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+        .logout-btn:hover {
+            background: #bb2d3b;
+            transform: scale(1.02);
+        }
+        /* Help Button */
+        .help-btn {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            background: #1a237e;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 22px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(26,35,126,0.3);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        /* Help Modal Content */
         .help-step {
             margin-bottom: 15px;
             padding: 10px;
             border-left: 4px solid #0d6efd;
-            background-color: #f8f9fa;
-            border-radius: 5px;
+            background: #f8f9fa;
+            border-radius: 8px;
         }
         .simple-instruction {
-            margin-bottom: 8px;
-            font-size: 0.95rem;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
         }
         .simple-instruction:before {
             content: "• ";
@@ -124,310 +192,232 @@
             font-weight: bold;
         }
         .language-switch {
-            margin: 10px 0;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 768px) {
+            body { padding: 15px; }
+            .dashboard-grid { gap: 15px; }
+            .welcome-title { font-size: 1.4rem; }
+            .admin-card { padding: 15px 10px; }
+            .card-icon { width: 50px; height: 50px; font-size: 24px; }
+            .card-title { font-size: 1rem; }
+            .card-btn { padding: 6px 14px; font-size: 0.75rem; }
         }
     </style>
 </head>
-<body class="bg-light">
-    <div class="container mt-4">
-        <!-- Fixed Help Button -->
-        <button class="btn btn-primary fixed-help-btn" id="helpButton" title="Help / मदद">
-            ?
-        </button>
+<body>
 
-        <!-- Dashboard Section -->
-        <div id="dashboardSection" class="section active">
-            <div class="row">
-                <div class="col-12">
-                    <!-- Coaching Centre Name -->
-                    <div class="coaching-name">
-                        QUEST COACHING CENTRE
-                    </div>
-                    
-                    <!-- Dashboard Cards -->
-                    <div class="row">
-                        <!-- MANAGE RESULTS - Main Button -->
-                        <div class="col-md-12 mb-4">
-                            <div class="card text-center dashboard-card border-primary">
-                                <div class="card-body">
-                                    <h5 class="card-title text-primary">📊 Manage Results</h5>
-                                    <p class="card-text">Create, edit, publish and manage all exam results</p>
-                                    <div>
-                                        <button id="manageResultsBtn" class="btn result-management-btn">📑 Manage Results</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Other Management Features Row -->
-                    <div class="row mt-2">
-                        <div class="col-md-6 mb-4">
-                            <div class="card text-center dashboard-card border-success">
-                                <div class="card-body">
-                                    <h5 class="card-title text-success">📋 Admission Management</h5>
-                                    <p class="card-text">Manage student admissions, view all students</p>
-                                    <div>
-                                        <button id="admissionManagementBtn" class="btn admission-management-btn">👨‍🎓 Student Dashboard</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-4">
-                            <div class="card text-center dashboard-card border-danger">
-                                <div class="card-body">
-                                    <h5 class="card-title text-danger">💰 Fee Management System</h5>
-                                    <p class="card-text">Manage student fees, add students, update payments</p>
-                                    <div>
-                                        <button id="feeManagementBtn" class="btn fee-management-btn">📊 Fee Management</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Third Row: Online Test + Admit Card -->
-                    <div class="row mt-2">
-                        <div class="col-md-6 mb-4">
-                            <div class="card text-center dashboard-card border-info">
-                                <div class="card-body">
-                                    <h5 class="card-title text-info">💻 Online Test</h5>
-                                    <p class="card-text">Manage online tests and publish new tests</p>
-                                    <div>
-                                        <button id="onlineTestBtn" class="btn online-test-btn">🌐 Open Online Test</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-4">
-                            <div class="card text-center dashboard-card border-purple">
-                                <div class="card-body">
-                                    <h5 class="card-title text-purple" style="color:#8b5cf6;">🎫 Admit Card Generator</h5>
-                                    <p class="card-text">Generate professional admit cards for students</p>
-                                    <div>
-                                        <button id="admitCardGeneratorBtn" class="btn admit-card-btn">📄 Generate Admit Card</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<div class="admin-container">
+    <!-- Welcome Card (Dynamic) -->
+    <div class="welcome-card">
+        <div class="d-flex flex-wrap justify-content-between align-items-center">
+            <div>
+                <h1 class="welcome-title" id="welcomeMessage">Welcome, Admin 👋</h1>
+                <p class="welcome-sub" id="coachingInfo">Loading coaching details...</p>
+                <div class="mt-2">
+                    <span class="coaching-badge" id="directorBadge">🎓 Director: --</span>
                 </div>
+            </div>
+            <div class="mt-2 mt-sm-0">
+                <i class="fas fa-school" style="font-size: 3rem; color: #1a237e; opacity: 0.5;"></i>
             </div>
         </div>
     </div>
 
-    <!-- Help Modal -->
-    <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="helpModalLabel">How to Use - मदद</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="language-switch text-center mb-3">
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-outline-primary active" id="englishHelpBtn">English</button>
-                            <button type="button" class="btn btn-outline-primary" id="hindiHelpBtn">हिंदी</button>
-                        </div>
-                    </div>
-                    
-                    <div id="englishInstructions">
-                        <h6 class="text-primary">📊 Manage Results</h6>
-                        <div class="help-step">
-                            <div class="simple-instruction">Click "Manage Results" button to open result management panel</div>
-                            <div class="simple-instruction">From there you can Create, Edit, Publish results</div>
-                            <div class="simple-instruction">View Draft Results and Old Published Results</div>
-                        </div>
-                        
-                        <h6 class="text-primary mt-4">📋 Admission Management</h6>
-                        <div class="help-step">
-                            <div class="simple-instruction">Click "Student Dashboard" to manage student admissions</div>
-                            <div class="simple-instruction">Add new students, view all enrolled students</div>
-                        </div>
+    <!-- Dashboard Cards Grid -->
+    <div class="dashboard-grid">
+        <!-- Card 1: Manage Results -->
+        <div class="admin-card card-1" id="manageResultsCard">
+            <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+            <h3 class="card-title">Manage Results</h3>
+            <p class="card-desc">Create, edit & publish results</p>
+            <button class="card-btn">Open →</button>
+        </div>
 
-                        <h6 class="text-primary mt-4">💰 Fee Management</h6>
-                        <div class="help-step">
-                            <div class="simple-instruction">Click "Fee Management" to open fee tracking system</div>
-                            <div class="simple-instruction">Manage student fees, add fee records, update payments</div>
-                        </div>
+        <!-- Card 2: Admission Management -->
+        <div class="admin-card card-2" id="admissionCard">
+            <div class="card-icon"><i class="fas fa-user-graduate"></i></div>
+            <h3 class="card-title">Admission Management</h3>
+            <p class="card-desc">Manage student admissions</p>
+            <button class="card-btn">Open →</button>
+        </div>
 
-                        <h6 class="text-primary mt-4">💻 Online Test</h6>
-                        <div class="help-step">
-                            <div class="simple-instruction">Click "Open Online Test" to manage online tests</div>
-                            <div class="simple-instruction">Create and publish new tests for students</div>
-                        </div>
+        <!-- Card 3: Fee Management -->
+        <div class="admin-card card-3" id="feeCard">
+            <div class="card-icon"><i class="fas fa-coins"></i></div>
+            <h3 class="card-title">Fee Management</h3>
+            <p class="card-desc">Track fees & payments</p>
+            <button class="card-btn">Open →</button>
+        </div>
 
-                        <h6 class="text-primary mt-4">🎫 Admit Card Generator</h6>
-                        <div class="help-step">
-                            <div class="simple-instruction">Click "Generate Admit Card" to open admit card generator</div>
-                            <div class="simple-instruction">Enter exam details and student roll number</div>
-                            <div class="simple-instruction">Generate, print, or download PDF</div>
-                        </div>
-                    </div>
-                    
-                    <div id="hindiInstructions" style="display: none;">
-                        <h6 class="text-primary">📊 रिजल्ट प्रबंधन</h6>
-                        <div class="help-step">
-                            <div class="simple-instruction">रिजल्ट प्रबंधन के लिए "Manage Results" बटन पर क्लिक करें</div>
-                            <div class="simple-instruction">वहां से आप रिजल्ट बना, एडिट और प्रकाशित कर सकते हैं</div>
-                            <div class="simple-instruction">ड्राफ्ट रिजल्ट और पुराने प्रकाशित रिजल्ट देखें</div>
-                        </div>
-                        
-                        <h6 class="text-primary mt-4">📋 एडमिशन प्रबंधन</h6>
-                        <div class="help-step">
-                            <div class="simple-instruction">"Student Dashboard" पर क्लिक करें छात्र एडमिशन प्रबंधित करने के लिए</div>
-                            <div class="simple-instruction">नए छात्र जोड़ें, सभी छात्र देखें</div>
-                        </div>
+        <!-- Card 4: Online Test -->
+        <div class="admin-card card-4" id="onlineTestCard">
+            <div class="card-icon"><i class="fas fa-laptop-code"></i></div>
+            <h3 class="card-title">Online Test</h3>
+            <p class="card-desc">Publish & manage tests</p>
+            <button class="card-btn">Open →</button>
+        </div>
 
-                        <h6 class="text-primary mt-4">💰 फीस प्रबंधन</h6>
-                        <div class="help-step">
-                            <div class="simple-instruction">"Fee Management" पर क्लिक करें फीस ट्रैकिंग सिस्टम खोलने के लिए</div>
-                            <div class="simple-instruction">छात्रों की फीस प्रबंधित करें, भुगतान अपडेट करें</div>
-                        </div>
+        <!-- Card 5: Admit Card Generator -->
+        <div class="admin-card card-5" id="admitCardCard">
+            <div class="card-icon"><i class="fas fa-id-card"></i></div>
+            <h3 class="card-title">Admit Card Generator</h3>
+            <p class="card-desc">Generate admit cards</p>
+            <button class="card-btn">Open →</button>
+        </div>
+    </div>
+</div>
 
-                        <h6 class="text-primary mt-4">💻 ऑनलाइन टेस्ट</h6>
-                        <div class="help-step">
-                            <div class="simple-instruction">"Open Online Test" पर क्लिक करें ऑनलाइन टेस्ट प्रबंधित करने के लिए</div>
-                            <div class="simple-instruction">छात्रों के लिए नए टेस्ट बनाएं और प्रकाशित करें</div>
-                        </div>
+<!-- Logout Button -->
+<button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
 
-                        <h6 class="text-primary mt-4">🎫 एडमिट कार्ड जनरेटर</h6>
-                        <div class="help-step">
-                            <div class="simple-instruction">"Generate Admit Card" पर क्लिक करें एडमिट कार्ड जनरेटर खोलने के लिए</div>
-                            <div class="simple-instruction">परीक्षा विवरण और छात्र का रोल नंबर भरें</div>
-                            <div class="simple-instruction">जनरेट करें, प्रिंट करें या PDF डाउनलोड करें</div>
-                        </div>
+<!-- Help Button -->
+<button class="help-btn" id="helpBtn"><i class="fas fa-question-circle"></i> Help</button>
+
+<!-- Help Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">📘 How to Use Admin Panel</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="language-switch text-center mb-3">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-primary active" id="englishHelpBtn">English</button>
+                        <button type="button" class="btn btn-outline-primary" id="hindiHelpBtn">हिंदी</button>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <div id="englishInstructions">
+                    <div class="help-step"><strong>📊 Manage Results</strong><div class="simple-instruction">Click "Manage Results" → Opens Result Management page (Create/Draft/Published)</div></div>
+                    <div class="help-step"><strong>👨‍🎓 Admission Management</strong><div class="simple-instruction">Manage student admissions, view all students, add new admissions</div></div>
+                    <div class="help-step"><strong>💰 Fee Management</strong><div class="simple-instruction">Track student fees, add fee records, update payments</div></div>
+                    <div class="help-step"><strong>💻 Online Test</strong><div class="simple-instruction">Create and publish online tests for students</div></div>
+                    <div class="help-step"><strong>🎫 Admit Card Generator</strong><div class="simple-instruction">Generate professional admit cards (enter exam details & roll number)</div></div>
                 </div>
+                <div id="hindiInstructions" style="display:none;">
+                    <div class="help-step"><strong>📊 रिजल्ट प्रबंधन</strong><div class="simple-instruction">"Manage Results" पर क्लिक करें → रिजल्ट बनाएं, एडिट करें, प्रकाशित करें</div></div>
+                    <div class="help-step"><strong>👨‍🎓 एडमिशन प्रबंधन</strong><div class="simple-instruction">छात्र एडमिशन देखें, नए छात्र जोड़ें</div></div>
+                    <div class="help-step"><strong>💰 फीस प्रबंधन</strong><div class="simple-instruction">छात्रों की फीस ट्रैक करें, भुगतान अपडेट करें</div></div>
+                    <div class="help-step"><strong>💻 ऑनलाइन टेस्ट</strong><div class="simple-instruction">ऑनलाइन टेस्ट बनाएं और प्रकाशित करें</div></div>
+                    <div class="help-step"><strong>🎫 एडमिट कार्ड</strong><div class="simple-instruction">परीक्षा विवरण और रोल नंबर भरकर एडमिट कार्ड बनाएं</div></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
-            authDomain: "quest-coaching.firebaseapp.com",
-            databaseURL: "https://quest-coaching-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "quest-coaching",
-            storageBucket: "quest-coaching.firebasestorage.app",
-            messagingSenderId: "131948734089",
-            appId: "1:131948734089:web:f4ba25110c8b1298360858"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
+        authDomain: "quest-coaching.firebaseapp.com",
+        databaseURL: "https://quest-coaching-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "quest-coaching",
+        storageBucket: "quest-coaching.firebasestorage.app",
+        messagingSenderId: "131948734089",
+        appId: "1:131948734089:web:f4ba25110c8b1298360858"
+    };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        // ============ AUTHENTICATION CHECK ============
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                alert('Please login from main page first!');
-                window.location.href = 'index.html';
-                return;
-            }
-            
-            // Add logout button
-            const logoutBtn = document.createElement('button');
-            logoutBtn.innerHTML = '🚪 Logout';
-            logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px;';
-            logoutBtn.onclick = async () => {
-                await signOut(auth);
-                window.location.href = 'index.html';
-            };
-            document.body.appendChild(logoutBtn);
-        });
+    // DOM Elements
+    const welcomeMsg = document.getElementById('welcomeMessage');
+    const coachingInfo = document.getElementById('coachingInfo');
+    const directorBadge = document.getElementById('directorBadge');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const helpBtn = document.getElementById('helpBtn');
+    const helpModal = new bootstrap.Modal(document.getElementById('helpModal'));
+    const englishHelpBtn = document.getElementById('englishHelpBtn');
+    const hindiHelpBtn = document.getElementById('hindiHelpBtn');
+    const englishInstructions = document.getElementById('englishInstructions');
+    const hindiInstructions = document.getElementById('hindiInstructions');
 
-        // Button Handlers
-        const manageResultsBtn = document.getElementById('manageResultsBtn');
-        const admissionManagementBtn = document.getElementById('admissionManagementBtn');
-        const feeManagementBtn = document.getElementById('feeManagementBtn');
-        const onlineTestBtn = document.getElementById('onlineTestBtn');
-        const admitCardGeneratorBtn = document.getElementById('admitCardGeneratorBtn');
+    // Card buttons
+    const manageResultsCard = document.getElementById('manageResultsCard');
+    const admissionCard = document.getElementById('admissionCard');
+    const feeCard = document.getElementById('feeCard');
+    const onlineTestCard = document.getElementById('onlineTestCard');
+    const admitCardCard = document.getElementById('admitCardCard');
+
+    // Authentication & Fetch Coaching Details
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            alert('Please login from main page first!');
+            window.location.href = 'index.html';
+            return;
+        }
+        // Show user email in welcome
+        const userEmail = user.email;
+        welcomeMsg.innerHTML = `Welcome, ${userEmail.split('@')[0]} 👋`;
         
-        // Help Modal
-        const helpButton = document.getElementById('helpButton');
-        const helpModal = new bootstrap.Modal(document.getElementById('helpModal'));
-        const englishHelpBtn = document.getElementById('englishHelpBtn');
-        const hindiHelpBtn = document.getElementById('hindiHelpBtn');
-        const englishInstructions = document.getElementById('englishInstructions');
-        const hindiInstructions = document.getElementById('hindiInstructions');
-
-        // Vibrate function
-        function vibrateButton() {
-            if (navigator.vibrate) {
-                navigator.vibrate(50);
+        // Fetch coaching details from Firestore (assuming a document 'coachingInfo' exists)
+        try {
+            const coachingDoc = await getDoc(doc(db, "settings", "coaching"));
+            if (coachingDoc.exists()) {
+                const data = coachingDoc.data();
+                coachingInfo.innerHTML = data.name || "QUEST COACHING CENTRE";
+                directorBadge.innerHTML = `🎓 Director: ${data.director || "MR. RAVI SIR"}`;
+            } else {
+                coachingInfo.innerHTML = "QUEST COACHING CENTRE";
+                directorBadge.innerHTML = "🎓 Director: MR. RAVI SIR";
             }
+        } catch (error) {
+            console.warn("Could not fetch coaching details", error);
+            coachingInfo.innerHTML = "QUEST COACHING CENTRE";
+            directorBadge.innerHTML = "🎓 Director: MR. RAVI SIR";
         }
+    });
 
-        document.addEventListener('click', function(e) {
-            if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
-                vibrateButton();
-            }
-        });
+    // Navigation Handlers
+    manageResultsCard.addEventListener('click', () => {
+        window.location.href = 'manage-results.html';
+    });
+    admissionCard.addEventListener('click', () => {
+        window.location.href = 'student-dashboard.html';
+    });
+    feeCard.addEventListener('click', () => {
+        window.open('dashboard.html', '_blank');
+    });
+    onlineTestCard.addEventListener('click', () => {
+        window.open('publishtest.html', '_blank');
+    });
+    admitCardCard.addEventListener('click', () => {
+        window.location.href = 'admit-card.html';
+    });
 
-        // Help Modal Handlers
-        helpButton.addEventListener('click', () => {
-            helpModal.show();
-        });
+    // Logout
+    logoutBtn.addEventListener('click', async () => {
+        await signOut(auth);
+        window.location.href = 'index.html';
+    });
 
-        englishHelpBtn.addEventListener('click', () => {
-            englishInstructions.style.display = 'block';
-            hindiInstructions.style.display = 'none';
-            englishHelpBtn.classList.add('active');
-            hindiHelpBtn.classList.remove('active');
-        });
-        
-        hindiHelpBtn.addEventListener('click', () => {
-            englishInstructions.style.display = 'none';
-            hindiInstructions.style.display = 'block';
-            englishHelpBtn.classList.remove('active');
-            hindiHelpBtn.classList.add('active');
-        });
-
-        // Navigation Handlers
-        if (manageResultsBtn) {
-            manageResultsBtn.addEventListener('click', () => {
-                window.location.href = 'manage-results.html';
-            });
-        }
-
-        if (admissionManagementBtn) {
-            admissionManagementBtn.addEventListener('click', () => {
-                window.location.href = 'student-dashboard.html';
-            });
-        }
-
-        if (feeManagementBtn) {
-            feeManagementBtn.addEventListener('click', () => {
-                window.open('dashboard.html', '_blank');
-            });
-        }
-
-        if (onlineTestBtn) {
-            onlineTestBtn.addEventListener('click', () => {
-                window.open('publishtest.html', '_blank');
-            });
-        }
-
-        if (admitCardGeneratorBtn) {
-            admitCardGeneratorBtn.addEventListener('click', () => {
-                window.location.href = 'admit-card.html';
-            });
-        }
-    </script>
+    // Help Modal
+    helpBtn.addEventListener('click', () => {
+        helpModal.show();
+    });
+    englishHelpBtn.addEventListener('click', () => {
+        englishInstructions.style.display = 'block';
+        hindiInstructions.style.display = 'none';
+        englishHelpBtn.classList.add('active');
+        hindiHelpBtn.classList.remove('active');
+    });
+    hindiHelpBtn.addEventListener('click', () => {
+        englishInstructions.style.display = 'none';
+        hindiInstructions.style.display = 'block';
+        englishHelpBtn.classList.remove('active');
+        hindiHelpBtn.classList.add('active');
+    });
+</script>
 </body>
 </html>
