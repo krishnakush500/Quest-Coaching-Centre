@@ -5,38 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quest Coaching Centre - Admin Panel</title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- jsPDF Library for PDF download -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- AutoTable plugin for jsPDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .section {
             display: none;
         }
         .active {
             display: block;
-        }
-        .subject-box {
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 10px;
-        }
-        .student-row {
-            transition: all 0.3s;
-        }
-        .student-row:hover {
-            background-color: #f8f9fa;
-        }
-        .nav-btn {
-            margin: 5px;
-        }
-        .success-message {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
         }
         .coaching-name {
             font-size: 2.5rem;
@@ -47,51 +22,6 @@
             text-transform: uppercase;
             letter-spacing: 2px;
         }
-        .help-step {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-left: 4px solid #0d6efd;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-        }
-        .language-switch {
-            margin: 10px 0;
-        }
-        .simple-instruction {
-            margin-bottom: 8px;
-            font-size: 0.95rem;
-        }
-        .simple-instruction:before {
-            content: "• ";
-            color: #0d6efd;
-            font-weight: bold;
-        }
-        /* Fixed Help Button Position */
-        .fixed-help-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        /* Published Success Toast */
-        .published-toast {
-            background-color: #198754 !important;
-        }
-        /* Save Changes Button Style */
-        .save-changes-btn {
-            background-color: #20c997;
-            border-color: #20c997;
-        }
-        .save-changes-btn:hover {
-            background-color: #1ba87e;
-            border-color: #1ba87e;
-        }
-        /* New Dashboard Cards - Equal Size */
         .dashboard-card {
             transition: transform 0.3s, box-shadow 0.3s;
             height: 100%;
@@ -111,98 +41,90 @@
         }
         .dashboard-card .btn {
             margin-top: 15px;
-            min-width: 160px;
+            min-width: 200px;
+            padding: 10px 20px;
+            font-weight: 600;
         }
-        /* Equal button size for all dashboard cards */
-        .dashboard-card .btn {
-            width: 180px;
-            padding: 10px 15px;
-        }
-        /* Admit Card Button */
-        .admit-card-btn {
-            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+        /* Result Management Button - Special Style */
+        .result-management-btn {
+            background: linear-gradient(135deg, #1a237e, #283593);
             color: white;
-            width: 100%;
-            padding: 12px;
-            border-radius: 50px;
-            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 12px 25px;
             border: none;
-            transition: 0.2s;
         }
-        .admit-card-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(139,92,246,0.3);
+        .result-management-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(26,35,126,0.3);
+            background: linear-gradient(135deg, #283593, #303f9f);
         }
-        /* PDF download button */
-        .pdf-download-btn {
-            background-color: #dc3545;
-            border-color: #dc3545;
-            color: white;
-        }
-        .pdf-download-btn:hover {
-            background-color: #bb2d3b;
-            border-color: #b02a37;
-        }
-        /* Top student highlight */
-        .top-student-row {
-            background-color: #fff3cd !important;
-            font-weight: 500;
-        }
-        /* Fee Management Button Style */
         .fee-management-btn {
             background-color: #dc3545;
             border-color: #dc3545;
             color: white;
-            font-weight: bold;
-            transition: all 0.3s;
-            width: 220px !important;
         }
         .fee-management-btn:hover {
             background-color: #bb2d3b;
-            border-color: #b02a37;
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3);
+            box-shadow: 0 10px 20px rgba(220,53,69,0.3);
         }
-        /* NEW: Admission Management Button */
         .admission-management-btn {
             background-color: #198754;
             border-color: #198754;
             color: white;
-            font-weight: bold;
-            transition: all 0.3s;
-            width: 220px !important;
         }
         .admission-management-btn:hover {
             background-color: #157347;
-            border-color: #146c43;
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(25, 135, 84, 0.3);
+            box-shadow: 0 10px 20px rgba(25,135,84,0.3);
         }
-        /* Equal card button container */
-        .card-btn-wrapper {
-            display: flex;
-            justify-content: center;
-            width: 100%;
+        .online-test-btn {
+            background-color: #0dcaf0;
+            border-color: #0dcaf0;
+            color: #000;
         }
-        /* Admit Card Row */
-        .admit-card-row {
-            margin-top: 20px;
+        .online-test-btn:hover {
+            background-color: #0bb5d8;
+            transform: translateY(-3px);
         }
-        .admit-card-card {
+        .admit-card-btn {
             background: linear-gradient(135deg, #8b5cf6, #6d28d9);
             color: white;
-        }
-        .admit-card-card .card-title, .admit-card-card .card-text {
-            color: white;
-        }
-        .admit-card-card .btn {
-            background: white;
-            color: #6d28d9;
             border: none;
         }
-        .admit-card-card .btn:hover {
-            background: #f3f4f6;
-            transform: translateY(-2px);
+        .admit-card-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(139,92,246,0.3);
+        }
+        .fixed-help-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .help-step {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-left: 4px solid #0d6efd;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .simple-instruction {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        .simple-instruction:before {
+            content: "• ";
+            color: #0d6efd;
+            font-weight: bold;
+        }
+        .language-switch {
+            margin: 10px 0;
         }
     </style>
 </head>
@@ -213,7 +135,7 @@
             ?
         </button>
 
-        <!-- Teacher Dashboard (Directly show without login) -->
+        <!-- Dashboard Section -->
         <div id="dashboardSection" class="section active">
             <div class="row">
                 <div class="col-12">
@@ -222,62 +144,30 @@
                         QUEST COACHING CENTRE
                     </div>
                     
-                    <!-- Dashboard Cards - All Equal Size -->
+                    <!-- Dashboard Cards -->
                     <div class="row">
-                        <div class="col-md-3 mb-4">
-                            <div class="card text-center dashboard-card">
+                        <!-- MANAGE RESULTS - Main Button -->
+                        <div class="col-md-12 mb-4">
+                            <div class="card text-center dashboard-card border-primary">
                                 <div class="card-body">
-                                    <h5 class="card-title">Create Result</h5>
-                                    <p class="card-text">Create a new exam result</p>
-                                    <div class="card-btn-wrapper">
-                                        <button id="createResultBtn" class="btn btn-primary">Go</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-4">
-                            <div class="card text-center dashboard-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Draft Results</h5>
-                                    <p class="card-text">View and edit draft results</p>
-                                    <div class="card-btn-wrapper">
-                                        <button id="draftResultsBtn" class="btn btn-warning">Go</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-4">
-                            <div class="card text-center dashboard-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Old Results</h5>
-                                    <p class="card-text">View published results</p>
-                                    <div class="card-btn-wrapper">
-                                        <button id="oldResultsBtn" class="btn btn-info">Go</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-4">
-                            <div class="card text-center dashboard-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Online Test</h5>
-                                    <p class="card-text">Manage online tests</p>
-                                    <div class="card-btn-wrapper">
-                                        <button id="onlineTestBtn" class="btn btn-success">Open</button>
+                                    <h5 class="card-title text-primary">📊 Manage Results</h5>
+                                    <p class="card-text">Create, edit, publish and manage all exam results</p>
+                                    <div>
+                                        <button id="manageResultsBtn" class="btn result-management-btn">📑 Manage Results</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- NEW ROW: Admission Management + Fee Management (Both side by side) -->
+                    <!-- Other Management Features Row -->
                     <div class="row mt-2">
                         <div class="col-md-6 mb-4">
                             <div class="card text-center dashboard-card border-success">
                                 <div class="card-body">
                                     <h5 class="card-title text-success">📋 Admission Management</h5>
                                     <p class="card-text">Manage student admissions, view all students</p>
-                                    <div class="card-btn-wrapper">
+                                    <div>
                                         <button id="admissionManagementBtn" class="btn admission-management-btn">👨‍🎓 Student Dashboard</button>
                                     </div>
                                 </div>
@@ -288,156 +178,40 @@
                                 <div class="card-body">
                                     <h5 class="card-title text-danger">💰 Fee Management System</h5>
                                     <p class="card-text">Manage student fees, add students, update payments</p>
-                                    <div class="card-btn-wrapper">
-                                        <button id="feeManagementBtn" class="btn fee-management-btn">📊 Fee Management Dashboard</button>
+                                    <div>
+                                        <button id="feeManagementBtn" class="btn fee-management-btn">📊 Fee Management</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- NEW ROW: Admit Card Generator -->
-                    <div class="row admit-card-row">
-                        <div class="col-md-12 mb-4">
-                            <div class="card text-center dashboard-card admit-card-card">
+                    <!-- Third Row: Online Test + Admit Card -->
+                    <div class="row mt-2">
+                        <div class="col-md-6 mb-4">
+                            <div class="card text-center dashboard-card border-info">
                                 <div class="card-body">
-                                    <h5 class="card-title">🎫 Admit Card Generator</h5>
+                                    <h5 class="card-title text-info">💻 Online Test</h5>
+                                    <p class="card-text">Manage online tests and publish new tests</p>
+                                    <div>
+                                        <button id="onlineTestBtn" class="btn online-test-btn">🌐 Open Online Test</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card text-center dashboard-card border-purple">
+                                <div class="card-body">
+                                    <h5 class="card-title text-purple" style="color:#8b5cf6;">🎫 Admit Card Generator</h5>
                                     <p class="card-text">Generate professional admit cards for students</p>
-                                    <div class="card-btn-wrapper">
-                                        <button id="admitCardGeneratorBtn" class="btn">📄 Generate Admit Card</button>
+                                    <div>
+                                        <button id="admitCardGeneratorBtn" class="btn admit-card-btn">📄 Generate Admit Card</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Create Result Section -->
-        <div id="createResultSection" class="section">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2>Create Result</h2>
-                <div>
-                    <button id="backToDashboardBtn" class="btn btn-secondary">Back to Dashboard</button>
-                </div>
-            </div>
-            
-            <!-- Step 1: Exam Setup -->
-            <div id="examSetupStep">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h4>Step 1: Exam Setup</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label for="examName" class="form-label">Exam Name</label>
-                            <input type="text" class="form-control" id="examName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="subjectCount" class="form-label">Number of Subjects</label>
-                            <input type="number" class="form-control" id="subjectCount" min="1" required>
-                        </div>
-                        <button id="generateSubjectFieldsBtn" class="btn btn-primary">Generate Subject Fields</button>
-                    </div>
-                </div>
-                
-                <div id="subjectFields" class="mb-4"></div>
-                
-                <div id="step1NextBtn" class="d-none">
-                    <button id="nextToStudentEntryBtn" class="btn btn-success">Next</button>
-                </div>
-            </div>
-            
-            <!-- Step 2: Student Marks Entry -->
-            <div id="studentEntryStep" class="d-none">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h4>Step 2: Student Marks Entry</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-3 mb-3">
-                                <label for="rollNo" class="form-label">Roll No</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="rollNo" min="1" value="1">
-                                    <button class="btn btn-outline-secondary" type="button" id="incrementRollBtn">+</button>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="studentName" class="form-label">Student Name</label>
-                                <input type="text" class="form-control" id="studentName" required>
-                            </div>
-                            <div class="col-md-5 mb-3">
-                                <label for="fatherName" class="form-label">Father Name (Optional)</label>
-                                <input type="text" class="form-control" id="fatherName">
-                            </div>
-                        </div>
-                        
-                        <div id="marksFields" class="mb-3"></div>
-                        
-                        <div class="d-flex gap-2">
-                            <button id="addStudentBtn" class="btn btn-primary">Add Student</button>
-                            <button id="updateStudentBtn" class="btn btn-warning d-none">Update Student</button>
-                            <button id="cancelEditBtn" class="btn btn-secondary d-none">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Students List</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Roll No</th>
-                                        <th>Name</th>
-                                        <th>Father Name</th>
-                                        <th>Marks</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="studentsTableBody">
-                                    <!-- Student rows will be added here dynamically -->
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <div class="d-flex gap-2 mt-3">
-                            <button id="saveDraftBtn" class="btn btn-warning">Save as Draft</button>
-                            <button id="saveChangesBtn" class="btn save-changes-btn d-none">Save Changes</button>
-                            <button id="publishResultBtn" class="btn btn-success">Publish Result</button>
-                            <button id="dontSaveBtn" class="btn btn-secondary d-none">Don't Save</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Draft Results Section -->
-        <div id="draftResultsSection" class="section">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2>Draft Results</h2>
-                <button id="backToDashboardBtn2" class="btn btn-secondary">Back to Dashboard</button>
-            </div>
-            
-            <div id="draftResultsList" class="row">
-                <!-- Draft results will be loaded here -->
-            </div>
-        </div>
-
-        <!-- Old Results Section -->
-        <div id="oldResultsSection" class="section">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2>Published Results</h2>
-                <button id="backToDashboardBtn3" class="btn btn-secondary">Back to Dashboard</button>
-            </div>
-            
-            <div id="oldResultsList" class="row">
-                <!-- Old results will be loaded here -->
             </div>
         </div>
     </div>
@@ -459,141 +233,68 @@
                     </div>
                     
                     <div id="englishInstructions">
-                        <h6 class="text-primary">Step 1: Make New Result</h6>
+                        <h6 class="text-primary">📊 Manage Results</h6>
                         <div class="help-step">
-                            <div class="simple-instruction">Click "Create Result" button</div>
-                            <div class="simple-instruction">Type exam name (like "Final Exam")</div>
-                            <div class="simple-instruction">Type how many subjects (like 5, 6, 7)</div>
-                            <div class="simple-instruction">Click "Generate Subject Fields" button</div>
-                            <div class="simple-instruction">Type subject names (like Math, Science)</div>
-                            <div class="simple-instruction">Type total marks for each subject</div>
-                            <div class="simple-instruction">Click "Next" button</div>
+                            <div class="simple-instruction">Click "Manage Results" button to open result management panel</div>
+                            <div class="simple-instruction">From there you can Create, Edit, Publish results</div>
+                            <div class="simple-instruction">View Draft Results and Old Published Results</div>
                         </div>
                         
-                        <h6 class="text-primary mt-4">Step 2: Add Students</h6>
+                        <h6 class="text-primary mt-4">📋 Admission Management</h6>
                         <div class="help-step">
-                            <div class="simple-instruction">Roll number will start from 1</div>
-                            <div class="simple-instruction">Type student name</div>
-                            <div class="simple-instruction">Type father name (if you want)</div>
-                            <div class="simple-instruction">Type marks for each subject</div>
-                            <div class="simple-instruction">Click "Add Student" button</div>
-                            <div class="simple-instruction">For next student, click "+" button for roll number</div>
-                            <div class="simple-instruction">Repeat for all students</div>
-                        </div>
-                        
-                        <h6 class="text-primary mt-4">Step 3: Save or Publish</h6>
-                        <div class="help-step">
-                            <div class="simple-instruction">"Save as Draft": Save for later changes</div>
-                            <div class="simple-instruction">"Publish Result": Make result final</div>
-                            <div class="simple-instruction">Before publish, you can edit/delete students</div>
-                            <div class="simple-instruction">To edit student: Click "Edit" button</div>
-                            <div class="simple-instruction">To delete student: Click "Delete" button</div>
-                        </div>
-                        
-                        <h6 class="text-primary mt-4">Step 4: Manage Results</h6>
-                        <div class="help-step">
-                            <div class="simple-instruction">"Draft Results": See saved results for editing</div>
-                            <div class="simple-instruction">"Old Results": See published results</div>
-                            <div class="simple-instruction">From drafts: You can edit or delete</div>
-                            <div class="simple-instruction">From published: You can view, edit or delete</div>
-                            <div class="simple-instruction">"View" button: See full result with Rank & TOP student</div>
-                            <div class="simple-instruction">"Edit" button: Make changes to result</div>
-                            <div class="simple-instruction"><strong>PDF Download:</strong> PDF includes Rank, Percentage, and Top Student Highlight</div>
+                            <div class="simple-instruction">Click "Student Dashboard" to manage student admissions</div>
+                            <div class="simple-instruction">Add new students, view all enrolled students</div>
                         </div>
 
-                        <h6 class="text-primary mt-4">Online Test</h6>
+                        <h6 class="text-primary mt-4">💰 Fee Management</h6>
                         <div class="help-step">
-                            <div class="simple-instruction">"Online Test": Click to manage online tests</div>
-                            <div class="simple-instruction">Opens publishtest.html in new tab</div>
-                            <div class="simple-instruction">Use this for online test management</div>
+                            <div class="simple-instruction">Click "Fee Management" to open fee tracking system</div>
+                            <div class="simple-instruction">Manage student fees, add fee records, update payments</div>
                         </div>
 
-                        <h6 class="text-primary mt-4">Admission Management</h6>
+                        <h6 class="text-primary mt-4">💻 Online Test</h6>
                         <div class="help-step">
-                            <div class="simple-instruction">"Student Dashboard": Click to manage student admissions</div>
-                            <div class="simple-instruction">View all students, add new admissions, manage existing students</div>
+                            <div class="simple-instruction">Click "Open Online Test" to manage online tests</div>
+                            <div class="simple-instruction">Create and publish new tests for students</div>
                         </div>
 
-                        <h6 class="text-primary mt-4">Fee Management</h6>
+                        <h6 class="text-primary mt-4">🎫 Admit Card Generator</h6>
                         <div class="help-step">
-                            <div class="simple-instruction">"Fee Management Dashboard": Click to open fee management system</div>
-                            <div class="simple-instruction">Manage student fees, add students, update payments</div>
-                        </div>
-
-                        <h6 class="text-primary mt-4">Admit Card Generator</h6>
-                        <div class="help-step">
-                            <div class="simple-instruction">"Admit Card Generator": Click to generate admit cards for students</div>
+                            <div class="simple-instruction">Click "Generate Admit Card" to open admit card generator</div>
                             <div class="simple-instruction">Enter exam details and student roll number</div>
                             <div class="simple-instruction">Generate, print, or download PDF</div>
                         </div>
                     </div>
                     
                     <div id="hindiInstructions" style="display: none;">
-                        <h6 class="text-primary">चरण 1: नया रिजल्ट बनाएं</h6>
+                        <h6 class="text-primary">📊 रिजल्ट प्रबंधन</h6>
                         <div class="help-step">
-                            <div class="simple-instruction">"Create Result" बटन पर क्लिक करें</div>
-                            <div class="simple-instruction">परीक्षा का नाम टाइप करें (जैसे "फाइनल एग्जाम")</div>
-                            <div class="simple-instruction">कितने विषय हैं टाइप करें (जैसे 5, 6, 7)</div>
-                            <div class="simple-instruction">"Generate Subject Fields" बटन पर क्लिक करें</div>
-                            <div class="simple-instruction">विषयों के नाम टाइप करें (जैसे गणित, विज्ञान)</div>
-                            <div class="simple-instruction">हर विषय के कुल अंक टाइप करें</div>
-                            <div class="simple-instruction">"Next" बटन पर क्लिक करें</div>
+                            <div class="simple-instruction">रिजल्ट प्रबंधन के लिए "Manage Results" बटन पर क्लिक करें</div>
+                            <div class="simple-instruction">वहां से आप रिजल्ट बना, एडिट और प्रकाशित कर सकते हैं</div>
+                            <div class="simple-instruction">ड्राफ्ट रिजल्ट और पुराने प्रकाशित रिजल्ट देखें</div>
                         </div>
                         
-                        <h6 class="text-primary mt-4">चरण 2: छात्र जोड़ें</h6>
+                        <h6 class="text-primary mt-4">📋 एडमिशन प्रबंधन</h6>
                         <div class="help-step">
-                            <div class="simple-instruction">रोल नंबर 1 से शुरू होगा</div>
-                            <div class="simple-instruction">छात्र का नाम टाइप करें</div>
-                            <div class="simple-instruction">पिता का नाम टाइप करें (अगर चाहें)</div>
-                            <div class="simple-instruction">हर विषय के अंक टाइप करें</div>
-                            <div class="simple-instruction">"Add Student" बटन पर क्लिक करें</div>
-                            <div class="simple-instruction">अगले छात्र के लिए, रोल नंबर के "+" बटन पर क्लिक करें</div>
-                            <div class="simple-instruction">सभी छात्रों के लिए दोहराएं</div>
-                        </div>
-                        
-                        <h6 class="text-primary mt-4">चरण 3: सेव या प्रकाशित करें</h6>
-                        <div class="help-step">
-                            <div class="simple-instruction">"Save as Draft": बाद में बदलाव के लिए सेव करें</div>
-                            <div class="simple-instruction">"Publish Result": रिजल्ट को अंतिम बनाएं</div>
-                            <div class="simple-instruction">प्रकाशित करने से पहले, छात्रों को एडिट/डिलीट कर सकते हैं</div>
-                            <div class="simple-instruction">छात्र एडिट करने के लिए: "Edit" बटन पर क्लिक करें</div>
-                            <div class="simple-instruction">छात्र डिलीट करने के लिए: "Delete" बटन पर क्लिक करें</div>
-                        </div>
-                        
-                        <h6 class="text-primary mt-4">चरण 4: रिजल्ट प्रबंधित करें</h6>
-                        <div class="help-step">
-                            <div class="simple-instruction">"Draft Results": एडिटिंग के लिए सेव किए रिजल्ट देखें</div>
-                            <div class="simple-instruction">"Old Results": प्रकाशित रिजल्ट देखें</div>
-                            <div class="simple-instruction">ड्राफ्ट से: आप एडिट या डिलीट कर सकते हैं</div>
-                            <div class="simple-instruction">प्रकाशित से: आप देख, एडिट या डिलीट कर सकते हैं</div>
-                            <div class="simple-instruction">"View" बटन: रैंक और टॉप छात्र के साथ रिजल्ट देखें</div>
-                            <div class="simple-instruction">"Edit" बटन: रिजल्ट में बदलाव करें</div>
-                            <div class="simple-instruction"><strong>PDF डाउनलोड:</strong> PDF में रैंक, प्रतिशत और टॉप छात्र हाइलाइट होगा</div>
+                            <div class="simple-instruction">"Student Dashboard" पर क्लिक करें छात्र एडमिशन प्रबंधित करने के लिए</div>
+                            <div class="simple-instruction">नए छात्र जोड़ें, सभी छात्र देखें</div>
                         </div>
 
-                        <h6 class="text-primary mt-4">ऑनलाइन टेस्ट</h6>
+                        <h6 class="text-primary mt-4">💰 फीस प्रबंधन</h6>
                         <div class="help-step">
-                            <div class="simple-instruction">"Online Test": ऑनलाइन टेस्ट मैनेज करने के लिए क्लिक करें</div>
-                            <div class="simple-instruction">publishtest.html नई टैब में खुल जाएगा</div>
-                            <div class="simple-instruction">इसे ऑनलाइन टेस्ट मैनेजमेंट के लिए उपयोग करें</div>
+                            <div class="simple-instruction">"Fee Management" पर क्लिक करें फीस ट्रैकिंग सिस्टम खोलने के लिए</div>
+                            <div class="simple-instruction">छात्रों की फीस प्रबंधित करें, भुगतान अपडेट करें</div>
                         </div>
 
-                        <h6 class="text-primary mt-4">एडमिशन प्रबंधन</h6>
+                        <h6 class="text-primary mt-4">💻 ऑनलाइन टेस्ट</h6>
                         <div class="help-step">
-                            <div class="simple-instruction">"Student Dashboard": छात्र एडमिशन प्रबंधित करने के लिए क्लिक करें</div>
-                            <div class="simple-instruction">सभी छात्र देखें, नए एडमिशन जोड़ें, मौजूदा छात्र प्रबंधित करें</div>
+                            <div class="simple-instruction">"Open Online Test" पर क्लिक करें ऑनलाइन टेस्ट प्रबंधित करने के लिए</div>
+                            <div class="simple-instruction">छात्रों के लिए नए टेस्ट बनाएं और प्रकाशित करें</div>
                         </div>
 
-                        <h6 class="text-primary mt-4">फीस प्रबंधन</h6>
+                        <h6 class="text-primary mt-4">🎫 एडमिट कार्ड जनरेटर</h6>
                         <div class="help-step">
-                            <div class="simple-instruction">"Fee Management Dashboard": फीस प्रबंधन प्रणाली खोलने के लिए क्लिक करें</div>
-                            <div class="simple-instruction">dashboard.html नई टैब में खुलेगा</div>
-                            <div class="simple-instruction">छात्रों की फीस प्रबंधित करें, नए छात्र जोड़ें, भुगतान अपडेट करें</div>
-                        </div>
-
-                        <h6 class="text-primary mt-4">एडमिट कार्ड जनरेटर</h6>
-                        <div class="help-step">
-                            <div class="simple-instruction">"Admit Card Generator": छात्रों के एडमिट कार्ड बनाने के लिए क्लिक करें</div>
+                            <div class="simple-instruction">"Generate Admit Card" पर क्लिक करें एडमिट कार्ड जनरेटर खोलने के लिए</div>
                             <div class="simple-instruction">परीक्षा विवरण और छात्र का रोल नंबर भरें</div>
                             <div class="simple-instruction">जनरेट करें, प्रिंट करें या PDF डाउनलोड करें</div>
                         </div>
@@ -606,96 +307,14 @@
         </div>
     </div>
 
-    <!-- Result View Modal -->
-    <div class="modal fade" id="resultModal" tabindex="-1">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="resultModalTitle">Result Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="resultDetails">
-                        <!-- Result details will be loaded here -->
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn pdf-download-btn" id="downloadPdfBtn">📥 Download All Results PDF (with Rank)</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Confirmation Modal for Editing Published Result -->
-    <div class="modal fade" id="editPublishedConfirmModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirm Edit</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>You are editing a published result. What would you like to do?</p>
-                    <div class="alert alert-info">
-                        <strong>Note:</strong> 
-                        <ul class="mb-0">
-                            <li><strong>Save Changes:</strong> Update the existing result directly</li>
-                            <li><strong>Don't Save:</strong> Go back without saving changes</li>
-                            <li><strong>Save as Draft:</strong> Save changes as a new draft</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="dontSaveConfirmBtn" data-bs-dismiss="modal">Don't Save</button>
-                    <button type="button" class="btn btn-warning" id="saveDraftConfirmBtn" data-bs-dismiss="modal">Save as Draft</button>
-                    <button type="button" class="btn save-changes-btn" id="saveChangesConfirmBtn" data-bs-dismiss="modal">Save Changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Success Message Toasts -->
-    <div id="successToast" class="toast align-items-center text-bg-success border-0 success-message" role="alert">
-        <div class="d-flex">
-            <div class="toast-body" id="toastMessage">
-                Successfully Saved!
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>
-    </div>
-
-    <!-- Published Success Toast -->
-    <div id="publishedToast" class="toast align-items-center text-bg-success border-0 success-message published-toast" role="alert" style="display: none;">
-        <div class="d-flex">
-            <div class="toast-body">
-                Result Published Successfully! ✓
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>
-    </div>
-
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     
     <!-- Firebase SDK -->
     <script type="module">
-        // Import Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-        import { 
-            getFirestore, 
-            collection, 
-            addDoc, 
-            getDocs, 
-            doc, 
-            updateDoc, 
-            deleteDoc, 
-            query, 
-            orderBy,
-            serverTimestamp,
-            where
-        } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
         // Firebase configuration
         const firebaseConfig = {
@@ -732,119 +351,22 @@
             document.body.appendChild(logoutBtn);
         });
 
-        // DOM Elements
-        const dashboardSection = document.getElementById('dashboardSection');
-        const createResultSection = document.getElementById('createResultSection');
-        const draftResultsSection = document.getElementById('draftResultsSection');
-        const oldResultsSection = document.getElementById('oldResultsSection');
-        
-        const createResultBtn = document.getElementById('createResultBtn');
-        const draftResultsBtn = document.getElementById('draftResultsBtn');
-        const oldResultsBtn = document.getElementById('oldResultsBtn');
+        // Button Handlers
+        const manageResultsBtn = document.getElementById('manageResultsBtn');
+        const admissionManagementBtn = document.getElementById('admissionManagementBtn');
+        const feeManagementBtn = document.getElementById('feeManagementBtn');
         const onlineTestBtn = document.getElementById('onlineTestBtn');
-        
-        // Admit Card Generator Button
         const admitCardGeneratorBtn = document.getElementById('admitCardGeneratorBtn');
         
-        // Admission Management Button
-        const admissionManagementBtn = document.getElementById('admissionManagementBtn');
-        
-        const backToDashboardBtn = document.getElementById('backToDashboardBtn');
-        const backToDashboardBtn2 = document.getElementById('backToDashboardBtn2');
-        const backToDashboardBtn3 = document.getElementById('backToDashboardBtn3');
-        
-        // Help Elements
+        // Help Modal
         const helpButton = document.getElementById('helpButton');
         const helpModal = new bootstrap.Modal(document.getElementById('helpModal'));
         const englishHelpBtn = document.getElementById('englishHelpBtn');
         const hindiHelpBtn = document.getElementById('hindiHelpBtn');
         const englishInstructions = document.getElementById('englishInstructions');
         const hindiInstructions = document.getElementById('hindiInstructions');
-        
-        // Create Result Elements
-        const examSetupStep = document.getElementById('examSetupStep');
-        const studentEntryStep = document.getElementById('studentEntryStep');
-        const examNameInput = document.getElementById('examName');
-        const subjectCountInput = document.getElementById('subjectCount');
-        const generateSubjectFieldsBtn = document.getElementById('generateSubjectFieldsBtn');
-        const subjectFields = document.getElementById('subjectFields');
-        const step1NextBtn = document.getElementById('step1NextBtn');
-        const nextToStudentEntryBtn = document.getElementById('nextToStudentEntryBtn');
-        
-        const rollNoInput = document.getElementById('rollNo');
-        const incrementRollBtn = document.getElementById('incrementRollBtn');
-        const studentNameInput = document.getElementById('studentName');
-        const fatherNameInput = document.getElementById('fatherName');
-        const marksFields = document.getElementById('marksFields');
-        const addStudentBtn = document.getElementById('addStudentBtn');
-        const updateStudentBtn = document.getElementById('updateStudentBtn');
-        const cancelEditBtn = document.getElementById('cancelEditBtn');
-        const studentsTableBody = document.getElementById('studentsTableBody');
-        const saveDraftBtn = document.getElementById('saveDraftBtn');
-        const saveChangesBtn = document.getElementById('saveChangesBtn');
-        const publishResultBtn = document.getElementById('publishResultBtn');
-        const dontSaveBtn = document.getElementById('dontSaveBtn');
-        
-        // Draft and Old Results Elements
-        const draftResultsList = document.getElementById('draftResultsList');
-        const oldResultsList = document.getElementById('oldResultsList');
-        
-        // Modal Elements
-        const resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
-        const resultModalTitle = document.getElementById('resultModalTitle');
-        const resultDetails = document.getElementById('resultDetails');
-        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
-        
-        // Confirmation Modal Elements
-        const editPublishedConfirmModal = new bootstrap.Modal(document.getElementById('editPublishedConfirmModal'));
-        const dontSaveConfirmBtn = document.getElementById('dontSaveConfirmBtn');
-        const saveDraftConfirmBtn = document.getElementById('saveDraftConfirmBtn');
-        const saveChangesConfirmBtn = document.getElementById('saveChangesConfirmBtn');
-        
-        // Toast Elements
-        const successToast = new bootstrap.Toast(document.getElementById('successToast'));
-        const publishedToast = new bootstrap.Toast(document.getElementById('publishedToast'));
-        const toastMessage = document.getElementById('toastMessage');
-        
-        // App State
-        let subjects = [];
-        let students = [];
-        let editingStudentIndex = null;
-        let editingDraftId = null;
-        let isEditingPublishedResult = false;
-        let editingPublishedResultId = null;
-        let hasChanges = false;
-        
-        let currentResultDataForPdf = null;
-        let currentExamNameForPdf = '';
 
-        // Admit Card Generator Button Handler
-        if (admitCardGeneratorBtn) {
-            admitCardGeneratorBtn.addEventListener('click', () => {
-                window.location.href = 'admit-card.html';
-            });
-        }
-
-        // Admission Management Button Handler
-        if (admissionManagementBtn) {
-            admissionManagementBtn.addEventListener('click', () => {
-                window.location.href = 'student-dashboard.html';
-            });
-        }
-
-        function showSection(section) {
-            dashboardSection.classList.remove('active');
-            createResultSection.classList.remove('active');
-            draftResultsSection.classList.remove('active');
-            oldResultsSection.classList.remove('active');
-            section.classList.add('active');
-        }
-
-        function showToast(message) {
-            toastMessage.textContent = message;
-            successToast.show();
-        }
-
+        // Vibrate function
         function vibrateButton() {
             if (navigator.vibrate) {
                 navigator.vibrate(50);
@@ -857,6 +379,7 @@
             }
         });
 
+        // Help Modal Handlers
         helpButton.addEventListener('click', () => {
             helpModal.show();
         });
@@ -875,996 +398,35 @@
             hindiHelpBtn.classList.add('active');
         });
 
-        const feeManagementBtn = document.getElementById('feeManagementBtn');
+        // Navigation Handlers
+        if (manageResultsBtn) {
+            manageResultsBtn.addEventListener('click', () => {
+                window.location.href = 'manage-results.html';
+            });
+        }
+
+        if (admissionManagementBtn) {
+            admissionManagementBtn.addEventListener('click', () => {
+                window.location.href = 'student-dashboard.html';
+            });
+        }
+
         if (feeManagementBtn) {
             feeManagementBtn.addEventListener('click', () => {
                 window.open('dashboard.html', '_blank');
-                showToast('Opening Fee Management Dashboard...');
             });
         }
 
-        createResultBtn.addEventListener('click', () => {
-            resetCreateResultForm();
-            showSection(createResultSection);
-        });
-        
-        draftResultsBtn.addEventListener('click', () => {
-            loadDraftResults();
-            showSection(draftResultsSection);
-        });
-        
-        oldResultsBtn.addEventListener('click', () => {
-            loadOldResults();
-            showSection(oldResultsSection);
-        });
-        
-        onlineTestBtn.addEventListener('click', () => {
-            window.open('publishtest.html', '_blank');
-            showToast('Opening Online Test Management...');
-        });
-        
-        backToDashboardBtn.addEventListener('click', () => {
-            if (isEditingPublishedResult && hasChanges) {
-                editPublishedConfirmModal.show();
-            } else {
-                resetCreateResultForm();
-                showSection(dashboardSection);
-            }
-        });
-        
-        backToDashboardBtn2.addEventListener('click', () => {
-            showSection(dashboardSection);
-        });
-        
-        backToDashboardBtn3.addEventListener('click', () => {
-            showSection(dashboardSection);
-        });
-
-        dontSaveConfirmBtn.addEventListener('click', () => {
-            resetCreateResultForm();
-            showSection(dashboardSection);
-        });
-        
-        saveDraftConfirmBtn.addEventListener('click', () => {
-            if (validateResultData()) {
-                saveEditedPublishedResultAsDraft();
-            } else {
-                showSection(dashboardSection);
-            }
-        });
-        
-        saveChangesConfirmBtn.addEventListener('click', () => {
-            if (validateResultData()) {
-                updateExistingPublishedResult();
-            } else {
-                showSection(dashboardSection);
-            }
-        });
-
-        generateSubjectFieldsBtn.addEventListener('click', () => {
-            const subjectCount = parseInt(subjectCountInput.value);
-            if (subjectCount < 1) return;
-            
-            subjectFields.innerHTML = '';
-            subjects = [];
-            
-            for (let i = 0; i < subjectCount; i++) {
-                const subjectBox = document.createElement('div');
-                subjectBox.className = 'subject-box';
-                subjectBox.innerHTML = `
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="form-label">Subject ${i+1} Name</label>
-                            <input type="text" class="form-control subject-name" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Total Marks</label>
-                            <input type="number" class="form-control subject-total" min="1" required>
-                        </div>
-                    </div>
-                `;
-                subjectFields.appendChild(subjectBox);
-            }
-            
-            step1NextBtn.classList.remove('d-none');
-        });
-
-        nextToStudentEntryBtn.addEventListener('click', () => {
-            const subjectNameInputs = document.querySelectorAll('.subject-name');
-            const subjectTotalInputs = document.querySelectorAll('.subject-total');
-            
-            subjects = [];
-            let valid = true;
-            
-            for (let i = 0; i < subjectNameInputs.length; i++) {
-                const name = subjectNameInputs[i].value.trim();
-                const total = parseInt(subjectTotalInputs[i].value);
-                
-                if (!name || isNaN(total) || total < 1) {
-                    valid = false;
-                    break;
-                }
-                
-                subjects.push({ name, total });
-            }
-            
-            if (!valid) {
-                alert('Please fill all subject fields correctly');
-                return;
-            }
-            
-            generateMarksFields();
-            examSetupStep.classList.add('d-none');
-            studentEntryStep.classList.remove('d-none');
-            setupChangeTracking();
-        });
-
-        function generateMarksFields() {
-            marksFields.innerHTML = '<h5>Enter Marks</h5>';
-            
-            subjects.forEach((subject, index) => {
-                const marksField = document.createElement('div');
-                marksField.className = 'mb-2';
-                marksField.innerHTML = `
-                    <label class="form-label">${subject.name} (Max: ${subject.total})</label>
-                    <input type="number" class="form-control subject-mark" data-subject="${subject.name}" min="0" max="${subject.total}" required>
-                `;
-                marksFields.appendChild(marksField);
+        if (onlineTestBtn) {
+            onlineTestBtn.addEventListener('click', () => {
+                window.open('publishtest.html', '_blank');
             });
         }
 
-        incrementRollBtn.addEventListener('click', () => {
-            rollNoInput.value = parseInt(rollNoInput.value) + 1;
-        });
-
-        addStudentBtn.addEventListener('click', () => {
-            const rollNo = parseInt(rollNoInput.value);
-            const name = studentNameInput.value.trim();
-            const fatherName = fatherNameInput.value.trim();
-            
-            if (!name) {
-                alert('Please enter student name');
-                return;
-            }
-            
-            const markInputs = document.querySelectorAll('.subject-mark');
-            const marks = {};
-            let valid = true;
-            
-            markInputs.forEach(input => {
-                const subjectName = input.getAttribute('data-subject');
-                const mark = parseInt(input.value);
-                
-                if (isNaN(mark) || mark < 0) {
-                    valid = false;
-                    return;
-                }
-                
-                const subject = subjects.find(s => s.name === subjectName);
-                if (mark > subject.total) {
-                    alert(`Marks for ${subjectName} cannot exceed ${subject.total}`);
-                    valid = false;
-                    return;
-                }
-                
-                marks[subjectName] = mark;
+        if (admitCardGeneratorBtn) {
+            admitCardGeneratorBtn.addEventListener('click', () => {
+                window.location.href = 'admit-card.html';
             });
-            
-            if (!valid) return;
-            
-            students.push({
-                rollNo,
-                name,
-                fatherName,
-                marks
-            });
-            
-            updateStudentsTable();
-            
-            studentNameInput.value = '';
-            fatherNameInput.value = '';
-            markInputs.forEach(input => input.value = '');
-            rollNoInput.value = rollNo + 1;
-            
-            hasChanges = true;
-            updateButtonVisibility();
-
-            showToast('Student added successfully!');
-        });
-
-        function updateStudentsTable() {
-            studentsTableBody.innerHTML = '';
-            
-            students.forEach((student, index) => {
-                const row = document.createElement('tr');
-                row.className = 'student-row';
-                
-                let marksHtml = '';
-                subjects.forEach(subject => {
-                    marksHtml += `<div>${subject.name}: ${student.marks[subject.name] || 0}/${subject.total}</div>`;
-                });
-                
-                row.innerHTML = `
-                    <td>${student.rollNo}</td>
-                    <td>${student.name}</td>
-                    <td>${student.fatherName || '-'}</td>
-                    <td>${marksHtml}</td>
-                    <td>
-                        <button class="btn btn-sm btn-warning edit-student" data-index="${index}">Edit</button>
-                        <button class="btn btn-sm btn-danger delete-student" data-index="${index}">Delete</button>
-                    </td>
-                `;
-                
-                studentsTableBody.appendChild(row);
-            });
-            
-            document.querySelectorAll('.edit-student').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const index = parseInt(e.target.getAttribute('data-index'));
-                    editStudent(index);
-                });
-            });
-            
-            document.querySelectorAll('.delete-student').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const index = parseInt(e.target.getAttribute('data-index'));
-                    deleteStudent(index);
-                });
-            });
-        }
-
-        function editStudent(index) {
-            const student = students[index];
-            editingStudentIndex = index;
-            
-            rollNoInput.value = student.rollNo;
-            studentNameInput.value = student.name;
-            fatherNameInput.value = student.fatherName || '';
-            
-            const markInputs = document.querySelectorAll('.subject-mark');
-            markInputs.forEach(input => {
-                const subjectName = input.getAttribute('data-subject');
-                input.value = student.marks[subjectName] || 0;
-            });
-            
-            addStudentBtn.classList.add('d-none');
-            updateStudentBtn.classList.remove('d-none');
-            cancelEditBtn.classList.remove('d-none');
-
-            showToast('Student edit mode activated!');
-        }
-
-        updateStudentBtn.addEventListener('click', () => {
-            if (editingStudentIndex === null) return;
-            
-            const rollNo = parseInt(rollNoInput.value);
-            const name = studentNameInput.value.trim();
-            const fatherName = fatherNameInput.value.trim();
-            
-            if (!name) {
-                alert('Please enter student name');
-                return;
-            }
-            
-            const markInputs = document.querySelectorAll('.subject-mark');
-            const marks = {};
-            let valid = true;
-            
-            markInputs.forEach(input => {
-                const subjectName = input.getAttribute('data-subject');
-                const mark = parseInt(input.value);
-                
-                if (isNaN(mark) || mark < 0) {
-                    valid = false;
-                    return;
-                }
-                
-                const subject = subjects.find(s => s.name === subjectName);
-                if (mark > subject.total) {
-                    alert(`Marks for ${subjectName} cannot exceed ${subject.total}`);
-                    valid = false;
-                    return;
-                }
-                
-                marks[subjectName] = mark;
-            });
-            
-            if (!valid) return;
-            
-            students[editingStudentIndex] = {
-                rollNo,
-                name,
-                fatherName,
-                marks
-            };
-            
-            updateStudentsTable();
-            cancelEdit();
-            hasChanges = true;
-            updateButtonVisibility();
-
-            showToast('Student updated successfully!');
-        });
-
-        cancelEditBtn.addEventListener('click', cancelEdit);
-
-        function cancelEdit() {
-            editingStudentIndex = null;
-            studentNameInput.value = '';
-            fatherNameInput.value = '';
-            const markInputs = document.querySelectorAll('.subject-mark');
-            markInputs.forEach(input => input.value = '');
-            addStudentBtn.classList.remove('d-none');
-            updateStudentBtn.classList.add('d-none');
-            cancelEditBtn.classList.add('d-none');
-            showToast('Edit cancelled!');
-        }
-
-        function deleteStudent(index) {
-            if (confirm('Are you sure you want to delete this student?')) {
-                students.splice(index, 1);
-                updateStudentsTable();
-                hasChanges = true;
-                updateButtonVisibility();
-                showToast('Student deleted successfully!');
-            }
-        }
-
-        function setupChangeTracking() {
-            const trackedInputs = [
-                examNameInput,
-                ...document.querySelectorAll('.subject-name'),
-                ...document.querySelectorAll('.subject-total'),
-                ...document.querySelectorAll('.subject-mark'),
-                studentNameInput,
-                fatherNameInput
-            ];
-            
-            trackedInputs.forEach(input => {
-                input.addEventListener('input', () => {
-                    hasChanges = true;
-                    updateButtonVisibility();
-                });
-            });
-        }
-
-        function updateButtonVisibility() {
-            if (isEditingPublishedResult) {
-                saveDraftBtn.classList.add('d-none');
-                publishResultBtn.classList.add('d-none');
-                saveChangesBtn.classList.remove('d-none');
-                dontSaveBtn.classList.remove('d-none');
-            } else {
-                saveDraftBtn.classList.remove('d-none');
-                publishResultBtn.classList.remove('d-none');
-                saveChangesBtn.classList.add('d-none');
-                dontSaveBtn.classList.add('d-none');
-            }
-        }
-
-        saveDraftBtn.addEventListener('click', async () => {
-            if (!validateResultData()) return;
-            
-            try {
-                const resultData = {
-                    examName: examNameInput.value,
-                    subjects,
-                    students,
-                    createdAt: serverTimestamp()
-                };
-                
-                if (editingDraftId) {
-                    const draftRef = doc(db, "draft_results", editingDraftId);
-                    await updateDoc(draftRef, resultData);
-                    showToast('Draft updated successfully!');
-                } else {
-                    await addDoc(collection(db, "draft_results"), resultData);
-                    showToast('Draft saved successfully!');
-                }
-                
-                resetCreateResultForm();
-                showSection(dashboardSection);
-            } catch (error) {
-                console.error('Error saving draft:', error);
-                alert('Error saving draft: ' + error.message);
-            }
-        });
-
-        saveChangesBtn.addEventListener('click', () => {
-            if (validateResultData()) {
-                updateExistingPublishedResult();
-            }
-        });
-
-        dontSaveBtn.addEventListener('click', () => {
-            if (confirm('Are you sure you want to discard all changes?')) {
-                resetCreateResultForm();
-                showSection(dashboardSection);
-            }
-        });
-
-        async function updateExistingPublishedResult() {
-            if (!validateResultData()) return;
-            
-            try {
-                const resultData = {
-                    examName: examNameInput.value,
-                    subjects,
-                    students,
-                    updatedAt: serverTimestamp()
-                };
-                
-                const resultRef = doc(db, "results", editingPublishedResultId);
-                await updateDoc(resultRef, resultData);
-                
-                showToast('Result updated successfully!');
-                resetCreateResultForm();
-                showSection(dashboardSection);
-            } catch (error) {
-                console.error('Error updating result:', error);
-                alert('Error updating result: ' + error.message);
-            }
-        }
-
-        async function saveEditedPublishedResultAsDraft() {
-            try {
-                const resultData = {
-                    examName: examNameInput.value,
-                    subjects,
-                    students,
-                    createdAt: serverTimestamp(),
-                    originalResultId: editingPublishedResultId
-                };
-                
-                await addDoc(collection(db, "draft_results"), resultData);
-                showToast('Changes saved as draft!');
-                resetCreateResultForm();
-                showSection(dashboardSection);
-            } catch (error) {
-                console.error('Error saving draft:', error);
-                alert('Error saving draft: ' + error.message);
-            }
-        }
-
-        publishResultBtn.addEventListener('click', async () => {
-            if (!validateResultData()) return;
-            
-            if (isEditingPublishedResult) {
-                alert('Please use "Save Changes" button to update published results.');
-                return;
-            }
-            
-            try {
-                const resultData = {
-                    examName: examNameInput.value,
-                    subjects,
-                    students,
-                    createdAt: serverTimestamp()
-                };
-                
-                await addDoc(collection(db, "results"), resultData);
-                
-                if (editingDraftId) {
-                    await deleteDoc(doc(db, "draft_results", editingDraftId));
-                }
-                
-                publishedToast.show();
-                resetCreateResultForm();
-                showSection(dashboardSection);
-            } catch (error) {
-                console.error('Error publishing result:', error);
-                alert('Error publishing result: ' + error.message);
-            }
-        });
-
-        function validateResultData() {
-            if (!examNameInput.value.trim()) {
-                alert('Please enter exam name');
-                return false;
-            }
-            
-            if (students.length === 0) {
-                alert('Please add at least one student');
-                return false;
-            }
-            
-            return true;
-        }
-
-        function resetCreateResultForm() {
-            examNameInput.value = '';
-            subjectCountInput.value = '';
-            subjectFields.innerHTML = '';
-            step1NextBtn.classList.add('d-none');
-            examSetupStep.classList.remove('d-none');
-            studentEntryStep.classList.add('d-none');
-            students = [];
-            studentsTableBody.innerHTML = '';
-            editingDraftId = null;
-            isEditingPublishedResult = false;
-            editingPublishedResultId = null;
-            hasChanges = false;
-            cancelEdit();
-            updateButtonVisibility();
-        }
-
-        async function loadDraftResults() {
-            try {
-                const q = query(collection(db, "draft_results"), orderBy("createdAt", "desc"));
-                const querySnapshot = await getDocs(q);
-                
-                draftResultsList.innerHTML = '';
-                
-                if (querySnapshot.empty) {
-                    draftResultsList.innerHTML = '<div class="col-12"><p class="text-center">No draft results found.</p></div>';
-                    return;
-                }
-                
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const draftCard = document.createElement('div');
-                    draftCard.className = 'col-md-6 col-lg-4 mb-3';
-                    draftCard.innerHTML = `
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">${data.examName}</h5>
-                                <p class="card-text">Subjects: ${data.subjects.length}</p>
-                                <p class="card-text">Students: ${data.students.length}</p>
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-sm btn-primary edit-draft" data-id="${doc.id}">Edit</button>
-                                    <button class="btn btn-sm btn-danger delete-draft" data-id="${doc.id}">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    draftResultsList.appendChild(draftCard);
-                });
-                
-                document.querySelectorAll('.edit-draft').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const draftId = e.target.getAttribute('data-id');
-                        editDraft(draftId);
-                    });
-                });
-                
-                document.querySelectorAll('.delete-draft').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const draftId = e.target.getAttribute('data-id');
-                        deleteDraft(draftId);
-                    });
-                });
-            } catch (error) {
-                console.error('Error loading draft results:', error);
-                alert('Error loading draft results: ' + error.message);
-            }
-        }
-
-        async function editDraft(draftId) {
-            try {
-                const draftDoc = await getDocs(query(collection(db, "draft_results"), where("__name__", "==", draftId)));
-                
-                if (draftDoc.empty) {
-                    alert('Draft not found');
-                    return;
-                }
-                
-                const data = draftDoc.docs[0].data();
-                
-                examNameInput.value = data.examName;
-                subjectCountInput.value = data.subjects.length;
-                
-                generateSubjectFieldsBtn.click();
-                
-                setTimeout(() => {
-                    const subjectNameInputs = document.querySelectorAll('.subject-name');
-                    const subjectTotalInputs = document.querySelectorAll('.subject-total');
-                    
-                    data.subjects.forEach((subject, index) => {
-                        if (subjectNameInputs[index]) {
-                            subjectNameInputs[index].value = subject.name;
-                        }
-                        if (subjectTotalInputs[index]) {
-                            subjectTotalInputs[index].value = subject.total;
-                        }
-                    });
-                    
-                    nextToStudentEntryBtn.click();
-                    
-                    students = data.students;
-                    updateStudentsTable();
-                    
-                    editingDraftId = draftId;
-                    isEditingPublishedResult = false;
-                    hasChanges = false;
-                    
-                    updateButtonVisibility();
-                    
-                    showSection(createResultSection);
-                }, 100);
-
-                showToast('Draft loaded for editing!');
-            } catch (error) {
-                console.error('Error loading draft:', error);
-                alert('Error loading draft: ' + error.message);
-            }
-        }
-
-        async function deleteDraft(draftId) {
-            if (!confirm('Are you sure you want to delete this draft?')) return;
-            
-            try {
-                await deleteDoc(doc(db, "draft_results", draftId));
-                showToast('Draft deleted successfully!');
-                loadDraftResults();
-            } catch (error) {
-                console.error('Error deleting draft:', error);
-                alert('Error deleting draft: ' + error.message);
-            }
-        }
-
-        function sortStudentsByPercentage(studentsArray, subjectsArray) {
-            const sorted = [...studentsArray];
-            
-            sorted.sort((a, b) => {
-                let totalA = 0, totalMaxA = 0;
-                let totalB = 0, totalMaxB = 0;
-                
-                subjectsArray.forEach(subject => {
-                    totalA += a.marks[subject.name] || 0;
-                    totalMaxA += subject.total;
-                    totalB += b.marks[subject.name] || 0;
-                    totalMaxB += subject.total;
-                });
-                
-                const percentA = totalMaxA > 0 ? (totalA / totalMaxA) : 0;
-                const percentB = totalMaxB > 0 ? (totalB / totalMaxB) : 0;
-                
-                return percentB - percentA;
-            });
-            
-            return sorted;
-        }
-
-        async function loadOldResults() {
-            try {
-                const q = query(collection(db, "results"), orderBy("createdAt", "desc"));
-                const querySnapshot = await getDocs(q);
-                
-                oldResultsList.innerHTML = '';
-                
-                if (querySnapshot.empty) {
-                    oldResultsList.innerHTML = '<div class="col-12"><p class="text-center">No published results found.</p></div>';
-                    return;
-                }
-                
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const date = data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : 'Unknown date';
-                    
-                    const resultCard = document.createElement('div');
-                    resultCard.className = 'col-md-6 col-lg-4 mb-3';
-                    resultCard.innerHTML = `
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title">${data.examName}</h5>
-                                <p class="card-text">Date: ${date}</p>
-                                <p class="card-text">Subjects: ${data.subjects.length}</p>
-                                <p class="card-text">Students: ${data.students.length}</p>
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-sm btn-primary view-result" data-id="${doc.id}">View</button>
-                                    <button class="btn btn-sm btn-warning edit-result" data-id="${doc.id}">Edit</button>
-                                    <button class="btn btn-sm btn-danger delete-result" data-id="${doc.id}">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                    oldResultsList.appendChild(resultCard);
-                });
-                
-                document.querySelectorAll('.view-result').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const resultId = e.target.getAttribute('data-id');
-                        viewResult(resultId);
-                    });
-                });
-
-                document.querySelectorAll('.edit-result').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const resultId = e.target.getAttribute('data-id');
-                        editResult(resultId);
-                    });
-                });
-                
-                document.querySelectorAll('.delete-result').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const resultId = e.target.getAttribute('data-id');
-                        deleteResult(resultId);
-                    });
-                });
-            } catch (error) {
-                console.error('Error loading old results:', error);
-                alert('Error loading old results: ' + error.message);
-            }
-        }
-
-        async function editResult(resultId) {
-            try {
-                const resultDoc = await getDocs(query(collection(db, "results"), where("__name__", "==", resultId)));
-                
-                if (resultDoc.empty) {
-                    alert('Result not found');
-                    return;
-                }
-                
-                const data = resultDoc.docs[0].data();
-                const docId = resultDoc.docs[0].id;
-                
-                examNameInput.value = data.examName;
-                subjectCountInput.value = data.subjects.length;
-                
-                generateSubjectFieldsBtn.click();
-                
-                setTimeout(() => {
-                    const subjectNameInputs = document.querySelectorAll('.subject-name');
-                    const subjectTotalInputs = document.querySelectorAll('.subject-total');
-                    
-                    data.subjects.forEach((subject, index) => {
-                        if (subjectNameInputs[index]) {
-                            subjectNameInputs[index].value = subject.name;
-                        }
-                        if (subjectTotalInputs[index]) {
-                            subjectTotalInputs[index].value = subject.total;
-                        }
-                    });
-                    
-                    nextToStudentEntryBtn.click();
-                    
-                    students = data.students;
-                    updateStudentsTable();
-                    
-                    editingDraftId = null;
-                    isEditingPublishedResult = true;
-                    editingPublishedResultId = docId;
-                    hasChanges = false;
-                    
-                    updateButtonVisibility();
-                    
-                    showSection(createResultSection);
-                }, 100);
-
-                showToast('Result loaded for editing!');
-            } catch (error) {
-                console.error('Error loading result:', error);
-                alert('Error loading result: ' + error.message);
-            }
-        }
-
-        async function deleteResult(resultId) {
-            if (!confirm('Are you sure you want to delete this published result?')) return;
-            
-            try {
-                await deleteDoc(doc(db, "results", resultId));
-                showToast('Result deleted successfully!');
-                loadOldResults();
-            } catch (error) {
-                console.error('Error deleting result:', error);
-                alert('Error deleting result: ' + error.message);
-            }
-        }
-
-        function generatePDF(resultData, examName) {
-            try {
-                const sortedStudents = sortStudentsByPercentage(resultData.students, resultData.subjects);
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({
-                    orientation: 'landscape',
-                    unit: 'mm',
-                    format: 'a4'
-                });
-
-                doc.setFontSize(18);
-                doc.setTextColor(0, 102, 204);
-                doc.text(`QUEST COACHING CENTRE - ${examName}`, 14, 15);
-                
-                const now = new Date();
-                const dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
-                doc.setFontSize(10);
-                doc.setTextColor(100);
-                doc.text(`Generated on: ${dateStr}`, 14, 25);
-                
-                if (sortedStudents.length > 0) {
-                    doc.setFontSize(11);
-                    doc.setTextColor(40, 167, 69);
-                    doc.text(`🏆 Top Student: ${sortedStudents[0].name} (Roll No: ${sortedStudents[0].rollNo})`, 14, 32);
-                }
-
-                let columns = [
-                    { header: 'Rank', dataKey: 'rank' },
-                    { header: 'Roll No', dataKey: 'rollNo' },
-                    { header: 'Student Name', dataKey: 'name' },
-                    { header: 'Father Name', dataKey: 'father' }
-                ];
-                
-                resultData.subjects.forEach(subject => {
-                    columns.push({ 
-                        header: `${subject.name}\n(${subject.total})`, 
-                        dataKey: subject.name 
-                    });
-                });
-                
-                columns.push({ header: 'Total', dataKey: 'total' });
-                columns.push({ header: 'Percentage', dataKey: 'percentage' });
-
-                const rows = sortedStudents.map((student, index) => {
-                    let row = {
-                        rank: index + 1,
-                        rollNo: student.rollNo,
-                        name: student.name,
-                        father: student.fatherName || '-'
-                    };
-                    
-                    let totalMarks = 0;
-                    let totalMaxMarks = 0;
-                    
-                    resultData.subjects.forEach(subject => {
-                        const mark = student.marks[subject.name] || 0;
-                        row[subject.name] = `${mark}/${subject.total}`;
-                        totalMarks += mark;
-                        totalMaxMarks += subject.total;
-                    });
-                    
-                    const percentage = totalMaxMarks > 0 ? ((totalMarks / totalMaxMarks) * 100).toFixed(2) : 0;
-                    
-                    row.total = `${totalMarks}/${totalMaxMarks}`;
-                    row.percentage = `${percentage}%`;
-                    
-                    return row;
-                });
-
-                doc.autoTable({
-                    startY: 40,
-                    head: [columns.map(col => col.header)],
-                    body: rows.map(row => 
-                        columns.map(col => row[col.dataKey] || '')
-                    ),
-                    styles: {
-                        fontSize: 8,
-                        cellPadding: 2,
-                        lineColor: [200, 200, 200],
-                        lineWidth: 0.1,
-                    },
-                    headStyles: {
-                        fillColor: [41, 128, 185],
-                        textColor: [255, 255, 255],
-                        fontSize: 9,
-                        fontStyle: 'bold',
-                        halign: 'center',
-                        valign: 'middle'
-                    },
-                    alternateRowStyles: {
-                        fillColor: [245, 245, 245]
-                    },
-                    margin: { top: 30, right: 10, bottom: 20, left: 10 },
-                    didDrawPage: function(data) {
-                        doc.setFontSize(8);
-                        doc.setTextColor(150);
-                        doc.text(
-                            `Page ${doc.internal.getNumberOfPages()}`,
-                            data.settings.margin.left,
-                            doc.internal.pageSize.height - 10
-                        );
-                    }
-                });
-
-                doc.save(`${examName}_Results_with_Rank.pdf`);
-                showToast('PDF Downloaded Successfully! (Includes Rank column)');
-            } catch (error) {
-                console.error('PDF Generation Error:', error);
-                alert('Error generating PDF: ' + error.message);
-            }
-        }
-
-        async function viewResult(resultId) {
-            try {
-                const resultDoc = await getDocs(query(collection(db, "results"), where("__name__", "==", resultId)));
-                
-                if (resultDoc.empty) {
-                    alert('Result not found');
-                    return;
-                }
-                
-                const data = resultDoc.docs[0].data();
-                const date = data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString() : 'Unknown date';
-                
-                currentResultDataForPdf = data;
-                currentExamNameForPdf = data.examName;
-                
-                const sortedStudents = sortStudentsByPercentage(data.students, data.subjects);
-                
-                resultModalTitle.textContent = data.examName + ' (Ranked by Percentage)';
-                
-                let resultHtml = `
-                    <p><strong>Date:</strong> ${date}</p>
-                    <p><strong>Subjects:</strong> ${data.subjects.map(s => `${s.name} (${s.total})`).join(', ')}</p>
-                    <p><strong>Total Students:</strong> ${data.students.length}</p>
-                    ${sortedStudents.length > 0 ? `<div class="alert alert-success"><strong>🏆 Top Student:</strong> ${sortedStudents[0].name} (Roll No: ${sortedStudents[0].rollNo})</div>` : ''}
-                    
-                    <h5 class="mt-4">Student Results (Highest Percentage First)</h5>
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>Roll No</th>
-                                    <th>Name</th>
-                                    <th>Father Name</th>
-                `;
-                
-                data.subjects.forEach(subject => {
-                    resultHtml += `<th>${subject.name}</th>`;
-                });
-                
-                resultHtml += `<th>Total</th>`;
-                resultHtml += `<th>Percentage</th>`;
-                
-                resultHtml += `
-                                </tr>
-                            </thead>
-                            <tbody>
-                `;
-                
-                sortedStudents.forEach((student, index) => {
-                    let totalMarks = 0;
-                    let totalMaxMarks = 0;
-                    const isTopStudent = index === 0;
-                    
-                    resultHtml += `<tr${isTopStudent ? ' class="top-student-row"' : ''}>`;
-                    resultHtml += `<td><strong>#${index + 1}</strong></td>`;
-                    resultHtml += `<td>${student.rollNo}</td>`;
-                    resultHtml += `<td>${student.name}${isTopStudent ? ' 🏆' : ''}</td>`;
-                    resultHtml += `<td>${student.fatherName || '-'}</td>`;
-                    
-                    data.subjects.forEach(subject => {
-                        const mark = student.marks[subject.name] || 0;
-                        totalMarks += mark;
-                        totalMaxMarks += subject.total;
-                        resultHtml += `<td>${mark}/${subject.total}</td>`;
-                    });
-                    
-                    const percentage = totalMaxMarks > 0 ? ((totalMarks / totalMaxMarks) * 100).toFixed(2) : 0;
-                    
-                    resultHtml += `
-                            <td><strong>${totalMarks}/${totalMaxMarks}</strong></td>
-                            <td><strong>${percentage}%</strong></td>
-                        <tr>
-                    `;
-                });
-                
-                resultHtml += `
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-                
-                resultDetails.innerHTML = resultHtml;
-                
-                const newDownloadBtn = downloadPdfBtn.cloneNode(true);
-                downloadPdfBtn.parentNode.replaceChild(newDownloadBtn, downloadPdfBtn);
-                window.downloadPdfBtn = newDownloadBtn;
-                
-                newDownloadBtn.addEventListener('click', () => {
-                    if (currentResultDataForPdf) {
-                        generatePDF(currentResultDataForPdf, currentExamNameForPdf);
-                    } else {
-                        alert('No result data to download');
-                    }
-                });
-                
-                resultModal.show();
-            } catch (error) {
-                console.error('Error loading result:', error);
-                alert('Error loading result: ' + error.message);
-            }
         }
     </script>
 </body>
