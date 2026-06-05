@@ -272,6 +272,29 @@
       cursor: pointer;
     }
     
+    /* PDF Clone Container - Hidden but used for PDF */
+    .pdf-clone-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      z-index: 9999;
+      overflow: auto;
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+    }
+    
+    .pdf-clone {
+      width: 100%;
+      max-width: 750px;
+      margin: 0 auto;
+      padding: 20px;
+      background: white;
+    }
+    
     /* Mobile Responsive */
     @media (max-width: 600px) {
       body { padding: 15px; }
@@ -344,7 +367,7 @@
     <!-- Header with Logo and Title -->
     <div class="result-card-header">
       <div class="result-logo">
-        <img id="coachingLogo" src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" alt="Logo">
+        <img id="coachingLogo" src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" alt="Quest Coaching Logo" crossorigin="anonymous">
       </div>
       <div class="result-title">
         <h2 id="coachingName">QUEST COACHING CENTRE</h2>
@@ -400,6 +423,9 @@
   </div>
 </div>
 
+<!-- PDF Clone Container -->
+<div id="pdfCloneContainer" class="pdf-clone-container"></div>
+
 <script>
   // Firebase Configuration
   const firebaseConfig = {
@@ -421,6 +447,10 @@
   const DIRECTOR_NAME = "MR. RAVI SIR";
   const COACHING_PHONE = "+91 9708442525";
   const COACHING_LOGO = "https://i.ibb.co/hF9tmnpB/20250903-202922.jpg";
+  
+  // Store current data for PDF
+  let currentExamData = null;
+  let currentStudentData = null;
   
   // Function to calculate grade based on percentage
   function getGrade(percentage) {
@@ -467,7 +497,6 @@
     }
     
     try {
-      // Fetch exam data from Firestore
       const docRef = db.collection("results").doc(examId);
       const docSnap = await docRef.get();
       
@@ -476,18 +505,17 @@
         return;
       }
       
-      const examData = docSnap.data();
+      currentExamData = docSnap.data();
       
-      // Find the student
-      const student = examData.students?.find(s => s.rollNo == rollNo);
+      const student = currentExamData.students?.find(s => s.rollNo == rollNo);
       
       if (!student) {
         showError(`Student with roll number ${rollNo} not found in this exam.`);
         return;
       }
       
-      // Display result
-      displayResult(examData, student);
+      currentStudentData = student;
+      displayResult(currentExamData, student);
       
     } catch (error) {
       console.error('Error loading result:', error);
@@ -497,28 +525,22 @@
   
   // Display result card
   function displayResult(examData, student) {
-    // Hide loading, show result card
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('resultCard').style.display = 'block';
     
-    // Set coaching info
     document.getElementById('coachingLogo').src = COACHING_LOGO;
     document.getElementById('coachingName').innerText = COACHING_NAME;
     document.getElementById('directorName').innerText = DIRECTOR_NAME;
     document.getElementById('examName').innerText = examData.examName || "Examination";
-    
-    // Set student info
     document.getElementById('studentName').innerText = student.name || "-";
     document.getElementById('fatherName').innerText = student.fatherName || "-";
     document.getElementById('studentRoll').innerText = student.rollNo || "-";
     
-    // Set coaching mention
     document.getElementById('coachingMention').innerHTML = `
       <p>This result is published by ${COACHING_NAME}, Gopalganj | Director: ${DIRECTOR_NAME}</p>
       <p>For queries: ${COACHING_PHONE}</p>
     `;
     
-    // Calculate and display marks table with grades
     let marksHtml = '';
     let totalObtained = 0;
     let totalMax = 0;
@@ -545,11 +567,9 @@
       }
     }
     
-    // Calculate total percentage
     const totalPercentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) : 0;
     const division = calculateDivision(parseFloat(totalPercentage));
     
-    // Add total row
     marksHtml += `
       <tr class="total-marks">
         <td><strong>Total</strong></td>
@@ -562,7 +582,6 @@
     document.getElementById('marksTableBody').innerHTML = marksHtml;
     document.getElementById('totalPercentage').innerHTML = `Total Percentage: ${totalPercentage}%`;
     
-    // Set division with color
     const divisionBox = document.getElementById('divisionBox');
     if (division === 'FIRST DIVISION') {
       divisionBox.style.background = '#d4edda';
@@ -582,14 +601,6 @@
       divisionBox.style.border = '2px solid #dc3545';
     }
     divisionBox.innerHTML = `Division: ${division}`;
-    
-    // Store data for WhatsApp share
-    window.currentStudentData = {
-      name: student.name,
-      rollNo: student.rollNo,
-      percentage: totalPercentage,
-      examName: examData.examName
-    };
   }
   
   function escapeHtml(str) {
@@ -608,30 +619,101 @@
     document.getElementById('errorMessage').innerHTML = message;
   }
   
-  // Download PDF function
-  function downloadResultPDF() {
+  // Create a clone for PDF (with proper image handling)
+  function createPDFClone() {
+    const originalCard = document.getElementById('resultCard');
+    const cloneContainer = document.getElementById('pdfCloneContainer');
+    
+    cloneContainer.innerHTML = '';
+    
+    const clone = originalCard.cloneNode(true);
+    clone.style.display = 'block';
+    clone.style.width = '100%';
+    clone.style.maxWidth = '750px';
+    clone.style.margin = '0 auto';
+    clone.style.padding = '20px';
+    clone.style.background = 'white';
+    clone.style.boxShadow = 'none';
+    
+    // Remove action buttons if any inside clone
+    const actionDiv = clone.querySelector('.action-buttons');
+    if (actionDiv) actionDiv.remove();
+    
+    // Ensure logo image loads properly in PDF
+    const logoImg = clone.querySelector('#coachingLogo');
+    if (logoImg) {
+      // Set a fixed image with proper cross-origin
+      logoImg.crossOrigin = 'Anonymous';
+      logoImg.src = COACHING_LOGO;
+    }
+    
+    cloneContainer.appendChild(clone);
+    cloneContainer.style.visibility = 'visible';
+    cloneContainer.style.opacity = '0';
+    cloneContainer.style.pointerEvents = 'none';
+    
+    return clone;
+  }
+  
+  // Wait for image to load
+  function waitForImageLoad(img) {
+    return new Promise((resolve) => {
+      if (img.complete) {
+        resolve();
+      } else {
+        img.onload = resolve;
+        img.onerror = resolve;
+      }
+    });
+  }
+  
+  // Download PDF function - FIXED for logo
+  async function downloadResultPDF() {
     const btn = document.querySelector('.btn-download');
     const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
     btn.disabled = true;
     
-    const element = document.getElementById('resultCard');
-    const opt = {
-      margin: [10, 10, 10, 10],
-      filename: `Result_${document.getElementById('studentRoll').innerText}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    
-    html2pdf().set(opt).from(element).save().then(() => {
+    try {
+      // Create clone for PDF
+      const clone = createPDFClone();
+      const cloneContainer = document.getElementById('pdfCloneContainer');
+      
+      // Wait for image to load in clone
+      const cloneImg = clone.querySelector('#coachingLogo');
+      if (cloneImg) {
+        await waitForImageLoad(cloneImg);
+      }
+      
+      // Small delay to ensure everything is rendered
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: `Result_${document.getElementById('studentRoll').innerText}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff'
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      
+      await html2pdf().set(opt).from(clone).save();
+      
+      // Cleanup
+      cloneContainer.innerHTML = '';
+      cloneContainer.style.visibility = 'hidden';
+      
+    } catch (error) {
+      console.error('PDF Error:', error);
+      alert('Error generating PDF. Please try again.');
+    } finally {
       btn.innerHTML = originalText;
       btn.disabled = false;
-    }).catch(() => {
-      btn.innerHTML = originalText;
-      btn.disabled = false;
-      alert('Error generating PDF');
-    });
+    }
   }
   
   // Share on WhatsApp function
@@ -651,10 +733,7 @@
   window.shareOnWhatsApp = shareOnWhatsApp;
   window.goBack = goBack;
   
-  // Set page title
   document.title = `Result | QUEST COACHING CENTRE`;
-  
-  // Load result when page loads
   document.addEventListener('DOMContentLoaded', loadResult);
 </script>
 </body>
