@@ -49,7 +49,7 @@
             color: #0d6efd;
             margin-right: 10px;
         }
-        .back-btn {
+        .back-to-admin {
             background: #6c757d;
             color: white;
             border: none;
@@ -58,11 +58,11 @@
             font-weight: 600;
             transition: 0.2s;
         }
-        .back-btn:hover {
+        .back-to-admin:hover {
             background: #5a6268;
             transform: translateY(-2px);
         }
-        /* 3 Main Action Cards */
+        /* 3 Main Action Cards (Initially visible) */
         .action-cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -122,12 +122,12 @@
             background: #1a237e;
             color: white;
         }
-        /* Section Containers */
-        .section-container {
+        /* Full Screen Section Containers (Hidden initially) */
+        .fullscreen-section {
+            display: none;
             background: white;
             border-radius: 25px;
             padding: 25px;
-            margin-bottom: 30px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
         .section-header {
@@ -145,16 +145,20 @@
             color: #1a237e;
             margin: 0;
         }
-        /* Form styling */
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 20px;
+            font-weight: 500;
+        }
         .subject-box {
             background: #f8fafc;
             border-radius: 16px;
             padding: 15px;
             margin-bottom: 12px;
             border: 1px solid #e2e8f0;
-        }
-        .student-row {
-            transition: 0.2s;
         }
         .student-row:hover {
             background: #f8fafc;
@@ -163,9 +167,6 @@
             background: #20c997;
             border-color: #20c997;
             color: white;
-        }
-        .save-changes-btn:hover {
-            background: #1ba87e;
         }
         .top-student-row {
             background: #fff3cd !important;
@@ -205,14 +206,14 @@
 <body>
 
 <div class="manage-container">
-    <!-- Header -->
+    <!-- Header (Always visible) -->
     <div class="header-section">
         <h1 class="page-title"><i class="fas fa-chart-line"></i> Manage Results</h1>
-        <button id="backToAdminBtn" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Admin Panel</button>
+        <button id="backToAdminBtn" class="back-to-admin"><i class="fas fa-arrow-left"></i> Back to Admin Panel</button>
     </div>
 
-    <!-- 3 Main Action Cards -->
-    <div class="action-cards">
+    <!-- 3 Main Action Cards (Initially visible) -->
+    <div id="actionCardsContainer" class="action-cards">
         <div class="action-card" id="createResultMainCard">
             <div class="action-icon"><i class="fas fa-plus-circle"></i></div>
             <h3 class="action-title">Create New Result</h3>
@@ -233,13 +234,12 @@
         </div>
     </div>
 
-    <!-- Create Result Section -->
-    <div id="createResultSection" class="section-container" style="display: none;">
+    <!-- Create Result Full Screen Section -->
+    <div id="createResultSection" class="fullscreen-section">
         <div class="section-header">
-            <h3><i class="fas fa-plus-circle me-2"></i> Create Result</h3>
-            <button id="backToManageMainBtn" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</button>
+            <h3><i class="fas fa-plus-circle me-2"></i> Create New Result</h3>
+            <button class="back-btn" id="backFromCreateBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button>
         </div>
-        
         <!-- Step 1: Exam Setup -->
         <div id="examSetupStep">
             <div class="card mb-4">
@@ -261,7 +261,6 @@
                 <button id="nextToStudentEntryBtn" class="btn btn-success">Next →</button>
             </div>
         </div>
-        
         <!-- Step 2: Student Marks Entry -->
         <div id="studentEntryStep" style="display: none;">
             <div class="card mb-4">
@@ -292,7 +291,6 @@
                     </div>
                 </div>
             </div>
-            
             <div class="card">
                 <div class="card-header bg-white fw-bold">Students List</div>
                 <div class="card-body">
@@ -315,20 +313,20 @@
         </div>
     </div>
 
-    <!-- Draft Results Section -->
-    <div id="draftResultsSection" class="section-container" style="display: none;">
+    <!-- Draft Results Full Screen Section -->
+    <div id="draftResultsSection" class="fullscreen-section">
         <div class="section-header">
             <h3><i class="fas fa-file-draft me-2"></i> Draft Results</h3>
-            <button id="backToManageFromDraftBtn" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</button>
+            <button class="back-btn" id="backFromDraftBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button>
         </div>
         <div id="draftResultsList" class="row g-4"></div>
     </div>
 
-    <!-- Old Results Section -->
-    <div id="oldResultsSection" class="section-container" style="display: none;">
+    <!-- Old Results Full Screen Section -->
+    <div id="oldResultsSection" class="fullscreen-section">
         <div class="section-header">
             <h3><i class="fas fa-history me-2"></i> Published Results</h3>
-            <button id="backToManageFromOldBtn" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</button>
+            <button class="back-btn" id="backFromOldBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button>
         </div>
         <div id="oldResultsList" class="row g-4"></div>
     </div>
@@ -409,6 +407,7 @@
     });
 
     // DOM Elements
+    const actionCardsContainer = document.getElementById('actionCardsContainer');
     const createResultSection = document.getElementById('createResultSection');
     const draftResultsSection = document.getElementById('draftResultsSection');
     const oldResultsSection = document.getElementById('oldResultsSection');
@@ -418,9 +417,9 @@
     const oldResultsMainCard = document.getElementById('oldResultsMainCard');
     
     const backToAdminBtn = document.getElementById('backToAdminBtn');
-    const backToManageMainBtn = document.getElementById('backToManageMainBtn');
-    const backToManageFromDraftBtn = document.getElementById('backToManageFromDraftBtn');
-    const backToManageFromOldBtn = document.getElementById('backToManageFromOldBtn');
+    const backFromCreateBtn = document.getElementById('backFromCreateBtn');
+    const backFromDraftBtn = document.getElementById('backFromDraftBtn');
+    const backFromOldBtn = document.getElementById('backFromOldBtn');
     
     // Create Result Elements
     const examSetupStep = document.getElementById('examSetupStep');
@@ -460,11 +459,20 @@
     let isEditingPublishedResult = false, editingPublishedResultId = null, hasChanges = false;
     let currentResultDataForPdf = null, currentExamNameForPdf = '';
 
-    function showSection(section) {
+    function showFullScreen(sectionToShow) {
+        actionCardsContainer.style.display = 'none';
         createResultSection.style.display = 'none';
         draftResultsSection.style.display = 'none';
         oldResultsSection.style.display = 'none';
-        section.style.display = 'block';
+        sectionToShow.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function showActionCards() {
+        actionCardsContainer.style.display = 'grid';
+        createResultSection.style.display = 'none';
+        draftResultsSection.style.display = 'none';
+        oldResultsSection.style.display = 'none';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     function showToast(msg, isPublished = false) {
         const toast = isPublished ? document.getElementById('publishedToast') : document.getElementById('successToast');
@@ -473,13 +481,13 @@
         setTimeout(() => toast.style.display = 'none', 2000);
     }
     // Navigation
-    createResultMainCard.addEventListener('click', () => { resetCreateResultForm(); showSection(createResultSection); });
-    draftResultsMainCard.addEventListener('click', () => { loadDraftResults(); showSection(draftResultsSection); });
-    oldResultsMainCard.addEventListener('click', () => { loadOldResults(); showSection(oldResultsSection); });
+    createResultMainCard.addEventListener('click', () => { resetCreateResultForm(); showFullScreen(createResultSection); });
+    draftResultsMainCard.addEventListener('click', () => { loadDraftResults(); showFullScreen(draftResultsSection); });
+    oldResultsMainCard.addEventListener('click', () => { loadOldResults(); showFullScreen(oldResultsSection); });
     backToAdminBtn.addEventListener('click', () => window.location.href = 'admin.html');
-    backToManageMainBtn.addEventListener('click', () => { resetCreateResultForm(); createResultSection.style.display = 'none'; });
-    backToManageFromDraftBtn.addEventListener('click', () => draftResultsSection.style.display = 'none');
-    backToManageFromOldBtn.addEventListener('click', () => oldResultsSection.style.display = 'none');
+    backFromCreateBtn.addEventListener('click', showActionCards);
+    backFromDraftBtn.addEventListener('click', showActionCards);
+    backFromOldBtn.addEventListener('click', showActionCards);
 
     // Generate subject fields
     generateSubjectFieldsBtn.addEventListener('click', () => {
@@ -604,7 +612,7 @@
             else await addDoc(collection(db, "draft_results"), data);
             showToast('Draft saved');
             resetCreateResultForm();
-            createResultSection.style.display = 'none';
+            showActionCards();
         } catch(e) { alert(e.message); }
     });
     publishResultBtn.addEventListener('click', async () => {
@@ -615,7 +623,7 @@
             if (editingDraftId) await deleteDoc(doc(db, "draft_results", editingDraftId));
             showToast('', true);
             resetCreateResultForm();
-            createResultSection.style.display = 'none';
+            showActionCards();
         } catch(e) { alert(e.message); }
     });
     function resetCreateResultForm() {
@@ -657,7 +665,7 @@
             updateStudentsTable();
             editingDraftId = id;
             isEditingPublishedResult = false;
-            showSection(createResultSection);
+            showFullScreen(createResultSection);
         }, 100);
     }
     async function deleteDraft(id) { if (confirm('Delete draft?')) { await deleteDoc(doc(db, "draft_results", id)); showToast('Draft deleted'); loadDraftResults(); } }
@@ -729,7 +737,7 @@
             editingDraftId = null;
             isEditingPublishedResult = true;
             editingPublishedResultId = id;
-            showSection(createResultSection);
+            showFullScreen(createResultSection);
         }, 100);
     }
     async function deleteResult(id) { if (confirm('Delete published result?')) { await deleteDoc(doc(db, "results", id)); showToast('Result deleted'); loadOldResults(); } }
