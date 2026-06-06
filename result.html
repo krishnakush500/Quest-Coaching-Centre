@@ -133,82 +133,72 @@
       font-size: 0.85rem;
     }
     
-    /* Student Info Section - Photo + Details in One Box */
-    .student-info-card {
-      background: #f8f9fc;
-      border-radius: 16px;
-      padding: 16px;
+    /* Student Info Section - Photo INSIDE the same box */
+    .student-info {
+      background: #f5f5f5;
+      border-radius: 12px;
+      padding: 15px;
       margin-bottom: 20px;
-      border: 1px solid #e9ecef;
-    }
-    
-    .student-info-inner {
       display: flex;
-      gap: 20px;
       align-items: center;
+      gap: 20px;
       flex-wrap: wrap;
     }
     
-    .student-photo-area {
-      flex-shrink: 0;
-      text-align: center;
-    }
-    
-    .student-photo-img {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid #1a237e;
-      background: white;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    
-    .no-photo-placeholder {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      background: #e9ecef;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 3px solid #1a237e;
-    }
-    
-    .no-photo-placeholder i {
-      font-size: 2.5rem;
-      color: #adb5bd;
-    }
-    
-    .student-details-area {
+    /* Student Details Section (Left side) */
+    .student-details {
       flex: 1;
+      min-width: 200px;
     }
     
-    .detail-row {
+    .info-row {
       display: flex;
-      margin-bottom: 12px;
+      flex-direction: column;
+      margin-bottom: 8px;
       padding: 8px 12px;
       background: white;
-      border-radius: 12px;
-      align-items: baseline;
-      flex-wrap: wrap;
+      border-radius: 8px;
     }
     
-    .detail-label {
-      width: 110px;
+    .info-label {
       font-weight: 700;
       color: #1a237e;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
+      margin-bottom: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     
-    .detail-value {
-      flex: 1;
+    .info-value {
       color: #333;
       font-size: 0.95rem;
       font-weight: 500;
     }
     
-    /* Marks Table */
+    /* Student Photo Section (Right side - inside same box) */
+    .student-photo-section {
+      text-align: center;
+      flex-shrink: 0;
+    }
+    
+    .student-photo {
+      width: 95px;
+      height: 105px;
+      object-fit: cover;
+      border: 2px solid #1a237e;
+      border-radius: 8px;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .photo-label {
+      font-size: 0.7rem;
+      color: #666;
+      margin-top: 5px;
+      font-weight: 500;
+    }
+    
+    /* Marks Table - with Grade Column */
     .marks-table {
       width: 100%;
       border-collapse: collapse;
@@ -274,7 +264,7 @@
       border-radius: 10px;
     }
     
-    /* Coaching Mention */
+    /* Coaching Mention Footer */
     .coaching-mention {
       text-align: center;
       margin-top: 20px;
@@ -285,7 +275,7 @@
       font-size: 0.85rem;
     }
     
-    /* Loading & Error */
+    /* Loading & Error States */
     .loading-state {
       text-align: center;
       padding: 50px 20px;
@@ -324,7 +314,7 @@
       cursor: pointer;
     }
     
-    /* PDF Clone */
+    /* PDF Clone Container */
     .pdf-clone-container {
       position: fixed;
       top: 0;
@@ -357,22 +347,10 @@
       .marks-table th, .marks-table td { padding: 6px; font-size: 0.75rem; }
       .action-btn { padding: 8px 16px; font-size: 0.75rem; }
       .percentage-display { font-size: 0.95rem; }
-      
-      .student-info-inner {
-        flex-direction: column;
-        text-align: center;
-      }
-      .student-photo-area {
-        margin-bottom: 10px;
-      }
-      .detail-row {
-        flex-direction: column;
-        text-align: left;
-      }
-      .detail-label {
-        width: 100%;
-        margin-bottom: 4px;
-      }
+      .student-info { flex-direction: column; text-align: center; }
+      .student-details { width: 100%; }
+      .student-photo-section { order: -1; margin-bottom: 10px; }
+      .student-photo { width: 85px; height: 95px; }
     }
     
     /* Print Styles */
@@ -394,12 +372,17 @@
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
       }
+      .grade-a-plus, .grade-a, .grade-b-plus, .grade-b, .grade-c, .grade-d, .grade-f {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
     }
   </style>
 </head>
 <body>
 
 <div class="result-container">
+  <!-- 3 Buttons - Top Section -->
   <div class="action-buttons">
     <button class="action-btn btn-download" onclick="downloadResultPDF()">
       <i class="fas fa-download"></i> Download PDF
@@ -412,21 +395,25 @@
     </button>
   </div>
   
+  <!-- Loading State -->
   <div id="loadingState" class="loading-state">
     <i class="fas fa-spinner fa-spin"></i>
     <p>Loading your result...</p>
   </div>
   
+  <!-- Error State -->
   <div id="errorState" class="error-state" style="display:none;">
     <i class="fas fa-exclamation-triangle"></i>
     <p id="errorMessage">Something went wrong!</p>
     <button onclick="goBack()"><i class="fas fa-arrow-left"></i> Go Back</button>
   </div>
   
+  <!-- Result Card (Hidden initially) -->
   <div id="resultCard" class="result-card" style="display:none;">
+    <!-- Header with Logo and Title -->
     <div class="result-card-header">
       <div class="result-logo">
-        <img id="coachingLogo" src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" alt="Logo" crossorigin="anonymous">
+        <img id="coachingLogo" src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" alt="Quest Coaching Logo" crossorigin="anonymous">
       </div>
       <div class="result-title">
         <h2 id="coachingName">QUEST COACHING CENTRE</h2>
@@ -435,40 +422,55 @@
       </div>
     </div>
     
-    <!-- Student Info Card - Photo + Details Together -->
-    <div class="student-info-card">
-      <div class="student-info-inner">
-        <div class="student-photo-area">
-          <img id="studentPhoto" class="student-photo-img" src="" alt="Student Photo" style="display: none;">
-          <div id="noPhotoPlaceholder" class="no-photo-placeholder" style="display: flex;">
-            <i class="fas fa-user-graduate"></i>
-          </div>
+    <!-- Student Info with Photo INSIDE the same box -->
+    <div class="student-info" id="studentInfoBox">
+      <!-- Left side: Student Details -->
+      <div class="student-details">
+        <div class="info-row">
+          <span class="info-label">Student Name</span>
+          <span class="info-value" id="studentName">-</span>
         </div>
-        <div class="student-details-area">
-          <div class="detail-row">
-            <span class="detail-label">Student Name:</span>
-            <span class="detail-value" id="studentName">-</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Father's Name:</span>
-            <span class="detail-value" id="fatherName">-</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Roll Number:</span>
-            <span class="detail-value" id="studentRoll">-</span>
-          </div>
+        <div class="info-row">
+          <span class="info-label">Father's Name</span>
+          <span class="info-value" id="fatherName">-</span>
         </div>
+        <div class="info-row">
+          <span class="info-label">Roll Number</span>
+          <span class="info-value" id="studentRoll">-</span>
+        </div>
+      </div>
+      
+      <!-- Right side: Passport Size Photo -->
+      <div class="student-photo-section">
+        <img id="studentPhoto" class="student-photo" src="" alt="Student Photo" style="display: none;">
+        <div class="photo-label" id="photoLabel">Student Photo</div>
       </div>
     </div>
     
+    <!-- Marks Table with Grade Column -->
     <table class="marks-table">
-      <thead><tr><th>Subject</th><th>Marks Obtained</th><th>Total Marks</th><th>Grade</th></tr></thead>
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Marks Obtained</th>
+          <th>Total Marks</th>
+          <th>Grade</th>
+        </tr>
+      </thead>
       <tbody id="marksTableBody"></tbody>
-     </table>
+    追逐
     
-    <div class="percentage-display" id="totalPercentage">Total Percentage: 0%</div>
-    <div class="division-display" id="divisionBox">Division: -</div>
+    <!-- Total Percentage -->
+    <div class="percentage-display" id="totalPercentage">
+      Total Percentage: 0%
+    </div>
     
+    <!-- Division -->
+    <div class="division-display" id="divisionBox">
+      Division: -
+    </div>
+    
+    <!-- Coaching Mention -->
     <div class="coaching-mention" id="coachingMention">
       <p>This result is published by QUEST COACHING CENTRE, Gopalganj | Director: MR. RAVI SIR</p>
       <p>For queries: +91 9708442525</p>
@@ -476,9 +478,11 @@
   </div>
 </div>
 
+<!-- PDF Clone Container -->
 <div id="pdfCloneContainer" class="pdf-clone-container"></div>
 
 <script>
+  // Firebase Configuration
   const firebaseConfig = {
     apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
     authDomain: "quest-coaching.firebaseapp.com",
@@ -489,17 +493,21 @@
     appId: "1:131948734089:web:f4ba25110c8b1298360858"
   };
   
+  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
   
+  // Coaching Info (QUEST COACHING CENTRE)
   const COACHING_NAME = "QUEST COACHING CENTRE";
   const DIRECTOR_NAME = "MR. RAVI SIR";
   const COACHING_PHONE = "+91 9708442525";
   const COACHING_LOGO = "https://i.ibb.co/hF9tmnpB/20250903-202922.jpg";
   
+  // Store current data
   let currentExamData = null;
   let currentStudentData = null;
   
+  // Function to calculate grade based on percentage
   function getGrade(percentage) {
     if(percentage >= 90) return { grade: "A+", className: "grade-a-plus" };
     if(percentage >= 75) return { grade: "A", className: "grade-a" };
@@ -510,6 +518,7 @@
     return { grade: "F", className: "grade-f" };
   }
   
+  // Calculate division based on percentage
   function calculateDivision(percentage) {
     if (percentage >= 60) return "FIRST DIVISION";
     if (percentage >= 45) return "SECOND DIVISION";
@@ -517,19 +526,28 @@
     return "FAIL";
   }
   
+  // Get URL parameters
   function getUrlParams() {
     const params = new URLSearchParams(window.location.search);
-    return { examId: params.get('examId'), rollNo: params.get('rollNo') };
+    return {
+      examId: params.get('examId'),
+      rollNo: params.get('rollNo')
+    };
   }
   
-  function goBack() { window.location.href = 'index.html'; }
+  // Go back to home
+  function goBack() {
+    window.location.href = 'index.html';
+  }
   
+  // Fetch student photo from admissions collection
   async function fetchStudentPhoto(rollNumber) {
     try {
       const q = db.collection("admissions").where("rollNumber", "==", String(rollNumber));
       const querySnapshot = await q.get();
       if (!querySnapshot.empty) {
-        return querySnapshot.docs[0].data().photoUrl || null;
+        const studentData = querySnapshot.docs[0].data();
+        return studentData.photoUrl || null;
       }
       return null;
     } catch (error) {
@@ -538,6 +556,7 @@
     }
   }
   
+  // Load result from Firebase
   async function loadResult() {
     const params = getUrlParams();
     const examId = params.examId;
@@ -553,30 +572,34 @@
       const docSnap = await docRef.get();
       
       if (!docSnap.exists) {
-        showError('Exam not found.');
+        showError('Exam not found. Please check the link and try again.');
         return;
       }
       
       currentExamData = docSnap.data();
+      
       const student = currentExamData.students?.find(s => s.rollNo == rollNo);
       
       if (!student) {
-        showError(`Student with roll number ${rollNo} not found.`);
+        showError(`Student with roll number ${rollNo} not found in this exam.`);
         return;
       }
       
       currentStudentData = student;
+      
+      // Fetch student photo from admissions
       const studentPhotoUrl = await fetchStudentPhoto(rollNo);
       student.photoUrl = studentPhotoUrl;
       
       displayResult(currentExamData, student);
       
     } catch (error) {
-      console.error('Error:', error);
-      showError('Failed to load result.');
+      console.error('Error loading result:', error);
+      showError('Failed to load result. Please try again later.');
     }
   }
   
+  // Display result card
   function displayResult(examData, student) {
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('resultCard').style.display = 'block';
@@ -589,18 +612,24 @@
     document.getElementById('fatherName').innerText = student.fatherName || "-";
     document.getElementById('studentRoll').innerText = student.rollNo || "-";
     
-    // Handle photo display
-    const studentPhoto = document.getElementById('studentPhoto');
-    const noPhotoPlaceholder = document.getElementById('noPhotoPlaceholder');
+    // Set student photo if available
+    const studentPhotoImg = document.getElementById('studentPhoto');
+    const photoLabel = document.getElementById('photoLabel');
     
-    if (student.photoUrl && student.photoUrl !== '') {
-      studentPhoto.src = student.photoUrl;
-      studentPhoto.style.display = 'block';
-      noPhotoPlaceholder.style.display = 'none';
+    if (student.photoUrl) {
+      studentPhotoImg.src = student.photoUrl;
+      studentPhotoImg.style.display = 'block';
+      photoLabel.style.display = 'block';
     } else {
-      studentPhoto.style.display = 'none';
-      noPhotoPlaceholder.style.display = 'flex';
+      studentPhotoImg.style.display = 'none';
+      photoLabel.style.display = 'block';
+      photoLabel.innerHTML = '📷 No Photo';
     }
+    
+    document.getElementById('coachingMention').innerHTML = `
+      <p>This result is published by ${COACHING_NAME}, Gopalganj | Director: ${DIRECTOR_NAME}</p>
+      <p>For queries: ${COACHING_PHONE}</p>
+    `;
     
     let marksHtml = '';
     let totalObtained = 0;
@@ -614,7 +643,15 @@
         const percentage = (marksObtained / subjectTotal) * 100;
         const gradeInfo = getGrade(percentage);
         
-        marksHtml += `<tr><td>${escapeHtml(subjectName)}</td><td>${marksObtained}</td><td>${subjectTotal}</td><td><span class="${gradeInfo.className}">${gradeInfo.grade}</span></td></tr>`;
+        marksHtml += `
+          <tr>
+            <td>${escapeHtml(subjectName)}</td>
+            <td>${marksObtained}</td>
+            <td>${subjectTotal}</td>
+            <td><span class="${gradeInfo.className}">${gradeInfo.grade}</span></td>
+          </tr>
+        `;
+        
         totalObtained += marksObtained;
         totalMax += subjectTotal;
       }
@@ -623,7 +660,14 @@
     const totalPercentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) : 0;
     const division = calculateDivision(parseFloat(totalPercentage));
     
-    marksHtml += `<tr class="total-marks"><td><strong>Total</strong></td><td><strong>${totalObtained}</strong></td><td><strong>${totalMax}</strong></td><td></td></tr>`;
+    marksHtml += `
+      <tr class="total-marks">
+        <td><strong>Total</strong></td>
+        <td><strong>${totalObtained}</strong></td>
+        <td><strong>${totalMax}</strong></td>
+        <td><td style="background:#e8f5e8;"></td></td>
+      </tr>
+    `;
     
     document.getElementById('marksTableBody').innerHTML = marksHtml;
     document.getElementById('totalPercentage').innerHTML = `Total Percentage: ${totalPercentage}%`;
@@ -665,10 +709,13 @@
     document.getElementById('errorMessage').innerHTML = message;
   }
   
+  // Create a clone for PDF
   function createPDFClone() {
     const originalCard = document.getElementById('resultCard');
     const cloneContainer = document.getElementById('pdfCloneContainer');
+    
     cloneContainer.innerHTML = '';
+    
     const clone = originalCard.cloneNode(true);
     clone.style.display = 'block';
     clone.style.width = '100%';
@@ -678,12 +725,18 @@
     clone.style.background = 'white';
     clone.style.boxShadow = 'none';
     
+    // Remove action buttons if any inside clone
     const actionDiv = clone.querySelector('.action-buttons');
     if (actionDiv) actionDiv.remove();
     
+    // Ensure logo image loads properly in PDF
     const logoImg = clone.querySelector('#coachingLogo');
-    if (logoImg) { logoImg.crossOrigin = 'Anonymous'; logoImg.src = COACHING_LOGO; }
+    if (logoImg) {
+      logoImg.crossOrigin = 'Anonymous';
+      logoImg.src = COACHING_LOGO;
+    }
     
+    // Ensure student photo loads properly in PDF
     const studentPhoto = clone.querySelector('#studentPhoto');
     if (studentPhoto && currentStudentData && currentStudentData.photoUrl) {
       studentPhoto.crossOrigin = 'Anonymous';
@@ -694,17 +747,26 @@
     cloneContainer.style.visibility = 'visible';
     cloneContainer.style.opacity = '0';
     cloneContainer.style.pointerEvents = 'none';
+    
     return clone;
   }
   
+  // Wait for image to load
   function waitForImageLoad(img) {
     return new Promise((resolve) => {
-      if (img && img.complete) { resolve(); }
-      else if (img) { img.onload = resolve; img.onerror = resolve; }
-      else { resolve(); }
+      if (img && img.complete && img.naturalWidth > 0) {
+        resolve();
+      } else if (img) {
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+        setTimeout(resolve, 2000);
+      } else {
+        resolve();
+      }
     });
   }
   
+  // Download PDF function
   async function downloadResultPDF() {
     const btn = document.querySelector('.btn-download');
     const originalText = btn.innerHTML;
@@ -714,41 +776,58 @@
     try {
       const clone = createPDFClone();
       const cloneContainer = document.getElementById('pdfCloneContainer');
+      
+      // Wait for images to load in clone
       const cloneLogo = clone.querySelector('#coachingLogo');
       const clonePhoto = clone.querySelector('#studentPhoto');
       
-      await Promise.all([waitForImageLoad(cloneLogo), waitForImageLoad(clonePhoto)]);
+      await Promise.all([
+        waitForImageLoad(cloneLogo),
+        waitForImageLoad(clonePhoto)
+      ]);
+      
       await new Promise(resolve => setTimeout(resolve, 300));
       
       const opt = {
         margin: [10, 10, 10, 10],
         filename: `Result_${document.getElementById('studentRoll').innerText}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
+        html2canvas: { 
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff'
+        },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
       
       await html2pdf().set(opt).from(clone).save();
+      
       cloneContainer.innerHTML = '';
       cloneContainer.style.visibility = 'hidden';
+      
     } catch (error) {
       console.error('PDF Error:', error);
-      alert('Error generating PDF.');
+      alert('Error generating PDF. Please try again.');
     } finally {
       btn.innerHTML = originalText;
       btn.disabled = false;
     }
   }
   
+  // Share on WhatsApp function
   function shareOnWhatsApp() {
     const studentName = document.getElementById('studentName').innerText;
     const studentRoll = document.getElementById('studentRoll').innerText;
     const totalPercent = document.getElementById('totalPercentage').innerText.replace('Total Percentage: ', '').replace('%', '');
     const examName = document.getElementById('examName').innerText;
+    
     const shareText = `📢 *Result Published* 📢\n\n🏫 *${COACHING_NAME}*\n📚 *${examName}*\n\n👨‍🎓 Student: ${studentName}\n📝 Roll No: ${studentRoll}\n📊 Percentage: ${totalPercent}%\n📞 Contact: ${COACHING_PHONE}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+    window.open(whatsappUrl, '_blank');
   }
   
+  // Make functions global
   window.downloadResultPDF = downloadResultPDF;
   window.shareOnWhatsApp = shareOnWhatsApp;
   window.goBack = goBack;
