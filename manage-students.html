@@ -113,7 +113,6 @@
             font-weight: 500;
         }
         .auto-fetch-badge { background: #e0f2fe; color: #0369a1; font-size: 11px; border-radius: 20px; padding: 4px 12px; margin-left: 12px; }
-        .student-photo-thumb { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #1a237e; }
         .photo-fetch-status { font-size: 11px; margin-top: 4px; }
         .photo-fetch-success { color: #16a34a; }
         .photo-fetch-missing { color: #dc2626; }
@@ -222,7 +221,7 @@
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead class="table-light">
-                                <tr><th>Photo</th><th>Roll</th><th>Name</th><th>Father</th><th>Marks</th><th>Actions</th></tr>
+                                <tr><th>Roll</th><th>Name</th><th>Father</th><th>Marks</th><th>Actions</th></tr>
                             </thead>
                             <tbody id="studentsTableBody"></tbody>
                         </table>
@@ -490,8 +489,16 @@
         students.forEach((s, idx) => {
             let marksHtml = '';
             subjects.forEach(sub => marksHtml += `<div>${sub.name}: ${s.marks[sub.name] || 0}/${sub.total}</div>`);
-            const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" class="student-photo-thumb" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷 No photo</span>';
-            const row = `<tr>${photoHtml}</td><td>${s.rollNo}</td><td>${s.name}</td><td>${s.fatherName || '-'}</td><td>${marksHtml}</td><td><button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button> <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button></td></tr>`;
+            const row = `<tr>
+                <td>${s.rollNo}</td>
+                <td>${s.name}</td>
+                <td>${s.fatherName || '-'}</td>
+                <td>${marksHtml}</td>
+                <td>
+                    <button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button>
+                    <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button>
+                </td>
+              </tr>`;
             studentsTableBody.insertAdjacentHTML('beforeend', row);
         });
         document.querySelectorAll('.edit-student').forEach(btn => btn.addEventListener('click', e => editStudent(parseInt(e.target.dataset.index))));
@@ -650,13 +657,12 @@
         resultModalTitle.innerText = data.examName + ' (Ranked)';
         let html = `<p><strong>Total Students:</strong> ${data.students.length}</p>`;
         if (sorted.length) html += `<div class="alert alert-success">🏆 Top Student: ${sorted[0].name} (Roll: ${sorted[0].rollNo})</div>`;
-        html += `<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Photo</th><th>Rank</th><th>Roll</th><th>Name</th><th>Father</th>`;
+        html += `<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Rank</th><th>Roll</th><th>Name</th><th>Father</th>`;
         data.subjects.forEach(s => html += `<th>${s.name}</th>`);
         html += `<th>Total</th><th>%</th></tr></thead><tbody>`;
         sorted.forEach((s, idx) => {
             let total = 0, maxTotal = 0;
-            const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷</span>';
-            html += `<tr${idx===0?' class="top-student-row"':''}><td>${photoHtml}</td><td><strong>#${idx+1}</strong></td><td>${s.rollNo}</td><td>${s.name}${idx===0?' 🏆':''}</td><td>${s.fatherName||'-'}</td>`;
+            html += `<tr${idx===0?' class="top-student-row"':''}><td><strong>#${idx+1}</strong></td><td>${s.rollNo}</td><td>${s.name}${idx===0?' 🏆':''}</td><td>${s.fatherName||'-'}</tr>`;
             data.subjects.forEach(sub => {
                 const mark = s.marks[sub.name] || 0;
                 total += mark; maxTotal += sub.total;
