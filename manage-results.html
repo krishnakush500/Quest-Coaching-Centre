@@ -4,200 +4,71 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Manage Results - Quest Coaching Centre</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- jsPDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background: #f0f2f5;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 20px;
-        }
-        .manage-container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; }
+        .manage-container { max-width: 1400px; margin: 0 auto; }
         .header-section {
-            background: white;
-            border-radius: 25px;
-            padding: 20px 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
+            background: white; border-radius: 25px; padding: 20px 30px; margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 15px;
         }
-        .page-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #1a237e;
-            margin: 0;
-        }
-        .page-title i {
-            color: #0d6efd;
-            margin-right: 10px;
-        }
-        .back-to-admin {
-            background: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 10px 24px;
-            font-weight: 600;
-            transition: 0.2s;
-        }
-        .back-to-admin:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
-        }
-        .action-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
+        .page-title { font-size: 1.8rem; font-weight: 700; color: #1a237e; margin: 0; }
+        .page-title i { color: #0d6efd; margin-right: 10px; }
+        .back-to-admin { background: #6c757d; color: white; border: none; border-radius: 50px; padding: 10px 24px; font-weight: 600; transition: 0.2s; }
+        .back-to-admin:hover { background: #5a6268; transform: translateY(-2px); }
+        .action-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-bottom: 40px; }
         .action-card {
-            background: white;
-            border-radius: 25px;
-            padding: 25px 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            background: white; border-radius: 25px; padding: 25px 20px; text-align: center;
+            transition: all 0.3s ease; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             border: 1px solid #f0f0f0;
         }
-        .action-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 30px rgba(0,0,0,0.1);
-        }
-        .action-icon {
-            width: 70px;
-            height: 70px;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 25px;
-            font-size: 32px;
-        }
+        .action-card:hover { transform: translateY(-8px); box-shadow: 0 20px 30px rgba(0,0,0,0.1); }
+        .action-icon { width: 70px; height: 70px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; border-radius: 25px; font-size: 32px; }
         .action-card:nth-child(1) .action-icon { background: #e8eafe; color: #1a237e; }
         .action-card:nth-child(2) .action-icon { background: #fff3cd; color: #ffc107; }
         .action-card:nth-child(3) .action-icon { background: #d1ecf1; color: #0dcaf0; }
-        
-        .action-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: #1e293b;
-        }
-        .action-desc {
-            font-size: 0.85rem;
-            color: #64748b;
-            margin-bottom: 20px;
-        }
-        .action-btn {
-            padding: 8px 24px;
-            border-radius: 40px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border: none;
-            background: #f1f5f9;
-            color: #1e293b;
-            transition: 0.2s;
-        }
-        .action-card:hover .action-btn {
-            background: #1a237e;
-            color: white;
-        }
-        .fullscreen-section {
-            display: none;
-            background: white;
-            border-radius: 25px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e9ecef;
-        }
-        .section-header h3 {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #1a237e;
-            margin: 0;
-        }
-        .back-btn {
-            background: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 8px 20px;
-            font-weight: 500;
-        }
-        .subject-box {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 15px;
-            margin-bottom: 12px;
-            border: 1px solid #e2e8f0;
-        }
-        .student-row:hover {
-            background: #f8fafc;
-        }
-        .save-changes-btn {
-            background: #20c997;
-            border-color: #20c997;
-            color: white;
-        }
-        .top-student-row {
-            background: #fff3cd !important;
-            font-weight: 500;
-        }
-        .pdf-download-btn {
-            background: #dc3545;
-            border-color: #dc3545;
-            color: white;
-        }
+        .action-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; color: #1e293b; }
+        .action-desc { font-size: 0.85rem; color: #64748b; margin-bottom: 20px; }
+        .action-btn { padding: 8px 24px; border-radius: 40px; font-size: 0.9rem; font-weight: 600; border: none; background: #f1f5f9; color: #1e293b; transition: 0.2s; }
+        .action-card:hover .action-btn { background: #1a237e; color: white; }
+        .fullscreen-section { display: none; background: white; border-radius: 25px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .section-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #e9ecef; }
+        .section-header h3 { font-size: 1.4rem; font-weight: 700; color: #1a237e; margin: 0; }
+        .back-btn { background: #6c757d; color: white; border: none; border-radius: 50px; padding: 8px 20px; font-weight: 500; }
+        .subject-box { background: #f8fafc; border-radius: 16px; padding: 15px; margin-bottom: 12px; border: 1px solid #e2e8f0; }
+        .save-changes-btn { background: #20c997; border-color: #20c997; color: white; }
+        .top-student-row { background: #fff3cd !important; font-weight: 500; }
+        .pdf-download-btn { background: #dc3545; border-color: #dc3545; color: white; }
         .toast-message {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            z-index: 1100;
-            background: #28a745;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 50px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: none;
-            align-items: center;
-            gap: 10px;
-            font-weight: 500;
+            position: fixed; bottom: 25px; right: 25px; z-index: 1100; background: #28a745;
+            color: white; padding: 12px 24px; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none; align-items: center; gap: 10px; font-weight: 500;
         }
-        .auto-fetch-badge {
-            background: #e0f2fe;
-            color: #0369a1;
-            font-size: 11px;
-            border-radius: 20px;
-            padding: 4px 12px;
-            margin-left: 12px;
-            font-weight: normal;
+        .auto-fetch-badge { background: #e0f2fe; color: #0369a1; font-size: 11px; border-radius: 20px; padding: 4px 12px; margin-left: 12px; font-weight: normal; }
+        
+        /* Progress Bar Overlay for Fetching */
+        .fetch-progress-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 10000; display: none;
+            justify-content: center; align-items: center; flex-direction: column;
         }
+        .fetch-progress-card {
+            background: white; padding: 30px 40px; border-radius: 28px; text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2); min-width: 280px;
+        }
+        .fetch-spinner { width: 50px; height: 50px; border: 4px solid #e0e0e0; border-top: 4px solid #1a237e; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .fetch-progress-card h3 { color: #1a237e; margin-bottom: 15px; font-size: 1.1rem; }
+        .fetch-progress-bar-container { width: 100%; height: 8px; background: #e0e0e0; border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+        .fetch-progress-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #1a237e, #283593, #10b981); border-radius: 10px; transition: width 0.3s ease; animation: fetchLoading 1.5s infinite; }
+        @keyframes fetchLoading { 0% { width: 0%; } 30% { width: 40%; } 60% { width: 70%; } 100% { width: 100%; } }
+        .fetch-progress-text { font-size: 0.8rem; color: #666; margin-top: 10px; }
+        
         @media (max-width: 768px) {
             body { padding: 15px; }
             .header-section { flex-direction: column; text-align: center; }
@@ -248,21 +119,13 @@
             <div class="card mb-4">
                 <div class="card-header bg-white fw-bold">Step 1: Exam Setup</div>
                 <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Exam Name</label>
-                        <input type="text" class="form-control" id="examName" placeholder="e.g., Final Examination 2025">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Number of Subjects</label>
-                        <input type="number" class="form-control" id="subjectCount" min="1">
-                    </div>
+                    <div class="mb-3"><label class="form-label">Exam Name</label><input type="text" class="form-control" id="examName" placeholder="e.g., Final Examination 2025"></div>
+                    <div class="mb-3"><label class="form-label">Number of Subjects</label><input type="number" class="form-control" id="subjectCount" min="1"></div>
                     <button id="generateSubjectFieldsBtn" class="btn btn-primary"><i class="fas fa-magic"></i> Generate Subject Fields</button>
                 </div>
             </div>
             <div id="subjectFields" class="mb-4"></div>
-            <div id="step1NextBtn" class="d-none">
-                <button id="nextToStudentEntryBtn" class="btn btn-success">Next →</button>
-            </div>
+            <div id="step1NextBtn" class="d-none"><button id="nextToStudentEntryBtn" class="btn btn-success">Next →</button></div>
         </div>
         <div id="studentEntryStep" style="display: none;">
             <div class="card mb-4">
@@ -299,12 +162,7 @@
             <div class="card">
                 <div class="card-header bg-white fw-bold">Students List</div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light"><tr><th>Roll</th><th>Name</th><th>Father</th><th>Marks</th><th>Actions</th></tr></thead>
-                            <tbody id="studentsTableBody"></tbody>
-                        </table>
-                    </div>
+                    <div class="table-responsive"><table class="table table-hover"><thead class="table-light"><tr><th>Roll</th><th>Name</th><th>Father</th><th>Marks</th><th>Actions</th></tr></thead><tbody id="studentsTableBody"></tbody></table></div>
                     <div class="d-flex gap-2 mt-3">
                         <button id="saveDraftBtn" class="btn btn-warning"><i class="fas fa-save"></i> Save as Draft</button>
                         <button id="saveChangesBtn" class="btn save-changes-btn d-none">Save Changes</button>
@@ -317,64 +175,29 @@
     </div>
 
     <div id="draftResultsSection" class="fullscreen-section">
-        <div class="section-header">
-            <h3><i class="fas fa-file-draft me-2"></i> Draft Results</h3>
-            <button class="back-btn" id="backFromDraftBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button>
-        </div>
+        <div class="section-header"><h3><i class="fas fa-file-draft me-2"></i> Draft Results</h3><button class="back-btn" id="backFromDraftBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button></div>
         <div id="draftResultsList" class="row g-4"></div>
     </div>
 
     <div id="oldResultsSection" class="fullscreen-section">
-        <div class="section-header">
-            <h3><i class="fas fa-history me-2"></i> Published Results</h3>
-            <button class="back-btn" id="backFromOldBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button>
-        </div>
+        <div class="section-header"><h3><i class="fas fa-history me-2"></i> Published Results</h3><button class="back-btn" id="backFromOldBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button></div>
         <div id="oldResultsList" class="row g-4"></div>
     </div>
 </div>
 
-<!-- Modals and Toasts (same as before) -->
-<div class="modal fade" id="resultModal" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="resultModalTitle">Result Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="resultDetails"></div>
-            <div class="modal-footer">
-                <button type="button" class="btn pdf-download-btn" id="downloadPdfBtn"><i class="fas fa-download"></i> Download PDF (with Rank)</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
+<!-- Fetch Progress Bar Overlay -->
+<div id="fetchProgressOverlay" class="fetch-progress-overlay">
+    <div class="fetch-progress-card">
+        <div class="fetch-spinner"></div>
+        <h3><i class="fas fa-search"></i> Fetching Student Details...</h3>
+        <div class="fetch-progress-bar-container"><div class="fetch-progress-bar-fill"></div></div>
+        <p class="fetch-progress-text" id="fetchProgressText">Searching in admission records...</p>
     </div>
 </div>
 
-<div class="modal fade" id="editPublishedConfirmModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Confirm Edit</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>You are editing a published result. What would you like to do?</p>
-                <div class="alert alert-info">
-                    <ul class="mb-0">
-                        <li><strong>Save Changes:</strong> Update the existing result directly</li>
-                        <li><strong>Don't Save:</strong> Go back without saving changes</li>
-                        <li><strong>Save as Draft:</strong> Save changes as a new draft</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="dontSaveConfirmBtn">Don't Save</button>
-                <button type="button" class="btn btn-warning" id="saveDraftConfirmBtn">Save as Draft</button>
-                <button type="button" class="btn save-changes-btn" id="saveChangesConfirmBtn">Save Changes</button>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Modals and Toasts -->
+<div class="modal fade" id="resultModal" tabindex="-1"><div class="modal-dialog modal-xl"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="resultModalTitle">Result Details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="resultDetails"></div><div class="modal-footer"><button type="button" class="btn pdf-download-btn" id="downloadPdfBtn"><i class="fas fa-download"></i> Download PDF (with Rank)</button><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div></div></div></div>
+<div class="modal fade" id="editPublishedConfirmModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Confirm Edit</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><p>You are editing a published result. What would you like to do?</p><div class="alert alert-info"><ul class="mb-0"><li><strong>Save Changes:</strong> Update the existing result directly</li><li><strong>Don't Save:</strong> Go back without saving changes</li><li><strong>Save as Draft:</strong> Save changes as a new draft</li></ul></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" id="dontSaveConfirmBtn">Don't Save</button><button type="button" class="btn btn-warning" id="saveDraftConfirmBtn">Save as Draft</button><button type="button" class="btn save-changes-btn" id="saveChangesConfirmBtn">Save Changes</button></div></div></div></div>
 
 <div id="successToast" class="toast-message"><i class="fas fa-check-circle"></i> <span id="toastMessage">Success!</span></div>
 <div id="publishedToast" class="toast-message" style="background: #198754;"><i class="fas fa-check-circle"></i> Result Published Successfully!</div>
@@ -383,9 +206,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-    import { 
-        getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, serverTimestamp, where, getDoc
-    } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
@@ -393,16 +214,13 @@
         projectId: "quest-coaching",
         storageBucket: "quest-coaching.firebasestorage.app"
     };
-
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    onAuthStateChanged(auth, (user) => {
-        if (!user) { alert('Please login first!'); window.location.href = 'index.html'; }
-    });
+    onAuthStateChanged(auth, (user) => { if (!user) { alert('Please login first!'); window.location.href = 'index.html'; } });
 
-    // DOM Elements (same as before)
+    // DOM Elements
     const actionCardsContainer = document.getElementById('actionCardsContainer');
     const createResultSection = document.getElementById('createResultSection');
     const draftResultsSection = document.getElementById('draftResultsSection');
@@ -446,6 +264,8 @@
     const dontSaveConfirmBtn = document.getElementById('dontSaveConfirmBtn');
     const saveDraftConfirmBtn = document.getElementById('saveDraftConfirmBtn');
     const saveChangesConfirmBtn = document.getElementById('saveChangesConfirmBtn');
+    const fetchProgressOverlay = document.getElementById('fetchProgressOverlay');
+    const fetchProgressText = document.getElementById('fetchProgressText');
     
     let subjects = [], students = [], editingStudentIndex = null, editingDraftId = null;
     let isEditingPublishedResult = false, editingPublishedResultId = null, hasChanges = false;
@@ -482,59 +302,82 @@
     backFromDraftBtn.addEventListener('click', showActionCards);
     backFromOldBtn.addEventListener('click', showActionCards);
 
-    // ========== NEW: Auto-fetch from admissions collection ==========
+    // ========== PROGRESS BAR FOR FETCHING STUDENT ==========
+    function showFetchProgress(text) {
+        fetchProgressText.textContent = text || 'Searching in admission records...';
+        fetchProgressOverlay.style.display = 'flex';
+    }
+    function hideFetchProgress() {
+        fetchProgressOverlay.style.display = 'none';
+    }
+
     async function fetchStudentFromAdmission(rollNumber) {
+        showFetchProgress(`Searching for roll number: ${rollNumber}...`);
+        await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for visual effect
         try {
-            // Query admissions collection where rollNumber matches
             const q = query(collection(db, "admissions"), where("rollNumber", "==", String(rollNumber)));
             const querySnapshot = await getDocs(q);
             if (!querySnapshot.empty) {
-                const studentDoc = querySnapshot.docs[0];
-                const studentData = studentDoc.data();
-                return {
-                    name: studentData.studentName || '',
-                    fatherName: studentData.fatherName || ''
-                };
+                const studentData = querySnapshot.docs[0].data();
+                fetchProgressText.textContent = `✓ Student found: ${studentData.studentName}`;
+                await new Promise(resolve => setTimeout(resolve, 300));
+                hideFetchProgress();
+                return { name: studentData.studentName || '', fatherName: studentData.fatherName || '' };
             } else {
+                fetchProgressText.textContent = `✗ Roll number ${rollNumber} not found in admissions`;
+                await new Promise(resolve => setTimeout(resolve, 800));
+                hideFetchProgress();
                 return null;
             }
         } catch (error) {
             console.error("Error fetching admission data:", error);
+            fetchProgressText.textContent = `✗ Error fetching data`;
+            await new Promise(resolve => setTimeout(resolve, 800));
+            hideFetchProgress();
             return null;
         }
     }
 
-    // Event listener on roll number input (on blur)
+    // Roll number input event with progress bar
     rollNoInput.addEventListener('blur', async () => {
         const rollVal = rollNoInput.value.trim();
         if (!rollVal) {
-            // Clear only if we are not editing an existing student? We'll clear only if not editing.
             if (editingStudentIndex === null) {
                 studentNameInput.value = '';
                 fatherNameInput.value = '';
             }
             return;
         }
-        // If we are in edit mode, maybe we don't want to auto-overwrite? But teacher might want to change admission? We'll allow but show warning.
+        if (editingStudentIndex !== null) {
+            // If editing, don't auto-fetch (teacher might be editing existing student)
+            return;
+        }
         const studentInfo = await fetchStudentFromAdmission(rollVal);
         if (studentInfo) {
             studentNameInput.value = studentInfo.name;
             fatherNameInput.value = studentInfo.fatherName;
-            showToast(`Student found: ${studentInfo.name}`, false);
-            // Optional: add a small visual feedback
+            showToast(`✅ Student found: ${studentInfo.name}`, false);
+            // Add green border effect
+            studentNameInput.style.borderColor = '#28a745';
+            fatherNameInput.style.borderColor = '#28a745';
+            setTimeout(() => {
+                studentNameInput.style.borderColor = '';
+                fatherNameInput.style.borderColor = '';
+            }, 1500);
         } else {
-            if (editingStudentIndex === null) {
-                // Only clear if not editing existing student from list
-                studentNameInput.value = '';
-                fatherNameInput.value = '';
-            }
-            showToast(`Roll number ${rollVal} not found in admissions. You can add manually.`, false);
+            studentNameInput.value = '';
+            fatherNameInput.value = '';
+            showToast(`❌ Roll number ${rollVal} not found in admissions. You can add manually.`, false);
+            studentNameInput.style.borderColor = '#dc3545';
+            fatherNameInput.style.borderColor = '#dc3545';
+            setTimeout(() => {
+                studentNameInput.style.borderColor = '';
+                fatherNameInput.style.borderColor = '';
+            }, 1500);
         }
     });
 
-    // Rest of the code remains same as earlier manage-results.html (generate subject fields, add student, etc.)
-    // (I'm including the full logic here for completeness; but it's identical to previous version except the auto-fetch)
-
+    // Rest of the result management functions
     generateSubjectFieldsBtn.addEventListener('click', () => {
         const cnt = parseInt(subjectCountInput.value);
         if (cnt < 1) return;
@@ -761,7 +604,7 @@
         html += `<th>Total</th><th>%</th></tr></thead><tbody>`;
         sorted.forEach((s, idx) => {
             let total = 0, maxTotal = 0;
-            html += `<tr${idx===0?' class="top-student-row"':''}><td><strong>#${idx+1}</strong></td><td>${s.rollNo}</td><td>${s.name}${idx===0?' 🏆':''}</td><td>${s.fatherName||'-'}</td>`;
+            html += `<tr${idx===0?' class="top-student-row"':''}><td><strong>#${idx+1}</strong></td><td>${s.rollNo}</td><td>${s.name}${idx===0?' 🏆':''}</td><td>${s.fatherName||'-'}</tr>`;
             data.subjects.forEach(sub => {
                 const mark = s.marks[sub.name] || 0;
                 total += mark; maxTotal += sub.total;
