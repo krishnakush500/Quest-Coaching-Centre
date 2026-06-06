@@ -2,493 +2,837 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>📋 Quest Coaching · Manage Students</title>
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Manage Results - Quest Coaching Centre</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- jsPDF Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
-        body { background: #f0f4fa; padding: 16px 12px 32px; min-height: 100vh; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        
-        .header-bar {
-            background: white;
-            border-radius: 40px;
-            padding: 14px 24px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 18px rgba(0,20,40,0.08);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .back-btn {
-            background: #e8f0fe;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: 600;
-            color: #1b4f9b;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .download-pdf-btn {
-            background: #dc2626;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.2s;
-        }
-        .download-pdf-btn:hover {
-            background: #b91c1c;
-            transform: translateY(-2px);
-        }
-        
-        .filter-card {
-            background: white;
-            border-radius: 32px;
+        body {
+            background: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 18px rgba(0,20,40,0.08);
+        }
+        .manage-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header-section {
+            background: white;
+            border-radius: 25px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             display: flex;
+            justify-content: space-between;
+            align-items: center;
             flex-wrap: wrap;
             gap: 15px;
-            align-items: flex-end;
         }
-        .filter-group { flex: 1; min-width: 150px; }
-        .filter-group label { font-size: 0.7rem; font-weight: 600; color: #64748b; display: block; margin-bottom: 5px; }
-        .filter-group select, .filter-group input { width: 100%; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 16px; background: white; }
-        .search-btn { background: #1b4f9b; color: white; border: none; padding: 10px 25px; border-radius: 40px; cursor: pointer; font-weight: 600; }
-        
-        .students-card { background: white; border-radius: 32px; padding: 20px; overflow-x: auto; box-shadow: 0 8px 18px rgba(0,20,40,0.08); }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f8fafc; padding: 14px 10px; text-align: left; font-size: 0.8rem; font-weight: 700; color: #1e3a5f; border-bottom: 2px solid #e2e8f0; }
-        td { padding: 12px 10px; border-bottom: 1px solid #e2e8f0; font-size: 0.85rem; vertical-align: middle; }
-        .student-photo { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; background: #e2e8f0; }
-        .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
-        .view-btn, .edit-btn, .delete-btn { padding: 6px 12px; border: none; border-radius: 30px; cursor: pointer; font-size: 0.7rem; font-weight: 600; }
-        .view-btn { background: #1b4f9b; color: white; }
-        .edit-btn { background: #f59e0b; color: white; }
-        .delete-btn { background: #dc2626; color: white; }
-        .badge { padding: 4px 10px; border-radius: 30px; font-size: 0.7rem; }
-        .badge.male { background: #dbeafe; color: #1e40af; }
-        .badge.female { background: #fce7f3; color: #be185d; }
-        .loading { text-align: center; padding: 40px; color: #64748b; }
-        
-        .auth-loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a237e;
+            margin: 0;
+        }
+        .page-title i {
+            color: #0d6efd;
+            margin-right: 10px;
+        }
+        .back-to-admin {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 24px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .back-to-admin:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        .action-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        .action-card {
             background: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 10000;
+            border-radius: 25px;
+            padding: 25px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: 1px solid #f0f0f0;
         }
-        .auth-loading .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #1b4f9b; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .main-content { display: none; }
+        .action-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 30px rgba(0,0,0,0.1);
+        }
+        .action-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 25px;
+            font-size: 32px;
+        }
+        .action-card:nth-child(1) .action-icon { background: #e8eafe; color: #1a237e; }
+        .action-card:nth-child(2) .action-icon { background: #fff3cd; color: #ffc107; }
+        .action-card:nth-child(3) .action-icon { background: #d1ecf1; color: #0dcaf0; }
         
-        @media (max-width: 700px) {
-            .filter-card { flex-direction: column; }
-            .action-buttons { flex-direction: column; }
-            td, th { font-size: 0.7rem; padding: 8px 5px; }
-            .header-bar { flex-direction: column; gap: 10px; }
-            .back-btn, .download-pdf-btn { width: 100%; justify-content: center; }
+        .action-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #1e293b;
+        }
+        .action-desc {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+        .action-btn {
+            padding: 8px 24px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: none;
+            background: #f1f5f9;
+            color: #1e293b;
+            transition: 0.2s;
+        }
+        .action-card:hover .action-btn {
+            background: #1a237e;
+            color: white;
+        }
+        .fullscreen-section {
+            display: none;
+            background: white;
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .section-header h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1a237e;
+            margin: 0;
+        }
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 20px;
+            font-weight: 500;
+        }
+        .subject-box {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        .student-row:hover {
+            background: #f8fafc;
+        }
+        .save-changes-btn {
+            background: #20c997;
+            border-color: #20c997;
+            color: white;
+        }
+        .top-student-row {
+            background: #fff3cd !important;
+            font-weight: 500;
+        }
+        .pdf-download-btn {
+            background: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+        .toast-message {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 1100;
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+        .auto-fetch-badge {
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 11px;
+            border-radius: 20px;
+            padding: 4px 12px;
+            margin-left: 12px;
+            font-weight: normal;
+        }
+        @media (max-width: 768px) {
+            body { padding: 15px; }
+            .header-section { flex-direction: column; text-align: center; }
+            .page-title { font-size: 1.4rem; }
+            .action-cards { gap: 15px; }
+            .action-card { padding: 20px 15px; }
+            .action-icon { width: 55px; height: 55px; font-size: 26px; }
+            .action-title { font-size: 1.1rem; }
         }
     </style>
 </head>
 <body>
-    <div id="authLoading" class="auth-loading">
-        <div class="spinner"></div>
-        <p style="margin-top: 15px; color: #1b4f9b; font-weight: 600;">Verifying access...</p>
+
+<div class="manage-container">
+    <div class="header-section">
+        <h1 class="page-title"><i class="fas fa-chart-line"></i> Manage Results</h1>
+        <button id="backToAdminBtn" class="back-to-admin"><i class="fas fa-arrow-left"></i> Back to Admin Panel</button>
     </div>
 
-    <div id="mainContent" class="main-content">
-    <div class="container">
-        <div class="header-bar">
-            <div class="logo-area">
-                <h1>📋 Manage Students</h1>
-                <p>Quest Coaching Centre | Under MR. RAVI SIR</p>
-            </div>
-            <div style="display: flex; gap: 12px;">
-                <button class="download-pdf-btn" id="downloadPdfBtn">
-                    <i class="fas fa-file-pdf"></i> Download PDF Report
-                </button>
-                <button class="back-btn" onclick="window.location.href='student-dashboard.html'">
-                    <i class="fas fa-arrow-left"></i> Back to Dashboard
-                </button>
-            </div>
+    <div id="actionCardsContainer" class="action-cards">
+        <div class="action-card" id="createResultMainCard">
+            <div class="action-icon"><i class="fas fa-plus-circle"></i></div>
+            <h3 class="action-title">Create New Result</h3>
+            <p class="action-desc">Create a new exam result with subjects & marks</p>
+            <button class="action-btn">Create →</button>
         </div>
-        
-        <div class="filter-card">
-            <div class="filter-group">
-                <label>🔍 Search by Name / Admission No / Mobile</label>
-                <input type="text" id="searchInput" placeholder="Type to search...">
-            </div>
-            <div class="filter-group">
-                <label>📚 Filter by Class</label>
-                <select id="classFilter">
-                    <option value="All">All Classes</option>
-                    <option>6th</option><option>7th</option><option>8th</option>
-                    <option>9th</option><option>10th</option>
-                    <option>11th (Science)</option><option>11th (Commerce)</option>
-                    <option>11th (Arts)</option>
-                    <option>12th (Science)</option><option>12th (Commerce)</option>
-                    <option>12th (Arts)</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label>📆 Session</label>
-                <select id="sessionFilter">
-                    <option value="All">All Sessions</option>
-                    <option>2024-25</option><option>2025-26</option>
-                    <option selected>2026-27</option>
-                </select>
-            </div>
-            <button class="search-btn" onclick="filterStudents()"><i class="fas fa-search"></i> Search</button>
+        <div class="action-card" id="draftResultsMainCard">
+            <div class="action-icon"><i class="fas fa-file-draft"></i></div>
+            <h3 class="action-title">Draft Results</h3>
+            <p class="action-desc">View and edit saved draft results</p>
+            <button class="action-btn">View Drafts →</button>
         </div>
-        
-        <div class="students-card">
-            <table>
-                <thead>
-                    <tr><th>Photo</th><th>Admission No</th><th>Student Name</th><th>Roll No</th><th>Father Name</th><th>Class</th><th>Gender</th><th>Mobile</th><th>Actions</th></tr>
-                </thead>
-                <tbody id="studentsTableBody">
-                    <tr><td colspan="9" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading students...</td></tr>
-                </tbody>
-            </table>
+        <div class="action-card" id="oldResultsMainCard">
+            <div class="action-icon"><i class="fas fa-history"></i></div>
+            <h3 class="action-title">Published Results</h3>
+            <p class="action-desc">View, edit or delete published results</p>
+            <button class="action-btn">View Published →</button>
         </div>
-    </div>
     </div>
 
-    <script>
+    <!-- Create Result Full Screen Section -->
+    <div id="createResultSection" class="fullscreen-section">
+        <div class="section-header">
+            <h3><i class="fas fa-plus-circle me-2"></i> Create New Result</h3>
+            <button class="back-btn" id="backFromCreateBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button>
+        </div>
+        <div id="examSetupStep">
+            <div class="card mb-4">
+                <div class="card-header bg-white fw-bold">Step 1: Exam Setup</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Exam Name</label>
+                        <input type="text" class="form-control" id="examName" placeholder="e.g., Final Examination 2025">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Number of Subjects</label>
+                        <input type="number" class="form-control" id="subjectCount" min="1">
+                    </div>
+                    <button id="generateSubjectFieldsBtn" class="btn btn-primary"><i class="fas fa-magic"></i> Generate Subject Fields</button>
+                </div>
+            </div>
+            <div id="subjectFields" class="mb-4"></div>
+            <div id="step1NextBtn" class="d-none">
+                <button id="nextToStudentEntryBtn" class="btn btn-success">Next →</button>
+            </div>
+        </div>
+        <div id="studentEntryStep" style="display: none;">
+            <div class="card mb-4">
+                <div class="card-header bg-white fw-bold">Step 2: Student Marks Entry 
+                    <span class="auto-fetch-badge"><i class="fas fa-sync-alt"></i> Auto-fetch from Admission</span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Roll No <span class="required" style="color:#dc2626;">*</span></label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="rollNo" min="1" value="1">
+                                <button class="btn btn-outline-secondary" type="button" id="incrementRollBtn">+</button>
+                            </div>
+                            <small class="text-muted">Enter roll number to auto-fetch student details</small>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Student Name</label>
+                            <input type="text" class="form-control" id="studentName" placeholder="Auto-fetched or manual">
+                        </div>
+                        <div class="col-md-5 mb-3">
+                            <label class="form-label">Father's Name (Optional)</label>
+                            <input type="text" class="form-control" id="fatherName" placeholder="Auto-fetched or manual">
+                        </div>
+                    </div>
+                    <div id="marksFields" class="mb-3"></div>
+                    <div class="d-flex gap-2">
+                        <button id="addStudentBtn" class="btn btn-primary"><i class="fas fa-user-plus"></i> Add Student</button>
+                        <button id="updateStudentBtn" class="btn btn-warning d-none">Update Student</button>
+                        <button id="cancelEditBtn" class="btn btn-secondary d-none">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header bg-white fw-bold">Students List</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light"><tr><th>Roll</th><th>Name</th><th>Father</th><th>Marks</th><th>Actions</th></tr></thead>
+                            <tbody id="studentsTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex gap-2 mt-3">
+                        <button id="saveDraftBtn" class="btn btn-warning"><i class="fas fa-save"></i> Save as Draft</button>
+                        <button id="saveChangesBtn" class="btn save-changes-btn d-none">Save Changes</button>
+                        <button id="publishResultBtn" class="btn btn-success"><i class="fas fa-globe"></i> Publish Result</button>
+                        <button id="dontSaveBtn" class="btn btn-secondary d-none">Don't Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="draftResultsSection" class="fullscreen-section">
+        <div class="section-header">
+            <h3><i class="fas fa-file-draft me-2"></i> Draft Results</h3>
+            <button class="back-btn" id="backFromDraftBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button>
+        </div>
+        <div id="draftResultsList" class="row g-4"></div>
+    </div>
+
+    <div id="oldResultsSection" class="fullscreen-section">
+        <div class="section-header">
+            <h3><i class="fas fa-history me-2"></i> Published Results</h3>
+            <button class="back-btn" id="backFromOldBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button>
+        </div>
+        <div id="oldResultsList" class="row g-4"></div>
+    </div>
+</div>
+
+<!-- Modals and Toasts (same as before) -->
+<div class="modal fade" id="resultModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="resultModalTitle">Result Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="resultDetails"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn pdf-download-btn" id="downloadPdfBtn"><i class="fas fa-download"></i> Download PDF (with Rank)</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editPublishedConfirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Edit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>You are editing a published result. What would you like to do?</p>
+                <div class="alert alert-info">
+                    <ul class="mb-0">
+                        <li><strong>Save Changes:</strong> Update the existing result directly</li>
+                        <li><strong>Don't Save:</strong> Go back without saving changes</li>
+                        <li><strong>Save as Draft:</strong> Save changes as a new draft</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="dontSaveConfirmBtn">Don't Save</button>
+                <button type="button" class="btn btn-warning" id="saveDraftConfirmBtn">Save as Draft</button>
+                <button type="button" class="btn save-changes-btn" id="saveChangesConfirmBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="successToast" class="toast-message"><i class="fas fa-check-circle"></i> <span id="toastMessage">Success!</span></div>
+<div id="publishedToast" class="toast-message" style="background: #198754;"><i class="fas fa-check-circle"></i> Result Published Successfully!</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import { 
+        getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, serverTimestamp, where, getDoc
+    } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
     const firebaseConfig = {
         apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
         authDomain: "quest-coaching.firebaseapp.com",
         projectId: "quest-coaching",
         storageBucket: "quest-coaching.firebasestorage.app"
     };
-    
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-    const admissionsCollection = db.collection('admissions');
 
-    const authLoading = document.getElementById('authLoading');
-    const mainContent = document.getElementById('mainContent');
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) { alert('Please login first!'); window.location.href = 'index.html'; }
+    });
+
+    // DOM Elements (same as before)
+    const actionCardsContainer = document.getElementById('actionCardsContainer');
+    const createResultSection = document.getElementById('createResultSection');
+    const draftResultsSection = document.getElementById('draftResultsSection');
+    const oldResultsSection = document.getElementById('oldResultsSection');
+    const createResultMainCard = document.getElementById('createResultMainCard');
+    const draftResultsMainCard = document.getElementById('draftResultsMainCard');
+    const oldResultsMainCard = document.getElementById('oldResultsMainCard');
+    const backToAdminBtn = document.getElementById('backToAdminBtn');
+    const backFromCreateBtn = document.getElementById('backFromCreateBtn');
+    const backFromDraftBtn = document.getElementById('backFromDraftBtn');
+    const backFromOldBtn = document.getElementById('backFromOldBtn');
+    
+    const examSetupStep = document.getElementById('examSetupStep');
+    const studentEntryStep = document.getElementById('studentEntryStep');
+    const examNameInput = document.getElementById('examName');
+    const subjectCountInput = document.getElementById('subjectCount');
+    const generateSubjectFieldsBtn = document.getElementById('generateSubjectFieldsBtn');
+    const subjectFields = document.getElementById('subjectFields');
+    const step1NextBtn = document.getElementById('step1NextBtn');
+    const nextToStudentEntryBtn = document.getElementById('nextToStudentEntryBtn');
+    const rollNoInput = document.getElementById('rollNo');
+    const incrementRollBtn = document.getElementById('incrementRollBtn');
+    const studentNameInput = document.getElementById('studentName');
+    const fatherNameInput = document.getElementById('fatherName');
+    const marksFields = document.getElementById('marksFields');
+    const addStudentBtn = document.getElementById('addStudentBtn');
+    const updateStudentBtn = document.getElementById('updateStudentBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const studentsTableBody = document.getElementById('studentsTableBody');
+    const saveDraftBtn = document.getElementById('saveDraftBtn');
+    const saveChangesBtn = document.getElementById('saveChangesBtn');
+    const publishResultBtn = document.getElementById('publishResultBtn');
+    const dontSaveBtn = document.getElementById('dontSaveBtn');
+    const draftResultsList = document.getElementById('draftResultsList');
+    const oldResultsList = document.getElementById('oldResultsList');
+    const resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+    const resultModalTitle = document.getElementById('resultModalTitle');
+    const resultDetails = document.getElementById('resultDetails');
     const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+    const editPublishedConfirmModal = new bootstrap.Modal(document.getElementById('editPublishedConfirmModal'));
+    const dontSaveConfirmBtn = document.getElementById('dontSaveConfirmBtn');
+    const saveDraftConfirmBtn = document.getElementById('saveDraftConfirmBtn');
+    const saveChangesConfirmBtn = document.getElementById('saveChangesConfirmBtn');
+    
+    let subjects = [], students = [], editingStudentIndex = null, editingDraftId = null;
+    let isEditingPublishedResult = false, editingPublishedResultId = null, hasChanges = false;
+    let currentResultDataForPdf = null, currentExamNameForPdf = '';
 
-    auth.onAuthStateChanged((user) => {
-        if (!user) {
-            Swal.fire({
-                title: 'Access Denied!',
-                text: 'Please login from main page first!',
-                icon: 'error',
-                confirmButtonColor: '#1b4f9b',
-                confirmButtonText: 'Go to Login'
-            }).then(() => {
-                window.location.href = 'index.html';
-            });
-            return;
-        }
-        authLoading.style.display = 'none';
-        mainContent.style.display = 'block';
-        
-        const logoutBtn = document.createElement('button');
-        logoutBtn.innerHTML = '🚪 Logout';
-        logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px;';
-        logoutBtn.onclick = async () => {
-            await auth.signOut();
-            window.location.href = 'index.html';
-        };
-        document.body.appendChild(logoutBtn);
-        
-        loadStudents();
-    });
-    
-    let allStudents = [];
-    
-    async function loadStudents() {
+    function showFullScreen(sectionToShow) {
+        actionCardsContainer.style.display = 'none';
+        createResultSection.style.display = 'none';
+        draftResultsSection.style.display = 'none';
+        oldResultsSection.style.display = 'none';
+        sectionToShow.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function showActionCards() {
+        actionCardsContainer.style.display = 'grid';
+        createResultSection.style.display = 'none';
+        draftResultsSection.style.display = 'none';
+        oldResultsSection.style.display = 'none';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function showToast(msg, isPublished = false) {
+        const toast = isPublished ? document.getElementById('publishedToast') : document.getElementById('successToast');
+        if (!isPublished) document.getElementById('toastMessage').innerText = msg;
+        toast.style.display = 'flex';
+        setTimeout(() => toast.style.display = 'none', 2000);
+    }
+
+    // Navigation
+    createResultMainCard.addEventListener('click', () => { resetCreateResultForm(); showFullScreen(createResultSection); });
+    draftResultsMainCard.addEventListener('click', () => { loadDraftResults(); showFullScreen(draftResultsSection); });
+    oldResultsMainCard.addEventListener('click', () => { loadOldResults(); showFullScreen(oldResultsSection); });
+    backToAdminBtn.addEventListener('click', () => window.location.href = 'admin.html');
+    backFromCreateBtn.addEventListener('click', showActionCards);
+    backFromDraftBtn.addEventListener('click', showActionCards);
+    backFromOldBtn.addEventListener('click', showActionCards);
+
+    // ========== NEW: Auto-fetch from admissions collection ==========
+    async function fetchStudentFromAdmission(rollNumber) {
         try {
-            const snapshot = await admissionsCollection.get();
-            allStudents = [];
-            snapshot.forEach(doc => {
-                allStudents.push({ id: doc.id, ...doc.data() });
-            });
-            // Sort by admission date - latest first
-            allStudents.sort((a, b) => {
-                const dateA = a.admissionDate ? new Date(a.admissionDate) : new Date(0);
-                const dateB = b.admissionDate ? new Date(b.admissionDate) : new Date(0);
-                return dateB - dateA;
-            });
-            filterStudents();
-        } catch (error) {
-            document.getElementById('studentsTableBody').innerHTML = '<td><td colspan="9" class="loading">❌ Error loading data</td></tr>';
-        }
-    }
-    
-    function filterStudents() {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        const classFilter = document.getElementById('classFilter').value;
-        const sessionFilter = document.getElementById('sessionFilter').value;
-        
-        let filtered = [...allStudents];
-        
-        if (searchTerm) {
-            filtered = filtered.filter(s => 
-                (s.studentName && s.studentName.toLowerCase().includes(searchTerm)) ||
-                (s.admissionNo && s.admissionNo.toLowerCase().includes(searchTerm)) ||
-                (s.rollNumber && s.rollNumber.toString().toLowerCase().includes(searchTerm)) ||
-                (s.parentMobile && s.parentMobile.includes(searchTerm))
-            );
-        }
-        if (classFilter !== 'All') {
-            filtered = filtered.filter(s => s.classApplying === classFilter);
-        }
-        if (sessionFilter !== 'All') {
-            filtered = filtered.filter(s => s.session === sessionFilter);
-        }
-        
-        displayStudents(filtered);
-    }
-    
-    function displayStudents(students) {
-        const tbody = document.getElementById('studentsTableBody');
-        if (students.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" class="loading">No students found</td></tr>';
-            return;
-        }
-        
-        let html = '';
-        students.forEach(student => {
-            const genderClass = student.gender === 'Male' ? 'male' : 'female';
-            const genderText = student.gender === 'Male' ? 'Male' : 'Female';
-            
-            let photoHtml = '';
-            if (student.photoUrl) {
-                photoHtml = `<img src="${student.photoUrl}" class="student-photo" onerror="this.src='https://via.placeholder.com/45'">`;
+            // Query admissions collection where rollNumber matches
+            const q = query(collection(db, "admissions"), where("rollNumber", "==", String(rollNumber)));
+            const querySnapshot = await getDocs(q);
+            if (!querySnapshot.empty) {
+                const studentDoc = querySnapshot.docs[0];
+                const studentData = studentDoc.data();
+                return {
+                    name: studentData.studentName || '',
+                    fatherName: studentData.fatherName || ''
+                };
             } else {
-                photoHtml = `<div class="student-photo" style="display:flex;align-items:center;justify-content:center;"><i class="fas fa-user" style="color:#64748b;"></i></div>`;
+                return null;
             }
-            
-            html += `<tr>
-                <td>${photoHtml}</td>
-                <td>${student.admissionNo || '-'}</td>
-                <td><strong>${student.studentName || '-'}</strong></td>
-                <td>${student.rollNumber || '-'}</td>
-                <td>${student.fatherName || '-'}</td>
-                <td>${student.classApplying || '-'}</td>
-                <td><span class="badge ${genderClass}">${genderText}</span></td>
-                <td>${student.parentMobile || '-'}</td>
-                <td class="action-buttons">
-                    <button class="view-btn" onclick="viewStudent('${student.id}')"><i class="fas fa-eye"></i> View</button>
-                    <button class="edit-btn" onclick="editStudent('${student.id}')"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="delete-btn" onclick="deleteStudent('${student.id}')"><i class="fas fa-trash"></i> Delete</button>
-                </td>
-            </tr>`;
-        });
-        tbody.innerHTML = html;
+        } catch (error) {
+            console.error("Error fetching admission data:", error);
+            return null;
+        }
     }
-    
-    // VIEW Student - Open in same tab with view mode
-    window.viewStudent = function(studentId) {
-        window.location.href = `new-admission.html?mode=view&id=${studentId}`;
-    };
-    
-    // EDIT Student - Open in same tab with edit mode
-    window.editStudent = function(studentId) {
-        window.location.href = `new-admission.html?mode=edit&id=${studentId}`;
-    };
-    
-    window.deleteStudent = function(studentId) {
-        const student = allStudents.find(s => s.id === studentId);
-        if (!student) return;
-        
-        Swal.fire({
-            title: 'Are you sure?',
-            text: `Delete "${student.studentName}"? This cannot be undone!`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#dc2626',
-            confirmButtonText: 'Yes, delete'
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                await admissionsCollection.doc(studentId).delete();
-                Swal.fire('Deleted!', 'Student has been removed.', 'success');
-                loadStudents();
+
+    // Event listener on roll number input (on blur)
+    rollNoInput.addEventListener('blur', async () => {
+        const rollVal = rollNoInput.value.trim();
+        if (!rollVal) {
+            // Clear only if we are not editing an existing student? We'll clear only if not editing.
+            if (editingStudentIndex === null) {
+                studentNameInput.value = '';
+                fatherNameInput.value = '';
             }
-        });
-    };
-    
-    // Download PDF Report with Photos
-    downloadPdfBtn.addEventListener('click', async () => {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        const classFilter = document.getElementById('classFilter').value;
-        const sessionFilter = document.getElementById('sessionFilter').value;
-        
-        let filtered = [...allStudents];
-        
-        if (searchTerm) {
-            filtered = filtered.filter(s => 
-                (s.studentName && s.studentName.toLowerCase().includes(searchTerm)) ||
-                (s.admissionNo && s.admissionNo.toLowerCase().includes(searchTerm)) ||
-                (s.rollNumber && s.rollNumber.toString().toLowerCase().includes(searchTerm)) ||
-                (s.parentMobile && s.parentMobile.includes(searchTerm))
-            );
-        }
-        if (classFilter !== 'All') {
-            filtered = filtered.filter(s => s.classApplying === classFilter);
-        }
-        if (sessionFilter !== 'All') {
-            filtered = filtered.filter(s => s.session === sessionFilter);
-        }
-        
-        if (filtered.length === 0) {
-            Swal.fire('No Data', 'No students found to download', 'info');
             return;
         }
-        
-        Swal.fire({
-            title: 'Generating PDF...',
-            text: 'Please wait while we prepare your report with photos',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
+        // If we are in edit mode, maybe we don't want to auto-overwrite? But teacher might want to change admission? We'll allow but show warning.
+        const studentInfo = await fetchStudentFromAdmission(rollVal);
+        if (studentInfo) {
+            studentNameInput.value = studentInfo.name;
+            fatherNameInput.value = studentInfo.fatherName;
+            showToast(`Student found: ${studentInfo.name}`, false);
+            // Optional: add a small visual feedback
+        } else {
+            if (editingStudentIndex === null) {
+                // Only clear if not editing existing student from list
+                studentNameInput.value = '';
+                fatherNameInput.value = '';
             }
-        });
-        
-        try {
-            // Create a temporary div to render the report with photos
-            const tempDiv = document.createElement('div');
-            tempDiv.style.position = 'absolute';
-            tempDiv.style.left = '-9999px';
-            tempDiv.style.top = '-9999px';
-            tempDiv.style.width = '1200px';
-            document.body.appendChild(tempDiv);
-            
-            // Calculate summary
-            let totalStudents = filtered.length;
-            let totalBoys = filtered.filter(s => s.gender === 'Male').length;
-            let totalGirls = filtered.filter(s => s.gender === 'Female').length;
-            
-            const currentDate = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-            const className = classFilter === 'All' ? 'All Classes' : classFilter;
-            const sessionName = sessionFilter === 'All' ? 'All Sessions' : sessionFilter;
-            
-            // Build table rows with photos
-            let tableRows = '';
-            for (let i = 0; i < filtered.length; i++) {
-                const student = filtered[i];
-                // Create a placeholder for photo that will be loaded as image
-                const photoHtml = student.photoUrl ? `<img src="${student.photoUrl}" style="width:45px; height:45px; border-radius:50%; object-fit:cover;" onerror="this.src='https://via.placeholder.com/45'">` : '<div style="width:45px; height:45px; border-radius:50%; background:#e2e8f0; display:flex; align-items:center; justify-content:center;"><i class="fas fa-user" style="color:#64748b;"></i></div>';
-                
-                tableRows += `
-                    <tr style="border-bottom: 1px solid #e2e8f0;">
-                        <td style="padding: 10px 8px; text-align: center;">${i + 1}</td>
-                        <td style="padding: 10px 8px; text-align: center;">${photoHtml}</td>
-                        <td style="padding: 10px 8px;">${student.admissionNo || '-'}</td>
-                        <td style="padding: 10px 8px;"><strong>${student.studentName || '-'}</strong></td>
-                        <td style="padding: 10px 8px;">${student.rollNumber || '-'}</td>
-                        <td style="padding: 10px 8px;">${student.fatherName || '-'}</td>
-                        <td style="padding: 10px 8px;">${student.classApplying || '-'}</td>
-                        <td style="padding: 10px 8px;">${student.gender || '-'}</td>
-                        <td style="padding: 10px 8px;">${student.parentMobile || '-'}</td>
-                    </tr>
-                `;
-            }
-            
-            tempDiv.innerHTML = `
-                <div id="reportContainer" style="padding: 30px; background: white; font-family: 'Segoe UI', Roboto, sans-serif;">
-                    <div style="text-align: center; margin-bottom: 25px; border-bottom: 2px solid #1b4f9b; padding-bottom: 15px;">
-                        <div style="font-size: 24px; font-weight: 800; color: #1b4f9b;">QUEST COACHING CENTRE</div>
-                        <div style="font-size: 11px; color: #4a5568; margin: 5px 0;">Block More, Gopalganj, Bihar - 841428 | Ph: +91 9708442525</div>
-                        <div style="font-size: 11px; color: #4a5568;">Under the guidance of MR. RAVI SIR</div>
-                    </div>
-                    <div style="font-size: 18px; font-weight: 700; color: #113a5e; text-align: center; margin: 15px 0 5px;">📊 STUDENTS REPORT</div>
-                    <div style="text-align: center; font-size: 11px; color: #64748b; margin-bottom: 20px;">Session: ${sessionName} | Class: ${className} | Date: ${currentDate} | Total Students: ${totalStudents}</div>
-                    
-                    <div style="background: linear-gradient(135deg, #1b4f9b, #2563eb); color: white; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-around; flex-wrap: wrap;">
-                        <div style="text-align: center;"><div style="font-size: 12px; opacity: 0.9;">👨‍🎓 Total Students</div><div style="font-size: 22px; font-weight: 800;">${totalStudents}</div></div>
-                        <div style="text-align: center;"><div style="font-size: 12px; opacity: 0.9;">👦 Boys</div><div style="font-size: 22px; font-weight: 800;">${totalBoys}</div></div>
-                        <div style="text-align: center;"><div style="font-size: 12px; opacity: 0.9;">👧 Girls</div><div style="font-size: 22px; font-weight: 800;">${totalGirls}</div></div>
-                    </div>
-                    
-                    <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
-                        <thead>
-                            <tr style="background: #1b4f9b; color: white;">
-                                <th style="padding: 10px 8px; text-align: center;">#</th>
-                                <th style="padding: 10px 8px; text-align: center;">Photo</th>
-                                <th style="padding: 10px 8px;">Admission No</th>
-                                <th style="padding: 10px 8px;">Student Name</th>
-                                <th style="padding: 10px 8px;">Roll No</th>
-                                <th style="padding: 10px 8px;">Father Name</th>
-                                <th style="padding: 10px 8px;">Class</th>
-                                <th style="padding: 10px 8px;">Gender</th>
-                                <th style="padding: 10px 8px;">Mobile</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${tableRows}
-                        </tbody>
-                    </table>
-                    
-                    <div style="display: flex; justify-content: space-between; margin-top: 30px;">
-                        <div><div style="border-top: 1px solid #000; width: 200px; margin-top: 30px;"></div><div style="font-size: 10px; text-align: center; margin-top: 5px;">Authorized Signatory</div></div>
-                        <div><div style="border-top: 1px solid #000; width: 200px; margin-top: 30px;"></div><div style="font-size: 10px; text-align: center; margin-top: 5px;">Principal / Director</div></div>
-                    </div>
-                    <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 10px; color: #64748b;">This is a computer generated report | Generated by Quest Coaching Management System</div>
-                </div>
-            `;
-            
-            // Wait for images to load
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            const element = tempDiv.querySelector('#reportContainer');
-            const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-            const imgData = canvas.toDataURL('image/png');
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const imgWidth = 190;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-            
-            // Clean up
-            document.body.removeChild(tempDiv);
-            
-            pdf.save(`Students_Report_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.pdf`);
-            
-            Swal.close();
-            Swal.fire('Success!', 'PDF report with photos generated successfully', 'success');
-        } catch (error) {
-            Swal.close();
-            console.error('PDF Error:', error);
-            Swal.fire('Error!', 'Failed to generate PDF: ' + error.message, 'error');
+            showToast(`Roll number ${rollVal} not found in admissions. You can add manually.`, false);
         }
     });
-    
-    document.getElementById('searchInput').addEventListener('keyup', filterStudents);
-    document.getElementById('classFilter').addEventListener('change', filterStudents);
-    document.getElementById('sessionFilter').addEventListener('change', filterStudents);
-    
-    loadStudents();
-    </script>
+
+    // Rest of the code remains same as earlier manage-results.html (generate subject fields, add student, etc.)
+    // (I'm including the full logic here for completeness; but it's identical to previous version except the auto-fetch)
+
+    generateSubjectFieldsBtn.addEventListener('click', () => {
+        const cnt = parseInt(subjectCountInput.value);
+        if (cnt < 1) return;
+        subjectFields.innerHTML = '';
+        subjects = [];
+        for (let i = 0; i < cnt; i++) {
+            const box = document.createElement('div');
+            box.className = 'subject-box';
+            box.innerHTML = `<div class="row"><div class="col-md-6"><label class="form-label">Subject ${i+1} Name</label><input type="text" class="form-control subject-name"></div><div class="col-md-6"><label class="form-label">Total Marks</label><input type="number" class="form-control subject-total" min="1"></div></div>`;
+            subjectFields.appendChild(box);
+        }
+        step1NextBtn.classList.remove('d-none');
+    });
+
+    nextToStudentEntryBtn.addEventListener('click', () => {
+        const nameInputs = document.querySelectorAll('.subject-name');
+        const totalInputs = document.querySelectorAll('.subject-total');
+        subjects = [];
+        let valid = true;
+        for (let i = 0; i < nameInputs.length; i++) {
+            const name = nameInputs[i].value.trim();
+            const total = parseInt(totalInputs[i].value);
+            if (!name || isNaN(total) || total < 1) { valid = false; break; }
+            subjects.push({ name, total });
+        }
+        if (!valid) { alert('Fill all subject fields'); return; }
+        generateMarksFields();
+        examSetupStep.style.display = 'none';
+        studentEntryStep.style.display = 'block';
+    });
+
+    function generateMarksFields() {
+        marksFields.innerHTML = '<h5 class="mb-3">Enter Marks</h5>';
+        subjects.forEach(sub => {
+            const div = document.createElement('div');
+            div.className = 'mb-2';
+            div.innerHTML = `<label class="form-label">${sub.name} (Max: ${sub.total})</label><input type="number" class="form-control subject-mark" data-subject="${sub.name}" min="0" max="${sub.total}">`;
+            marksFields.appendChild(div);
+        });
+    }
+
+    incrementRollBtn.addEventListener('click', () => rollNoInput.value = parseInt(rollNoInput.value) + 1);
+
+    addStudentBtn.addEventListener('click', async () => {
+        const roll = parseInt(rollNoInput.value);
+        const name = studentNameInput.value.trim();
+        if (!name) { alert('Enter student name'); return; }
+        const marks = {};
+        let valid = true;
+        document.querySelectorAll('.subject-mark').forEach(inp => {
+            const sub = inp.dataset.subject;
+            const mark = parseInt(inp.value);
+            if (isNaN(mark) || mark < 0) valid = false;
+            const subObj = subjects.find(s => s.name === sub);
+            if (mark > subObj.total) { alert(`${sub} marks cannot exceed ${subObj.total}`); valid = false; }
+            marks[sub] = mark;
+        });
+        if (!valid) return;
+        students.push({ rollNo: roll, name, fatherName: fatherNameInput.value.trim(), marks });
+        updateStudentsTable();
+        studentNameInput.value = ''; fatherNameInput.value = '';
+        document.querySelectorAll('.subject-mark').forEach(inp => inp.value = '');
+        rollNoInput.value = roll + 1;
+        hasChanges = true;
+        showToast('Student added');
+    });
+
+    function updateStudentsTable() {
+        studentsTableBody.innerHTML = '';
+        students.forEach((s, idx) => {
+            let marksHtml = '';
+            subjects.forEach(sub => marksHtml += `<div>${sub.name}: ${s.marks[sub.name] || 0}/${sub.total}</div>`);
+            const row = `<tr><td>${s.rollNo}</td><td>${s.name}</td><td>${s.fatherName || '-'}</td><td>${marksHtml}</td><td><button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button> <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button></td></tr>`;
+            studentsTableBody.insertAdjacentHTML('beforeend', row);
+        });
+        document.querySelectorAll('.edit-student').forEach(btn => btn.addEventListener('click', e => editStudent(parseInt(e.target.dataset.index))));
+        document.querySelectorAll('.delete-student').forEach(btn => btn.addEventListener('click', e => deleteStudent(parseInt(e.target.dataset.index))));
+    }
+
+    function editStudent(idx) {
+        const s = students[idx];
+        editingStudentIndex = idx;
+        rollNoInput.value = s.rollNo;
+        studentNameInput.value = s.name;
+        fatherNameInput.value = s.fatherName || '';
+        document.querySelectorAll('.subject-mark').forEach(inp => inp.value = s.marks[inp.dataset.subject] || 0);
+        addStudentBtn.classList.add('d-none'); updateStudentBtn.classList.remove('d-none'); cancelEditBtn.classList.remove('d-none');
+    }
+
+    updateStudentBtn.addEventListener('click', () => {
+        if (editingStudentIndex === null) return;
+        const roll = parseInt(rollNoInput.value);
+        const name = studentNameInput.value.trim();
+        if (!name) { alert('Enter name'); return; }
+        const marks = {};
+        let valid = true;
+        document.querySelectorAll('.subject-mark').forEach(inp => {
+            const sub = inp.dataset.subject;
+            const mark = parseInt(inp.value);
+            if (isNaN(mark) || mark < 0) valid = false;
+            const subObj = subjects.find(s => s.name === sub);
+            if (mark > subObj.total) { alert(`${sub} exceeds max`); valid = false; }
+            marks[sub] = mark;
+        });
+        if (!valid) return;
+        students[editingStudentIndex] = { rollNo: roll, name, fatherName: fatherNameInput.value.trim(), marks };
+        updateStudentsTable();
+        cancelEdit();
+        hasChanges = true;
+        showToast('Student updated');
+    });
+
+    cancelEditBtn.addEventListener('click', cancelEdit);
+    function cancelEdit() {
+        editingStudentIndex = null;
+        studentNameInput.value = ''; fatherNameInput.value = '';
+        document.querySelectorAll('.subject-mark').forEach(inp => inp.value = '');
+        addStudentBtn.classList.remove('d-none'); updateStudentBtn.classList.add('d-none'); cancelEditBtn.classList.add('d-none');
+    }
+
+    function deleteStudent(idx) {
+        if (confirm('Delete student?')) { students.splice(idx, 1); updateStudentsTable(); hasChanges = true; showToast('Deleted'); }
+    }
+
+    saveDraftBtn.addEventListener('click', async () => {
+        if (!examNameInput.value.trim() || students.length === 0) { alert('Exam name and at least one student required'); return; }
+        try {
+            const data = { examName: examNameInput.value, subjects, students, createdAt: serverTimestamp() };
+            if (editingDraftId) await updateDoc(doc(db, "draft_results", editingDraftId), data);
+            else await addDoc(collection(db, "draft_results"), data);
+            showToast('Draft saved');
+            resetCreateResultForm();
+            showActionCards();
+        } catch(e) { alert(e.message); }
+    });
+
+    publishResultBtn.addEventListener('click', async () => {
+        if (!examNameInput.value.trim() || students.length === 0) { alert('Exam name and at least one student required'); return; }
+        if (isEditingPublishedResult) { alert('Use "Save Changes" to update published result'); return; }
+        try {
+            await addDoc(collection(db, "results"), { examName: examNameInput.value, subjects, students, createdAt: serverTimestamp() });
+            if (editingDraftId) await deleteDoc(doc(db, "draft_results", editingDraftId));
+            showToast('', true);
+            resetCreateResultForm();
+            showActionCards();
+        } catch(e) { alert(e.message); }
+    });
+
+    function resetCreateResultForm() {
+        examNameInput.value = ''; subjectCountInput.value = ''; subjectFields.innerHTML = '';
+        step1NextBtn.classList.add('d-none');
+        examSetupStep.style.display = 'block';
+        studentEntryStep.style.display = 'none';
+        students = []; updateStudentsTable();
+        editingDraftId = null; isEditingPublishedResult = false; editingPublishedResultId = null; hasChanges = false;
+        cancelEdit();
+    }
+
+    async function loadDraftResults() {
+        const q = query(collection(db, "draft_results"), orderBy("createdAt", "desc"));
+        const snap = await getDocs(q);
+        draftResultsList.innerHTML = '';
+        if (snap.empty) { draftResultsList.innerHTML = '<div class="col-12"><p class="text-center text-muted">No drafts found.</p></div>'; return; }
+        snap.forEach(doc => {
+            const d = doc.data();
+            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">Subjects: ${d.subjects.length} | Students: ${d.students.length}</p><div class="d-flex gap-2"><button class="btn btn-sm btn-primary edit-draft" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-danger delete-draft" data-id="${doc.id}">Delete</button></div></div></div></div>`;
+            draftResultsList.insertAdjacentHTML('beforeend', card);
+        });
+        document.querySelectorAll('.edit-draft').forEach(btn => btn.addEventListener('click', e => editDraft(e.target.dataset.id)));
+        document.querySelectorAll('.delete-draft').forEach(btn => btn.addEventListener('click', e => deleteDraft(e.target.dataset.id)));
+    }
+
+    async function editDraft(id) {
+        const q = query(collection(db, "draft_results"), where("__name__", "==", id));
+        const snap = await getDocs(q);
+        if (snap.empty) return;
+        const data = snap.docs[0].data();
+        examNameInput.value = data.examName;
+        subjectCountInput.value = data.subjects.length;
+        generateSubjectFieldsBtn.click();
+        setTimeout(() => {
+            const nameInps = document.querySelectorAll('.subject-name');
+            const totalInps = document.querySelectorAll('.subject-total');
+            data.subjects.forEach((sub, idx) => { if (nameInps[idx]) nameInps[idx].value = sub.name; if (totalInps[idx]) totalInps[idx].value = sub.total; });
+            nextToStudentEntryBtn.click();
+            students = data.students;
+            updateStudentsTable();
+            editingDraftId = id;
+            isEditingPublishedResult = false;
+            showFullScreen(createResultSection);
+        }, 100);
+    }
+
+    async function deleteDraft(id) { if (confirm('Delete draft?')) { await deleteDoc(doc(db, "draft_results", id)); showToast('Draft deleted'); loadDraftResults(); } }
+
+    async function loadOldResults() {
+        const q = query(collection(db, "results"), orderBy("createdAt", "desc"));
+        const snap = await getDocs(q);
+        oldResultsList.innerHTML = '';
+        if (snap.empty) { oldResultsList.innerHTML = '<div class="col-12"><p class="text-center text-muted">No published results.</p></div>'; return; }
+        snap.forEach(doc => {
+            const d = doc.data();
+            const date = d.createdAt ? new Date(d.createdAt.toDate()).toLocaleDateString() : 'Unknown';
+            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">${date} | Subjects: ${d.subjects.length} | Students: ${d.students.length}</p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary view-result" data-id="${doc.id}">View</button><button class="btn btn-sm btn-warning edit-result" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-danger delete-result" data-id="${doc.id}">Delete</button></div></div></div></div>`;
+            oldResultsList.insertAdjacentHTML('beforeend', card);
+        });
+        document.querySelectorAll('.view-result').forEach(btn => btn.addEventListener('click', e => viewResult(e.target.dataset.id)));
+        document.querySelectorAll('.edit-result').forEach(btn => btn.addEventListener('click', e => editResult(e.target.dataset.id)));
+        document.querySelectorAll('.delete-result').forEach(btn => btn.addEventListener('click', e => deleteResult(e.target.dataset.id)));
+    }
+
+    async function viewResult(id) {
+        const q = query(collection(db, "results"), where("__name__", "==", id));
+        const snap = await getDocs(q);
+        if (snap.empty) return;
+        const data = snap.docs[0].data();
+        currentResultDataForPdf = data; currentExamNameForPdf = data.examName;
+        const sorted = sortStudentsByPercentage(data.students, data.subjects);
+        resultModalTitle.innerText = data.examName + ' (Ranked)';
+        let html = `<p><strong>Total Students:</strong> ${data.students.length}</p>`;
+        if (sorted.length) html += `<div class="alert alert-success">🏆 Top Student: ${sorted[0].name} (Roll: ${sorted[0].rollNo})</div>`;
+        html += `<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Rank</th><th>Roll</th><th>Name</th><th>Father</th>`;
+        data.subjects.forEach(s => html += `<th>${s.name}</th>`);
+        html += `<th>Total</th><th>%</th></tr></thead><tbody>`;
+        sorted.forEach((s, idx) => {
+            let total = 0, maxTotal = 0;
+            html += `<tr${idx===0?' class="top-student-row"':''}><td><strong>#${idx+1}</strong></td><td>${s.rollNo}</td><td>${s.name}${idx===0?' 🏆':''}</td><td>${s.fatherName||'-'}</td>`;
+            data.subjects.forEach(sub => {
+                const mark = s.marks[sub.name] || 0;
+                total += mark; maxTotal += sub.total;
+                html += `<td>${mark}/${sub.total}</td>`;
+            });
+            const percent = maxTotal ? ((total/maxTotal)*100).toFixed(2) : 0;
+            html += `<td><strong>${total}/${maxTotal}</strong></td><td><strong>${percent}%</strong></td></tr>`;
+        });
+        html += `</tbody></table></div>`;
+        resultDetails.innerHTML = html;
+        resultModal.show();
+    }
+
+    function sortStudentsByPercentage(arr, subs) {
+        return [...arr].sort((a,b) => {
+            let ta=0, ma=0, tb=0, mb=0;
+            subs.forEach(s => { ta += a.marks[s.name]||0; ma += s.total; tb += b.marks[s.name]||0; mb += s.total; });
+            return (tb/mb) - (ta/ma);
+        });
+    }
+
+    async function editResult(id) {
+        const q = query(collection(db, "results"), where("__name__", "==", id));
+        const snap = await getDocs(q);
+        if (snap.empty) return;
+        const data = snap.docs[0].data();
+        examNameInput.value = data.examName;
+        subjectCountInput.value = data.subjects.length;
+        generateSubjectFieldsBtn.click();
+        setTimeout(() => {
+            const nameInps = document.querySelectorAll('.subject-name');
+            const totalInps = document.querySelectorAll('.subject-total');
+            data.subjects.forEach((sub, idx) => { if (nameInps[idx]) nameInps[idx].value = sub.name; if (totalInps[idx]) totalInps[idx].value = sub.total; });
+            nextToStudentEntryBtn.click();
+            students = data.students;
+            updateStudentsTable();
+            editingDraftId = null;
+            isEditingPublishedResult = true;
+            editingPublishedResultId = id;
+            showFullScreen(createResultSection);
+        }, 100);
+    }
+
+    async function deleteResult(id) { if (confirm('Delete published result?')) { await deleteDoc(doc(db, "results", id)); showToast('Result deleted'); loadOldResults(); } }
+
+    downloadPdfBtn.addEventListener('click', () => { if (currentResultDataForPdf) generatePDF(currentResultDataForPdf, currentExamNameForPdf); });
+
+    function generatePDF(data, examName) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        doc.setFontSize(18); doc.text(`QUEST COACHING CENTRE - ${examName}`, 14, 15);
+        const sorted = sortStudentsByPercentage(data.students, data.subjects);
+        let columns = [{ header: 'Rank', dataKey: 'rank' }, { header: 'Roll No', dataKey: 'rollNo' }, { header: 'Name', dataKey: 'name' }, { header: 'Father', dataKey: 'father' }];
+        data.subjects.forEach(s => columns.push({ header: `${s.name}\n(${s.total})`, dataKey: s.name }));
+        columns.push({ header: 'Total', dataKey: 'total' }, { header: '%', dataKey: 'percentage' });
+        const rows = sorted.map((s, idx) => {
+            let row = { rank: idx+1, rollNo: s.rollNo, name: s.name, father: s.fatherName||'-' };
+            let total=0, maxTotal=0;
+            data.subjects.forEach(sub => {
+                const mark = s.marks[sub.name]||0;
+                row[sub.name] = `${mark}/${sub.total}`;
+                total+=mark; maxTotal+=sub.total;
+            });
+            row.total = `${total}/${maxTotal}`;
+            row.percentage = maxTotal ? `${((total/maxTotal)*100).toFixed(2)}%` : '0%';
+            return row;
+        });
+        doc.autoTable({ startY: 25, head: [columns.map(c=>c.header)], body: rows.map(r=>columns.map(c=>r[c.dataKey])), styles: { fontSize: 8 }, headStyles: { fillColor: [41,128,185] } });
+        doc.save(`${examName}_Results.pdf`);
+        showToast('PDF Downloaded');
+    }
+</script>
 </body>
 </html>
