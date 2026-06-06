@@ -10,22 +10,46 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; }
+        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         .manage-container { max-width: 1400px; margin: 0 auto; }
         .header-section {
-            background: white; border-radius: 25px; padding: 20px 30px; margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between;
-            align-items: center; flex-wrap: wrap; gap: 15px;
+            background: white;
+            border-radius: 25px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
         .page-title { font-size: 1.8rem; font-weight: 700; color: #1a237e; margin: 0; }
         .page-title i { color: #0d6efd; margin-right: 10px; }
-        .back-to-admin { background: #6c757d; color: white; border: none; border-radius: 50px; padding: 10px 24px; font-weight: 600; transition: 0.2s; }
+        .back-to-admin {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 24px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
         .back-to-admin:hover { background: #5a6268; transform: translateY(-2px); }
-        .action-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-bottom: 40px; }
+        .action-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
         .action-card {
-            background: white; border-radius: 25px; padding: 25px 20px; text-align: center;
-            transition: all 0.3s ease; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            border: 1px solid #f0f0f0;
+            background: white;
+            border-radius: 25px;
+            padding: 25px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
         .action-card:hover { transform: translateY(-8px); box-shadow: 0 20px 30px rgba(0,0,0,0.1); }
         .action-icon { width: 70px; height: 70px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; border-radius: 25px; font-size: 32px; }
@@ -34,41 +58,65 @@
         .action-card:nth-child(3) .action-icon { background: #d1ecf1; color: #0dcaf0; }
         .action-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; color: #1e293b; }
         .action-desc { font-size: 0.85rem; color: #64748b; margin-bottom: 20px; }
-        .action-btn { padding: 8px 24px; border-radius: 40px; font-size: 0.9rem; font-weight: 600; border: none; background: #f1f5f9; color: #1e293b; transition: 0.2s; }
+        .action-btn {
+            padding: 8px 24px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: none;
+            background: #f1f5f9;
+            transition: 0.2s;
+        }
         .action-card:hover .action-btn { background: #1a237e; color: white; }
-        .fullscreen-section { display: none; background: white; border-radius: 25px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .section-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #e9ecef; }
+        .fullscreen-section {
+            display: none;
+            background: white;
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
         .section-header h3 { font-size: 1.4rem; font-weight: 700; color: #1a237e; margin: 0; }
-        .back-btn { background: #6c757d; color: white; border: none; border-radius: 50px; padding: 8px 20px; font-weight: 500; }
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 20px;
+            font-weight: 500;
+        }
         .subject-box { background: #f8fafc; border-radius: 16px; padding: 15px; margin-bottom: 12px; border: 1px solid #e2e8f0; }
         .save-changes-btn { background: #20c997; border-color: #20c997; color: white; }
         .top-student-row { background: #fff3cd !important; font-weight: 500; }
         .pdf-download-btn { background: #dc3545; border-color: #dc3545; color: white; }
         .toast-message {
-            position: fixed; bottom: 25px; right: 25px; z-index: 1100; background: #28a745;
-            color: white; padding: 12px 24px; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: none; align-items: center; gap: 10px; font-weight: 500;
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 1100;
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
         }
-        .auto-fetch-badge { background: #e0f2fe; color: #0369a1; font-size: 11px; border-radius: 20px; padding: 4px 12px; margin-left: 12px; font-weight: normal; }
-        
-        /* Progress Bar Overlay for Fetching */
-        .fetch-progress-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 10000; display: none;
-            justify-content: center; align-items: center; flex-direction: column;
-        }
-        .fetch-progress-card {
-            background: white; padding: 30px 40px; border-radius: 28px; text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2); min-width: 280px;
-        }
-        .fetch-spinner { width: 50px; height: 50px; border: 4px solid #e0e0e0; border-top: 4px solid #1a237e; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .fetch-progress-card h3 { color: #1a237e; margin-bottom: 15px; font-size: 1.1rem; }
-        .fetch-progress-bar-container { width: 100%; height: 8px; background: #e0e0e0; border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
-        .fetch-progress-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #1a237e, #283593, #10b981); border-radius: 10px; transition: width 0.3s ease; animation: fetchLoading 1.5s infinite; }
-        @keyframes fetchLoading { 0% { width: 0%; } 30% { width: 40%; } 60% { width: 70%; } 100% { width: 100%; } }
-        .fetch-progress-text { font-size: 0.8rem; color: #666; margin-top: 10px; }
-        
+        .auto-fetch-badge { background: #e0f2fe; color: #0369a1; font-size: 11px; border-radius: 20px; padding: 4px 12px; margin-left: 12px; }
+        .student-photo-thumb { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #1a237e; }
+        .photo-fetch-status { font-size: 11px; margin-top: 4px; }
+        .photo-fetch-success { color: #16a34a; }
+        .photo-fetch-missing { color: #dc2626; }
         @media (max-width: 768px) {
             body { padding: 15px; }
             .header-section { flex-direction: column; text-align: center; }
@@ -109,7 +157,6 @@
         </div>
     </div>
 
-    <!-- Create Result Full Screen Section -->
     <div id="createResultSection" class="fullscreen-section">
         <div class="section-header">
             <h3><i class="fas fa-plus-circle me-2"></i> Create New Result</h3>
@@ -130,25 +177,35 @@
         <div id="studentEntryStep" style="display: none;">
             <div class="card mb-4">
                 <div class="card-header bg-white fw-bold">Step 2: Student Marks Entry 
-                    <span class="auto-fetch-badge"><i class="fas fa-sync-alt"></i> Auto-fetch from Admission</span>
+                    <span class="auto-fetch-badge"><i class="fas fa-sync-alt"></i> Auto-fetch from Admission (Name + Father + Photo)</span>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3 mb-3">
-                            <label class="form-label">Roll No <span class="required" style="color:#dc2626;">*</span></label>
+                            <label class="form-label">Roll No <span style="color:#dc2626;">*</span></label>
                             <div class="input-group">
                                 <input type="number" class="form-control" id="rollNo" min="1" value="1">
                                 <button class="btn btn-outline-secondary" type="button" id="incrementRollBtn">+</button>
                             </div>
-                            <small class="text-muted">Enter roll number to auto-fetch student details</small>
+                            <small class="text-muted">Enter roll number to auto-fetch student details & photo</small>
+                            <div id="photoFetchStatus" class="photo-fetch-status"></div>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Student Name</label>
                             <input type="text" class="form-control" id="studentName" placeholder="Auto-fetched or manual">
                         </div>
                         <div class="col-md-5 mb-3">
-                            <label class="form-label">Father's Name (Optional)</label>
+                            <label class="form-label">Father's Name</label>
                             <input type="text" class="form-control" id="fatherName" placeholder="Auto-fetched or manual">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Student Photo Preview</label>
+                            <div>
+                                <img id="studentPhotoPreview" src="" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #1a237e; display: none;">
+                                <span id="noPhotoMsg" class="text-muted" style="display: none;">No photo available</span>
+                            </div>
                         </div>
                     </div>
                     <div id="marksFields" class="mb-3"></div>
@@ -162,7 +219,14 @@
             <div class="card">
                 <div class="card-header bg-white fw-bold">Students List</div>
                 <div class="card-body">
-                    <div class="table-responsive"><table class="table table-hover"><thead class="table-light"><tr><th>Roll</th><th>Name</th><th>Father</th><th>Marks</th><th>Actions</th></tr></thead><tbody id="studentsTableBody"></tbody></table></div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr><th>Photo</th><th>Roll</th><th>Name</th><th>Father</th><th>Marks</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody id="studentsTableBody"></tbody>
+                        </table>
+                    </div>
                     <div class="d-flex gap-2 mt-3">
                         <button id="saveDraftBtn" class="btn btn-warning"><i class="fas fa-save"></i> Save as Draft</button>
                         <button id="saveChangesBtn" class="btn save-changes-btn d-none">Save Changes</button>
@@ -185,22 +249,20 @@
     </div>
 </div>
 
-<!-- Fetch Progress Bar Overlay -->
-<div id="fetchProgressOverlay" class="fetch-progress-overlay">
-    <div class="fetch-progress-card">
-        <div class="fetch-spinner"></div>
-        <h3><i class="fas fa-search"></i> Fetching Student Details...</h3>
-        <div class="fetch-progress-bar-container"><div class="fetch-progress-bar-fill"></div></div>
-        <p class="fetch-progress-text" id="fetchProgressText">Searching in admission records...</p>
-    </div>
+<!-- Modals -->
+<div class="modal fade" id="resultModal" tabindex="-1">
+    <div class="modal-dialog modal-xl"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="resultModalTitle">Result Details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body" id="resultDetails"></div><div class="modal-footer"><button type="button" class="btn pdf-download-btn" id="downloadPdfBtn"><i class="fas fa-download"></i> Download PDF</button><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div></div></div>
 </div>
 
-<!-- Modals and Toasts -->
-<div class="modal fade" id="resultModal" tabindex="-1"><div class="modal-dialog modal-xl"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="resultModalTitle">Result Details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body" id="resultDetails"></div><div class="modal-footer"><button type="button" class="btn pdf-download-btn" id="downloadPdfBtn"><i class="fas fa-download"></i> Download PDF (with Rank)</button><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div></div></div></div>
-<div class="modal fade" id="editPublishedConfirmModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Confirm Edit</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><p>You are editing a published result. What would you like to do?</p><div class="alert alert-info"><ul class="mb-0"><li><strong>Save Changes:</strong> Update the existing result directly</li><li><strong>Don't Save:</strong> Go back without saving changes</li><li><strong>Save as Draft:</strong> Save changes as a new draft</li></ul></div></div><div class="modal-footer"><button type="button" class="btn btn-secondary" id="dontSaveConfirmBtn">Don't Save</button><button type="button" class="btn btn-warning" id="saveDraftConfirmBtn">Save as Draft</button><button type="button" class="btn save-changes-btn" id="saveChangesConfirmBtn">Save Changes</button></div></div></div></div>
+<div class="modal fade" id="editPublishedConfirmModal" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Confirm Edit</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body"><p>Editing a published result. What to do?</p><div class="alert alert-info"><ul><li><strong>Save Changes:</strong> Update existing result</li><li><strong>Don't Save:</strong> Go back</li><li><strong>Save as Draft:</strong> Save as new draft</li></ul></div></div>
+    <div class="modal-footer"><button type="button" class="btn btn-secondary" id="dontSaveConfirmBtn">Don't Save</button><button type="button" class="btn btn-warning" id="saveDraftConfirmBtn">Save as Draft</button><button type="button" class="btn save-changes-btn" id="saveChangesConfirmBtn">Save Changes</button></div></div></div>
+</div>
 
 <div id="successToast" class="toast-message"><i class="fas fa-check-circle"></i> <span id="toastMessage">Success!</span></div>
-<div id="publishedToast" class="toast-message" style="background: #198754;"><i class="fas fa-check-circle"></i> Result Published Successfully!</div>
+<div id="publishedToast" class="toast-message" style="background: #198754;"><i class="fas fa-check-circle"></i> Result Published!</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script type="module">
@@ -232,7 +294,6 @@
     const backFromCreateBtn = document.getElementById('backFromCreateBtn');
     const backFromDraftBtn = document.getElementById('backFromDraftBtn');
     const backFromOldBtn = document.getElementById('backFromOldBtn');
-    
     const examSetupStep = document.getElementById('examSetupStep');
     const studentEntryStep = document.getElementById('studentEntryStep');
     const examNameInput = document.getElementById('examName');
@@ -245,6 +306,8 @@
     const incrementRollBtn = document.getElementById('incrementRollBtn');
     const studentNameInput = document.getElementById('studentName');
     const fatherNameInput = document.getElementById('fatherName');
+    const studentPhotoPreview = document.getElementById('studentPhotoPreview');
+    const photoFetchStatus = document.getElementById('photoFetchStatus');
     const marksFields = document.getElementById('marksFields');
     const addStudentBtn = document.getElementById('addStudentBtn');
     const updateStudentBtn = document.getElementById('updateStudentBtn');
@@ -264,36 +327,16 @@
     const dontSaveConfirmBtn = document.getElementById('dontSaveConfirmBtn');
     const saveDraftConfirmBtn = document.getElementById('saveDraftConfirmBtn');
     const saveChangesConfirmBtn = document.getElementById('saveChangesConfirmBtn');
-    const fetchProgressOverlay = document.getElementById('fetchProgressOverlay');
-    const fetchProgressText = document.getElementById('fetchProgressText');
-    
+
     let subjects = [], students = [], editingStudentIndex = null, editingDraftId = null;
     let isEditingPublishedResult = false, editingPublishedResultId = null, hasChanges = false;
     let currentResultDataForPdf = null, currentExamNameForPdf = '';
+    let currentStudentPhotoUrl = '';
 
-    function showFullScreen(sectionToShow) {
-        actionCardsContainer.style.display = 'none';
-        createResultSection.style.display = 'none';
-        draftResultsSection.style.display = 'none';
-        oldResultsSection.style.display = 'none';
-        sectionToShow.style.display = 'block';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    function showActionCards() {
-        actionCardsContainer.style.display = 'grid';
-        createResultSection.style.display = 'none';
-        draftResultsSection.style.display = 'none';
-        oldResultsSection.style.display = 'none';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    function showToast(msg, isPublished = false) {
-        const toast = isPublished ? document.getElementById('publishedToast') : document.getElementById('successToast');
-        if (!isPublished) document.getElementById('toastMessage').innerText = msg;
-        toast.style.display = 'flex';
-        setTimeout(() => toast.style.display = 'none', 2000);
-    }
+    function showFullScreen(section) { actionCardsContainer.style.display = 'none'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; section.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    function showActionCards() { actionCardsContainer.style.display = 'grid'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    function showToast(msg, isPublished = false) { const toast = isPublished ? document.getElementById('publishedToast') : document.getElementById('successToast'); if (!isPublished) document.getElementById('toastMessage').innerText = msg; toast.style.display = 'flex'; setTimeout(() => toast.style.display = 'none', 2000); }
 
-    // Navigation
     createResultMainCard.addEventListener('click', () => { resetCreateResultForm(); showFullScreen(createResultSection); });
     draftResultsMainCard.addEventListener('click', () => { loadDraftResults(); showFullScreen(draftResultsSection); });
     oldResultsMainCard.addEventListener('click', () => { loadOldResults(); showFullScreen(oldResultsSection); });
@@ -302,82 +345,69 @@
     backFromDraftBtn.addEventListener('click', showActionCards);
     backFromOldBtn.addEventListener('click', showActionCards);
 
-    // ========== PROGRESS BAR FOR FETCHING STUDENT ==========
-    function showFetchProgress(text) {
-        fetchProgressText.textContent = text || 'Searching in admission records...';
-        fetchProgressOverlay.style.display = 'flex';
-    }
-    function hideFetchProgress() {
-        fetchProgressOverlay.style.display = 'none';
-    }
-
+    // Fetch student from admissions with photo URL
     async function fetchStudentFromAdmission(rollNumber) {
-        showFetchProgress(`Searching for roll number: ${rollNumber}...`);
-        await new Promise(resolve => setTimeout(resolve, 500)); // Small delay for visual effect
         try {
             const q = query(collection(db, "admissions"), where("rollNumber", "==", String(rollNumber)));
             const querySnapshot = await getDocs(q);
             if (!querySnapshot.empty) {
                 const studentData = querySnapshot.docs[0].data();
-                fetchProgressText.textContent = `✓ Student found: ${studentData.studentName}`;
-                await new Promise(resolve => setTimeout(resolve, 300));
-                hideFetchProgress();
-                return { name: studentData.studentName || '', fatherName: studentData.fatherName || '' };
-            } else {
-                fetchProgressText.textContent = `✗ Roll number ${rollNumber} not found in admissions`;
-                await new Promise(resolve => setTimeout(resolve, 800));
-                hideFetchProgress();
-                return null;
+                return {
+                    name: studentData.studentName || '',
+                    fatherName: studentData.fatherName || '',
+                    photoUrl: studentData.photoUrl || null,
+                    admissionNo: studentData.admissionNo || ''
+                };
             }
+            return null;
         } catch (error) {
             console.error("Error fetching admission data:", error);
-            fetchProgressText.textContent = `✗ Error fetching data`;
-            await new Promise(resolve => setTimeout(resolve, 800));
-            hideFetchProgress();
             return null;
         }
     }
 
-    // Roll number input event with progress bar
+    // Auto-fetch on roll number blur
     rollNoInput.addEventListener('blur', async () => {
         const rollVal = rollNoInput.value.trim();
         if (!rollVal) {
             if (editingStudentIndex === null) {
                 studentNameInput.value = '';
                 fatherNameInput.value = '';
+                studentPhotoPreview.style.display = 'none';
+                photoFetchStatus.innerHTML = '';
             }
             return;
         }
-        if (editingStudentIndex !== null) {
-            // If editing, don't auto-fetch (teacher might be editing existing student)
-            return;
-        }
+        
+        photoFetchStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching student data...';
         const studentInfo = await fetchStudentFromAdmission(rollVal);
+        
         if (studentInfo) {
             studentNameInput.value = studentInfo.name;
             fatherNameInput.value = studentInfo.fatherName;
-            showToast(`✅ Student found: ${studentInfo.name}`, false);
-            // Add green border effect
-            studentNameInput.style.borderColor = '#28a745';
-            fatherNameInput.style.borderColor = '#28a745';
-            setTimeout(() => {
-                studentNameInput.style.borderColor = '';
-                fatherNameInput.style.borderColor = '';
-            }, 1500);
+            currentStudentPhotoUrl = studentInfo.photoUrl;
+            
+            if (studentInfo.photoUrl) {
+                studentPhotoPreview.src = studentInfo.photoUrl;
+                studentPhotoPreview.style.display = 'block';
+                photoFetchStatus.innerHTML = '<span class="photo-fetch-success"><i class="fas fa-check-circle"></i> Student found! Photo available.</span>';
+            } else {
+                studentPhotoPreview.style.display = 'none';
+                photoFetchStatus.innerHTML = '<span class="photo-fetch-warning"><i class="fas fa-image"></i> Student found, but no photo uploaded.</span>';
+            }
+            showToast(`Student found: ${studentInfo.name}`, false);
         } else {
-            studentNameInput.value = '';
-            fatherNameInput.value = '';
-            showToast(`❌ Roll number ${rollVal} not found in admissions. You can add manually.`, false);
-            studentNameInput.style.borderColor = '#dc3545';
-            fatherNameInput.style.borderColor = '#dc3545';
-            setTimeout(() => {
-                studentNameInput.style.borderColor = '';
-                fatherNameInput.style.borderColor = '';
-            }, 1500);
+            if (editingStudentIndex === null) {
+                studentNameInput.value = '';
+                fatherNameInput.value = '';
+                studentPhotoPreview.style.display = 'none';
+            }
+            currentStudentPhotoUrl = '';
+            photoFetchStatus.innerHTML = '<span class="photo-fetch-missing"><i class="fas fa-exclamation-triangle"></i> Roll number not found in admissions. You can add manually.</span>';
+            showToast(`Roll number ${rollVal} not found in admissions.`, false);
         }
     });
 
-    // Rest of the result management functions
     generateSubjectFieldsBtn.addEventListener('click', () => {
         const cnt = parseInt(subjectCountInput.value);
         if (cnt < 1) return;
@@ -386,7 +416,7 @@
         for (let i = 0; i < cnt; i++) {
             const box = document.createElement('div');
             box.className = 'subject-box';
-            box.innerHTML = `<div class="row"><div class="col-md-6"><label class="form-label">Subject ${i+1} Name</label><input type="text" class="form-control subject-name"></div><div class="col-md-6"><label class="form-label">Total Marks</label><input type="number" class="form-control subject-total" min="1"></div></div>`;
+            box.innerHTML = `<div class="row"><div class="col-md-6"><label>Subject ${i+1} Name</label><input type="text" class="form-control subject-name"></div><div class="col-md-6"><label>Total Marks</label><input type="number" class="form-control subject-total" min="1"></div></div>`;
             subjectFields.appendChild(box);
         }
         step1NextBtn.classList.remove('d-none');
@@ -421,7 +451,7 @@
 
     incrementRollBtn.addEventListener('click', () => rollNoInput.value = parseInt(rollNoInput.value) + 1);
 
-    addStudentBtn.addEventListener('click', async () => {
+    addStudentBtn.addEventListener('click', () => {
         const roll = parseInt(rollNoInput.value);
         const name = studentNameInput.value.trim();
         if (!name) { alert('Enter student name'); return; }
@@ -436,10 +466,20 @@
             marks[sub] = mark;
         });
         if (!valid) return;
-        students.push({ rollNo: roll, name, fatherName: fatherNameInput.value.trim(), marks });
+        
+        students.push({ 
+            rollNo: roll, 
+            name, 
+            fatherName: fatherNameInput.value.trim(), 
+            marks,
+            photoUrl: currentStudentPhotoUrl || null
+        });
         updateStudentsTable();
         studentNameInput.value = ''; fatherNameInput.value = '';
         document.querySelectorAll('.subject-mark').forEach(inp => inp.value = '');
+        studentPhotoPreview.style.display = 'none';
+        photoFetchStatus.innerHTML = '';
+        currentStudentPhotoUrl = '';
         rollNoInput.value = roll + 1;
         hasChanges = true;
         showToast('Student added');
@@ -450,7 +490,8 @@
         students.forEach((s, idx) => {
             let marksHtml = '';
             subjects.forEach(sub => marksHtml += `<div>${sub.name}: ${s.marks[sub.name] || 0}/${sub.total}</div>`);
-            const row = `<tr><td>${s.rollNo}</td><td>${s.name}</td><td>${s.fatherName || '-'}</td><td>${marksHtml}</td><td><button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button> <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button></td></tr>`;
+            const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" class="student-photo-thumb" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷 No photo</span>';
+            const row = `<tr>${photoHtml}</td><td>${s.rollNo}</td><td>${s.name}</td><td>${s.fatherName || '-'}</td><td>${marksHtml}</td><td><button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button> <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button></td></tr>`;
             studentsTableBody.insertAdjacentHTML('beforeend', row);
         });
         document.querySelectorAll('.edit-student').forEach(btn => btn.addEventListener('click', e => editStudent(parseInt(e.target.dataset.index))));
@@ -463,6 +504,13 @@
         rollNoInput.value = s.rollNo;
         studentNameInput.value = s.name;
         fatherNameInput.value = s.fatherName || '';
+        currentStudentPhotoUrl = s.photoUrl;
+        if (s.photoUrl) {
+            studentPhotoPreview.src = s.photoUrl;
+            studentPhotoPreview.style.display = 'block';
+        } else {
+            studentPhotoPreview.style.display = 'none';
+        }
         document.querySelectorAll('.subject-mark').forEach(inp => inp.value = s.marks[inp.dataset.subject] || 0);
         addStudentBtn.classList.add('d-none'); updateStudentBtn.classList.remove('d-none'); cancelEditBtn.classList.remove('d-none');
     }
@@ -483,7 +531,7 @@
             marks[sub] = mark;
         });
         if (!valid) return;
-        students[editingStudentIndex] = { rollNo: roll, name, fatherName: fatherNameInput.value.trim(), marks };
+        students[editingStudentIndex] = { rollNo: roll, name, fatherName: fatherNameInput.value.trim(), marks, photoUrl: currentStudentPhotoUrl };
         updateStudentsTable();
         cancelEdit();
         hasChanges = true;
@@ -494,6 +542,9 @@
     function cancelEdit() {
         editingStudentIndex = null;
         studentNameInput.value = ''; fatherNameInput.value = '';
+        studentPhotoPreview.style.display = 'none';
+        photoFetchStatus.innerHTML = '';
+        currentStudentPhotoUrl = '';
         document.querySelectorAll('.subject-mark').forEach(inp => inp.value = '');
         addStudentBtn.classList.remove('d-none'); updateStudentBtn.classList.add('d-none'); cancelEditBtn.classList.add('d-none');
     }
@@ -599,12 +650,13 @@
         resultModalTitle.innerText = data.examName + ' (Ranked)';
         let html = `<p><strong>Total Students:</strong> ${data.students.length}</p>`;
         if (sorted.length) html += `<div class="alert alert-success">🏆 Top Student: ${sorted[0].name} (Roll: ${sorted[0].rollNo})</div>`;
-        html += `<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Rank</th><th>Roll</th><th>Name</th><th>Father</th>`;
+        html += `<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Photo</th><th>Rank</th><th>Roll</th><th>Name</th><th>Father</th>`;
         data.subjects.forEach(s => html += `<th>${s.name}</th>`);
         html += `<th>Total</th><th>%</th></tr></thead><tbody>`;
         sorted.forEach((s, idx) => {
             let total = 0, maxTotal = 0;
-            html += `<tr${idx===0?' class="top-student-row"':''}><td><strong>#${idx+1}</strong></td><td>${s.rollNo}</td><td>${s.name}${idx===0?' 🏆':''}</td><td>${s.fatherName||'-'}</tr>`;
+            const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷</span>';
+            html += `<tr${idx===0?' class="top-student-row"':''}><td>${photoHtml}</td><td><strong>#${idx+1}</strong></td><td>${s.rollNo}</td><td>${s.name}${idx===0?' 🏆':''}</td><td>${s.fatherName||'-'}</td>`;
             data.subjects.forEach(sub => {
                 const mark = s.marks[sub.name] || 0;
                 total += mark; maxTotal += sub.total;
