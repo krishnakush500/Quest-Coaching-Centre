@@ -68,11 +68,37 @@
             flex-wrap: wrap;
             gap: 15px;
             align-items: flex-end;
+            position: relative;
         }
         .filter-group { flex: 1; min-width: 150px; }
         .filter-group label { font-size: 0.7rem; font-weight: 600; color: #64748b; display: block; margin-bottom: 5px; }
         .filter-group select, .filter-group input { width: 100%; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 16px; background: white; }
         .search-btn { background: #1b4f9b; color: white; border: none; padding: 10px 25px; border-radius: 40px; cursor: pointer; font-weight: 600; }
+        
+        /* Student Count Badge */
+        .stats-summary {
+            background: linear-gradient(135deg, #1e3a5f, #2563eb);
+            border-radius: 28px;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            color: white;
+        }
+        .stat-box {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 16px;
+            border-radius: 40px;
+            backdrop-filter: blur(2px);
+        }
+        .stat-box span:first-child { font-size: 0.75rem; font-weight: 500; opacity: 0.9; }
+        .stat-box span:last-child { font-size: 1.5rem; font-weight: 800; line-height: 1; }
         
         .students-card { background: white; border-radius: 32px; padding: 20px; overflow-x: auto; box-shadow: 0 8px 18px rgba(0,20,40,0.08); }
         table { width: 100%; border-collapse: collapse; }
@@ -111,10 +137,9 @@
             .action-buttons { flex-direction: column; }
             td, th { font-size: 0.7rem; padding: 8px 5px; }
             .header-bar { flex-direction: column; gap: 10px; }
-            .back-btn, .download-pdf-btn { width: 100%; justify-content: center; }
+            .stats-summary { justify-content: center; }
+            .stat-box span:last-child { font-size: 1.2rem; }
         }
-        /* PDF hidden helper */
-        .pdf-helper { position: absolute; left: -9999px; top: -9999px; width: 1100px; background: white; z-index: -1; }
     </style>
 </head>
 <body>
@@ -168,6 +193,14 @@
             <button class="search-btn" onclick="filterStudents()"><i class="fas fa-search"></i> Search</button>
         </div>
         
+        <!-- Dynamic Student Count Section -->
+        <div id="statsPanel" class="stats-summary">
+            <div class="stat-box"><span>👨‍🎓 TOTAL STUDENTS</span><span id="totalCountStat">0</span></div>
+            <div class="stat-box"><span>👦 BOYS</span><span id="boysCountStat">0</span></div>
+            <div class="stat-box"><span>👧 GIRLS</span><span id="girlsCountStat">0</span></div>
+            <div class="stat-box"><span>📖 CURRENT CLASS</span><span id="classLabelStat">All</span></div>
+        </div>
+        
         <div class="students-card">
             <table>
                 <thead>
@@ -216,7 +249,7 @@
         
         const logoutBtn = document.createElement('button');
         logoutBtn.innerHTML = '🚪 Logout';
-        logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px;';
+        logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px; box-shadow:0 2px 8px rgba(0,0,0,0.2);';
         logoutBtn.onclick = async () => {
             await auth.signOut();
             window.location.href = 'index.html';
@@ -235,14 +268,16 @@
             snapshot.forEach(doc => {
                 allStudents.push({ id: doc.id, ...doc.data() });
             });
+            // default sort by roll number (numeric if possible, else string)
             allStudents.sort((a, b) => {
-                const dateA = a.admissionDate ? new Date(a.admissionDate) : new Date(0);
-                const dateB = b.admissionDate ? new Date(b.admissionDate) : new Date(0);
-                return dateB - dateA;
+                const rollA = a.rollNumber ? a.rollNumber.toString() : '';
+                const rollB = b.rollNumber ? b.rollNumber.toString() : '';
+                return rollA.localeCompare(rollB, undefined, { numeric: true });
             });
             filterStudents();
         } catch (error) {
             document.getElementById('studentsTableBody').innerHTML = '<tr><td colspan="9" class="loading">❌ Error loading data</td></tr>';
+            updateStatsDisplay([]);
         }
     }
     
@@ -268,13 +303,33 @@
             filtered = filtered.filter(s => s.session === sessionFilter);
         }
         
+        // sort filtered again by roll number
+        filtered.sort((a, b) => {
+            const rollA = a.rollNumber ? a.rollNumber.toString() : '';
+            const rollB = b.rollNumber ? b.rollNumber.toString() : '';
+            return rollA.localeCompare(rollB, undefined, { numeric: true });
+        });
+        
         displayStudents(filtered);
+        updateStatsDisplay(filtered);
+    }
+    
+    function updateStatsDisplay(students) {
+        const total = students.length;
+        const boys = students.filter(s => s.gender === 'Male').length;
+        const girls = students.filter(s => s.gender === 'Female').length;
+        document.getElementById('totalCountStat').innerText = total;
+        document.getElementById('boysCountStat').innerText = boys;
+        document.getElementById('girlsCountStat').innerText = girls;
+        const selectedClass = document.getElementById('classFilter').value;
+        const classDisplay = selectedClass === 'All' ? 'All Classes' : selectedClass;
+        document.getElementById('classLabelStat').innerHTML = classDisplay;
     }
     
     function displayStudents(students) {
         const tbody = document.getElementById('studentsTableBody');
         if (students.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" class="loading">No students found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" class="loading">📭 No students found</td></tr>';
             return;
         }
         
@@ -285,9 +340,9 @@
             
             let photoHtml = '';
             if (student.photoUrl) {
-                photoHtml = `<img src="${student.photoUrl}" class="student-photo" onerror="this.src='https://via.placeholder.com/45'">`;
+                photoHtml = `<img src="${student.photoUrl}" class="student-photo" onerror="this.src='https://via.placeholder.com/45?text=No+Image'">`;
             } else {
-                photoHtml = `<div class="student-photo" style="display:flex;align-items:center;justify-content:center;"><i class="fas fa-user" style="color:#64748b;"></i></div>`;
+                photoHtml = `<div class="student-photo" style="display:flex;align-items:center;justify-content:center;background:#eef2ff;"><i class="fas fa-user-graduate" style="color:#1b4f9b;"></i></div>`;
             }
             
             html += `<tr>
@@ -337,12 +392,12 @@
         });
     };
     
-    // =============== MULTI-PAGE PDF GENERATOR (A4, ALL STUDENTS VISIBLE) ===============
+    // =============== MULTI-PAGE PDF (Roll Number Wise, Header only on first page) ===============
     async function generateMultiPagePDF(studentsData, filtersInfo) {
         const { className, sessionName, currentDate, totalStudents, totalBoys, totalGirls, searchApplied } = filtersInfo;
         
-        // Helper: Build a complete page content (returns a div element with report layout)
-        function buildReportPageContent(studentsSubset, pageNumber = 1, totalPages = 1, startIndex = 0) {
+        // Build a page component with option to include header or not
+        function buildReportPageContent(studentsSubset, pageNumber, totalPages, startIndex, includeFullHeader) {
             const pageDiv = document.createElement('div');
             pageDiv.style.width = '1000px';
             pageDiv.style.padding = '20px 25px 25px 25px';
@@ -350,27 +405,29 @@
             pageDiv.style.fontFamily = "'Segoe UI', Roboto, sans-serif";
             pageDiv.style.boxSizing = 'border-box';
             
-            // Header section
-            let headerHtml = `
-                <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #1b4f9b; padding-bottom: 12px;">
-                    <div style="font-size: 22px; font-weight: 800; color: #1b4f9b;">QUEST COACHING CENTRE</div>
-                    <div style="font-size: 10px; color: #4a5568; margin: 4px 0;">Block More, Gopalganj, Bihar - 841428 | Ph: +91 9708442525</div>
-                    <div style="font-size: 10px; color: #4a5568;">Under the guidance of MR. RAVI SIR</div>
-                </div>
-                <div style="font-size: 17px; font-weight: 700; color: #113a5e; text-align: center; margin: 10px 0 5px;">📊 STUDENTS REPORT</div>
-                <div style="text-align: center; font-size: 10px; color: #64748b; margin-bottom: 15px;">
-                    Session: ${sessionName} | Class: ${className} | Date: ${currentDate} | Total: ${totalStudents}
-                    ${searchApplied ? ' | 🔍 Filtered View' : ''}
-                </div>
-                ${pageNumber === 1 ? `
-                <div style="background: linear-gradient(135deg, #1b4f9b, #2563eb); color: white; padding: 12px 18px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-around; flex-wrap: wrap;">
-                    <div style="text-align: center;"><div style="font-size: 11px; opacity: 0.9;">👨‍🎓 Total Students</div><div style="font-size: 20px; font-weight: 800;">${totalStudents}</div></div>
-                    <div style="text-align: center;"><div style="font-size: 11px; opacity: 0.9;">👦 Boys</div><div style="font-size: 20px; font-weight: 800;">${totalBoys}</div></div>
-                    <div style="text-align: center;"><div style="font-size: 11px; opacity: 0.9;">👧 Girls</div><div style="font-size: 20px; font-weight: 800;">${totalGirls}</div></div>
-                </div>
-                ` : `<div style="height: 5px;"></div>`}
-                <div style="font-size: 10px; text-align: right; margin-bottom: 8px; color: #334155;">Page ${pageNumber} of ${totalPages}</div>
-            `;
+            let headerHtml = '';
+            if (includeFullHeader) {
+                headerHtml = `
+                    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #1b4f9b; padding-bottom: 12px;">
+                        <div style="font-size: 24px; font-weight: 800; color: #1b4f9b;">QUEST COACHING CENTRE</div>
+                        <div style="font-size: 11px; color: #4a5568; margin: 5px 0;">Block More, Gopalganj, Bihar - 841428 | Ph: +91 9708442525</div>
+                        <div style="font-size: 11px; color: #4a5568;">Under the guidance of MR. RAVI SIR</div>
+                    </div>
+                    <div style="font-size: 18px; font-weight: 700; color: #113a5e; text-align: center; margin: 10px 0 5px;">📊 STUDENTS REPORT (Roll Number Wise)</div>
+                    <div style="text-align: center; font-size: 10px; color: #64748b; margin-bottom: 18px;">
+                        Session: ${sessionName} | Class: ${className} | Date: ${currentDate} | Total: ${totalStudents}
+                        ${searchApplied ? ' | 🔍 Filtered View' : ''}
+                    </div>
+                    <div style="background: linear-gradient(135deg, #1b4f9b, #2563eb); color: white; padding: 12px 18px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-around; flex-wrap: wrap;">
+                        <div style="text-align: center;"><div style="font-size: 11px; opacity: 0.9;">👨‍🎓 Total Students</div><div style="font-size: 20px; font-weight: 800;">${totalStudents}</div></div>
+                        <div style="text-align: center;"><div style="font-size: 11px; opacity: 0.9;">👦 Boys</div><div style="font-size: 20px; font-weight: 800;">${totalBoys}</div></div>
+                        <div style="text-align: center;"><div style="font-size: 11px; opacity: 0.9;">👧 Girls</div><div style="font-size: 20px; font-weight: 800;">${totalGirls}</div></div>
+                    </div>
+                `;
+            } else {
+                // simple spacer & page number only (no coaching header/ stats)
+                headerHtml = `<div style="height: 15px;"></div><div style="text-align: right; font-size: 9px; color: #334155; margin-bottom: 8px;">Page ${pageNumber} of ${totalPages}</div>`;
+            }
             
             // Build table rows
             let tableRows = '';
@@ -379,7 +436,7 @@
                 const serial = startIndex + i + 1;
                 const photoCell = st.photoUrl ? 
                     `<img src="${st.photoUrl}" style="width:38px; height:38px; border-radius:50%; object-fit:cover;" onerror="this.src='https://via.placeholder.com/38'">` : 
-                    `<div style="width:38px; height:38px; border-radius:50%; background:#e2e8f0; display:flex; align-items:center; justify-content:center;"><span style="font-size:12px;">📷</span></div>`;
+                    `<div style="width:38px; height:38px; border-radius:50%; background:#e2e8f0; display:flex; align-items:center; justify-content:center;"><i class="fas fa-user" style="color:#4b5563;"></i></div>`;
                 
                 tableRows += `
                     <tr style="border-bottom: 1px solid #e2e8f0;">
@@ -397,7 +454,7 @@
             }
             
             const tableHtml = `
-                <table style="width:100%; border-collapse:collapse; font-size:10px; margin-top:5px;">
+                <table style="width:100%; border-collapse:collapse; font-size:10px; margin-top:8px;">
                     <thead>
                         <tr style="background:#1b4f9b; color:white; font-size:9px;">
                             <th style="padding: 8px 4px; text-align:center;">#</th>
@@ -416,30 +473,24 @@
             `;
             
             const footerHtml = `
-                <div style="display: flex; justify-content: space-between; margin-top: 25px; margin-bottom: 10px;">
-                    <div><div style="border-top: 1px solid #94a3b8; width: 180px; margin-top: 25px;"></div><div style="font-size: 9px; text-align: center; margin-top: 4px;">Authorized Signatory</div></div>
-                    <div><div style="border-top: 1px solid #94a3b8; width: 180px; margin-top: 25px;"></div><div style="font-size: 9px; text-align: center; margin-top: 4px;">Principal / Director</div></div>
+                <div style="display: flex; justify-content: space-between; margin-top: 28px; margin-bottom: 10px;">
+                    <div><div style="border-top: 1px solid #94a3b8; width: 180px; margin-top: 25px;"></div><div style="font-size: 9px; text-align: center; margin-top: 5px;">Authorized Signatory</div></div>
+                    <div><div style="border-top: 1px solid #94a3b8; width: 180px; margin-top: 25px;"></div><div style="font-size: 9px; text-align: center; margin-top: 5px;">Principal / Director</div></div>
                 </div>
-                <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 8px; color: #64748b;">Generated by Quest Coaching Management System</div>
+                <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 8px; color: #64748b;">Generated by Quest Coaching Management System</div>
             `;
             
             pageDiv.innerHTML = headerHtml + tableHtml + footerHtml;
             return pageDiv;
         }
         
-        // Split students into chunks for A4 pages (approx 18-20 rows per page based on content)
-        // We'll compute rows per page dynamically: keep around 19 rows for readability on A4
-        const ROWS_PER_PAGE = 18; 
+        const ROWS_PER_PAGE = 17; // comfortable for A4 with/without header
         const chunks = [];
         for (let i = 0; i < studentsData.length; i += ROWS_PER_PAGE) {
             chunks.push(studentsData.slice(i, i + ROWS_PER_PAGE));
         }
-        if (chunks.length === 0) {
-            Swal.fire('No Data', 'No students available for PDF', 'info');
-            return null;
-        }
+        if (chunks.length === 0) return null;
         
-        // Create temporary container to render pages sequentially
         const tempContainer = document.createElement('div');
         tempContainer.style.position = 'absolute';
         tempContainer.style.left = '-9999px';
@@ -455,40 +506,36 @@
             for (let idx = 0; idx < chunks.length; idx++) {
                 const chunk = chunks[idx];
                 const startSerial = idx * ROWS_PER_PAGE;
-                const pageDiv = buildReportPageContent(chunk, idx + 1, chunks.length, startSerial);
+                // First page includes full header, subsequent pages only page number
+                const includeFull = (idx === 0);
+                const pageDiv = buildReportPageContent(chunk, idx + 1, chunks.length, startSerial, includeFull);
                 tempContainer.innerHTML = '';
                 tempContainer.appendChild(pageDiv);
                 
-                // Wait for images to render & load properly
-                await new Promise(resolve => setTimeout(resolve, 800));
-                
-                // Capture with html2canvas high quality
+                await new Promise(resolve => setTimeout(resolve, 700));
                 const canvas = await html2canvas(pageDiv, {
-                    scale: 2.5,
+                    scale: 2.8,
                     useCORS: true,
                     backgroundColor: '#ffffff',
                     logging: false
                 });
                 const imgData = canvas.toDataURL('image/png');
-                const imgWidth = 190; // mm (A4 width with margins)
+                const imgWidth = 190;
                 const imgHeight = (canvas.height * imgWidth) / canvas.width;
                 
-                if (!isFirstPage) {
-                    pdf.addPage();
-                }
+                if (!isFirstPage) pdf.addPage();
                 pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
                 isFirstPage = false;
             }
             return pdf;
         } catch (err) {
-            console.error("PDF chunk error", err);
             throw err;
         } finally {
             document.body.removeChild(tempContainer);
         }
     }
     
-    // Modified PDF download handler: supports ALL students with multi-page A4
+    // PDF Download - Roll Number wise sorting already applied in filtered list
     downloadPdfBtn.addEventListener('click', async () => {
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         const classFilter = document.getElementById('classFilter').value;
@@ -511,14 +558,21 @@
             filtered = filtered.filter(s => s.session === sessionFilter);
         }
         
+        // Ensure roll number wise sorting for PDF (numeric)
+        filtered.sort((a, b) => {
+            const rollA = a.rollNumber ? a.rollNumber.toString() : '';
+            const rollB = b.rollNumber ? b.rollNumber.toString() : '';
+            return rollA.localeCompare(rollB, undefined, { numeric: true });
+        });
+        
         if (filtered.length === 0) {
             Swal.fire('No Data', 'No students found to download', 'info');
             return;
         }
         
         Swal.fire({
-            title: 'Generating Multi-Page PDF...',
-            text: `Preparing report for ${filtered.length} students. Please wait.`,
+            title: 'Generating PDF...',
+            text: `Preparing roll number wise report (${filtered.length} students)`,
             allowOutsideClick: false,
             didOpen: () => { Swal.showLoading(); }
         });
@@ -532,8 +586,6 @@
             const sessionName = sessionFilter === 'All' ? 'All Sessions' : sessionFilter;
             const searchApplied = searchTerm !== '' || classFilter !== 'All' || sessionFilter !== 'All';
             
-            // Ensure all student photo URLs are accessible (cors may affect but html2canvas handles)
-            // Prepare data enriched
             const enrichedStudents = filtered.map(s => ({
                 ...s,
                 photoUrl: s.photoUrl && s.photoUrl.trim() !== '' ? s.photoUrl : null,
@@ -554,20 +606,19 @@
                 Swal.close();
                 return;
             }
-            
-            pdf.save(`Quest_Students_FullReport_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.pdf`);
+            pdf.save(`Quest_Students_RollWise_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.pdf`);
             Swal.close();
             Swal.fire({
                 icon: 'success',
                 title: 'PDF Ready!',
-                text: `Report with ${totalStudents} student(s) generated across multiple pages.`,
-                timer: 2500,
+                text: `Report with ${totalStudents} student(s) sorted by Roll Number.`,
+                timer: 2200,
                 showConfirmButton: false
             });
         } catch (error) {
             Swal.close();
-            console.error('PDF Generation Error:', error);
-            Swal.fire('Error!', 'Failed to generate multi-page PDF: ' + error.message, 'error');
+            console.error('PDF Error:', error);
+            Swal.fire('Error!', 'Failed to generate PDF: ' + error.message, 'error');
         }
     });
     
