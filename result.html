@@ -3,726 +3,676 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>📊 Result Card · Quest Coaching Centre</title>
+    <title>🎓 QUEST COACHING · Official Result Card</title>
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Poppins', 'Roboto', sans-serif;
+        }
         body {
             background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
             min-height: 100vh;
             padding: 30px 20px;
-            font-family: 'Segoe UI', 'Poppins', 'Roboto', sans-serif;
         }
-        .container { max-width: 800px; margin: 0 auto; }
-        
-        .auth-loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
+
+        /* main container - exactly like admit card form layout */
+        .result-main-container {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        /* action bar (buttons) premium style */
+        .action-buttons {
             display: flex;
             justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 10000;
-        }
-        .auth-loading .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #1b4f9b;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .progress-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.85);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-        .progress-card {
-            background: white;
-            padding: 35px;
-            border-radius: 30px;
-            text-align: center;
-            min-width: 300px;
-        }
-        .progress-bar-container {
-            width: 100%;
-            height: 12px;
-            background: #e2e8f0;
-            border-radius: 20px;
-            overflow: hidden;
-            margin: 20px 0;
-        }
-        .progress-bar-fill {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #1b4f9b, #c5a059);
-            border-radius: 20px;
-            transition: width 0.3s ease;
-        }
-        
-        .main-content { display: none; }
-        .form-card {
-            background: white;
-            border-radius: 32px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            margin-bottom: 30px;
-        }
-        .form-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1e3a5f;
-            text-align: center;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        .form-title i { color: #c5a059; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-weight: 600; color: #334155; margin-bottom: 8px; font-size: 0.85rem; }
-        input, select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            background: #fafbfc;
-        }
-        input:focus, select:focus { border-color: #1b4f9b; outline: none; background: white; box-shadow: 0 0 0 3px rgba(27,79,155,0.1); }
-        .btn-generate, .btn-view-cards {
-            background: linear-gradient(135deg, #1b4f9b, #0f3f7a);
-            color: white;
-            padding: 14px 28px;
-            border: none;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s;
-            margin-top: 10px;
-        }
-        .btn-view-cards { background: linear-gradient(135deg, #16a34a, #15803d); }
-        .btn-generate:hover, .btn-view-cards:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(27,79,155,0.3); }
-        .btn-add-subject {
-            background: #f59e0b;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        .btn-remove-subject {
-            background: #dc2626;
-            color: white;
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .subjects-container {
-            border: 1px solid #e2e8f0;
-            border-radius: 20px;
-            padding: 15px;
-            margin-top: 10px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .subject-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
-            align-items: center;
-            background: #f8fafc;
-            padding: 10px;
-            border-radius: 16px;
+            gap: 18px;
+            margin-bottom: 28px;
             flex-wrap: wrap;
         }
-        .student-preview {
-            background: #f0f7ff;
-            border-radius: 16px;
-            padding: 12px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        .student-preview.show { display: block; }
-        .preview-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dashed #c1d6f0; }
-        .loading-spinner { display: none; text-align: center; padding: 20px; }
-        .loading-spinner.show { display: block; }
-        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #1b4f9b; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
-        .logout-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            background: #dc3545;
+        .action-btn {
+            background: linear-gradient(135deg, #1b4f9b, #0f3f7a);
             color: white;
+            padding: 12px 30px;
             border: none;
-            border-radius: 50px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 0.9rem;
             cursor: pointer;
-            z-index: 9999;
-            font-weight: bold;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
         }
-        
-        /* ========= RESULT CARD STYLES - EXACTLY MATCH ADMIT CARD LAYOUT ========= */
-        .result-card-wrapper {
-            background: white;
-            border-radius: 32px;
-            padding: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            margin-top: 20px;
-            display: none;
+        .action-btn i { font-size: 1rem; }
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 22px rgba(27, 79, 155, 0.25);
         }
+        .btn-whatsapp { background: linear-gradient(135deg, #25D366, #128C7E); }
+        .btn-print { background: linear-gradient(135deg, #1e3a5f, #0f2c48); }
+
+        /* CARD STYLE: exact replica of admit card UI */
         .result-card {
             background: white;
-            border-radius: 24px;
-            overflow: hidden;
-            border: 1px solid rgba(27,79,155,0.2);
+            border-radius: 36px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+            padding: 28px 28px 32px;
+            transition: all 0.2s;
+            border: 1px solid rgba(197, 160, 89, 0.3);
         }
+
+        /* header area exactly like admit card's elegant header */
         .result-header {
-            background: linear-gradient(135deg, #1b4f9b, #0f3f7a);
-            padding: 20px;
             text-align: center;
-            color: white;
-        }
-        .result-header h2 {
-            font-size: 1.8rem;
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-        }
-        .result-header h3 {
-            font-size: 1.3rem;
-            font-weight: 500;
-            color: #ffd966;
-        }
-        .result-header p {
-            font-size: 0.85rem;
-            opacity: 0.9;
-            margin-top: 6px;
-        }
-        .student-detail-panel {
+            margin-bottom: 25px;
+            padding-bottom: 18px;
+            border-bottom: 3px solid #c5a059;
             display: flex;
+            align-items: center;
+            justify-content: center;
             gap: 20px;
-            padding: 20px;
-            background: #f8fafc;
-            border-bottom: 2px solid #e2e8f0;
             flex-wrap: wrap;
         }
-        .student-info-grid {
-            flex: 2;
+        .logo-wrapper {
+            width: 85px;
+            height: 85px;
+            background: #f8f4e8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #c5a059;
+            box-shadow: 0 8px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .logo-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .title-section h2 {
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: #1b4f9b;
+            letter-spacing: -0.3px;
+        }
+        .title-section h3 {
+            font-size: 1.3rem;
+            color: #c5a059;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+        .title-section p {
+            color: #475569;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* student info panel – same as admit card preview style */
+        .student-info-panel {
+            background: #f0f7ff;
+            border-radius: 28px;
+            padding: 18px 22px;
+            margin-bottom: 28px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+            border: 1px solid #d9e6f7;
+        }
+        .info-details {
+            flex: 1;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(210px,1fr));
+            gap: 12px 20px;
         }
         .info-item {
             background: white;
-            border-radius: 16px;
-            padding: 10px 14px;
+            border-radius: 20px;
+            padding: 8px 16px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-left: 4px solid #c5a059;
         }
         .info-label {
             font-size: 0.7rem;
-            text-transform: uppercase;
             font-weight: 700;
+            text-transform: uppercase;
             color: #1b4f9b;
             letter-spacing: 0.5px;
         }
         .info-value {
+            font-weight: 700;
+            color: #0f172a;
             font-size: 0.95rem;
-            font-weight: 600;
-            color: #1e293b;
             margin-top: 4px;
+            word-break: break-word;
         }
-        .photo-area {
-            width: 110px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-        .student-photo-card {
+        .student-photo-box {
             width: 100px;
             height: 120px;
-            object-fit: cover;
-            border-radius: 12px;
+            background: #fff;
+            border-radius: 16px;
             border: 2px solid #c5a059;
-            background: white;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #fefaf0;
         }
-        .marks-table-container {
-            padding: 20px;
-            overflow-x: auto;
+        .student-photo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
-        .marks-table {
+
+        /* marks table: elegant and clean (like subject timing but marks) */
+        .marks-grid {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
+            margin-bottom: 20px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
-        .marks-table th {
-            background: #1e3a5f;
+        .marks-grid th {
+            background: #1b4f9b;
             color: white;
+            font-weight: 700;
+            padding: 14px 8px;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        .marks-grid td {
             padding: 12px 8px;
-            text-align: left;
-            font-weight: 600;
-        }
-        .marks-table td {
-            padding: 10px 8px;
+            text-align: center;
             border-bottom: 1px solid #e2e8f0;
+            background: white;
+            font-size: 0.9rem;
+            font-weight: 500;
         }
-        .marks-table tr:hover {
-            background: #f1f5f9;
+        .marks-grid tr:last-child td {
+            border-bottom: none;
+        }
+        .marks-grid tr:hover td {
+            background: #faf5e8;
         }
         .total-row {
-            background: #eef2ff;
-            font-weight: 700;
-            border-top: 2px solid #cbd5e1;
+            background: #eef3fc;
+            font-weight: 800;
         }
+        .total-row td {
+            font-weight: 800;
+            background: #eef3fc;
+            border-top: 2px solid #c5a059;
+        }
+
+        /* grade badges inspired by admit card premium touches */
         .grade-badge {
             display: inline-block;
-            padding: 4px 12px;
-            border-radius: 40px;
-            font-size: 0.7rem;
+            padding: 4px 14px;
+            border-radius: 100px;
             font-weight: 700;
+            font-size: 0.75rem;
+            letter-spacing: 0.3px;
         }
-        .grade-Aplus { background: #d1fae5; color: #065f46; }
-        .grade-A { background: #dbeafe; color: #1e40af; }
-        .grade-Bplus { background: #fed7aa; color: #9a3412; }
-        .grade-B { background: #fef3c7; color: #92400e; }
-        .grade-C { background: #ffedd5; color: #c2410c; }
-        .grade-D { background: #fee2e2; color: #b91c1c; }
-        .grade-F { background: #fecaca; color: #991b1b; }
-        .result-footer {
-            background: #f1f5f9;
-            padding: 14px;
-            text-align: center;
-            font-size: 0.7rem;
-            color: #475569;
-            border-top: 1px solid #cbd5e1;
-        }
-        .percentage-block {
-            background: linear-gradient(135deg, #c5a05920, #1b4f9b20);
-            margin: 0 20px 20px 20px;
-            padding: 12px;
-            border-radius: 20px;
+        .grade-Aplus { background: #22c55e20; color: #15803d; border: 1px solid #86efac; }
+        .grade-A { background: #3b82f620; color: #1e40af; border: 1px solid #93c5fd; }
+        .grade-Bplus { background: #facc1520; color: #a16207; border: 1px solid #fde047; }
+        .grade-B { background: #f9731620; color: #c2410c; border: 1px solid #fdba74; }
+        .grade-C { background: #f59e0b20; color: #b45309; border: 1px solid #fed7aa; }
+        .grade-D { background: #ef444420; color: #b91c1c; border: 1px solid #fca5a5; }
+        .grade-F { background: #dc262620; color: #991b1b; border: 1px solid #f87171; }
+
+        .percentage-division-area {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 16px;
+            margin-top: 12px;
+            background: #fefce8;
+            padding: 12px 20px;
+            border-radius: 60px;
         }
-        .percentage-text {
-            font-size: 1.2rem;
+        .percentage-box {
+            font-size: 1.3rem;
             font-weight: 800;
             color: #1b4f9b;
         }
-        .division-text {
-            font-size: 1rem;
-            font-weight: 700;
-            padding: 6px 18px;
+        .division-box {
+            font-size: 1.1rem;
+            font-weight: 800;
+            padding: 6px 20px;
             border-radius: 40px;
             background: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
-        .action-buttons-row {
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-            margin-top: 15px;
+        .footer-note {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 15px;
+            border-top: 2px dashed #cbd5e1;
+            color: #475569;
+            font-size: 0.7rem;
+            font-weight: 500;
         }
-        .small-btn {
-            background: #e2e8f0;
+
+        /* loading & error same as original */
+        .loading-state, .error-state {
+            background: white;
+            border-radius: 48px;
+            padding: 48px 24px;
+            text-align: center;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.1);
+        }
+        .error-state button {
+            background: #dc2626;
+            color: white;
             border: none;
-            padding: 8px 16px;
+            padding: 8px 20px;
             border-radius: 40px;
-            font-weight: 600;
+            margin-top: 18px;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.2s;
+            font-weight: bold;
         }
-        .small-btn:hover { background: #cbd5e1; transform: translateY(-1px); }
-        .btn-download-result { background: #28a745; color: white; }
+
+        /* PDF clone container (hidden for generation) */
+        .pdf-clone-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            z-index: -1;
+            opacity: 0;
+            pointer-events: none;
+        }
+
         @media (max-width: 650px) {
-            .student-detail-panel { flex-direction: column; align-items: center; }
-            .photo-area { order: -1; }
+            .student-info-panel { flex-direction: column; align-items: stretch; }
+            .student-photo-box { width: 90px; height: 110px; margin: 0 auto; }
+            .title-section h2 { font-size: 1.4rem; }
+        }
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .action-buttons { display: none; }
+            .result-card { box-shadow: none; border-radius: 0; padding: 12px; }
         }
     </style>
 </head>
 <body>
-    <div id="authLoading" class="auth-loading">
-        <div class="spinner"></div>
-        <p style="margin-top: 15px; color: #1b4f9b; font-weight: 600;">Verifying access...</p>
+
+<div class="result-main-container">
+    <!-- action buttons exactly like admit card style -->
+    <div class="action-buttons">
+        <button class="action-btn" id="downloadPdfBtn"><i class="fas fa-download"></i> Download PDF</button>
+        <button class="action-btn btn-whatsapp" id="whatsappShareBtn"><i class="fab fa-whatsapp"></i> Share on WhatsApp</button>
+        <button class="action-btn btn-print" id="printResultBtn"><i class="fas fa-print"></i> Print Card</button>
     </div>
-    <div id="pageProgressOverlay" class="progress-overlay">
-        <div class="progress-card">
-            <h3><i class="fas fa-spinner fa-spin"></i> Loading Application</h3>
-            <div class="progress-bar-container"><div class="progress-bar-fill" id="pageProgressFill"></div></div>
-            <div class="progress-status" id="pageProgressStatus">Initializing...</div>
-            <div class="progress-percent" id="pageProgressPercent">0%</div>
-        </div>
+
+    <div id="loadingState" class="loading-state">
+        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #1b4f9b;"></i>
+        <p style="margin-top: 15px; font-weight: 600;">Fetching result details...</p>
     </div>
-    <div id="mainContent" class="main-content">
-        <div class="container">
-            <div class="form-card">
-                <div class="form-title"><i class="fas fa-graduation-cap"></i><span>📊 Result Card Generator</span></div>
-                <div class="form-group"><label>📝 Exam Name</label><input type="text" id="examName" placeholder="e.g., Final Examination 2025"></div>
-                <div class="form-group"><label>🏫 Class</label><select id="classSelect"><option value="">Select Class</option><option>6th</option><option>7th</option><option>8th</option><option>9th</option><option>10th</option><option>11th (Science)</option><option>11th (Commerce)</option><option>11th (Arts)</option><option>12th (Science)</option><option>12th (Commerce)</option><option>12th (Arts)</option></select></div>
-                <div class="form-group"><label>🎫 Roll Number</label><input type="text" id="rollNumberInput" placeholder="Enter Roll Number" autocomplete="off"></div>
-                
-                <!-- Subjects with marks entry (replaces time slots) -->
-                <div class="form-group"><label>📚 Subjects & Marks (Max Marks = 100 each by default)</label><div id="subjectsContainer" class="subjects-container"></div><button type="button" class="btn-add-subject" id="addSubjectBtn"><i class="fas fa-plus"></i> Add Subject</button></div>
-                
-                <div id="studentPreview" class="student-preview"></div>
-                <div class="loading-spinner" id="loadingSpinner"><div class="spinner"></div><p>Fetching student details...</p></div>
-                <button class="btn-generate" id="generateResultBtn"><i class="fas fa-chart-line"></i> Generate Result Card</button>
-                <button class="btn-view-cards" id="viewResultHistoryBtn" onclick="window.location.href='previous-cards.html'"><i class="fas fa-history"></i> View Previous Cards</button>
+
+    <div id="errorState" class="error-state" style="display: none;">
+        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #dc2626;"></i>
+        <p id="errorMessage" style="margin: 15px 0;">Error loading result</p>
+        <button onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Back to Home</button>
+    </div>
+
+    <!-- RESULT CARD (matching admit card aesthetics) -->
+    <div id="resultCard" class="result-card" style="display: none;">
+        <div class="result-header">
+            <div class="logo-wrapper">
+                <img id="coachingLogoImg" src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" alt="Quest Logo" crossorigin="anonymous">
             </div>
-            <div id="resultCardWrapper" class="result-card-wrapper"></div>
+            <div class="title-section">
+                <h2>QUEST COACHING CENTRE</h2>
+                <h3 id="examNameTitle">Annual Examination 2025</h3>
+                <p>Under the guidance of <strong>MR. RAVI SIR</strong> &nbsp;|&nbsp; Excellence in Education</p>
+            </div>
+        </div>
+
+        <!-- Student info panel (similar to admit card preview) -->
+        <div class="student-info-panel">
+            <div class="info-details">
+                <div class="info-item"><div class="info-label">🎓 Student Name</div><div class="info-value" id="studentNameDisplay">-</div></div>
+                <div class="info-item"><div class="info-label">👨‍👦 Father's Name</div><div class="info-value" id="fatherNameDisplay">-</div></div>
+                <div class="info-item"><div class="info-label">🎫 Roll Number</div><div class="info-value" id="rollNumberDisplay">-</div></div>
+                <div class="info-item"><div class="info-label">📅 Class / Stream</div><div class="info-value" id="classDisplay">-</div></div>
+            </div>
+            <div class="student-photo-box">
+                <img id="studentPhotoImg" src="" alt="Student Photo" style="display: none;">
+            </div>
+        </div>
+
+        <!-- Marks Table: exactly where subjects & timing used to be, now subjects & marks -->
+        <table class="marks-grid" id="marksTable">
+            <thead>
+                <tr><th>📖 Subject</th><th>📊 Marks Obtained</th><th>📈 Total Marks</th><th>🏅 Grade</th></tr>
+            </thead>
+            <tbody id="marksTableBody"></tbody>
+        </table>
+
+        <!-- percentage + division -->
+        <div class="percentage-division-area">
+            <div class="percentage-box"><i class="fas fa-chart-line"></i> Total Percentage: <span id="totalPercentSpan">0%</span></div>
+            <div class="division-box" id="divisionSpan">Division: —</div>
+        </div>
+
+        <div class="footer-note">
+            <i class="fas fa-id-card"></i> This is a computer-generated result card · Valid as per QUEST COACHING rules<br>
+            📞 For queries: +91 9708442525 | Gopalganj, Bihar
         </div>
     </div>
+</div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
-            authDomain: "quest-coaching.firebaseapp.com",
-            projectId: "quest-coaching",
-            storageBucket: "quest-coaching.firebasestorage.app"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-        const admissionsCollection = db.collection('admissions');
-        const resultsCollection = db.collection('results');  // store generated results
+<div id="pdfCloneContainer" class="pdf-clone-container"></div>
 
-        let currentStudentData = null;
-        let subjectsWithMarks = [];   // each: { name, obtained, max:100 }
+<script>
+    // ==================== FIREBASE INIT ====================
+    const firebaseConfig = {
+        apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
+        authDomain: "quest-coaching.firebaseapp.com",
+        projectId: "quest-coaching",
+        storageBucket: "quest-coaching.firebasestorage.app"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-        function updatePageProgress(percent, status) {
-            const fill = document.getElementById('pageProgressFill');
-            const statusDiv = document.getElementById('pageProgressStatus');
-            const percentDiv = document.getElementById('pageProgressPercent');
-            if (fill) fill.style.width = percent + '%';
-            if (statusDiv) statusDiv.textContent = status || `Loading ${percent}%`;
-            if (percentDiv) percentDiv.textContent = percent + '%';
+    // coaching constants
+    const COACHING_LOGO_URL = "https://i.ibb.co/hF9tmnpB/20250903-202922.jpg";
+    const COACHING_PHONE = "+91 9708442525";
+
+    let currentExamData = null;
+    let currentStudent = null;
+    let currentStudentPhotoUrl = null;
+
+    // Helper: grade & division logic
+    function getGradeObject(percentage) {
+        if (percentage >= 90) return { grade: "A+", className: "grade-Aplus" };
+        if (percentage >= 75) return { grade: "A", className: "grade-A" };
+        if (percentage >= 65) return { grade: "B+", className: "grade-Bplus" };
+        if (percentage >= 55) return { grade: "B", className: "grade-B" };
+        if (percentage >= 45) return { grade: "C", className: "grade-C" };
+        if (percentage >= 33) return { grade: "D", className: "grade-D" };
+        return { grade: "F", className: "grade-F" };
+    }
+
+    function getDivision(percentage) {
+        if (percentage >= 60) return "FIRST DIVISION";
+        if (percentage >= 45) return "SECOND DIVISION";
+        if (percentage >= 30) return "THIRD DIVISION";
+        return "FAIL (Needs Improvement)";
+    }
+
+    // fetch student photo from admissions collection using roll number
+    async function fetchStudentPhotoUrl(rollNumber) {
+        try {
+            const q = db.collection("admissions").where("rollNumber", "==", String(rollNumber));
+            const snap = await q.get();
+            if (!snap.empty) {
+                const data = snap.docs[0].data();
+                return data.photoUrl || null;
+            }
+            return null;
+        } catch (err) {
+            console.warn("Photo fetch error", err);
+            return null;
+        }
+    }
+
+    function getUrlParams() {
+        const params = new URLSearchParams(window.location.search);
+        return { examId: params.get('examId'), rollNo: params.get('rollNo') };
+    }
+
+    async function loadResultData() {
+        const { examId, rollNo } = getUrlParams();
+        if (!examId || !rollNo) {
+            showError("Missing exam ID or roll number in URL.");
+            return;
         }
 
-        auth.onAuthStateChanged(async (user) => {
-            if (!user) {
-                Swal.fire({ title: 'Access Denied!', text: 'Please login from main page first!', icon: 'error' }).then(() => { window.location.href = 'index.html'; });
+        try {
+            const examDoc = await db.collection("results").doc(examId).get();
+            if (!examDoc.exists) {
+                showError("Exam result not found. Please verify the link.");
                 return;
             }
-            document.getElementById('authLoading').style.display = 'none';
-            document.getElementById('pageProgressOverlay').style.display = 'flex';
-            updatePageProgress(0, 'Starting...');
-            await loadDefaultSubjects();
-            updatePageProgress(100, 'Ready');
-            setTimeout(() => {
-                document.getElementById('pageProgressOverlay').style.display = 'none';
-                document.getElementById('mainContent').style.display = 'block';
-            }, 500);
-            const logoutBtn = document.createElement('button');
-            logoutBtn.innerHTML = '🚪 Logout';
-            logoutBtn.className = 'logout-btn';
-            logoutBtn.onclick = async () => { await auth.signOut(); window.location.href = 'index.html'; };
-            document.body.appendChild(logoutBtn);
-        });
 
-        function getDefaultSubjectsForMarks() {
-            return [
-                { name: "हिन्दी", obtained: 0, max: 100 },
-                { name: "अंग्रेजी", obtained: 0, max: 100 },
-                { name: "गणित", obtained: 0, max: 100 },
-                { name: "विज्ञान", obtained: 0, max: 100 },
-                { name: "सामाजिक विज्ञान", obtained: 0, max: 100 },
-                { name: "संस्कृत", obtained: 0, max: 100 }
-            ];
-        }
-
-        async function loadDefaultSubjects() {
-            subjectsWithMarks = getDefaultSubjectsForMarks();
-            renderSubjectsWithMarks();
-        }
-
-        function renderSubjectsWithMarks() {
-            const container = document.getElementById('subjectsContainer');
-            if (!container) return;
-            container.innerHTML = '';
-            subjectsWithMarks.forEach((sub, idx) => {
-                const row = document.createElement('div');
-                row.className = 'subject-row';
-                row.innerHTML = `
-                    <input type="text" placeholder="Subject Name" value="${escapeHtml(sub.name)}" style="flex:2;" class="subject-name-input">
-                    <input type="number" placeholder="Marks Obtained" value="${sub.obtained}" min="0" max="${sub.max}" step="1" style="flex:1;" class="subject-marks-input">
-                    <span style="font-size:0.8rem;">/ ${sub.max}</span>
-                    <button class="btn-remove-subject"><i class="fas fa-trash"></i></button>
-                `;
-                container.appendChild(row);
-                const nameInput = row.querySelector('.subject-name-input');
-                const marksInput = row.querySelector('.subject-marks-input');
-                nameInput.addEventListener('change', () => { subjectsWithMarks[idx].name = nameInput.value; });
-                marksInput.addEventListener('input', () => { 
-                    let val = parseInt(marksInput.value) || 0;
-                    subjectsWithMarks[idx].obtained = Math.min(val, subjectsWithMarks[idx].max);
-                    marksInput.value = subjectsWithMarks[idx].obtained;
-                });
-                row.querySelector('.btn-remove-subject').addEventListener('click', () => {
-                    subjectsWithMarks.splice(idx, 1);
-                    renderSubjectsWithMarks();
-                });
-            });
-        }
-
-        document.getElementById('addSubjectBtn')?.addEventListener('click', () => {
-            subjectsWithMarks.push({ name: "New Subject", obtained: 0, max: 100 });
-            renderSubjectsWithMarks();
-        });
-
-        // Fetch student details using roll number (same as admit card)
-        document.getElementById('rollNumberInput')?.addEventListener('input', async function() {
-            const roll = this.value.trim();
-            const previewDiv = document.getElementById('studentPreview');
-            const loader = document.getElementById('loadingSpinner');
-            if (roll.length < 2) {
-                previewDiv.classList.remove('show');
-                currentStudentData = null;
+            currentExamData = examDoc.data();
+            const studentsList = currentExamData.students || [];
+            const studentRecord = studentsList.find(s => String(s.rollNo) === String(rollNo));
+            if (!studentRecord) {
+                showError(`Roll number ${rollNo} not found in this exam.`);
                 return;
             }
-            loader.classList.add('show');
-            try {
-                const snap = await admissionsCollection.where('rollNumber', '==', roll).get();
-                if (!snap.empty) {
-                    let student = null;
-                    snap.forEach(doc => { student = { id: doc.id, ...doc.data() }; });
-                    currentStudentData = student;
-                    previewDiv.innerHTML = `
-                        <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                            <div style="width:55px; height:55px; border-radius:50%; overflow:hidden; border:2px solid #c5a059;">
-                                ${student.photoUrl ? `<img src="${student.photoUrl}" style="width:100%;height:100%;object-fit:cover;">` : '<i class="fas fa-user" style="font-size:30px; line-height:55px; display:block; text-align:center;"></i>'}
-                            </div>
-                            <div style="flex:1;">
-                                <div class="preview-row"><span><strong>Student Name:</strong></span><span>${student.studentName || 'N/A'}</span></div>
-                                <div class="preview-row"><span><strong>Father's Name:</strong></span><span>${student.fatherName || 'N/A'}</span></div>
-                                <div class="preview-row"><span><strong>Registration No:</strong></span><span>${student.admissionNo || 'N/A'}</span></div>
-                                <div class="preview-row"><span><strong>DOB:</strong></span><span>${student.dob ? new Date(student.dob).toLocaleDateString('en-GB') : 'N/A'}</span></div>
-                            </div>
-                        </div>
-                    `;
-                    previewDiv.classList.add('show');
-                } else {
-                    previewDiv.innerHTML = `<div style="color:#dc2626;">❌ No student found with Roll Number: ${roll}</div>`;
-                    previewDiv.classList.add('show');
-                    currentStudentData = null;
-                }
-            } catch (error) {
-                console.error(error);
-                previewDiv.innerHTML = `<div style="color:#dc2626;">Error fetching student</div>`;
-                previewDiv.classList.add('show');
-            } finally {
-                loader.classList.remove('show');
+
+            // enrich student with extra fields
+            currentStudent = studentRecord;
+            const photoUrl = await fetchStudentPhotoUrl(rollNo);
+            currentStudentPhotoUrl = photoUrl;
+            currentStudent.photoUrl = photoUrl;
+
+            // also fetch class/stream if needed
+            if (!currentStudent.className && currentExamData.className) currentStudent.className = currentExamData.className;
+            else if (!currentStudent.className) currentStudent.className = "Not Specified";
+
+            displayResultCard();
+        } catch (error) {
+            console.error(error);
+            showError("Network error or unable to fetch result.");
+        }
+    }
+
+    function displayResultCard() {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('resultCard').style.display = 'block';
+
+        // set exam name
+        const examTitleElem = document.getElementById('examNameTitle');
+        examTitleElem.innerText = currentExamData.examName || "Final Examination 2025";
+
+        // student info
+        document.getElementById('studentNameDisplay').innerText = currentStudent.name || "—";
+        document.getElementById('fatherNameDisplay').innerText = currentStudent.fatherName || "—";
+        document.getElementById('rollNumberDisplay').innerText = currentStudent.rollNo || "—";
+        document.getElementById('classDisplay').innerText = currentStudent.className || currentExamData.className || "—";
+
+        // photo handling
+        const photoImg = document.getElementById('studentPhotoImg');
+        if (currentStudentPhotoUrl && currentStudentPhotoUrl.trim() !== "") {
+            photoImg.src = currentStudentPhotoUrl;
+            photoImg.style.display = "block";
+            photoImg.style.width = "100%";
+            photoImg.style.height = "100%";
+            photoImg.style.objectFit = "cover";
+        } else {
+            photoImg.style.display = "none";
+            // fallback icon inside parent
+            const parentBox = document.querySelector('.student-photo-box');
+            if (parentBox && !parentBox.querySelector('.fa-user-circle')) {
+                const fallbackIcon = document.createElement('i');
+                fallbackIcon.className = "fas fa-user-graduate";
+                fallbackIcon.style.fontSize = "3rem";
+                fallbackIcon.style.color = "#c5a059";
+                parentBox.style.justifyContent = "center";
+                parentBox.style.alignItems = "center";
+                if (!parentBox.contains(photoImg)) parentBox.appendChild(photoImg);
+                photoImg.style.display = "none";
+                const existingFallback = parentBox.querySelector('.fa-user-graduate');
+                if (!existingFallback) parentBox.appendChild(fallbackIcon);
             }
-        });
-
-        function getGradeAndClass(percentage) {
-            if (percentage >= 90) return { grade: "A+", className: "grade-Aplus" };
-            if (percentage >= 75) return { grade: "A", className: "grade-A" };
-            if (percentage >= 60) return { grade: "B+", className: "grade-Bplus" };
-            if (percentage >= 45) return { grade: "B", className: "grade-B" };
-            if (percentage >= 33) return { grade: "C", className: "grade-C" };
-            if (percentage >= 25) return { grade: "D", className: "grade-D" };
-            return { grade: "F", className: "grade-F" };
         }
 
-        function calculateDivision(perc) {
-            if (perc >= 60) return "First Division";
-            if (perc >= 45) return "Second Division";
-            if (perc >= 30) return "Third Division";
-            return "Fail (No Division)";
-        }
+        // Build marks table (exactly subjects array from exam config)
+        const subjects = currentExamData.subjects || [];
+        const marksObtainedMap = currentStudent.marks || {};
+        let totalObtained = 0;
+        let totalMaxMarks = 0;
+        let tbody = document.getElementById('marksTableBody');
+        tbody.innerHTML = '';
 
-        async function saveResultToFirebase(examName, studentClass, student, subjectsMarks, totalPerc, division, gradeSummary) {
-            const resultData = {
-                examName: examName,
-                studentClass: studentClass,
-                studentId: student.id,
-                rollNumber: student.rollNumber,
-                studentName: student.studentName,
-                fatherName: student.fatherName,
-                admissionNo: student.admissionNo,
-                photoUrl: student.photoUrl || null,
-                subjects: subjectsMarks.map(s => ({ name: s.name, obtained: s.obtained, max: s.max })),
-                totalPercentage: parseFloat(totalPerc),
-                division: division,
-                overallGrade: gradeSummary,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-            const docRef = await resultsCollection.add(resultData);
-            return docRef.id;
-        }
+        for (let sub of subjects) {
+            const subName = sub.name;
+            const maxMarks = sub.total || 100;
+            const obtained = marksObtainedMap[subName] !== undefined ? marksObtainedMap[subName] : 0;
+            const percent = maxMarks > 0 ? (obtained / maxMarks) * 100 : 0;
+            const gradeObj = getGradeObject(percent);
+            totalObtained += obtained;
+            totalMaxMarks += maxMarks;
 
-        function renderResultCard(examName, studentClass, student, subjectsData, totalObtained, totalMax, totalPercentage, division) {
-            const wrapper = document.getElementById('resultCardWrapper');
-            wrapper.style.display = 'block';
-            let marksRows = '';
-            let totalObtainedSum = totalObtained;
-            let totalMaxSum = totalMax;
-            
-            subjectsData.forEach(sub => {
-                const percSub = (sub.obtained / sub.max) * 100;
-                const gradeInfo = getGradeAndClass(percSub);
-                marksRows += `
-                    <tr>
-                        <td>${escapeHtml(sub.name)}</td>
-                        <td>${sub.obtained}</td>
-                        <td>${sub.max}</td>
-                        <td><span class="grade-badge ${gradeInfo.className}">${gradeInfo.grade}</span></td>
-                    </tr>
-                `;
-            });
-            
-            const finalGrade = getGradeAndClass(totalPercentage);
-            const divisionColor = division.includes("First") ? "#28a745" : (division.includes("Second") ? "#ffc107" : (division.includes("Third") ? "#fd7e14" : "#dc3545"));
-            
-            wrapper.innerHTML = `
-                <div class="result-card">
-                    <div class="result-header">
-                        <h2><i class="fas fa-school"></i> QUEST COACHING CENTRE</h2>
-                        <h3>${escapeHtml(examName)}</h3>
-                        <p>Under the guidance of MR. RAVI SIR | Excellence in Education</p>
-                    </div>
-                    <div class="student-detail-panel">
-                        <div class="student-info-grid">
-                            <div class="info-item"><div class="info-label">Student Name</div><div class="info-value">${escapeHtml(student.studentName || '-')}</div></div>
-                            <div class="info-item"><div class="info-label">Father's Name</div><div class="info-value">${escapeHtml(student.fatherName || '-')}</div></div>
-                            <div class="info-item"><div class="info-label">Roll Number</div><div class="info-value">${escapeHtml(student.rollNumber || '-')}</div></div>
-                            <div class="info-item"><div class="info-label">Registration No.</div><div class="info-value">${escapeHtml(student.admissionNo || '-')}</div></div>
-                            <div class="info-item"><div class="info-label">Class</div><div class="info-value">${escapeHtml(studentClass)}</div></div>
-                        </div>
-                        <div class="photo-area">
-                            ${student.photoUrl ? `<img src="${student.photoUrl}" class="student-photo-card" alt="Photo" crossorigin="anonymous">` : `<div style="width:100px;height:120px;background:#e2e8f0;border-radius:12px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-user-circle fa-3x" style="color:#94a3b8;"></i></div>`}
-                        </div>
-                    </div>
-                    <div class="marks-table-container">
-                        <table class="marks-table">
-                            <thead><tr><th>Subject</th><th>Obtained</th><th>Total</th><th>Grade</th></tr></thead>
-                            <tbody>${marksRows}<tr class="total-row"><td><strong>Grand Total</strong></td><td><strong>${totalObtainedSum}</strong></td><td><strong>${totalMaxSum}</strong></td><td></td></tr></tbody>
-                        </table>
-                    </div>
-                    <div class="percentage-block">
-                        <span class="percentage-text"><i class="fas fa-chart-simple"></i> Percentage: ${totalPercentage.toFixed(2)}%</span>
-                        <span class="division-text" style="border:2px solid ${divisionColor}; color:${divisionColor};">🏆 ${division}</span>
-                        <span class="grade-badge ${finalGrade.className}" style="font-size:0.9rem;">Overall Grade: ${finalGrade.grade}</span>
-                    </div>
-                    <div class="result-footer">
-                        <i class="fas fa-print"></i> This is a computer generated result card | Quest Coaching, Gopalganj | Contact: +91 9708442525
-                    </div>
-                </div>
-                <div class="action-buttons-row">
-                    <button class="small-btn btn-download-result" id="downloadResultPdfBtn"><i class="fas fa-download"></i> Download PDF</button>
-                    <button class="small-btn" id="shareResultWhatsappBtn"><i class="fab fa-whatsapp"></i> Share on WhatsApp</button>
-                </div>
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="text-align:left; font-weight:600;">${escapeHtml(subName)}</td>
+                <td>${obtained}</td>
+                <td>${maxMarks}</td>
+                <td><span class="grade-badge ${gradeObj.className}">${gradeObj.grade}</span></td>
             `;
-            
-            document.getElementById('downloadResultPdfBtn')?.addEventListener('click', () => downloadResultAsPDF());
-            document.getElementById('shareResultWhatsappBtn')?.addEventListener('click', () => shareResultOnWhatsApp(examName, student, totalPercentage, division));
+            tbody.appendChild(row);
         }
 
-        async function downloadResultAsPDF() {
-            const resultCardElem = document.querySelector('.result-card');
-            if (!resultCardElem) return;
-            Swal.fire({ title: 'Generating PDF...', text: 'Please wait', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            try {
-                const canvas = await html2canvas(resultCardElem, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-                const imgData = canvas.toDataURL('image/png');
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const imgWidth = 190;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-                pdf.save(`Result_${currentStudentData?.rollNumber || 'student'}.pdf`);
-                Swal.close();
-                Swal.fire('Success', 'Result PDF downloaded!', 'success');
-            } catch (err) {
-                Swal.close();
-                Swal.fire('Error', 'Failed to generate PDF', 'error');
-                console.error(err);
-            }
-        }
+        // total row
+        const totalPercentValue = totalMaxMarks > 0 ? ((totalObtained / totalMaxMarks) * 100).toFixed(2) : 0;
+        const divisionText = getDivision(parseFloat(totalPercentValue));
+        const totalRow = document.createElement('tr');
+        totalRow.classList.add('total-row');
+        totalRow.innerHTML = `
+            <td style="font-weight:800; text-align:left;">📌 TOTAL</td>
+            <td style="font-weight:800;">${totalObtained}</td>
+            <td style="font-weight:800;">${totalMaxMarks}</td>
+            <td style="background:#eef3fc;"></td>
+        `;
+        tbody.appendChild(totalRow);
 
-        function shareResultOnWhatsApp(examName, student, percentage, division) {
-            const text = `📢 *Result Published* 📢\n\n🏫 QUEST COACHING CENTRE\n📚 ${examName}\n👨‍🎓 Student: ${student.studentName}\n🎫 Roll No: ${student.rollNumber}\n📊 Percentage: ${percentage.toFixed(2)}%\n🎖️ Division: ${division}\n📞 Contact: 9708442525`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-        }
+        document.getElementById('totalPercentSpan').innerText = `${totalPercentValue}%`;
+        const divisionSpan = document.getElementById('divisionSpan');
+        divisionSpan.innerHTML = `🏆 Division: ${divisionText}`;
+        // style division box dynamically
+        if (divisionText.includes("FIRST")) divisionSpan.style.background = "#d9f99d";
+        else if (divisionText.includes("SECOND")) divisionSpan.style.background = "#bfdbfe";
+        else if (divisionText.includes("THIRD")) divisionSpan.style.background = "#fed7aa";
+        else if (divisionText.includes("FAIL")) divisionSpan.style.background = "#fecaca";
+        else divisionSpan.style.background = "#e2e3e5";
+    }
 
-        document.getElementById('generateResultBtn')?.addEventListener('click', async () => {
-            const roll = document.getElementById('rollNumberInput').value.trim();
-            const examName = document.getElementById('examName').value.trim();
-            const studentClass = document.getElementById('classSelect').value;
-            if (!roll || !currentStudentData) {
-                Swal.fire('Error', 'Please enter a valid Roll Number and ensure student is fetched', 'error');
-                return;
-            }
-            if (!examName) { Swal.fire('Error', 'Please enter Exam Name', 'error'); return; }
-            if (!studentClass) { Swal.fire('Error', 'Please select Class', 'error'); return; }
-            const validSubjects = subjectsWithMarks.filter(s => s.name && s.name.trim() !== '');
-            if (validSubjects.length === 0) { Swal.fire('Error', 'Add at least one subject', 'error'); return; }
-            
-            let totalObtained = 0, totalMax = 0;
-            validSubjects.forEach(sub => { totalObtained += sub.obtained; totalMax += sub.max; });
-            const totalPercentage = totalMax > 0 ? (totalObtained / totalMax) * 100 : 0;
-            const division = calculateDivision(totalPercentage);
-            
-            Swal.fire({ title: 'Generating Result Card...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            try {
-                await saveResultToFirebase(examName, studentClass, currentStudentData, validSubjects, totalPercentage, division, getGradeAndClass(totalPercentage).grade);
-                renderResultCard(examName, studentClass, currentStudentData, validSubjects, totalObtained, totalMax, totalPercentage, division);
-                Swal.close();
-                Swal.fire('Success!', 'Result card generated & saved!', 'success');
-            } catch (error) {
-                Swal.close();
-                Swal.fire('Error', 'Failed to save result', 'error');
-                console.error(error);
-            }
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
         });
+    }
 
-        function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
-    </script>
+    function showError(msg) {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('errorState').style.display = 'block';
+        document.getElementById('errorMessage').innerHTML = msg;
+    }
+
+    // ===================== PDF GENERATION (mirroring admit card look) =====================
+    async function createPdfCloneElement() {
+        const originalCard = document.getElementById('resultCard');
+        const cloneContainer = document.getElementById('pdfCloneContainer');
+        cloneContainer.innerHTML = '';
+        const clone = originalCard.cloneNode(true);
+        clone.style.width = '100%';
+        clone.style.maxWidth = '700px';
+        clone.style.margin = '0 auto';
+        clone.style.padding = '20px';
+        clone.style.background = 'white';
+        clone.style.borderRadius = '32px';
+        clone.style.boxShadow = 'none';
+        // remove any action button inside if any
+        clone.querySelectorAll('.action-buttons').forEach(el => el.remove());
+        // ensure logo & photo have absolute URLs
+        const logoClone = clone.querySelector('#coachingLogoImg');
+        if (logoClone) logoClone.src = COACHING_LOGO_URL;
+        const photoClone = clone.querySelector('#studentPhotoImg');
+        if (photoClone && currentStudentPhotoUrl) {
+            photoClone.src = currentStudentPhotoUrl;
+            photoClone.style.display = 'block';
+        } else if (photoClone) {
+            photoClone.style.display = 'none';
+        }
+        cloneContainer.appendChild(clone);
+        cloneContainer.style.position = 'fixed';
+        cloneContainer.style.top = '-10000px';
+        cloneContainer.style.left = '-10000px';
+        cloneContainer.style.opacity = '0';
+        cloneContainer.style.pointerEvents = 'none';
+        cloneContainer.style.zIndex = '-1';
+        return clone;
+    }
+
+    async function downloadResultPDF() {
+        const btn = document.getElementById('downloadPdfBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Generating PDF...';
+        btn.disabled = true;
+        try {
+            const cloneElem = await createPdfCloneElement();
+            const cloneDiv = document.getElementById('pdfCloneContainer').firstChild;
+            if (!cloneDiv) throw new Error('clone failed');
+            // ensure images load
+            const images = cloneDiv.querySelectorAll('img');
+            await Promise.all(Array.from(images).map(img => {
+                if (img.complete) return;
+                return new Promise(resolve => { img.onload = resolve; img.onerror = resolve; setTimeout(resolve, 1500); });
+            }));
+            await new Promise(r => setTimeout(r, 200));
+            const opt = {
+                margin: [8, 8, 8, 8],
+                filename: `Result_${currentStudent.rollNo || 'student'}.pdf`,
+                image: { type: 'jpeg', quality: 0.95 },
+                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            await html2pdf().set(opt).from(cloneDiv).save();
+            document.getElementById('pdfCloneContainer').innerHTML = '';
+        } catch (err) {
+            console.error(err);
+            Swal.fire('Error', 'Could not generate PDF. Please try again.', 'error');
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    function shareWhatsApp() {
+        if (!currentStudent) return;
+        const studentName = currentStudent.name || "Student";
+        const roll = currentStudent.rollNo || "";
+        const percentSpan = document.getElementById('totalPercentSpan')?.innerText || "0%";
+        const examName = currentExamData?.examName || "Exam";
+        const shareMsg = `📢 *RESULT CARD - QUEST COACHING* 📢\n\n🏫 *${examName}*\n👨‍🎓 Name: ${studentName}\n🎫 Roll No: ${roll}\n📊 Percentage: ${percentSpan}\n🏅 Status: Published by Quest Coaching Centre\n📞 Contact: ${COACHING_PHONE}\n\n✨ Best wishes for future! ✨`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(shareMsg)}`, '_blank');
+    }
+
+    function printResult() {
+        window.print();
+    }
+
+    // event bindings after load
+    document.getElementById('downloadPdfBtn')?.addEventListener('click', downloadResultPDF);
+    document.getElementById('whatsappShareBtn')?.addEventListener('click', shareWhatsApp);
+    document.getElementById('printResultBtn')?.addEventListener('click', printResult);
+
+    // start app
+    loadResultData();
+</script>
 </body>
 </html>
