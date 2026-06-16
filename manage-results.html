@@ -118,27 +118,30 @@
         .photo-fetch-success { color: #16a34a; }
         .photo-fetch-missing { color: #dc2626; }
         .template-selector {
-            background: #f0f7ff;
-            border-radius: 16px;
-            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
             margin-bottom: 20px;
-            border: 2px solid #c5a059;
+            border: 1px solid #dee2e6;
         }
         .template-option {
-            display: inline-flex;
-            align-items: center;
-            gap: 15px;
-            margin-right: 30px;
+            display: inline-block;
+            margin-right: 20px;
             cursor: pointer;
         }
-        .template-option input { width: 20px; height: 20px; margin: 0; cursor: pointer; }
-        .template-option label { margin: 0; font-weight: 600; cursor: pointer; }
+        .template-option input { margin-right: 8px; }
         .template-preview {
-            font-size: 12px;
-            color: #666;
-            margin-left: 35px;
-            margin-top: 5px;
+            width: 80px;
+            height: 60px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            display: inline-block;
+            margin-left: 10px;
+            vertical-align: middle;
+            background-size: cover;
         }
+        .template-preview.template1 { background: linear-gradient(135deg, #1a237e, #c5a059); }
+        .template-preview.template2 { background: linear-gradient(135deg, #1b4f9b, #c5a059); }
         @media (max-width: 768px) {
             body { padding: 15px; }
             .header-section { flex-direction: column; text-align: center; }
@@ -185,22 +188,20 @@
             <button class="back-btn" id="backFromCreateBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button>
         </div>
         
-        <!-- Template Selection -->
+        <!-- Template Selection at the beginning -->
         <div class="template-selector">
-            <h5><i class="fas fa-palette"></i> Select Result Template</h5>
-            <div style="display: flex; gap: 30px; flex-wrap: wrap; margin-top: 15px;">
-                <label class="template-option">
-                    <input type="radio" name="resultTemplate" value="template1" checked>
-                    <span><i class="fas fa-table"></i> <strong>Template 1</strong> (Standard Table Style)</span>
-                </label>
-                <label class="template-option">
-                    <input type="radio" name="resultTemplate" value="template2">
-                    <span><i class="fas fa-id-card"></i> <strong>Template 2</strong> (Admit Card Style)</span>
-                </label>
+            <label class="fw-bold mb-2 d-block"><i class="fas fa-palette"></i> Select Result Template:</label>
+            <div class="template-option">
+                <input type="radio" name="resultTemplate" id="template1" value="result.html" checked>
+                <label for="template1">📄 Template 1 (Classic Result)</label>
+                <div class="template-preview template1"></div>
             </div>
-            <div class="template-preview">
-                <i class="fas fa-info-circle"></i> Template 1: Traditional result with table format | Template 2: Same design as Admit Card with marksheet
+            <div class="template-option">
+                <input type="radio" name="resultTemplate" id="template2" value="result1.html">
+                <label for="template2">🎫 Template 2 (Admit Card Style Marksheet)</label>
+                <div class="template-preview template2"></div>
             </div>
+            <small class="text-muted d-block mt-2">Template 2 shows marksheet in admit card style layout</small>
         </div>
         
         <div id="examSetupStep">
@@ -285,7 +286,10 @@
     </div>
 
     <div id="oldResultsSection" class="fullscreen-section">
-        <div class="section-header"><h3><i class="fas fa-history me-2"></i> Published Results</h3><button class="back-btn" id="backFromOldBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button></div>
+        <div class="section-header">
+            <h3><i class="fas fa-history me-2"></i> Published Results</h3>
+            <button class="back-btn" id="backFromOldBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button>
+        </div>
         <div id="oldResultsList" class="row g-4"></div>
     </div>
 </div>
@@ -293,13 +297,32 @@
 <!-- Modals -->
 <div class="modal fade" id="resultModal" tabindex="-1">
     <div class="modal-dialog modal-xl"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="resultModalTitle">Result Details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-    <div class="modal-body" id="resultDetails"></div><div class="modal-footer"><button type="button" class="btn btn-primary" id="viewResultTemplate1Btn"><i class="fas fa-table"></i> View Template 1</button><button type="button" class="btn btn-info" id="viewResultTemplate2Btn"><i class="fas fa-id-card"></i> View Template 2</button><button type="button" class="btn pdf-download-btn" id="downloadPdfBtn"><i class="fas fa-download"></i> Download PDF</button><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div></div></div>
+    <div class="modal-body" id="resultDetails"></div><div class="modal-footer"><button type="button" class="btn pdf-download-btn" id="downloadPdfBtn"><i class="fas fa-download"></i> Download PDF</button><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div></div></div>
 </div>
 
 <div class="modal fade" id="editPublishedConfirmModal" tabindex="-1">
     <div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Confirm Edit</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
     <div class="modal-body"><p>Editing a published result. What to do?</p><div class="alert alert-info"><ul><li><strong>Save Changes:</strong> Update existing result</li><li><strong>Don't Save:</strong> Go back</li><li><strong>Save as Draft:</strong> Save as new draft</li></ul></div></div>
     <div class="modal-footer"><button type="button" class="btn btn-secondary" id="dontSaveConfirmBtn">Don't Save</button><button type="button" class="btn btn-warning" id="saveDraftConfirmBtn">Save as Draft</button><button type="button" class="btn save-changes-btn" id="saveChangesConfirmBtn">Save Changes</button></div></div></div>
+</div>
+
+<!-- Change Template Modal -->
+<div class="modal fade" id="changeTemplateModal" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title">Change Result Template</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+        <p>Select template for <strong id="changeTemplateExamName"></strong></p>
+        <div class="template-selector mb-3">
+            <div class="template-option d-block mb-2">
+                <input type="radio" name="changeTemplate" id="changeTemplate1" value="result.html">
+                <label for="changeTemplate1">📄 Template 1 (Classic Result)</label>
+            </div>
+            <div class="template-option d-block">
+                <input type="radio" name="changeTemplate" id="changeTemplate2" value="result1.html">
+                <label for="changeTemplate2">🎫 Template 2 (Admit Card Style Marksheet)</label>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-primary" id="confirmChangeTemplateBtn">Change Template</button></div></div></div>
 </div>
 
 <div id="successToast" class="toast-message"><i class="fas fa-check-circle"></i> <span id="toastMessage">Success!</span></div>
@@ -364,25 +387,22 @@
     const resultModalTitle = document.getElementById('resultModalTitle');
     const resultDetails = document.getElementById('resultDetails');
     const downloadPdfBtn = document.getElementById('downloadPdfBtn');
-    const viewResultTemplate1Btn = document.getElementById('viewResultTemplate1Btn');
-    const viewResultTemplate2Btn = document.getElementById('viewResultTemplate2Btn');
     const editPublishedConfirmModal = new bootstrap.Modal(document.getElementById('editPublishedConfirmModal'));
     const dontSaveConfirmBtn = document.getElementById('dontSaveConfirmBtn');
     const saveDraftConfirmBtn = document.getElementById('saveDraftConfirmBtn');
     const saveChangesConfirmBtn = document.getElementById('saveChangesConfirmBtn');
+    const changeTemplateModal = new bootstrap.Modal(document.getElementById('changeTemplateModal'));
+    const confirmChangeTemplateBtn = document.getElementById('confirmChangeTemplateBtn');
 
     let subjects = [], students = [], editingStudentIndex = null, editingDraftId = null;
     let isEditingPublishedResult = false, editingPublishedResultId = null, hasChanges = false;
     let currentResultDataForPdf = null, currentExamNameForPdf = '';
     let currentStudentPhotoUrl = '';
-    let selectedTemplate = 'template1';
-    
-    // Template selection listener
-    document.querySelectorAll('input[name="resultTemplate"]').forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            selectedTemplate = e.target.value;
-        });
-    });
+    let pendingResultIdForTemplateChange = null;
+
+    function getSelectedTemplate() {
+        return document.querySelector('input[name="resultTemplate"]:checked')?.value || 'result.html';
+    }
 
     function showFullScreen(section) { actionCardsContainer.style.display = 'none'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; section.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
     function showActionCards() { actionCardsContainer.style.display = 'grid'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -521,8 +541,7 @@
             name, 
             fatherName: fatherNameInput.value.trim(), 
             marks,
-            photoUrl: currentStudentPhotoUrl || null,
-            admissionNo: ''
+            photoUrl: currentStudentPhotoUrl || null
         });
         updateStudentsTable();
         studentNameInput.value = ''; fatherNameInput.value = '';
@@ -541,7 +560,7 @@
             let marksHtml = '';
             subjects.forEach(sub => marksHtml += `<div>${sub.name}: ${s.marks[sub.name] || 0}/${sub.total}</div>`);
             const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" class="student-photo-thumb" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷 No photo</span>';
-            const row = `<tr>${photoHtml}</td><td>${s.rollNo}</td><td>${s.name}</td><td>${s.fatherName || '-'}</td><td>${marksHtml}</td><td><button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button> <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button></td></tr>`;
+            const row = `<tr>${photoHtml}${s.rollNo}${s.name}${s.fatherName || '-'}${marksHtml}<td><button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button> <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button></tr>`;
             studentsTableBody.insertAdjacentHTML('beforeend', row);
         });
         document.querySelectorAll('.edit-student').forEach(btn => btn.addEventListener('click', e => editStudent(parseInt(e.target.dataset.index))));
@@ -606,7 +625,7 @@
     saveDraftBtn.addEventListener('click', async () => {
         if (!examNameInput.value.trim() || students.length === 0) { alert('Exam name and at least one student required'); return; }
         try {
-            const data = { examName: examNameInput.value, subjects, students, template: selectedTemplate, createdAt: serverTimestamp() };
+            const data = { examName: examNameInput.value, subjects, students, template: getSelectedTemplate(), createdAt: serverTimestamp() };
             if (editingDraftId) await updateDoc(doc(db, "draft_results", editingDraftId), data);
             else await addDoc(collection(db, "draft_results"), data);
             showToast('Draft saved');
@@ -619,7 +638,13 @@
         if (!examNameInput.value.trim() || students.length === 0) { alert('Exam name and at least one student required'); return; }
         if (isEditingPublishedResult) { alert('Use "Save Changes" to update published result'); return; }
         try {
-            await addDoc(collection(db, "results"), { examName: examNameInput.value, subjects, students, template: selectedTemplate, createdAt: serverTimestamp() });
+            await addDoc(collection(db, "results"), { 
+                examName: examNameInput.value, 
+                subjects, 
+                students, 
+                template: getSelectedTemplate(),
+                createdAt: serverTimestamp() 
+            });
             if (editingDraftId) await deleteDoc(doc(db, "draft_results", editingDraftId));
             showToast('', true);
             resetCreateResultForm();
@@ -635,8 +660,7 @@
         students = []; updateStudentsTable();
         editingDraftId = null; isEditingPublishedResult = false; editingPublishedResultId = null; hasChanges = false;
         cancelEdit();
-        selectedTemplate = 'template1';
-        document.querySelector('input[value="template1"]').checked = true;
+        document.getElementById('template1').checked = true;
     }
 
     async function loadDraftResults() {
@@ -646,8 +670,8 @@
         if (snap.empty) { draftResultsList.innerHTML = '<div class="col-12"><p class="text-center text-muted">No drafts found.</p></div>'; return; }
         snap.forEach(doc => {
             const d = doc.data();
-            const templateBadge = d.template === 'template2' ? '<span class="badge bg-info ms-2">Template 2</span>' : '<span class="badge bg-secondary ms-2">Template 1</span>';
-            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName} ${templateBadge}</h5><p class="card-text text-muted">Subjects: ${d.subjects.length} | Students: ${d.students.length}</p><div class="d-flex gap-2"><button class="btn btn-sm btn-primary edit-draft" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-danger delete-draft" data-id="${doc.id}">Delete</button></div></div></div></div>`;
+            const templateName = d.template === 'result1.html' ? '📋 Template 2' : '📄 Template 1';
+            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">Subjects: ${d.subjects.length} | Students: ${d.students.length}<br><small><i class="fas fa-palette"></i> Template: ${templateName}</small></p><div class="d-flex gap-2"><button class="btn btn-sm btn-primary edit-draft" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-danger delete-draft" data-id="${doc.id}">Delete</button></div></div></div></div>`;
             draftResultsList.insertAdjacentHTML('beforeend', card);
         });
         document.querySelectorAll('.edit-draft').forEach(btn => btn.addEventListener('click', e => editDraft(e.target.dataset.id)));
@@ -660,13 +684,11 @@
         if (snap.empty) return;
         const data = snap.docs[0].data();
         examNameInput.value = data.examName;
-        selectedTemplate = data.template || 'template1';
-        if (selectedTemplate === 'template2') {
-            document.querySelector('input[value="template2"]').checked = true;
-        } else {
-            document.querySelector('input[value="template1"]').checked = true;
-        }
         subjectCountInput.value = data.subjects.length;
+        
+        if (data.template === 'result1.html') document.getElementById('template2').checked = true;
+        else document.getElementById('template1').checked = true;
+        
         generateSubjectFieldsBtn.click();
         setTimeout(() => {
             const nameInps = document.querySelectorAll('.subject-name');
@@ -690,36 +712,62 @@
         if (snap.empty) { oldResultsList.innerHTML = '<div class="col-12"><p class="text-center text-muted">No published results.</p></div>'; return; }
         snap.forEach(doc => {
             const d = doc.data();
-            const templateBadge = d.template === 'template2' ? '<span class="badge bg-info ms-2">Template 2</span>' : '<span class="badge bg-secondary ms-2">Template 1</span>';
             const date = d.createdAt ? new Date(d.createdAt.toDate()).toLocaleDateString() : 'Unknown';
-            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName} ${templateBadge}</h5><p class="card-text text-muted">${date} | Subjects: ${d.subjects.length} | Students: ${d.students.length}</p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary view-result" data-id="${doc.id}">View</button><button class="btn btn-sm btn-warning edit-result" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-danger delete-result" data-id="${doc.id}">Delete</button></div></div></div></div>`;
+            const templateName = d.template === 'result1.html' ? '🎫 Template 2' : '📄 Template 1';
+            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">${date} | Subjects: ${d.subjects.length} | Students: ${d.students.length}<br><small><i class="fas fa-palette"></i> Current Template: ${templateName}</small></p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary view-result" data-id="${doc.id}">View</button><button class="btn btn-sm btn-warning edit-result" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-info change-template" data-id="${doc.id}" data-name="${d.examName}" data-template="${d.template || 'result.html'}"><i class="fas fa-palette"></i> Change Template</button><button class="btn btn-sm btn-danger delete-result" data-id="${doc.id}">Delete</button></div></div></div></div>`;
             oldResultsList.insertAdjacentHTML('beforeend', card);
         });
         document.querySelectorAll('.view-result').forEach(btn => btn.addEventListener('click', e => viewResult(e.target.dataset.id)));
         document.querySelectorAll('.edit-result').forEach(btn => btn.addEventListener('click', e => editResult(e.target.dataset.id)));
         document.querySelectorAll('.delete-result').forEach(btn => btn.addEventListener('click', e => deleteResult(e.target.dataset.id)));
+        document.querySelectorAll('.change-template').forEach(btn => btn.addEventListener('click', e => {
+            pendingResultIdForTemplateChange = e.target.dataset.id;
+            document.getElementById('changeTemplateExamName').innerText = e.target.dataset.name;
+            const currentTemplate = e.target.dataset.template;
+            if (currentTemplate === 'result1.html') document.getElementById('changeTemplate2').checked = true;
+            else document.getElementById('changeTemplate1').checked = true;
+            changeTemplateModal.show();
+        }));
     }
 
-    let currentViewResultId = null;
-    
+    confirmChangeTemplateBtn.addEventListener('click', async () => {
+        if (!pendingResultIdForTemplateChange) return;
+        const newTemplate = document.querySelector('input[name="changeTemplate"]:checked')?.value;
+        if (!newTemplate) return;
+        try {
+            await updateDoc(doc(db, "results", pendingResultIdForTemplateChange), { template: newTemplate });
+            showToast('Template updated successfully!');
+            changeTemplateModal.hide();
+            loadOldResults();
+        } catch (e) { alert(e.message); }
+    });
+
     async function viewResult(id) {
-        currentViewResultId = id;
         const q = query(collection(db, "results"), where("__name__", "==", id));
         const snap = await getDocs(q);
         if (snap.empty) return;
         const data = snap.docs[0].data();
         currentResultDataForPdf = data; currentExamNameForPdf = data.examName;
+        const template = data.template || 'result.html';
+        
+        // Generate view link based on template
+        const viewUrl = `${template}?examId=${id}&rollNo=`;
+        
         const sorted = sortStudentsByPercentage(data.students, data.subjects);
-        const templateUsed = data.template === 'template2' ? 'Template 2 (Admit Card Style)' : 'Template 1 (Standard)';
-        resultModalTitle.innerText = `${data.examName} (${templateUsed}) - Ranked`;
-        let html = `<p><strong>Total Students:</strong> ${data.students.length} | <strong>Template Used:</strong> ${templateUsed}</p>`;
+        resultModalTitle.innerText = data.examName + ` (Template: ${template === 'result1.html' ? 'Admit Card Style' : 'Classic'})`;
+        let html = `<p><strong>Total Students:</strong> ${data.students.length}</p>`;
         if (sorted.length) html += `<div class="alert alert-success">🏆 Top Student: ${sorted[0].name} (Roll: ${sorted[0].rollNo})</div>`;
+        html += `<div class="alert alert-info"><i class="fas fa-info-circle"></i> <strong>View Result:</strong> Students can view using the link below (replace ROLLNUMBER)</div>`;
+        html += `<div class="mb-3"><input type="text" class="form-control font-monospace" readonly value="${window.location.origin}/${viewUrl}ROLLNUMBER" id="viewLinkCopy"></div>`;
+        html += `<button class="btn btn-sm btn-secondary mb-3" onclick="navigator.clipboard.writeText(document.getElementById('viewLinkCopy').value);alert('Link copied!')"><i class="fas fa-copy"></i> Copy Link</button>`;
+        
         html += `<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Photo</th><th>Rank</th><th>Roll</th><th>Name</th><th>Father</th>`;
         data.subjects.forEach(s => html += `<th>${s.name}</th>`);
-        html += `<th>Total</th><th>%</th></tr></thead><tbody>`;
+        html += `<th>Total</th><th>%</th><th>Action</th></tr></thead><tbody>`;
         sorted.forEach((s, idx) => {
             let total = 0, maxTotal = 0;
             const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷</span>';
+            const studentViewUrl = `${window.location.origin}/${template}?examId=${id}&rollNo=${s.rollNo}`;
             html += `<tr${idx===0?' class="top-student-row"':''}><td>${photoHtml}</td><td><strong>#${idx+1}</strong></td><td>${s.rollNo}</td><td>${s.name}${idx===0?' 🏆':''}</td><td>${s.fatherName||'-'}</td>`;
             data.subjects.forEach(sub => {
                 const mark = s.marks[sub.name] || 0;
@@ -727,26 +775,13 @@
                 html += `<td>${mark}/${sub.total}</td>`;
             });
             const percent = maxTotal ? ((total/maxTotal)*100).toFixed(2) : 0;
-            html += `<td><strong>${total}/${maxTotal}</strong></td><td><strong>${percent}%</strong></td></tr>`;
+            html += `<td><strong>${total}/${maxTotal}</strong></td><td><strong>${percent}%</strong></td>`;
+            html += `<td><a href="${studentViewUrl}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i> View</a></td></tr>`;
         });
         html += `</tbody></table></div>`;
         resultDetails.innerHTML = html;
         resultModal.show();
     }
-    
-    // View in Template 1 (original result page)
-    viewResultTemplate1Btn.addEventListener('click', () => {
-        if (currentViewResultId) {
-            window.open(`result-view.html?id=${currentViewResultId}`, '_blank');
-        }
-    });
-    
-    // View in Template 2 (admit card style)
-    viewResultTemplate2Btn.addEventListener('click', () => {
-        if (currentViewResultId) {
-            window.open(`result-template2.html?resultId=${currentViewResultId}`, '_blank');
-        }
-    });
 
     function sortStudentsByPercentage(arr, subs) {
         return [...arr].sort((a,b) => {
@@ -762,13 +797,11 @@
         if (snap.empty) return;
         const data = snap.docs[0].data();
         examNameInput.value = data.examName;
-        selectedTemplate = data.template || 'template1';
-        if (selectedTemplate === 'template2') {
-            document.querySelector('input[value="template2"]').checked = true;
-        } else {
-            document.querySelector('input[value="template1"]').checked = true;
-        }
         subjectCountInput.value = data.subjects.length;
+        
+        if (data.template === 'result1.html') document.getElementById('template2').checked = true;
+        else document.getElementById('template1').checked = true;
+        
         generateSubjectFieldsBtn.click();
         setTimeout(() => {
             const nameInps = document.querySelectorAll('.subject-name');
