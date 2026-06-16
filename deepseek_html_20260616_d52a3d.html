@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>📄 Result Card · Quest Coaching Centre (Template 2)</title>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            font-family: 'Segoe UI', 'Poppins', 'Roboto', sans-serif;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        .result-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        /* Header Section - Same as Admit Card */
+        .result-header {
+            background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+            padding: 25px 30px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+        .result-header h1 {
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+        .result-header h3 {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+        .result-header .exam-name {
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 5px 20px;
+            border-radius: 50px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        /* Student Info Section */
+        .student-info {
+            padding: 25px 30px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+        .student-details {
+            flex: 2;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .info-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .info-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #1a237e;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+        }
+        .info-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-top: 4px;
+        }
+        .student-photo {
+            width: 120px;
+            height: 140px;
+            object-fit: cover;
+            border: 3px solid #c5a059;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .no-photo {
+            width: 120px;
+            height: 140px;
+            background: #e2e8f0;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 2rem;
+            border: 3px solid #c5a059;
+        }
+        
+        /* Marks Table - This replaces the timetable in admit card */
+        .marks-section {
+            padding: 25px 30px;
+        }
+        .marks-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1a237e;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #c5a059;
+            display: inline-block;
+        }
+        .marks-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+        .marks-table th {
+            background: #1a237e;
+            color: white;
+            padding: 12px 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .marks-table td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+        }
+        .marks-table tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        .marks-table tr.total-row {
+            background: #e8eafe;
+            font-weight: 700;
+        }
+        .marks-table tr.total-row td {
+            font-weight: 700;
+            border-top: 2px solid #1a237e;
+        }
+        
+        /* Result Summary */
+        .result-summary {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .summary-card {
+            background: linear-gradient(135deg, #1a237e, #0d47a1);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 16px;
+            text-align: center;
+            min-width: 150px;
+        }
+        .summary-card .value {
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+        .summary-card .label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+        .division-card {
+            background: #c5a059;
+            color: white;
+        }
+        
+        /* Footer */
+        .result-footer {
+            background: #f1f5f9;
+            padding: 20px 30px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .action-btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-download { background: #28a745; color: white; }
+        .btn-share { background: #25D366; color: white; }
+        .btn-print { background: #1a237e; color: white; }
+        .action-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+        
+        .loading-state {
+            text-align: center;
+            padding: 60px;
+            background: white;
+            border-radius: 24px;
+        }
+        .error-state {
+            text-align: center;
+            padding: 40px;
+            background: #fee2e2;
+            color: #dc2626;
+            border-radius: 24px;
+        }
+        
+        @media (max-width: 700px) {
+            .student-info { flex-direction: column; align-items: center; }
+            .student-details { grid-template-columns: 1fr; width: 100%; }
+            .marks-table th, .marks-table td { font-size: 0.7rem; padding: 6px; }
+            .summary-card .value { font-size: 1.2rem; }
+            .summary-card { padding: 10px 15px; min-width: 100px; }
+        }
+        
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .action-buttons { display: none; }
+            .result-card { box-shadow: none; border-radius: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="loadingState" class="loading-state">
+        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #1a237e;"></i>
+        <p style="margin-top: 15px;">Loading result card...</p>
+    </div>
+    
+    <div id="errorState" class="error-state" style="display: none;">
+        <i class="fas fa-exclamation-triangle" style="font-size: 2rem;"></i>
+        <p id="errorMessage" style="margin-top: 10px;">Something went wrong!</p>
+        <button onclick="goBack()" style="margin-top: 15px; padding: 8px 20px; background: #1a237e; color: white; border: none; border-radius: 50px; cursor: pointer;">Go Back</button>
+    </div>
+    
+    <div id="resultCard" class="result-card" style="display: none;">
+        <div class="result-header">
+            <h1><i class="fas fa-graduation-cap"></i> QUEST COACHING CENTRE</h1>
+            <h3>Under the guidance of MR. RAVI SIR</h3>
+            <div class="exam-name" id="examNameDisplay">Examination</div>
+        </div>
+        
+        <div class="student-info">
+            <div class="student-details">
+                <div class="info-item">
+                    <span class="info-label"><i class="fas fa-user"></i> Student Name</span>
+                    <span class="info-value" id="studentName">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label"><i class="fas fa-father"></i> Father's Name</span>
+                    <span class="info-value" id="fatherName">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label"><i class="fas fa-id-card"></i> Roll Number</span>
+                    <span class="info-value" id="studentRoll">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label"><i class="fas fa-calendar"></i> Registration No</span>
+                    <span class="info-value" id="regNo">-</span>
+                </div>
+            </div>
+            <div>
+                <img id="studentPhoto" class="student-photo" style="display: none;" alt="Student Photo">
+                <div id="noPhotoDiv" class="no-photo" style="display: flex;"><i class="fas fa-user-graduate"></i></div>
+            </div>
+        </div>
+        
+        <div class="marks-section">
+            <div class="marks-title"><i class="fas fa-chart-simple"></i> MARKSHEET</div>
+            <table class="marks-table">
+                <thead>
+                    <tr>
+                        <th>S.No.</th>
+                        <th>Subject</th>
+                        <th>Marks Obtained</th>
+                        <th>Total Marks</th>
+                        <th>Grade</th>
+                    </tr>
+                </thead>
+                <tbody id="marksTableBody"></tbody>
+            </table>
+            
+            <div class="result-summary">
+                <div class="summary-card">
+                    <div class="value" id="totalPercentage">0%</div>
+                    <div class="label">Percentage</div>
+                </div>
+                <div class="summary-card division-card" id="divisionCard">
+                    <div class="value" id="divisionValue">-</div>
+                    <div class="label">Division</div>
+                </div>
+                <div class="summary-card">
+                    <div class="value" id="totalObtained">0</div>
+                    <div class="label">Total Obtained</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="result-footer">
+            <p>This result is published by QUEST COACHING CENTRE, Gopalganj</p>
+            <p>For queries: +91 9708442525 | Email: questcoaching@gmail.com</p>
+            <p><i class="fas fa-print"></i> This is a computer generated document, no signature required</p>
+        </div>
+    </div>
+    
+    <div class="action-buttons" id="actionButtons" style="display: none;">
+        <button class="action-btn btn-download" onclick="downloadResultPDF()"><i class="fas fa-download"></i> Download PDF</button>
+        <button class="action-btn btn-share" onclick="shareOnWhatsApp()"><i class="fab fa-whatsapp"></i> Share on WhatsApp</button>
+        <button class="action-btn btn-print" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
+        authDomain: "quest-coaching.firebaseapp.com",
+        projectId: "quest-coaching",
+        storageBucket: "quest-coaching.firebasestorage.app"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    
+    let currentResultData = null;
+    let currentStudentData = null;
+    
+    function getGrade(percentage) {
+        if(percentage >= 90) return { grade: "A+", bg: "#d4edda", color: "#155724" };
+        if(percentage >= 75) return { grade: "A", bg: "#d1ecf1", color: "#0c5460" };
+        if(percentage >= 65) return { grade: "B+", bg: "#fff3cd", color: "#856404" };
+        if(percentage >= 55) return { grade: "B", bg: "#ffe6b3", color: "#856404" };
+        if(percentage >= 45) return { grade: "C", bg: "#ffe0b3", color: "#cc7000" };
+        if(percentage >= 33) return { grade: "D", bg: "#f8d7da", color: "#721c24" };
+        return { grade: "F", bg: "#f5c6cb", color: "#721c24" };
+    }
+    
+    function calculateDivision(percentage) {
+        if (percentage >= 60) return "FIRST DIVISION";
+        if (percentage >= 45) return "SECOND DIVISION";
+        if (percentage >= 33) return "THIRD DIVISION";
+        return "FAIL";
+    }
+    
+    function getUrlParams() {
+        const params = new URLSearchParams(window.location.search);
+        return { resultId: params.get('id'), examId: params.get('examId'), rollNo: params.get('rollNo') };
+    }
+    
+    function goBack() { window.location.href = 'index.html'; }
+    
+    async function fetchStudentPhoto(rollNumber) {
+        try {
+            const q = db.collection("admissions").where("rollNumber", "==", String(rollNumber));
+            const querySnapshot = await q.get();
+            if (!querySnapshot.empty) {
+                return querySnapshot.docs[0].data().photoUrl || null;
+            }
+            return null;
+        } catch (error) {
+            console.error("Error fetching photo:", error);
+            return null;
+        }
+    }
+    
+    async function loadResult() {
+        const params = getUrlParams();
+        const resultId = params.resultId;
+        const examId = params.examId;
+        const rollNo = params.rollNo;
+        
+        if ((!examId || !rollNo) && !resultId) {
+            showError('Invalid URL. Missing result ID or exam details.');
+            return;
+        }
+        
+        try {
+            let examData, student;
+            
+            if (resultId) {
+                // Direct result document
+                const docSnap = await db.collection("results").doc(resultId).get();
+                if (!docSnap.exists) {
+                    showError('Result not found.');
+                    return;
+                }
+                examData = docSnap.data();
+                student = examData.students?.find(s => s.rollNo == rollNo) || examData.students?.[0];
+                if (!student && rollNo) {
+                    student = examData.students?.find(s => s.rollNo == rollNo);
+                }
+                if (!student && examData.students?.length) {
+                    student = examData.students[0];
+                }
+            } else if (examId && rollNo) {
+                const docSnap = await db.collection("results").doc(examId).get();
+                if (!docSnap.exists) {
+                    showError('Exam not found.');
+                    return;
+                }
+                examData = docSnap.data();
+                student = examData.students?.find(s => s.rollNo == rollNo);
+            }
+            
+            if (!examData) {
+                showError('Exam data not found.');
+                return;
+            }
+            
+            if (!student) {
+                showError(`Student with roll number ${rollNo} not found in this exam.`);
+                return;
+            }
+            
+            // Fetch photo from admissions if not present
+            if (!student.photoUrl) {
+                const photoUrl = await fetchStudentPhoto(student.rollNo);
+                student.photoUrl = photoUrl;
+            }
+            
+            currentResultData = examData;
+            currentStudentData = student;
+            displayResult(examData, student);
+            
+        } catch (error) {
+            console.error('Error loading result:', error);
+            showError('Failed to load result. Please try again later.');
+        }
+    }
+    
+    function displayResult(examData, student) {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('resultCard').style.display = 'block';
+        document.getElementById('actionButtons').style.display = 'flex';
+        
+        document.getElementById('examNameDisplay').innerHTML = `<i class="fas fa-file-alt"></i> ${examData.examName || "Examination"}`;
+        document.getElementById('studentName').innerText = student.name || student.studentName || "-";
+        document.getElementById('fatherName').innerText = student.fatherName || "-";
+        document.getElementById('studentRoll').innerText = student.rollNo || student.rollNumber || "-";
+        document.getElementById('regNo').innerText = student.admissionNo || student.regNo || "-";
+        
+        const studentPhotoImg = document.getElementById('studentPhoto');
+        const noPhotoDiv = document.getElementById('noPhotoDiv');
+        
+        if (student.photoUrl && student.photoUrl !== '') {
+            studentPhotoImg.src = student.photoUrl;
+            studentPhotoImg.style.display = 'block';
+            noPhotoDiv.style.display = 'none';
+        } else {
+            studentPhotoImg.style.display = 'none';
+            noPhotoDiv.style.display = 'flex';
+        }
+        
+        let marksHtml = '';
+        let totalObtained = 0;
+        let totalMax = 0;
+        let serialNo = 1;
+        
+        if (student.marks && examData.subjects) {
+            for (const subject of examData.subjects) {
+                const subjectName = subject.name;
+                const subjectTotal = subject.total || 100;
+                const marksObtained = student.marks[subjectName] || 0;
+                const percentage = (marksObtained / subjectTotal) * 100;
+                const gradeInfo = getGrade(percentage);
+                
+                marksHtml += `<tr>
+                    <td>${serialNo++}</td>
+                    <td style="text-align: left; font-weight: 500;">${escapeHtml(subjectName)}</td>
+                    <td><strong>${marksObtained}</strong></td>
+                    <td>${subjectTotal}</td>
+                    <td><span style="background: ${gradeInfo.bg}; color: ${gradeInfo.color}; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">${gradeInfo.grade}</span></td>
+                </tr>`;
+                totalObtained += marksObtained;
+                totalMax += subjectTotal;
+            }
+        }
+        
+        const totalPercentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) : 0;
+        const division = calculateDivision(parseFloat(totalPercentage));
+        
+        marksHtml += `<tr class="total-row">
+            <td colspan="2" style="text-align: right; font-weight: 700;">GRAND TOTAL</td>
+            <td><strong>${totalObtained}</strong></td>
+            <td><strong>${totalMax}</strong></td>
+            <td></td>
+        </tr>`;
+        
+        document.getElementById('marksTableBody').innerHTML = marksHtml;
+        document.getElementById('totalPercentage').innerHTML = `${totalPercentage}%`;
+        document.getElementById('totalObtained').innerHTML = `${totalObtained}/${totalMax}`;
+        document.getElementById('divisionValue').innerHTML = division;
+        
+        // Set division card color
+        const divisionCard = document.getElementById('divisionCard');
+        if (division === 'FIRST DIVISION') {
+            divisionCard.style.background = "#28a745";
+        } else if (division === 'SECOND DIVISION') {
+            divisionCard.style.background = "#17a2b8";
+        } else if (division === 'THIRD DIVISION') {
+            divisionCard.style.background = "#ffc107";
+            divisionCard.style.color = "#333";
+        } else {
+            divisionCard.style.background = "#dc3545";
+        }
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    function showError(message) {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('errorState').style.display = 'block';
+        document.getElementById('errorMessage').innerHTML = message;
+    }
+    
+    async function downloadResultPDF() {
+        const btn = document.querySelector('.btn-download');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+        btn.disabled = true;
+        
+        try {
+            const element = document.getElementById('resultCard');
+            const opt = {
+                margin: [5, 5, 5, 5],
+                filename: `Result_${currentStudentData?.rollNo || 'Student'}_${currentResultData?.examName || 'Exam'}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            await html2pdf().set(opt).from(element).save();
+        } catch (error) {
+            console.error('PDF Error:', error);
+            Swal.fire('Error', 'Failed to generate PDF', 'error');
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+    
+    function shareOnWhatsApp() {
+        const studentName = document.getElementById('studentName').innerText;
+        const studentRoll = document.getElementById('studentRoll').innerText;
+        const totalPercent = document.getElementById('totalPercentage').innerText;
+        const examName = document.getElementById('examNameDisplay').innerText;
+        const division = document.getElementById('divisionValue').innerText;
+        
+        const shareText = `📢 *RESULT PUBLISHED* 📢\n\n🏫 *QUEST COACHING CENTRE, Gopalganj*\n📚 *${examName}*\n\n👨‍🎓 Student: ${studentName}\n📝 Roll No: ${studentRoll}\n📊 Percentage: ${totalPercent}\n🏆 Division: ${division}\n\n🌟 *Congratulations!* 🌟\n📞 Contact: +91 9708442525`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
+    }
+    
+    window.downloadResultPDF = downloadResultPDF;
+    window.shareOnWhatsApp = shareOnWhatsApp;
+    window.goBack = goBack;
+    
+    document.title = `Result Card | QUEST COACHING CENTRE`;
+    document.addEventListener('DOMContentLoaded', loadResult);
+</script>
+</body>
+</html>
