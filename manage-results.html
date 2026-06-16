@@ -117,6 +117,36 @@
         .photo-fetch-status { font-size: 11px; margin-top: 4px; }
         .photo-fetch-success { color: #16a34a; }
         .photo-fetch-missing { color: #dc2626; }
+        .template-selector {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+        .template-option {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .template-card {
+            flex: 1;
+            min-width: 200px;
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .template-card.selected {
+            border-color: #1a237e;
+            background: #e8eafe;
+        }
+        .template-card i { font-size: 32px; margin-bottom: 10px; display: block; }
+        .template-card .template-name { font-weight: 600; margin-bottom: 5px; }
+        .template-card .template-desc { font-size: 11px; color: #666; }
         @media (max-width: 768px) {
             body { padding: 15px; }
             .header-section { flex-direction: column; text-align: center; }
@@ -162,9 +192,33 @@
             <h3><i class="fas fa-plus-circle me-2"></i> Create New Result</h3>
             <button class="back-btn" id="backFromCreateBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button>
         </div>
-        <div id="examSetupStep">
+        
+        <!-- Template Selection Step -->
+        <div id="templateSelectionStep" class="mb-4">
+            <div class="card">
+                <div class="card-header bg-white fw-bold"><i class="fas fa-palette"></i> Step 1: Choose Result Template</div>
+                <div class="card-body">
+                    <div class="template-option">
+                        <div class="template-card" data-template="default" id="templateDefaultCard">
+                            <i class="fas fa-table-list"></i>
+                            <div class="template-name">Default Template</div>
+                            <div class="template-desc">Standard marksheet style with table</div>
+                        </div>
+                        <div class="template-card" data-template="admitcard" id="templateAdmitCardCard">
+                            <i class="fas fa-id-card"></i>
+                            <div class="template-name">Admit Card Style</div>
+                            <div class="template-desc">Like admit card with marksheet in timetable area</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="selectedTemplate" value="default">
+                    <button id="templateNextBtn" class="btn btn-primary mt-3"><i class="fas fa-arrow-right"></i> Next: Exam Setup</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="examSetupStep" style="display: none;">
             <div class="card mb-4">
-                <div class="card-header bg-white fw-bold">Step 1: Exam Setup</div>
+                <div class="card-header bg-white fw-bold">Step 2: Exam Setup</div>
                 <div class="card-body">
                     <div class="mb-3"><label class="form-label">Exam Name</label><input type="text" class="form-control" id="examName" placeholder="e.g., Final Examination 2025"></div>
                     <div class="mb-3"><label class="form-label">Number of Subjects</label><input type="number" class="form-control" id="subjectCount" min="1"></div>
@@ -174,9 +228,10 @@
             <div id="subjectFields" class="mb-4"></div>
             <div id="step1NextBtn" class="d-none"><button id="nextToStudentEntryBtn" class="btn btn-success">Next →</button></div>
         </div>
+        
         <div id="studentEntryStep" style="display: none;">
             <div class="card mb-4">
-                <div class="card-header bg-white fw-bold">Step 2: Student Marks Entry 
+                <div class="card-header bg-white fw-bold">Step 3: Student Marks Entry 
                     <span class="auto-fetch-badge"><i class="fas fa-sync-alt"></i> Auto-fetch from Admission (Name + Father + Photo)</span>
                 </div>
                 <div class="card-body">
@@ -294,6 +349,7 @@
     const backFromCreateBtn = document.getElementById('backFromCreateBtn');
     const backFromDraftBtn = document.getElementById('backFromDraftBtn');
     const backFromOldBtn = document.getElementById('backFromOldBtn');
+    const templateSelectionStep = document.getElementById('templateSelectionStep');
     const examSetupStep = document.getElementById('examSetupStep');
     const studentEntryStep = document.getElementById('studentEntryStep');
     const examNameInput = document.getElementById('examName');
@@ -327,11 +383,36 @@
     const dontSaveConfirmBtn = document.getElementById('dontSaveConfirmBtn');
     const saveDraftConfirmBtn = document.getElementById('saveDraftConfirmBtn');
     const saveChangesConfirmBtn = document.getElementById('saveChangesConfirmBtn');
+    const templateNextBtn = document.getElementById('templateNextBtn');
+    const templateDefaultCard = document.getElementById('templateDefaultCard');
+    const templateAdmitCardCard = document.getElementById('templateAdmitCardCard');
+    const selectedTemplateInput = document.getElementById('selectedTemplate');
 
     let subjects = [], students = [], editingStudentIndex = null, editingDraftId = null;
     let isEditingPublishedResult = false, editingPublishedResultId = null, hasChanges = false;
-    let currentResultDataForPdf = null, currentExamNameForPdf = '';
-    let currentStudentPhotoUrl = '';
+    let currentResultDataForPdf = null, currentExamNameForPdf = '', currentTemplateForPdf = '';
+
+    // Template Selection
+    let selectedTemplate = 'default';
+    
+    templateDefaultCard.addEventListener('click', () => {
+        templateDefaultCard.classList.add('selected');
+        templateAdmitCardCard.classList.remove('selected');
+        selectedTemplate = 'default';
+        selectedTemplateInput.value = 'default';
+    });
+    
+    templateAdmitCardCard.addEventListener('click', () => {
+        templateAdmitCardCard.classList.add('selected');
+        templateDefaultCard.classList.remove('selected');
+        selectedTemplate = 'admitcard';
+        selectedTemplateInput.value = 'admitcard';
+    });
+    
+    templateNextBtn.addEventListener('click', () => {
+        templateSelectionStep.style.display = 'none';
+        examSetupStep.style.display = 'block';
+    });
 
     function showFullScreen(section) { actionCardsContainer.style.display = 'none'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; section.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
     function showActionCards() { actionCardsContainer.style.display = 'grid'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -345,7 +426,6 @@
     backFromDraftBtn.addEventListener('click', showActionCards);
     backFromOldBtn.addEventListener('click', showActionCards);
 
-    // Fetch student from admissions with photo URL
     async function fetchStudentFromAdmission(rollNumber) {
         try {
             const q = query(collection(db, "admissions"), where("rollNumber", "==", String(rollNumber)));
@@ -366,7 +446,6 @@
         }
     }
 
-    // Auto-fetch on roll number blur
     rollNoInput.addEventListener('blur', async () => {
         const rollVal = rollNoInput.value.trim();
         if (!rollVal) {
@@ -491,7 +570,7 @@
             let marksHtml = '';
             subjects.forEach(sub => marksHtml += `<div>${sub.name}: ${s.marks[sub.name] || 0}/${sub.total}</div>`);
             const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" class="student-photo-thumb" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷 No photo</span>';
-            const row = `<tr>${photoHtml}</td><td>${s.rollNo}</td><td>${s.name}</td><td>${s.fatherName || '-'}</td><td>${marksHtml}</td><td><button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button> <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button></td></tr>`;
+            const row = `<tr>${photoHtml}</td><td>${s.rollNo}</td><td>${s.name}</td></td><td>${s.fatherName || '-'}</td><td>${marksHtml}</td><td><button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button> <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button></td></tr>`;
             studentsTableBody.insertAdjacentHTML('beforeend', row);
         });
         document.querySelectorAll('.edit-student').forEach(btn => btn.addEventListener('click', e => editStudent(parseInt(e.target.dataset.index))));
@@ -556,7 +635,13 @@
     saveDraftBtn.addEventListener('click', async () => {
         if (!examNameInput.value.trim() || students.length === 0) { alert('Exam name and at least one student required'); return; }
         try {
-            const data = { examName: examNameInput.value, subjects, students, createdAt: serverTimestamp() };
+            const data = { 
+                examName: examNameInput.value, 
+                subjects, 
+                students, 
+                templateType: selectedTemplate,
+                createdAt: serverTimestamp() 
+            };
             if (editingDraftId) await updateDoc(doc(db, "draft_results", editingDraftId), data);
             else await addDoc(collection(db, "draft_results"), data);
             showToast('Draft saved');
@@ -569,7 +654,13 @@
         if (!examNameInput.value.trim() || students.length === 0) { alert('Exam name and at least one student required'); return; }
         if (isEditingPublishedResult) { alert('Use "Save Changes" to update published result'); return; }
         try {
-            await addDoc(collection(db, "results"), { examName: examNameInput.value, subjects, students, createdAt: serverTimestamp() });
+            await addDoc(collection(db, "results"), { 
+                examName: examNameInput.value, 
+                subjects, 
+                students, 
+                templateType: selectedTemplate,
+                createdAt: serverTimestamp() 
+            });
             if (editingDraftId) await deleteDoc(doc(db, "draft_results", editingDraftId));
             showToast('', true);
             resetCreateResultForm();
@@ -578,13 +669,18 @@
     });
 
     function resetCreateResultForm() {
+        templateSelectionStep.style.display = 'block';
+        examSetupStep.style.display = 'none';
+        studentEntryStep.style.display = 'none';
         examNameInput.value = ''; subjectCountInput.value = ''; subjectFields.innerHTML = '';
         step1NextBtn.classList.add('d-none');
-        examSetupStep.style.display = 'block';
-        studentEntryStep.style.display = 'none';
         students = []; updateStudentsTable();
         editingDraftId = null; isEditingPublishedResult = false; editingPublishedResultId = null; hasChanges = false;
         cancelEdit();
+        templateDefaultCard.classList.add('selected');
+        templateAdmitCardCard.classList.remove('selected');
+        selectedTemplate = 'default';
+        selectedTemplateInput.value = 'default';
     }
 
     async function loadDraftResults() {
@@ -594,7 +690,8 @@
         if (snap.empty) { draftResultsList.innerHTML = '<div class="col-12"><p class="text-center text-muted">No drafts found.</p></div>'; return; }
         snap.forEach(doc => {
             const d = doc.data();
-            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">Subjects: ${d.subjects.length} | Students: ${d.students.length}</p><div class="d-flex gap-2"><button class="btn btn-sm btn-primary edit-draft" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-danger delete-draft" data-id="${doc.id}">Delete</button></div></div></div></div>`;
+            const templateBadge = d.templateType === 'admitcard' ? '<span class="badge bg-info ms-2">Admit Card Style</span>' : '<span class="badge bg-secondary ms-2">Default Style</span>';
+            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName} ${templateBadge}</h5><p class="card-text text-muted">Subjects: ${d.subjects.length} | Students: ${d.students.length}</p><div class="d-flex gap-2"><button class="btn btn-sm btn-primary edit-draft" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-danger delete-draft" data-id="${doc.id}">Delete</button></div></div></div></div>`;
             draftResultsList.insertAdjacentHTML('beforeend', card);
         });
         document.querySelectorAll('.edit-draft').forEach(btn => btn.addEventListener('click', e => editDraft(e.target.dataset.id)));
@@ -606,6 +703,14 @@
         const snap = await getDocs(q);
         if (snap.empty) return;
         const data = snap.docs[0].data();
+        
+        // Set template
+        if (data.templateType === 'admitcard') {
+            templateAdmitCardCard.click();
+        } else {
+            templateDefaultCard.click();
+        }
+        
         examNameInput.value = data.examName;
         subjectCountInput.value = data.subjects.length;
         generateSubjectFieldsBtn.click();
@@ -618,6 +723,7 @@
             updateStudentsTable();
             editingDraftId = id;
             isEditingPublishedResult = false;
+            templateSelectionStep.style.display = 'none';
             showFullScreen(createResultSection);
         }, 100);
     }
@@ -632,7 +738,8 @@
         snap.forEach(doc => {
             const d = doc.data();
             const date = d.createdAt ? new Date(d.createdAt.toDate()).toLocaleDateString() : 'Unknown';
-            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">${date} | Subjects: ${d.subjects.length} | Students: ${d.students.length}</p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary view-result" data-id="${doc.id}">View</button><button class="btn btn-sm btn-warning edit-result" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-danger delete-result" data-id="${doc.id}">Delete</button></div></div></div></div>`;
+            const templateBadge = d.templateType === 'admitcard' ? '<span class="badge bg-info ms-2">Admit Card Style</span>' : '<span class="badge bg-secondary ms-2">Default Style</span>';
+            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName} ${templateBadge}</h5><p class="card-text text-muted">${date} | Subjects: ${d.subjects.length} | Students: ${d.students.length}</p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary view-result" data-id="${doc.id}">View</button><button class="btn btn-sm btn-warning edit-result" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-danger delete-result" data-id="${doc.id}">Delete</button></div></div></div></div>`;
             oldResultsList.insertAdjacentHTML('beforeend', card);
         });
         document.querySelectorAll('.view-result').forEach(btn => btn.addEventListener('click', e => viewResult(e.target.dataset.id)));
@@ -645,7 +752,10 @@
         const snap = await getDocs(q);
         if (snap.empty) return;
         const data = snap.docs[0].data();
-        currentResultDataForPdf = data; currentExamNameForPdf = data.examName;
+        currentResultDataForPdf = data; 
+        currentExamNameForPdf = data.examName;
+        currentTemplateForPdf = data.templateType || 'default';
+        
         const sorted = sortStudentsByPercentage(data.students, data.subjects);
         resultModalTitle.innerText = data.examName + ' (Ranked)';
         let html = `<p><strong>Total Students:</strong> ${data.students.length}</p>`;
@@ -683,6 +793,13 @@
         const snap = await getDocs(q);
         if (snap.empty) return;
         const data = snap.docs[0].data();
+        
+        if (data.templateType === 'admitcard') {
+            templateAdmitCardCard.click();
+        } else {
+            templateDefaultCard.click();
+        }
+        
         examNameInput.value = data.examName;
         subjectCountInput.value = data.subjects.length;
         generateSubjectFieldsBtn.click();
@@ -696,6 +813,7 @@
             editingDraftId = null;
             isEditingPublishedResult = true;
             editingPublishedResultId = id;
+            templateSelectionStep.style.display = 'none';
             showFullScreen(createResultSection);
         }, 100);
     }
