@@ -215,6 +215,23 @@
       color: #666;
       margin-bottom: 4px;
     }
+    .template-badge {
+      display: inline-block;
+      font-size: 0.6rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: #e2e8f0;
+      color: #475569;
+      margin-top: 4px;
+    }
+    .template-badge.admit-card {
+      background: #dbeafe;
+      color: #1a237e;
+    }
+    .template-badge.classic {
+      background: #e2e8f0;
+      color: #475569;
+    }
     
     /* NEW Sticker */
     .new-sticker {
@@ -912,10 +929,14 @@
       let html = "";
       resultsToShow.forEach((result, index) => {
         const newSticker = result.isNew ? '<div class="new-sticker">NEW</div>' : '';
+        const template = result.data.template || 'result';
+        const templateLabel = template === 'result1' ? '🎫 Admit Card Style' : '📄 Classic';
+        const badgeClass = template === 'result1' ? 'admit-card' : 'classic';
         html += `<div class="result-item" onclick="selectExam('${result.id}', ${index})" id="result-item-${index}">
           ${newSticker}
           <div class="exam-name">${result.examName}</div>
           <div class="exam-date">📅 Published: ${result.createdAt}</div>
+          <span class="template-badge ${badgeClass}">${templateLabel}</span>
         </div>`;
       });
       resultsList.innerHTML = html;
@@ -984,8 +1005,11 @@
         return;
       }
       
-      // Open new page with result
-      const url = `result.html?examId=${selectedExamId}&rollNo=${rollInput}`;
+      // Check which template to use
+      const template = selectedExamData.template || 'result';
+      
+      // Open the appropriate result page
+      const url = `${template}.html?examId=${selectedExamId}&rollNo=${rollInput}`;
       window.open(url, '_blank');
     }
 
