@@ -126,13 +126,13 @@
         }
         .template-option {
             display: inline-block;
-            margin-right: 20px;
+            margin-right: 25px;
             cursor: pointer;
         }
         .template-option input { margin-right: 8px; }
         .template-preview {
-            width: 80px;
-            height: 60px;
+            width: 70px;
+            height: 50px;
             border: 2px solid #ddd;
             border-radius: 8px;
             display: inline-block;
@@ -209,6 +209,8 @@
                 <div class="card-header bg-white fw-bold">Step 1: Exam Setup</div>
                 <div class="card-body">
                     <div class="mb-3"><label class="form-label">Exam Name</label><input type="text" class="form-control" id="examName" placeholder="e.g., Final Examination 2025"></div>
+                    <div class="mb-3"><label class="form-label">Exam Centre</label><input type="text" class="form-control" id="examCentre" placeholder="e.g., QUEST COACHING CENTRE, GOPALGANJ"></div>
+                    <div class="mb-3"><label class="form-label">Roll Code</label><input type="text" class="form-control" id="rollCode" placeholder="Roll Code" value="55075"></div>
                     <div class="mb-3"><label class="form-label">Number of Subjects</label><input type="number" class="form-control" id="subjectCount" min="1"></div>
                     <button id="generateSubjectFieldsBtn" class="btn btn-primary"><i class="fas fa-magic"></i> Generate Subject Fields</button>
                 </div>
@@ -361,6 +363,8 @@
     const examSetupStep = document.getElementById('examSetupStep');
     const studentEntryStep = document.getElementById('studentEntryStep');
     const examNameInput = document.getElementById('examName');
+    const examCentreInput = document.getElementById('examCentre');
+    const rollCodeInput = document.getElementById('rollCode');
     const subjectCountInput = document.getElementById('subjectCount');
     const generateSubjectFieldsBtn = document.getElementById('generateSubjectFieldsBtn');
     const subjectFields = document.getElementById('subjectFields');
@@ -485,7 +489,7 @@
         for (let i = 0; i < cnt; i++) {
             const box = document.createElement('div');
             box.className = 'subject-box';
-            box.innerHTML = `<div class="row"><div class="col-md-6"><label>Subject ${i+1} Name</label><input type="text" class="form-control subject-name"></div><div class="col-md-6"><label>Total Marks</label><input type="number" class="form-control subject-total" min="1"></div></div>`;
+            box.innerHTML = `<div class="row"><div class="col-md-6"><label>Subject ${i+1} Name</label><input type="text" class="form-control subject-name"></div><div class="col-md-6"><label>Total Marks</label><input type="number" class="form-control subject-total" min="1" value="100"></div></div>`;
             subjectFields.appendChild(box);
         }
         step1NextBtn.classList.remove('d-none');
@@ -560,7 +564,7 @@
             let marksHtml = '';
             subjects.forEach(sub => marksHtml += `<div>${sub.name}: ${s.marks[sub.name] || 0}/${sub.total}</div>`);
             const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" class="student-photo-thumb" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷 No photo</span>';
-            const row = `<tr>${photoHtml}${s.rollNo}${s.name}${s.fatherName || '-'}${marksHtml}<td><button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button> <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button></tr>`;
+            const row = `<tr>${photoHtml}${s.rollNo}${s.name}${s.fatherName || '-'}${marksHtml}<td><button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button> <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button></td></tr>`;
             studentsTableBody.insertAdjacentHTML('beforeend', row);
         });
         document.querySelectorAll('.edit-student').forEach(btn => btn.addEventListener('click', e => editStudent(parseInt(e.target.dataset.index))));
@@ -625,7 +629,15 @@
     saveDraftBtn.addEventListener('click', async () => {
         if (!examNameInput.value.trim() || students.length === 0) { alert('Exam name and at least one student required'); return; }
         try {
-            const data = { examName: examNameInput.value, subjects, students, template: getSelectedTemplate(), createdAt: serverTimestamp() };
+            const data = { 
+                examName: examNameInput.value, 
+                examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
+                rollCode: rollCodeInput.value || '55075',
+                subjects, 
+                students, 
+                template: getSelectedTemplate(), 
+                createdAt: serverTimestamp() 
+            };
             if (editingDraftId) await updateDoc(doc(db, "draft_results", editingDraftId), data);
             else await addDoc(collection(db, "draft_results"), data);
             showToast('Draft saved');
@@ -640,6 +652,8 @@
         try {
             await addDoc(collection(db, "results"), { 
                 examName: examNameInput.value, 
+                examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
+                rollCode: rollCodeInput.value || '55075',
                 subjects, 
                 students, 
                 template: getSelectedTemplate(),
@@ -653,7 +667,11 @@
     });
 
     function resetCreateResultForm() {
-        examNameInput.value = ''; subjectCountInput.value = ''; subjectFields.innerHTML = '';
+        examNameInput.value = ''; 
+        examCentreInput.value = '';
+        rollCodeInput.value = '55075';
+        subjectCountInput.value = ''; 
+        subjectFields.innerHTML = '';
         step1NextBtn.classList.add('d-none');
         examSetupStep.style.display = 'block';
         studentEntryStep.style.display = 'none';
@@ -670,8 +688,8 @@
         if (snap.empty) { draftResultsList.innerHTML = '<div class="col-12"><p class="text-center text-muted">No drafts found.</p></div>'; return; }
         snap.forEach(doc => {
             const d = doc.data();
-            const templateName = d.template === 'result1.html' ? '📋 Template 2' : '📄 Template 1';
-            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">Subjects: ${d.subjects.length} | Students: ${d.students.length}<br><small><i class="fas fa-palette"></i> Template: ${templateName}</small></p><div class="d-flex gap-2"><button class="btn btn-sm btn-primary edit-draft" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-danger delete-draft" data-id="${doc.id}">Delete</button></div></div></div></div>`;
+            const templateName = d.template === 'result1.html' ? '🎫 Template 2 (Admit Card Style)' : '📄 Template 1 (Classic)';
+            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">Subjects: ${d.subjects.length} | Students: ${d.students.length}<br><small><i class="fas fa-palette"></i> ${templateName}</small></p><div class="d-flex gap-2"><button class="btn btn-sm btn-primary edit-draft" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-danger delete-draft" data-id="${doc.id}">Delete</button></div></div></div></div>`;
             draftResultsList.insertAdjacentHTML('beforeend', card);
         });
         document.querySelectorAll('.edit-draft').forEach(btn => btn.addEventListener('click', e => editDraft(e.target.dataset.id)));
@@ -683,7 +701,9 @@
         const snap = await getDocs(q);
         if (snap.empty) return;
         const data = snap.docs[0].data();
-        examNameInput.value = data.examName;
+        examNameInput.value = data.examName || '';
+        examCentreInput.value = data.examCentre || '';
+        rollCodeInput.value = data.rollCode || '55075';
         subjectCountInput.value = data.subjects.length;
         
         if (data.template === 'result1.html') document.getElementById('template2').checked = true;
@@ -713,8 +733,8 @@
         snap.forEach(doc => {
             const d = doc.data();
             const date = d.createdAt ? new Date(d.createdAt.toDate()).toLocaleDateString() : 'Unknown';
-            const templateName = d.template === 'result1.html' ? '🎫 Template 2' : '📄 Template 1';
-            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">${date} | Subjects: ${d.subjects.length} | Students: ${d.students.length}<br><small><i class="fas fa-palette"></i> Current Template: ${templateName}</small></p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary view-result" data-id="${doc.id}">View</button><button class="btn btn-sm btn-warning edit-result" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-info change-template" data-id="${doc.id}" data-name="${d.examName}" data-template="${d.template || 'result.html'}"><i class="fas fa-palette"></i> Change Template</button><button class="btn btn-sm btn-danger delete-result" data-id="${doc.id}">Delete</button></div></div></div></div>`;
+            const templateName = d.template === 'result1.html' ? '🎫 Template 2 (Admit Card Style)' : '📄 Template 1 (Classic)';
+            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">${date} | Subjects: ${d.subjects.length} | Students: ${d.students.length}<br><small><i class="fas fa-palette"></i> ${templateName}</small></p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary view-result" data-id="${doc.id}">View</button><button class="btn btn-sm btn-warning edit-result" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-info change-template" data-id="${doc.id}" data-name="${d.examName}" data-template="${d.template || 'result.html'}"><i class="fas fa-palette"></i> Change Template</button><button class="btn btn-sm btn-danger delete-result" data-id="${doc.id}">Delete</button></div></div></div></div>`;
             oldResultsList.insertAdjacentHTML('beforeend', card);
         });
         document.querySelectorAll('.view-result').forEach(btn => btn.addEventListener('click', e => viewResult(e.target.dataset.id)));
@@ -750,24 +770,23 @@
         currentResultDataForPdf = data; currentExamNameForPdf = data.examName;
         const template = data.template || 'result.html';
         
-        // Generate view link based on template
-        const viewUrl = `${template}?examId=${id}&rollNo=`;
+        const baseUrl = window.location.origin + window.location.pathname.replace('manage-results.html', '');
+        const viewUrl = `${baseUrl}${template}?examId=${id}&rollNo=`;
         
         const sorted = sortStudentsByPercentage(data.students, data.subjects);
         resultModalTitle.innerText = data.examName + ` (Template: ${template === 'result1.html' ? 'Admit Card Style' : 'Classic'})`;
         let html = `<p><strong>Total Students:</strong> ${data.students.length}</p>`;
         if (sorted.length) html += `<div class="alert alert-success">🏆 Top Student: ${sorted[0].name} (Roll: ${sorted[0].rollNo})</div>`;
-        html += `<div class="alert alert-info"><i class="fas fa-info-circle"></i> <strong>View Result:</strong> Students can view using the link below (replace ROLLNUMBER)</div>`;
-        html += `<div class="mb-3"><input type="text" class="form-control font-monospace" readonly value="${window.location.origin}/${viewUrl}ROLLNUMBER" id="viewLinkCopy"></div>`;
-        html += `<button class="btn btn-sm btn-secondary mb-3" onclick="navigator.clipboard.writeText(document.getElementById('viewLinkCopy').value);alert('Link copied!')"><i class="fas fa-copy"></i> Copy Link</button>`;
+        html += `<div class="alert alert-info"><i class="fas fa-info-circle"></i> <strong>Student View Link:</strong> Share this link with students (replace ROLLNUMBER with actual roll number)</div>`;
+        html += `<div class="mb-3"><div class="input-group"><input type="text" class="form-control font-monospace" readonly value="${viewUrl}ROLLNUMBER" id="viewLinkCopy"><button class="btn btn-outline-secondary" onclick="navigator.clipboard.writeText(document.getElementById('viewLinkCopy').value);alert('Link copied!')"><i class="fas fa-copy"></i> Copy</button></div></div>`;
         
-        html += `<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Photo</th><th>Rank</th><th>Roll</th><th>Name</th><th>Father</th>`;
+        html += `<div class="table-responsive mt-3"><table class="table table-striped"><thead><tr><th>Photo</th><th>Rank</th><th>Roll</th><th>Name</th><th>Father</th>`;
         data.subjects.forEach(s => html += `<th>${s.name}</th>`);
-        html += `<th>Total</th><th>%</th><th>Action</th></tr></thead><tbody>`;
+        html += `<th>Total</th><th>%</th><th>View Link</th></tr></thead><tbody>`;
         sorted.forEach((s, idx) => {
             let total = 0, maxTotal = 0;
             const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷</span>';
-            const studentViewUrl = `${window.location.origin}/${template}?examId=${id}&rollNo=${s.rollNo}`;
+            const studentViewUrl = `${baseUrl}${template}?examId=${id}&rollNo=${s.rollNo}`;
             html += `<tr${idx===0?' class="top-student-row"':''}><td>${photoHtml}</td><td><strong>#${idx+1}</strong></td><td>${s.rollNo}</td><td>${s.name}${idx===0?' 🏆':''}</td><td>${s.fatherName||'-'}</td>`;
             data.subjects.forEach(sub => {
                 const mark = s.marks[sub.name] || 0;
@@ -776,7 +795,7 @@
             });
             const percent = maxTotal ? ((total/maxTotal)*100).toFixed(2) : 0;
             html += `<td><strong>${total}/${maxTotal}</strong></td><td><strong>${percent}%</strong></td>`;
-            html += `<td><a href="${studentViewUrl}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i> View</a></td></tr>`;
+            html += `<td><a href="${studentViewUrl}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-external-link-alt"></i> View</a></td></tr>`;
         });
         html += `</tbody></table></div>`;
         resultDetails.innerHTML = html;
@@ -796,7 +815,9 @@
         const snap = await getDocs(q);
         if (snap.empty) return;
         const data = snap.docs[0].data();
-        examNameInput.value = data.examName;
+        examNameInput.value = data.examName || '';
+        examCentreInput.value = data.examCentre || '';
+        rollCodeInput.value = data.rollCode || '55075';
         subjectCountInput.value = data.subjects.length;
         
         if (data.template === 'result1.html') document.getElementById('template2').checked = true;
