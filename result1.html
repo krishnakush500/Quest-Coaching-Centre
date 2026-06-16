@@ -6,6 +6,7 @@
   <title>📄 Result · Admit Card Style · Quest Coaching</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -63,6 +64,7 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.15);
       overflow: hidden;
       position: relative;
+      border: 3px solid #c5a059; /* 🟡 GOLDEN BORDER */
     }
     
     /* Header - Same as Admit Card */
@@ -70,7 +72,7 @@
       background: linear-gradient(135deg, #1a3a5c, #0f2b44);
       padding: 20px 25px;
       text-align: center;
-      border-bottom: 4px solid #c5a059;
+      border-bottom: 4px solid #c5a059; /* 🟡 GOLDEN BORDER */
     }
     
     .header-content {
@@ -85,7 +87,7 @@
       width: 85px;
       height: 85px;
       border-radius: 50%;
-      border: 3px solid #c5a059;
+      border: 3px solid #c5a059; /* 🟡 GOLDEN BORDER */
       overflow: hidden;
       background: white;
       flex-shrink: 0;
@@ -105,7 +107,7 @@
     }
     
     .header-text .sub-title {
-      color: #c5a059;
+      color: #c5a059; /* 🟡 GOLDEN */
       font-size: 0.9rem;
       letter-spacing: 2px;
     }
@@ -116,26 +118,34 @@
       margin-top: 4px;
     }
     
-    .header-text .exam-name {
+    /* ✅ CHANGE: MARKSHEET heading instead of exam name */
+    .header-text .marksheet-heading {
       color: #ffd700;
-      font-size: 1.1rem;
-      font-weight: 700;
+      font-size: 1.3rem;
+      font-weight: 800;
       margin-top: 6px;
       background: rgba(255,255,255,0.1);
-      padding: 4px 16px;
+      padding: 4px 24px;
       border-radius: 20px;
       display: inline-block;
+      letter-spacing: 3px;
+      border: 2px solid #c5a059; /* 🟡 GOLDEN BORDER */
     }
     
-    /* Exam Centre Strip */
-    .exam-centre-strip {
-      background: #c5a059;
+    /* ✅ CHANGE: Yellow stripe with Exam Name */
+    .exam-name-strip {
+      background: #c5a059; /* 🟡 GOLDEN */
       color: white;
-      padding: 8px 20px;
+      padding: 10px 20px;
       text-align: center;
-      font-weight: 600;
-      font-size: 0.9rem;
+      font-weight: 700;
+      font-size: 1rem;
       letter-spacing: 1px;
+      border-bottom: 2px solid #1a3a5c;
+    }
+    
+    .exam-name-strip i {
+      margin-right: 8px;
     }
     
     /* Student Info - Same as Admit Card */
@@ -145,7 +155,7 @@
       gap: 20px;
       flex-wrap: wrap;
       background: #f8f9fc;
-      border-bottom: 2px solid #e2e8f0;
+      border-bottom: 2px solid #c5a059; /* 🟡 GOLDEN BORDER */
     }
     
     .student-photo-area {
@@ -157,7 +167,7 @@
     .student-photo {
       width: 110px;
       height: 130px;
-      border: 3px solid #1a3a5c;
+      border: 3px solid #c5a059; /* 🟡 GOLDEN BORDER */
       border-radius: 10px;
       object-fit: cover;
       background: white;
@@ -177,7 +187,7 @@
       padding: 6px 10px;
       background: white;
       border-radius: 8px;
-      border-left: 3px solid #1a3a5c;
+      border-left: 3px solid #c5a059; /* 🟡 GOLDEN BORDER */
     }
     
     .detail-item .label {
@@ -198,14 +208,14 @@
       color: #dc2626;
     }
     
-    /* Roll Code & Roll Number Boxes */
+    /* ✅ Roll Code & Roll Number - Same as Admit Card */
     .roll-code-box {
       display: flex;
       justify-content: center;
-      gap: 30px;
+      gap: 40px;
       padding: 12px 20px;
       background: #f1f5f9;
-      border-bottom: 2px solid #e2e8f0;
+      border-bottom: 2px solid #c5a059; /* 🟡 GOLDEN BORDER */
       flex-wrap: wrap;
     }
     
@@ -217,15 +227,50 @@
       font-size: 0.7rem;
       color: #64748b;
       font-weight: 600;
+      text-transform: uppercase;
     }
     
     .roll-code-item .value {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       font-weight: 800;
       color: #1a3a5c;
     }
     
-    /* MARKS TABLE - This replaces the timetable */
+    /* QR Code Section */
+    .qr-section {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 10px 25px;
+      background: #f8f9fc;
+      border-bottom: 2px solid #c5a059; /* 🟡 GOLDEN BORDER */
+    }
+    
+    .qr-box {
+      background: white;
+      padding: 8px;
+      border: 2px solid #c5a059; /* 🟡 GOLDEN BORDER */
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .qr-box #qrcode {
+      width: 70px;
+      height: 70px;
+    }
+    
+    .qr-box .qr-label {
+      font-size: 0.6rem;
+      color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+      writing-mode: vertical-rl;
+      letter-spacing: 1px;
+    }
+    
+    /* MARKS TABLE */
     .marks-section {
       padding: 20px 25px;
       background: white;
@@ -242,7 +287,7 @@
     }
     
     .marks-section-title i {
-      color: #c5a059;
+      color: #c5a059; /* 🟡 GOLDEN */
     }
     
     .marks-table {
@@ -258,6 +303,7 @@
       text-align: left;
       font-size: 0.8rem;
       font-weight: 600;
+      border-bottom: 2px solid #c5a059; /* 🟡 GOLDEN BORDER */
     }
     
     .marks-table td {
@@ -277,10 +323,7 @@
     .marks-table .total-row {
       background: #e8f0fe !important;
       font-weight: 700;
-    }
-    
-    .marks-table .total-row td {
-      border-top: 2px solid #1a3a5c;
+      border-top: 2px solid #c5a059; /* 🟡 GOLDEN BORDER */
     }
     
     .grade-badge {
@@ -291,13 +334,13 @@
       font-weight: 700;
     }
     
-    .grade-a-plus { background: #d4edda; color: #155724; }
-    .grade-a { background: #d1ecf1; color: #0c5460; }
-    .grade-b-plus { background: #fff3cd; color: #856404; }
-    .grade-b { background: #ffe6b3; color: #856404; }
-    .grade-c { background: #ffe0b3; color: #cc7000; }
-    .grade-d { background: #f8d7da; color: #721c24; }
-    .grade-f { background: #f5c6cb; color: #721c24; }
+    .grade-a-plus { background: #d4edda; color: #155724; border: 1px solid #c5a059; }
+    .grade-a { background: #d1ecf1; color: #0c5460; border: 1px solid #c5a059; }
+    .grade-b-plus { background: #fff3cd; color: #856404; border: 1px solid #c5a059; }
+    .grade-b { background: #ffe6b3; color: #856404; border: 1px solid #c5a059; }
+    .grade-c { background: #ffe0b3; color: #cc7000; border: 1px solid #c5a059; }
+    .grade-d { background: #f8d7da; color: #721c24; border: 1px solid #c5a059; }
+    .grade-f { background: #f5c6cb; color: #721c24; border: 1px solid #c5a059; }
     
     /* Percentage & Division Box */
     .result-summary {
@@ -305,7 +348,7 @@
       gap: 20px;
       padding: 15px 25px 20px 25px;
       background: #f8fafc;
-      border-top: 2px solid #e2e8f0;
+      border-top: 2px solid #c5a059; /* 🟡 GOLDEN BORDER */
       flex-wrap: wrap;
     }
     
@@ -317,6 +360,7 @@
       border-radius: 10px;
       background: white;
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      border: 1px solid #c5a059; /* 🟡 GOLDEN BORDER */
     }
     
     .summary-box .label {
@@ -356,10 +400,11 @@
       text-align: center;
       color: rgba(255,255,255,0.7);
       font-size: 0.8rem;
+      border-top: 3px solid #c5a059; /* 🟡 GOLDEN BORDER */
     }
     
     .result-footer strong {
-      color: #c5a059;
+      color: #c5a059; /* 🟡 GOLDEN */
     }
     
     /* Loading & Error States */
@@ -369,6 +414,7 @@
       background: white;
       border-radius: 16px;
       box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      border: 2px solid #c5a059;
     }
     
     .loading-state i {
@@ -384,6 +430,7 @@
       color: #991b1b;
       border-radius: 16px;
       margin: 20px 0;
+      border: 2px solid #c5a059;
     }
     
     .error-state button {
@@ -428,22 +475,26 @@
       .header-text h1 { font-size: 1.3rem; }
       .header-content { gap: 12px; }
       .logo-box { width: 65px; height: 65px; }
-      .roll-code-box { gap: 15px; }
+      .roll-code-box { gap: 20px; }
       .result-summary { flex-direction: column; }
       .action-btn { padding: 8px 16px; font-size: 0.75rem; }
       .marks-table th, .marks-table td { padding: 6px 8px; font-size: 0.75rem; }
       .student-photo { width: 90px; height: 110px; }
+      .header-text .marksheet-heading { font-size: 1rem; padding: 3px 16px; }
+      .qr-section { justify-content: center; }
+      .qr-box #qrcode { width: 55px; height: 55px; }
     }
     
     @media print {
       body { background: white; padding: 0; margin: 0; }
       .action-buttons { display: none; }
-      .admit-card-result { box-shadow: none; border-radius: 0; }
+      .admit-card-result { box-shadow: none; border-radius: 0; border: 2px solid #c5a059; }
       .result-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .exam-centre-strip { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .exam-name-strip { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .marks-table th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .result-footer { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .grade-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .roll-code-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
 </head>
@@ -483,13 +534,16 @@
           <h1>QUEST COACHING CENTRE</h1>
           <div class="sub-title">|| SEARCH FOR KNOWLEDGE ||</div>
           <div class="director">Under the guidance of <strong>MR. RAVI SIR</strong></div>
-          <div class="exam-name" id="examName">Final Examination 2025</div>
+          <!-- ✅ CHANGE: MARKSHEET heading instead of exam name -->
+          <div class="marksheet-heading"><i class="fas fa-star"></i> MARKSHEET <i class="fas fa-star"></i></div>
         </div>
       </div>
     </div>
     
-    <!-- Exam Centre -->
-    <div class="exam-centre-strip" id="examCentre">📍 Examination Centre: QUEST COACHING CENTRE, GOPALGANJ</div>
+    <!-- ✅ CHANGE: Yellow stripe with Exam Name -->
+    <div class="exam-name-strip">
+      <i class="fas fa-trophy"></i> Exam: <span id="examName">Final Examination 2025</span>
+    </div>
     
     <!-- Student Info -->
     <div class="student-info-row">
@@ -506,7 +560,7 @@
       </div>
     </div>
     
-    <!-- Roll Code & Roll Number -->
+    <!-- ✅ Roll Code & Roll Number (Same as Admit Card) -->
     <div class="roll-code-box">
       <div class="roll-code-item">
         <div class="label">ROLL CODE</div>
@@ -518,7 +572,15 @@
       </div>
     </div>
     
-    <!-- MARKS TABLE (Replaces Timetable) -->
+    <!-- ✅ QR Code Section -->
+    <div class="qr-section">
+      <div class="qr-box">
+        <div id="qrcode"></div>
+        <span class="qr-label">SCAN TO VERIFY</span>
+      </div>
+    </div>
+    
+    <!-- MARKS TABLE -->
     <div class="marks-section">
       <div class="marks-section-title">
         <i class="fas fa-chart-bar"></i> Marks Obtained
@@ -622,7 +684,7 @@
     return { text: "FAIL ❌", className: "division-fail" };
   }
   
-  async function fetchStudentPhoto(rollNumber) {
+  async function fetchStudentFromAdmission(rollNumber) {
     try {
       const q = db.collection("admissions").where("rollNumber", "==", String(rollNumber));
       const querySnapshot = await q.get();
@@ -638,7 +700,7 @@
       }
       return null;
     } catch (error) {
-      console.error("Error fetching photo:", error);
+      console.error("Error fetching admission data:", error);
       return null;
     }
   }
@@ -673,7 +735,7 @@
       currentStudentData = student;
       
       // Fetch additional student info from admissions
-      const extraInfo = await fetchStudentPhoto(rollNo);
+      const extraInfo = await fetchStudentFromAdmission(rollNo);
       if (extraInfo) {
         student.photoUrl = extraInfo.photoUrl || student.photoUrl;
         student.registrationNo = extraInfo.registrationNo || student.registrationNo;
@@ -694,10 +756,9 @@
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('resultCard').style.display = 'block';
     
-    // Header
+    // Header - Exam Name in yellow stripe
     document.getElementById('coachingLogo').src = COACHING_LOGO;
     document.getElementById('examName').innerText = examData.examName || "Examination";
-    document.getElementById('examCentre').innerHTML = `📍 Examination Centre: ${examData.examCentre || 'QUEST COACHING CENTRE, GOPALGANJ'}`;
     
     // Student Photo
     const photoImg = document.getElementById('studentPhoto');
@@ -731,6 +792,23 @@
     // Roll Code & Number
     document.getElementById('rollCode').innerText = examData.rollCode || student.rollCode || '55075';
     document.getElementById('rollNumber').innerText = student.rollNo || student.rollNumber || '-';
+    
+    // ✅ Generate QR Code
+    const publicUrl = `${window.location.origin}${window.location.pathname}?examId=${currentExamId}&rollNo=${student.rollNo}`;
+    setTimeout(() => {
+      const qrContainer = document.getElementById('qrcode');
+      if (qrContainer) {
+        qrContainer.innerHTML = '';
+        new QRCode(qrContainer, {
+          text: publicUrl,
+          width: 70,
+          height: 70,
+          colorDark: "#1a3a5c",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+        });
+      }
+    }, 200);
     
     // Marks Table
     let marksHtml = '';
@@ -822,6 +900,20 @@
     if (photoImg && currentStudentData && currentStudentData.photoUrl) {
       photoImg.crossOrigin = 'Anonymous';
       photoImg.src = currentStudentData.photoUrl;
+    }
+    
+    // Fix QR Code - replace with image
+    const qrContainer = clone.querySelector('#qrcode');
+    if (qrContainer) {
+      const canvas = qrContainer.querySelector('canvas');
+      if (canvas) {
+        const img = document.createElement('img');
+        img.src = canvas.toDataURL('image/png');
+        img.style.width = '70px';
+        img.style.height = '70px';
+        qrContainer.innerHTML = '';
+        qrContainer.appendChild(img);
+      }
     }
     
     cloneContainer.appendChild(clone);
