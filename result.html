@@ -14,14 +14,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
+        /* ========== COMPLETE COPY FROM ADMIT CARD GENERATOR ========== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        /* Admit Card Print Styles - Exactly from Admit Card Generator */
-        @media print {
-            body { background: white; padding: 0; margin: 0; }
-            .action-buttons, .no-print { display: none !important; }
-            .admit-card { box-shadow: none; margin: 0; padding: 0; }
-        }
         
         body {
             background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
@@ -56,7 +50,7 @@
         .btn-share { background: #25D366; color: white; }
         .btn-print { background: #1a237e; color: white; }
         
-        /* Loading & Error States */
+        /* Loading States */
         .loading-state {
             text-align: center;
             padding: 50px 20px;
@@ -86,37 +80,36 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* ========== ADMIT CARD STYLE - EXACT COPY FROM ADMIT CARD GENERATOR ========== */
-        .admit-card {
+        /* ========== ADMIT CARD STYLES - EXACT COPY ========== */
+        .admit-card-container {
             max-width: 900px;
             margin: 0 auto;
             background: white;
             border-radius: 24px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.15);
             overflow: hidden;
-            position: relative;
         }
         
-        /* Header - Exact same as Admit Card */
-        .card-header {
+        /* Header with Logo - Same as Admit Card */
+        .result-header {
             background: linear-gradient(135deg, #1b4f9b, #0f3f7a);
             color: white;
             padding: 20px;
             text-align: center;
         }
         
-        .card-header h1 {
+        .result-header h1 {
             font-size: 2rem;
             letter-spacing: 1px;
             margin-bottom: 5px;
         }
         
-        .card-header p {
+        .result-header p {
             font-size: 0.9rem;
             opacity: 0.9;
         }
         
-        .exam-badge {
+        .exam-title {
             background: #c5a059;
             display: inline-block;
             padding: 8px 24px;
@@ -127,11 +120,11 @@
         }
         
         /* Content Body */
-        .card-body {
+        .result-body {
             padding: 25px;
         }
         
-        /* Student Section - Exactly like Admit Card */
+        /* Student Info Section - Same as Admit Card */
         .student-section {
             display: flex;
             gap: 25px;
@@ -142,12 +135,12 @@
             flex-wrap: wrap;
         }
         
-        .student-photo {
+        .student-photo-box {
             flex-shrink: 0;
             text-align: center;
         }
         
-        .student-photo img {
+        .student-photo-box img {
             width: 130px;
             height: 150px;
             object-fit: cover;
@@ -157,34 +150,34 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         
-        .student-details {
+        .student-details-grid {
             flex: 1;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
         }
         
-        .detail-item {
+        .info-card {
             background: white;
             padding: 8px 12px;
             border-radius: 10px;
             border-left: 4px solid #c5a059;
         }
         
-        .detail-label {
+        .info-label {
             font-size: 0.7rem;
             color: #666;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         
-        .detail-value {
+        .info-value {
             font-size: 0.95rem;
             font-weight: 600;
             color: #1e3a5f;
         }
         
-        /* Marksheet Section - Replacing Timetable */
+        /* Marksheet Section - Replaces Timetable */
         .marksheet-section {
             margin: 20px 0;
         }
@@ -269,8 +262,8 @@
             border-radius: 30px;
         }
         
-        /* QR and Signature - Exactly like Admit Card */
-        .qr-signature {
+        /* QR Code and Signature - Same as Admit Card */
+        .qr-signature-section {
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
@@ -281,11 +274,11 @@
             gap: 20px;
         }
         
-        .qr-code {
+        .qr-box {
             text-align: center;
         }
         
-        .qr-code p {
+        .qr-box p {
             font-size: 0.7rem;
             color: #666;
             margin-top: 5px;
@@ -296,7 +289,7 @@
             height: 90px;
         }
         
-        .signature {
+        .signature-box {
             text-align: center;
         }
         
@@ -312,13 +305,13 @@
             color: #666;
         }
         
-        .director-name {
+        .director-sign {
             font-weight: 700;
             color: #1e3a5f;
         }
         
         /* Footer */
-        .card-footer {
+        .result-footer {
             background: #1e3a5f;
             color: white;
             text-align: center;
@@ -327,11 +320,17 @@
         }
         
         @media (max-width: 700px) {
-            .student-details { grid-template-columns: 1fr; }
-            .student-photo img { width: 100px; height: 120px; }
-            .qr-signature { flex-direction: column; align-items: center; text-align: center; }
+            .student-details-grid { grid-template-columns: 1fr; }
+            .student-photo-box img { width: 100px; height: 120px; }
+            .qr-signature-section { flex-direction: column; align-items: center; text-align: center; }
             .result-summary { flex-direction: column; text-align: center; }
             .marks-table th, .marks-table td { padding: 6px 4px; font-size: 0.7rem; }
+        }
+        
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .action-buttons { display: none; }
+            .admit-card-container { box-shadow: none; border-radius: 0; }
         }
     </style>
 </head>
@@ -355,28 +354,28 @@
         <button onclick="goBack()" style="margin-top: 15px; padding: 8px 20px; background: #1b4f9b; color: white; border: none; border-radius: 30px; cursor: pointer;"><i class="fas fa-arrow-left"></i> Go Back</button>
     </div>
     
-    <!-- ADMIT CARD - EXACT SAME STYLE AS ADMIT CARD GENERATOR -->
-    <div id="resultCard" class="admit-card" style="display:none;">
-        <div class="card-header">
+    <!-- RESULT CARD - SAME AS ADMIT CARD LAYOUT -->
+    <div id="resultCard" class="admit-card-container" style="display:none;">
+        <div class="result-header">
             <h1>QUEST COACHING CENTRE</h1>
             <p>Under the guidance of <strong>MR. RAVI SIR</strong></p>
-            <div class="exam-badge" id="examNameDisplay">Examination</div>
+            <div class="exam-title" id="examNameDisplay">Examination</div>
         </div>
         
-        <div class="card-body">
+        <div class="result-body">
             <!-- Student Information - Same as Admit Card -->
             <div class="student-section">
-                <div class="student-photo">
+                <div class="student-photo-box">
                     <img id="studentPhotoImg" src="" alt="Student Photo" style="display: none;">
                     <div id="noPhotoBox" style="width:130px; height:150px; background:#e2e8f0; border-radius:12px; display: flex; align-items: center; justify-content: center; color:#94a3b8; font-size:12px; border:2px solid #c5a059;">No Photo</div>
                 </div>
-                <div class="student-details">
-                    <div class="detail-item"><div class="detail-label">Student Name</div><div class="detail-value" id="studentNameDisplay">-</div></div>
-                    <div class="detail-item"><div class="detail-label">Father's Name</div><div class="detail-value" id="fatherNameDisplay">-</div></div>
-                    <div class="detail-item"><div class="detail-label">Roll Number</div><div class="detail-value" id="rollNoDisplay">-</div></div>
-                    <div class="detail-item"><div class="detail-label">Roll Code</div><div class="detail-value" id="rollCodeDisplay">55075</div></div>
-                    <div class="detail-item"><div class="detail-label">Registration No</div><div class="detail-value" id="regNoDisplay">-</div></div>
-                    <div class="detail-item"><div class="detail-label">Date of Birth</div><div class="detail-value" id="dobDisplay">-</div></div>
+                <div class="student-details-grid">
+                    <div class="info-card"><div class="info-label">Student Name</div><div class="info-value" id="studentNameDisplay">-</div></div>
+                    <div class="info-card"><div class="info-label">Father's Name</div><div class="info-value" id="fatherNameDisplay">-</div></div>
+                    <div class="info-card"><div class="info-label">Roll Number</div><div class="info-value" id="rollNoDisplay">-</div></div>
+                    <div class="info-card"><div class="info-label">Roll Code</div><div class="info-value" id="rollCodeDisplay">55075</div></div>
+                    <div class="info-card"><div class="info-label">Registration No</div><div class="info-value" id="regNoDisplay">-</div></div>
+                    <div class="info-card"><div class="info-label">Date of Birth</div><div class="info-value" id="dobDisplay">-</div></div>
                 </div>
             </div>
             
@@ -399,22 +398,22 @@
                 <div class="division-box" id="divisionDisplay">Division: -</div>
             </div>
             
-            <!-- QR Code and Signature - Exactly like Admit Card -->
-            <div class="qr-signature">
-                <div class="qr-code">
+            <!-- QR Code and Signature - Same as Admit Card -->
+            <div class="qr-signature-section">
+                <div class="qr-box">
                     <div id="qrcode"></div>
                     <p>Verify with QR Code</p>
                 </div>
-                <div class="signature">
+                <div class="signature-box">
                     <div class="signature-line"></div>
                     <div class="signature-text">(Authorized Signature)</div>
-                    <div class="director-name">MR. RAVI SIR</div>
+                    <div class="director-sign">MR. RAVI SIR</div>
                     <div class="signature-text">Director, Quest Coaching Centre</div>
                 </div>
             </div>
         </div>
         
-        <div class="card-footer">
+        <div class="result-footer">
             <p>This result is published by QUEST COACHING CENTRE, Gopalganj | For queries: +91 9708442525</p>
         </div>
     </div>
