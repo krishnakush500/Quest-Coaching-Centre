@@ -988,6 +988,9 @@
       document.querySelectorAll('.result-item').forEach(item => item.classList.remove('active'));
     }
 
+    // =============================================
+    // ✅ FIXED: getResult() function with template check
+    // =============================================
     function getResult() {
       const rollInput = document.getElementById('roll-input').value.trim();
       if (!rollInput) {
@@ -999,17 +1002,27 @@
         return;
       }
       
-      const student = selectedExamData.students.find(s => s.rollNo == rollInput);
+      // Check if student exists
+      const student = selectedExamData.students.find(s => String(s.rollNo) == String(rollInput));
       if (!student) {
         alert("Roll number not found in this exam.");
         return;
       }
       
-      // Check which template to use
+      // ✅ IMPORTANT: Check which template to use
       const template = selectedExamData.template || 'result';
       
-      // Open the appropriate result page
-      const url = `${template}.html?examId=${selectedExamId}&rollNo=${rollInput}`;
+      // ✅ Redirect to the correct template file
+      let url;
+      if (template === 'result1') {
+        url = `result1.html?examId=${selectedExamId}&rollNo=${rollInput}`;
+      } else {
+        url = `result.html?examId=${selectedExamId}&rollNo=${rollInput}`;
+      }
+      
+      console.log('Opening template:', template);
+      console.log('URL:', url);
+      
       window.open(url, '_blank');
     }
 
