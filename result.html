@@ -54,6 +54,7 @@
     .btn-download { background: #28a745; color: white; }
     .btn-share { background: #25D366; color: white; }
     .btn-print { background: #1a237e; color: white; }
+    .btn-back { background: #6c757d; color: white; }
     
     .result-card {
       width: 100%;
@@ -233,6 +234,7 @@
     <button class="action-btn btn-download" onclick="downloadResultPDF()"><i class="fas fa-download"></i> Download PDF</button>
     <button class="action-btn btn-share" onclick="shareOnWhatsApp()"><i class="fab fa-whatsapp"></i> Share on WhatsApp</button>
     <button class="action-btn btn-print" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+    <button class="action-btn btn-back" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back</button>
   </div>
   
   <div id="loadingState" class="loading-state">
@@ -330,7 +332,9 @@
     return { examId: params.get('examId'), rollNo: params.get('rollNo') };
   }
   
-  function goBack() { window.location.href = 'index.html'; }
+  function goBack() { 
+    window.location.href = 'index.html'; 
+  }
   
   async function fetchStudentPhoto(rollNumber) {
     try {
@@ -346,6 +350,9 @@
     }
   }
   
+  // =============================================
+  // ✅ UPDATED: loadResult() with template redirect
+  // =============================================
   async function loadResult() {
     const params = getUrlParams();
     const examId = params.examId;
@@ -364,7 +371,19 @@
       }
       
       currentExamData = docSnap.data();
-      const student = currentExamData.students?.find(s => s.rollNo == rollNo);
+      
+      // ✅ CHECK: Agar template 'result1' hai to redirect karo
+      const template = currentExamData.template || 'result';
+      if (template === 'result1') {
+        console.log('🔄 Redirecting to result1.html (Admit Card Style)');
+        window.location.href = `result1.html?examId=${examId}&rollNo=${rollNo}`;
+        return;
+      }
+      
+      // ✅ Agar template 'result' hai to normal flow continue karo
+      console.log('📄 Using Classic Result Template');
+      
+      const student = currentExamData.students?.find(s => String(s.rollNo) == String(rollNo));
       
       if (!student) {
         showError(`Student with roll number ${rollNo} not found in this exam.`);
