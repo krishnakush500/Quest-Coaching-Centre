@@ -1,3 +1,4 @@
+<!-- FILE: result-view.html - Complete Code with Dual Template Support -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,6 +56,7 @@
     .btn-share { background: #25D366; color: white; }
     .btn-print { background: #1a237e; color: white; }
     
+    /* Default Template Styles */
     .result-card {
       width: 100%;
       background: white;
@@ -157,6 +159,168 @@
     .division-display { text-align: center; font-size: 1.1rem; font-weight: 700; padding: 10px; margin-top: 12px; border-radius: 10px; }
     .coaching-mention { text-align: center; margin-top: 20px; padding-top: 12px; border-top: 2px solid #ddd; color: #666; font-style: italic; font-size: 0.8rem; }
     
+    /* ============================================ */
+    /* ADMIT CARD STYLE RESULT TEMPLATE (NEW) */
+    /* ============================================ */
+    .admitcard-result-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+    
+    .admitcard-header {
+      background: linear-gradient(135deg, #1b4f9b, #0f3f7a);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .admitcard-header h1 {
+      font-size: 1.8rem;
+      margin-bottom: 5px;
+      letter-spacing: 1px;
+    }
+    
+    .admitcard-header p {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    
+    .admitcard-body {
+      padding: 25px;
+    }
+    
+    /* Student Photo & Info Row - Like Admit Card */
+    .admitcard-student-row {
+      display: flex;
+      gap: 25px;
+      margin-bottom: 25px;
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .admitcard-student-photo {
+      flex-shrink: 0;
+      text-align: center;
+    }
+    
+    .admitcard-student-photo img {
+      width: 120px;
+      height: 140px;
+      object-fit: cover;
+      border: 3px solid #c5a059;
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .admitcard-student-details {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    
+    .admitcard-info-item {
+      background: white;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border-left: 4px solid #c5a059;
+    }
+    
+    .admitcard-info-label {
+      font-size: 0.7rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .admitcard-info-value {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #1e3a5f;
+    }
+    
+    /* Marks Table inside Admit Card Style */
+    .admitcard-marks-section {
+      margin: 20px 0;
+    }
+    
+    .admitcard-marks-title {
+      background: #1b4f9b;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 10px 10px 0 0;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    
+    .admitcard-marks-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border: 1px solid #e2e8f0;
+    }
+    
+    .admitcard-marks-table th {
+      background: #f1f5f9;
+      color: #1e3a5f;
+      padding: 10px 8px;
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border-bottom: 2px solid #c5a059;
+    }
+    
+    .admitcard-marks-table td {
+      padding: 8px;
+      text-align: center;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 0.85rem;
+    }
+    
+    .admitcard-marks-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .admitcard-result-summary {
+      background: linear-gradient(135deg, #e0eafc, #f0f7ff);
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .admitcard-percentage {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1b4f9b;
+    }
+    
+    .admitcard-division {
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 30px;
+    }
+    
+    .admitcard-footer {
+      background: #1e3a5f;
+      color: white;
+      text-align: center;
+      padding: 12px;
+      font-size: 0.75rem;
+    }
+    
     .loading-state { text-align: center; padding: 50px 20px; background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
     .loading-state i { font-size: 2rem; color: #1a237e; margin-bottom: 15px; }
     .error-state { text-align: center; padding: 40px 20px; background: #ffe6e6; color: #b30000; border-radius: 12px; margin: 20px; }
@@ -183,29 +347,6 @@
       background: white;
     }
     
-    /* Force desktop layout for PDF */
-    .pdf-clone .student-info-card {
-      display: flex !important;
-      flex-direction: row !important;
-      align-items: center !important;
-      gap: 20px !important;
-      flex-wrap: nowrap !important;
-    }
-    .pdf-clone .student-photo-area {
-      order: 0 !important;
-      width: 100px !important;
-      flex-shrink: 0 !important;
-    }
-    .pdf-clone .student-photo {
-      width: 90px !important;
-      height: 110px !important;
-    }
-    .pdf-clone .marks-table th,
-    .pdf-clone .marks-table td {
-      padding: 4px !important;
-      font-size: 0.7rem !important;
-    }
-    
     @media (max-width: 600px) {
       body { padding: 15px; }
       .result-logo { width: 65px; height: 65px; }
@@ -216,6 +357,10 @@
       .student-photo-area { order: -1; margin-bottom: 10px; }
       .student-details-area { width: 100%; }
       .student-photo { width: 100px; height: 120px; }
+      
+      .admitcard-student-details { grid-template-columns: 1fr; }
+      .admitcard-student-photo img { width: 90px; height: 110px; }
+      .admitcard-result-summary { flex-direction: column; text-align: center; }
     }
     
     @media print {
@@ -228,8 +373,8 @@
 </head>
 <body>
 
-<div class="result-container">
-  <div class="action-buttons">
+<div class="result-container" id="resultContainer">
+  <div class="action-buttons" id="actionButtons">
     <button class="action-btn btn-download" onclick="downloadResultPDF()"><i class="fas fa-download"></i> Download PDF</button>
     <button class="action-btn btn-share" onclick="shareOnWhatsApp()"><i class="fab fa-whatsapp"></i> Share on WhatsApp</button>
     <button class="action-btn btn-print" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
@@ -246,7 +391,8 @@
     <button onclick="goBack()"><i class="fas fa-arrow-left"></i> Go Back</button>
   </div>
   
-  <div id="resultCard" class="result-card" style="display:none;">
+  <!-- Default Template Result Card -->
+  <div id="defaultResultCard" class="result-card" style="display:none;">
     <div class="result-card-header">
       <div class="result-logo">
         <img id="coachingLogo" src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" alt="Quest Coaching Logo" crossorigin="anonymous">
@@ -270,7 +416,8 @@
     </div>
     
     <table class="marks-table">
-      <thead><tr><th>Subject</th><th>Marks Obtained</th><th>Total Marks</th><th>Grade</th></tr></thead>
+      <thead><tr><th>Subject</th><th>Marks Obtained</th><th>Total Marks</th><th>Grade</th></tr>
+      </thead>
       <tbody id="marksTableBody"></tbody>
     </table>
     
@@ -278,6 +425,53 @@
     <div class="division-display" id="divisionBox">Division: -</div>
     
     <div class="coaching-mention" id="coachingMention">
+      <p>This result is published by QUEST COACHING CENTRE, Gopalganj | Director: MR. RAVI SIR</p>
+      <p>For queries: +91 9708442525</p>
+    </div>
+  </div>
+  
+  <!-- NEW: Admit Card Style Result Template -->
+  <div id="admitcardResultContainer" class="admitcard-result-container" style="display:none;">
+    <div class="admitcard-header">
+      <h1>QUEST COACHING CENTRE</h1>
+      <p>Under the guidance of <strong>MR. RAVI SIR</strong></p>
+      <h3 id="admitcardExamName" style="color: #c5a059; margin-top: 8px;">Exam Name</h3>
+    </div>
+    
+    <div class="admitcard-body">
+      <!-- Student Row - Like Admit Card Layout -->
+      <div class="admitcard-student-row">
+        <div class="admitcard-student-photo">
+          <img id="admitcardStudentPhoto" src="" alt="Student Photo" style="display: none;">
+          <div id="admitcardNoPhoto" style="width:120px; height:140px; background:#e2e8f0; border-radius:12px; display: flex; align-items: center; justify-content: center; color:#94a3b8; font-size:12px; border:2px solid #c5a059;">No Photo</div>
+        </div>
+        <div class="admitcard-student-details">
+          <div class="admitcard-info-item"><div class="admitcard-info-label">Student Name</div><div class="admitcard-info-value" id="admitcardStudentName">-</div></div>
+          <div class="admitcard-info-item"><div class="admitcard-info-label">Father's Name</div><div class="admitcard-info-value" id="admitcardFatherName">-</div></div>
+          <div class="admitcard-info-item"><div class="admitcard-info-label">Roll Number</div><div class="admitcard-info-value" id="admitcardRollNo">-</div></div>
+          <div class="admitcard-info-item"><div class="admitcard-info-label">Roll Code</div><div class="admitcard-info-value" id="admitcardRollCode">55075</div></div>
+        </div>
+      </div>
+      
+      <!-- MARKSHEET (Replacing Timetable) -->
+      <div class="admitcard-marks-section">
+        <div class="admitcard-marks-title"><i class="fas fa-chart-line"></i> Marksheet</div>
+        <table class="admitcard-marks-table">
+          <thead>
+            <tr><th>Subject Code</th><th>Subject Name</th><th>Marks Obtained</th><th>Total Marks</th><th>Grade</th></tr>
+          </thead>
+          <tbody id="admitcardMarksBody"></tbody>
+        </table>
+      </div>
+      
+      <!-- Result Summary -->
+      <div class="admitcard-result-summary">
+        <div class="admitcard-percentage" id="admitcardPercentage">Total Percentage: 0%</div>
+        <div class="admitcard-division" id="admitcardDivision">Division: -</div>
+      </div>
+    </div>
+    
+    <div class="admitcard-footer">
       <p>This result is published by QUEST COACHING CENTRE, Gopalganj | Director: MR. RAVI SIR</p>
       <p>For queries: +91 9708442525</p>
     </div>
@@ -307,6 +501,7 @@
   
   let currentExamData = null;
   let currentStudentData = null;
+  let currentTemplateType = 'default';
   
   function getGrade(percentage) {
     if(percentage >= 90) return { grade: "A+", className: "grade-a-plus" };
@@ -327,7 +522,7 @@
   
   function getUrlParams() {
     const params = new URLSearchParams(window.location.search);
-    return { examId: params.get('examId'), rollNo: params.get('rollNo') };
+    return { examId: params.get('examId'), rollNo: params.get('rollNo'), template: params.get('template') };
   }
   
   function goBack() { window.location.href = 'index.html'; }
@@ -350,6 +545,7 @@
     const params = getUrlParams();
     const examId = params.examId;
     const rollNo = params.rollNo;
+    const templateParam = params.template;
     
     if (!examId || !rollNo) {
       showError('Invalid URL. Missing exam ID or roll number.');
@@ -364,6 +560,12 @@
       }
       
       currentExamData = docSnap.data();
+      currentTemplateType = currentExamData.templateType || 'default';
+      
+      // Override by URL param if present
+      if (templateParam === 'admitcard') currentTemplateType = 'admitcard';
+      if (templateParam === 'default') currentTemplateType = 'default';
+      
       const student = currentExamData.students?.find(s => s.rollNo == rollNo);
       
       if (!student) {
@@ -375,7 +577,12 @@
       const studentPhotoUrl = await fetchStudentPhoto(rollNo);
       student.photoUrl = studentPhotoUrl;
       
-      displayResult(currentExamData, student);
+      // Display based on template type
+      if (currentTemplateType === 'admitcard') {
+        displayAdmitCardResult(currentExamData, student);
+      } else {
+        displayDefaultResult(currentExamData, student);
+      }
       
     } catch (error) {
       console.error('Error loading result:', error);
@@ -383,9 +590,11 @@
     }
   }
   
-  function displayResult(examData, student) {
+  // DEFAULT TEMPLATE DISPLAY
+  function displayDefaultResult(examData, student) {
     document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('resultCard').style.display = 'block';
+    document.getElementById('defaultResultCard').style.display = 'block';
+    document.getElementById('admitcardResultContainer').style.display = 'none';
     
     document.getElementById('coachingLogo').src = COACHING_LOGO;
     document.getElementById('coachingName').innerText = COACHING_NAME;
@@ -455,6 +664,78 @@
     divisionBox.innerHTML = `Division: ${division}`;
   }
   
+  // NEW: ADMIT CARD STYLE RESULT DISPLAY
+  function displayAdmitCardResult(examData, student) {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('defaultResultCard').style.display = 'none';
+    document.getElementById('admitcardResultContainer').style.display = 'block';
+    
+    document.getElementById('admitcardExamName').innerText = examData.examName || "Examination";
+    document.getElementById('admitcardStudentName').innerText = student.name || "-";
+    document.getElementById('admitcardFatherName').innerText = student.fatherName || "-";
+    document.getElementById('admitcardRollNo').innerText = student.rollNo || "-";
+    
+    const studentPhotoImg = document.getElementById('admitcardStudentPhoto');
+    const noPhotoDiv = document.getElementById('admitcardNoPhoto');
+    
+    if (student.photoUrl) {
+      studentPhotoImg.src = student.photoUrl;
+      studentPhotoImg.style.display = 'block';
+      noPhotoDiv.style.display = 'none';
+    } else {
+      studentPhotoImg.style.display = 'none';
+      noPhotoDiv.style.display = 'flex';
+    }
+    
+    let marksHtml = '';
+    let totalObtained = 0;
+    let totalMax = 0;
+    let subjectCounter = 1;
+    
+    if (student.marks && examData.subjects) {
+      for (const subject of examData.subjects) {
+        const subjectName = subject.name;
+        const subjectTotal = subject.total || 100;
+        const marksObtained = student.marks[subjectName] || 0;
+        const percentage = (marksObtained / subjectTotal) * 100;
+        const gradeInfo = getGrade(percentage);
+        
+        marksHtml += `<tr>
+          <td>${String(subjectCounter).padStart(3, '0')}</td>
+          <td>${escapeHtml(subjectName)}</td>
+          <td><strong>${marksObtained}</strong></td>
+          <td>${subjectTotal}</td>
+          <td><span class="${gradeInfo.className}">${gradeInfo.grade}</span></td>
+        </tr>`;
+        totalObtained += marksObtained;
+        totalMax += subjectTotal;
+        subjectCounter++;
+      }
+    }
+    
+    const totalPercentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) : 0;
+    const division = calculateDivision(parseFloat(totalPercentage));
+    
+    document.getElementById('admitcardMarksBody').innerHTML = marksHtml;
+    document.getElementById('admitcardPercentage').innerHTML = `📊 Total Percentage: ${totalPercentage}%`;
+    
+    const divisionElem = document.getElementById('admitcardDivision');
+    if (division === 'FIRST DIVISION') {
+      divisionElem.style.background = '#d4edda';
+      divisionElem.style.color = '#28a745';
+    } else if (division === 'SECOND DIVISION') {
+      divisionElem.style.background = '#d1ecf1';
+      divisionElem.style.color = '#17a2b8';
+    } else if (division === 'THIRD DIVISION') {
+      divisionElem.style.background = '#fff3cd';
+      divisionElem.style.color = '#ffc107';
+    } else {
+      divisionElem.style.background = '#f8d7da';
+      divisionElem.style.color = '#dc3545';
+    }
+    divisionElem.innerHTML = `🏆 Division: ${division}`;
+  }
+  
   function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/[&<>]/g, function(m) {
@@ -472,61 +753,55 @@
   }
   
   function createPDFClone() {
-    const originalCard = document.getElementById('resultCard');
     const cloneContainer = document.getElementById('pdfCloneContainer');
-    
     cloneContainer.innerHTML = '';
     
-    const clone = originalCard.cloneNode(true);
-    clone.classList.add('pdf-clone');
-    clone.style.display = 'block';
-    clone.style.width = '100%';
-    clone.style.maxWidth = '650px';
-    clone.style.margin = '0 auto';
-    clone.style.padding = '12px';
-    clone.style.background = 'white';
-    clone.style.boxShadow = 'none';
+    let clone;
+    if (currentTemplateType === 'admitcard') {
+      const originalCard = document.getElementById('admitcardResultContainer');
+      clone = originalCard.cloneNode(true);
+      clone.classList.add('pdf-clone');
+      clone.style.display = 'block';
+      clone.style.width = '100%';
+      clone.style.maxWidth = '650px';
+      clone.style.margin = '0 auto';
+      clone.style.background = 'white';
+      clone.style.boxShadow = 'none';
+      
+      // Fix images for CORS
+      const logoImg = clone.querySelector('.admitcard-header img');
+      const studentPhoto = clone.querySelector('#admitcardStudentPhoto');
+      if (studentPhoto && currentStudentData && currentStudentData.photoUrl) {
+        studentPhoto.crossOrigin = 'Anonymous';
+        studentPhoto.src = currentStudentData.photoUrl;
+      }
+    } else {
+      const originalCard = document.getElementById('defaultResultCard');
+      clone = originalCard.cloneNode(true);
+      clone.classList.add('pdf-clone');
+      clone.style.display = 'block';
+      clone.style.width = '100%';
+      clone.style.maxWidth = '650px';
+      clone.style.margin = '0 auto';
+      clone.style.background = 'white';
+      clone.style.boxShadow = 'none';
+      
+      // Fix images for CORS
+      const logoImg = clone.querySelector('#coachingLogo');
+      if (logoImg) {
+        logoImg.crossOrigin = 'Anonymous';
+        logoImg.src = COACHING_LOGO;
+      }
+      const studentPhoto = clone.querySelector('#studentPhoto');
+      if (studentPhoto && currentStudentData && currentStudentData.photoUrl) {
+        studentPhoto.crossOrigin = 'Anonymous';
+        studentPhoto.src = currentStudentData.photoUrl;
+      }
+    }
     
-    // Remove action buttons
+    // Remove action buttons from clone
     const actionDiv = clone.querySelector('.action-buttons');
     if (actionDiv) actionDiv.remove();
-    
-    // Force desktop layout
-    const studentInfoCard = clone.querySelector('.student-info-card');
-    if (studentInfoCard) {
-      studentInfoCard.style.display = 'flex';
-      studentInfoCard.style.flexDirection = 'row';
-      studentInfoCard.style.alignItems = 'center';
-      studentInfoCard.style.gap = '15px';
-      studentInfoCard.style.flexWrap = 'nowrap';
-    }
-    
-    const studentPhotoArea = clone.querySelector('.student-photo-area');
-    if (studentPhotoArea) {
-      studentPhotoArea.style.order = '0';
-      studentPhotoArea.style.width = '90px';
-      studentPhotoArea.style.flexShrink = '0';
-    }
-    
-    const studentPhoto = clone.querySelector('#studentPhoto');
-    if (studentPhoto && currentStudentData && currentStudentData.photoUrl) {
-      studentPhoto.style.width = '85px';
-      studentPhoto.style.height = '105px';
-    }
-    
-    // Fix logo
-    const logoImg = clone.querySelector('#coachingLogo');
-    if (logoImg) {
-      logoImg.crossOrigin = 'Anonymous';
-      logoImg.src = COACHING_LOGO;
-    }
-    
-    // Fix student photo
-    const clonePhoto = clone.querySelector('#studentPhoto');
-    if (clonePhoto && currentStudentData && currentStudentData.photoUrl) {
-      clonePhoto.crossOrigin = 'Anonymous';
-      clonePhoto.src = currentStudentData.photoUrl;
-    }
     
     cloneContainer.appendChild(clone);
     cloneContainer.style.visibility = 'visible';
@@ -560,19 +835,14 @@
       const clone = createPDFClone();
       const cloneContainer = document.getElementById('pdfCloneContainer');
       
-      const cloneLogo = clone.querySelector('#coachingLogo');
-      const clonePhoto = clone.querySelector('#studentPhoto');
-      
-      await Promise.all([
-        waitForImageLoad(cloneLogo),
-        waitForImageLoad(clonePhoto)
-      ]);
+      const images = clone.querySelectorAll('img');
+      await Promise.all(Array.from(images).map(waitForImageLoad));
       
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const opt = {
         margin: [5, 5, 5, 5],
-        filename: `Result_${document.getElementById('studentRoll').innerText}.pdf`,
+        filename: `Result_${currentStudentData?.rollNo || 'Student'}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { 
           scale: 2,
@@ -598,12 +868,23 @@
   }
   
   function shareOnWhatsApp() {
-    const studentName = document.getElementById('studentName').innerText;
-    const studentRoll = document.getElementById('studentRoll').innerText;
-    const totalPercent = document.getElementById('totalPercentage').innerText.replace('Total Percentage: ', '').replace('%', '');
-    const examName = document.getElementById('examName').innerText;
-    
-    const shareText = `📢 *Result Published* 📢\n\n🏫 *${COACHING_NAME}*\n📚 *${examName}*\n\n👨‍🎓 Student: ${studentName}\n📝 Roll No: ${studentRoll}\n📊 Percentage: ${totalPercent}%\n📞 Contact: ${COACHING_PHONE}`;
+    let shareText = '';
+    if (currentTemplateType === 'admitcard') {
+      const studentName = document.getElementById('admitcardStudentName').innerText;
+      const studentRoll = document.getElementById('admitcardRollNo').innerText;
+      const percentElem = document.getElementById('admitcardPercentage');
+      const totalPercent = percentElem ? percentElem.innerText.replace('📊 Total Percentage: ', '').replace('%', '') : '0';
+      const examName = document.getElementById('admitcardExamName').innerText;
+      
+      shareText = `📢 *Result Published* 📢\n\n🏫 *${COACHING_NAME}*\n📚 *${examName}*\n\n👨‍🎓 Student: ${studentName}\n📝 Roll No: ${studentRoll}\n📊 Percentage: ${totalPercent}%\n📞 Contact: ${COACHING_PHONE}`;
+    } else {
+      const studentName = document.getElementById('studentName').innerText;
+      const studentRoll = document.getElementById('studentRoll').innerText;
+      const totalPercent = document.getElementById('totalPercentage').innerText.replace('Total Percentage: ', '').replace('%', '');
+      const examName = document.getElementById('examName').innerText;
+      
+      shareText = `📢 *Result Published* 📢\n\n🏫 *${COACHING_NAME}*\n📚 *${examName}*\n\n👨‍🎓 Student: ${studentName}\n📝 Roll No: ${studentRoll}\n📊 Percentage: ${totalPercent}%\n📞 Contact: ${COACHING_PHONE}`;
+    }
     window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
   }
   
