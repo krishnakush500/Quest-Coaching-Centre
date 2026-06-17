@@ -83,7 +83,6 @@
       flex-wrap: wrap;
     }
     
-    /* ✅ Logo Bada - 85px se 95px */
     .logo-box {
       width: 95px;
       height: 95px;
@@ -119,30 +118,35 @@
       margin-top: 4px;
     }
     
-    /* ✅ MARKSHEET - Chhota aur kam highlight */
-    .header-text .marksheet-heading {
-      color: #c5a059;
-      font-size: 0.95rem;
-      font-weight: 700;
+    /* ✅ NEW: Coaching Address in Header */
+    .header-text .coaching-contact {
+      color: rgba(255,255,255,0.85);
+      font-size: 0.7rem;
       margin-top: 6px;
-      background: rgba(255,255,255,0.08);
-      padding: 2px 16px;
-      border-radius: 16px;
-      display: inline-block;
-      letter-spacing: 2px;
-      border: 1px solid rgba(197, 160, 89, 0.3);
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      border-top: 1px solid rgba(197,160,89,0.3);
+      padding-top: 6px;
     }
     
-    .header-text .marksheet-heading i {
-      font-size: 0.7rem;
+    .header-text .coaching-contact span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .header-text .coaching-contact i {
       color: #c5a059;
+      font-size: 0.65rem;
     }
     
     /* Yellow stripe with Exam Name */
     .exam-name-strip {
       background: #c5a059;
       color: white;
-      padding: 10px 20px;
+      padding: 8px 20px;
       text-align: center;
       font-weight: 700;
       font-size: 1rem;
@@ -152,6 +156,26 @@
     
     .exam-name-strip i {
       margin-right: 8px;
+    }
+    
+    /* ✅ NEW: MARKSHEET heading - Yellow stripe ke neeche */
+    .marksheet-heading {
+      background: #f8f9fc;
+      text-align: center;
+      padding: 6px 0;
+      border-bottom: 2px solid #c5a059;
+    }
+    
+    .marksheet-heading h2 {
+      color: #1a3a5c;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+    }
+    
+    .marksheet-heading h2 i {
+      color: #c5a059;
+      font-size: 0.8rem;
     }
     
     /* Student Info Row - Photo + Details + QR */
@@ -165,7 +189,6 @@
       align-items: stretch;
     }
     
-    /* ✅ Photo Bada - 110x130 se 120x140 */
     .student-photo-area {
       width: 130px;
       flex-shrink: 0;
@@ -182,7 +205,6 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     
-    /* Details Area */
     .student-details {
       flex: 1;
       display: grid;
@@ -218,7 +240,6 @@
       color: #dc2626;
     }
     
-    /* ✅ QR Area - Thoda adjust */
     .qr-area {
       width: 110px;
       flex-shrink: 0;
@@ -311,6 +332,17 @@
       background: #e8f0fe !important;
       font-weight: 700;
       border-top: 2px solid #c5a059;
+    }
+    
+    /* ✅ Subject Status Badge */
+    .status-pass {
+      color: #16a34a;
+      font-weight: 700;
+    }
+    
+    .status-fail {
+      color: #dc2626;
+      font-weight: 700;
     }
     
     .grade-badge {
@@ -468,11 +500,11 @@
       .marks-table th, .marks-table td { padding: 6px 8px; font-size: 0.75rem; }
       .student-photo { width: 100px; height: 120px; }
       .student-photo-area { width: 110px; }
-      .header-text .marksheet-heading { font-size: 0.85rem; padding: 2px 12px; }
       .qr-area { width: 90px; padding: 8px; }
       .qr-area #qrcode { width: 65px; height: 65px; }
       .qr-area #qrcode canvas,
       .qr-area #qrcode img { width: 65px !important; height: 65px !important; }
+      .header-text .coaching-contact { font-size: 0.6rem; gap: 8px; }
     }
     
     @media print {
@@ -483,7 +515,6 @@
       .exam-name-strip { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .marks-table th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .result-footer { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .grade-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
 </head>
@@ -523,8 +554,12 @@
           <h1>QUEST COACHING CENTRE</h1>
           <div class="sub-title">|| SEARCH FOR KNOWLEDGE ||</div>
           <div class="director">Under the guidance of <strong>MR. RAVI SIR</strong></div>
-          <!-- ✅ MARKSHEET - Chhota aur kam highlight -->
-          <div class="marksheet-heading"><i class="fas fa-star"></i> MARKSHEET <i class="fas fa-star"></i></div>
+          <!-- ✅ NEW: Address + Phone + Email in Header -->
+          <div class="coaching-contact">
+            <span><i class="fas fa-map-marker-alt"></i> Block More, Gopalganj - 841428</span>
+            <span><i class="fas fa-phone-alt"></i> +91 9708442525</span>
+            <span><i class="fas fa-envelope"></i> questcoachingcentre@gmail.com</span>
+          </div>
         </div>
       </div>
     </div>
@@ -534,9 +569,14 @@
       <i class="fas fa-trophy"></i> Exam: <span id="examName">Final Examination 2025</span>
     </div>
     
+    <!-- ✅ NEW: MARKSHEET heading - Yellow stripe ke neeche -->
+    <div class="marksheet-heading">
+      <h2><i class="fas fa-star"></i> MARKSHEET <i class="fas fa-star"></i></h2>
+    </div>
+    
     <!-- Student Info Row: Photo + Details + QR -->
     <div class="student-info-row">
-      <!-- Photo - Bada -->
+      <!-- Photo -->
       <div class="student-photo-area">
         <img id="studentPhoto" class="student-photo" src="" alt="Student Photo" style="display:none;">
       </div>
@@ -569,9 +609,9 @@
         <thead>
           <tr>
             <th>Subject</th>
-            <th>Marks Obtained</th>
             <th>Total Marks</th>
-            <th>Grade</th>
+            <th>Marks Obtained</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody id="marksTableBody"></tbody>
@@ -664,6 +704,16 @@
     return { text: "FAIL ❌", className: "division-fail" };
   }
   
+  // ✅ Subject wise Pass/Fail (30% se kam = Fail)
+  function getSubjectStatus(obtained, total) {
+    const percentage = (obtained / total) * 100;
+    if (percentage >= 30) {
+      return { text: "PASS ✅", className: "status-pass" };
+    } else {
+      return { text: "FAIL ❌", className: "status-fail" };
+    }
+  }
+  
   async function fetchStudentFromAdmission(rollNumber) {
     try {
       const q = db.collection("admissions").where("rollNumber", "==", String(rollNumber));
@@ -736,8 +786,7 @@
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('resultCard').style.display = 'block';
     
-    // Header - Exam Name in yellow stripe
-    document.getElementById('coachingLogo').src = COACHING_LOGO;
+    // Exam Name in yellow stripe
     document.getElementById('examName').innerText = examData.examName || "Examination";
     
     // Student Photo
@@ -749,12 +798,11 @@
       photoImg.style.display = 'none';
     }
     
-    // Student Details (including Roll Code & Roll Number)
+    // Student Details
     document.getElementById('studentName').innerText = student.name || student.studentName || '-';
     document.getElementById('fatherName').innerText = student.fatherName || '-';
     document.getElementById('registrationNo').innerText = student.registrationNo || student.admissionNo || '-';
     
-    // DOB formatting
     let dobDisplay = '-';
     if (student.dob) {
       try {
@@ -768,12 +816,10 @@
     
     document.getElementById('studentGender').innerText = student.gender || '-';
     document.getElementById('studentClass').innerText = student.studentClass || examData.studentClass || student.classApplying || '-';
-    
-    // Roll Code & Roll Number - Now in details section
     document.getElementById('rollCode').innerText = examData.rollCode || student.rollCode || '55075';
     document.getElementById('rollNumber').innerText = student.rollNo || student.rollNumber || '-';
     
-    // ✅ Generate QR Code - Same page open karega
+    // ✅ QR Code - Result link (same page)
     const publicUrl = `${window.location.origin}${window.location.pathname}?examId=${currentExamId}&rollNo=${student.rollNo}`;
     setTimeout(() => {
       const qrContainer = document.getElementById('qrcode');
@@ -790,10 +836,11 @@
       }
     }, 200);
     
-    // Marks Table
+    // ✅ MARKS TABLE - New Column Order: Subject | Total | Obtained | Status
     let marksHtml = '';
     let totalObtained = 0;
     let totalMax = 0;
+    let subjectFail = false;
     
     if (student.marks && examData.subjects) {
       for (const subject of examData.subjects) {
@@ -801,29 +848,39 @@
         const subjectTotal = subject.total || 100;
         const marksObtained = student.marks[subjectName] !== undefined ? student.marks[subjectName] : 0;
         const percentage = subjectTotal > 0 ? (marksObtained / subjectTotal) * 100 : 0;
-        const gradeInfo = getGrade(percentage);
+        const statusInfo = getSubjectStatus(marksObtained, subjectTotal);
+        
+        if (statusInfo.text.includes('FAIL')) subjectFail = true;
         
         marksHtml += `<tr>
-          <td>${subjectName}</td>
-          <td><strong>${marksObtained}</strong></td>
+          <td><strong>${subjectName}</strong></td>
           <td>${subjectTotal}</td>
-          <td><span class="grade-badge ${gradeInfo.className}">${gradeInfo.grade}</span></td>
+          <td><strong>${marksObtained}</strong></td>
+          <td><span class="${statusInfo.className}">${statusInfo.text}</span></td>
         </tr>`;
         totalObtained += marksObtained;
         totalMax += subjectTotal;
       }
     }
     
+    // ✅ Final Result - Agar kisi subject me fail hai to overall FAIL
     const totalPercentage = totalMax > 0 ? ((totalObtained / totalMax) * 100) : 0;
     const roundedPercentage = totalPercentage.toFixed(2);
     const divisionInfo = calculateDivision(totalPercentage);
-    const statusInfo = getResultStatus(totalPercentage);
+    
+    // ✅ Overall Status: Agar koi subject fail hai to Overall FAIL
+    let overallStatus;
+    if (subjectFail) {
+      overallStatus = { text: "FAIL ❌", className: "division-fail" };
+    } else {
+      overallStatus = getResultStatus(totalPercentage);
+    }
     
     // Total Row
     marksHtml += `<tr class="total-row">
       <td><strong>TOTAL</strong></td>
-      <td><strong>${totalObtained}</strong></td>
       <td><strong>${totalMax}</strong></td>
+      <td><strong>${totalObtained}</strong></td>
       <td></td>
     </tr>`;
     
@@ -838,8 +895,8 @@
     divisionEl.className = `value ${divisionInfo.className}`;
     
     const statusEl = document.getElementById('resultStatus');
-    statusEl.innerText = statusInfo.text;
-    statusEl.className = `value ${statusInfo.className}`;
+    statusEl.innerText = overallStatus.text;
+    statusEl.className = `value ${overallStatus.className}`;
   }
   
   function showError(message) {
@@ -865,11 +922,9 @@
     clone.style.background = 'white';
     clone.style.boxShadow = 'none';
     
-    // Remove action buttons
     const actionDiv = clone.querySelector('.action-buttons');
     if (actionDiv) actionDiv.remove();
     
-    // Fix images
     const logoImg = clone.querySelector('#coachingLogo');
     if (logoImg) {
       logoImg.crossOrigin = 'Anonymous';
@@ -882,7 +937,6 @@
       photoImg.src = currentStudentData.photoUrl;
     }
     
-    // Fix QR Code - replace with image
     const qrContainer = clone.querySelector('#qrcode');
     if (qrContainer) {
       const canvas = qrContainer.querySelector('canvas');
@@ -971,8 +1025,9 @@
     const percentage = document.getElementById('percentageDisplay').innerText;
     const examName = document.getElementById('examName').innerText;
     const division = document.getElementById('divisionDisplay').innerText;
+    const status = document.getElementById('resultStatus').innerText;
     
-    const shareText = `📢 *Result Published* 📢\n\n🏫 *QUEST COACHING CENTRE*\n📚 *${examName}*\n\n👨‍🎓 Student: ${studentName}\n📝 Roll No: ${rollNumber}\n📊 Percentage: ${percentage}\n🏅 Division: ${division}\n📞 Contact: ${COACHING_PHONE}`;
+    const shareText = `📢 *Result Published* 📢\n\n🏫 *QUEST COACHING CENTRE*\n📚 *${examName}*\n\n👨‍🎓 Student: ${studentName}\n📝 Roll No: ${rollNumber}\n📊 Percentage: ${percentage}\n🏅 Division: ${division}\n📌 Status: ${status}\n📞 Contact: ${COACHING_PHONE}`;
     
     if (navigator.share) {
       navigator.share({
@@ -984,7 +1039,6 @@
     }
   }
   
-  // Make functions global
   window.downloadResultPDF = downloadResultPDF;
   window.shareResult = shareResult;
   window.goBack = goBack;
