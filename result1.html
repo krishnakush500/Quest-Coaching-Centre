@@ -698,7 +698,7 @@
       container.innerHTML = '';
       
       try {
-        const qr = new QRCode(container, {
+        new QRCode(container, {
           text: text,
           width: 65,
           height: 65,
@@ -707,10 +707,9 @@
           correctLevel: QRCode.CorrectLevel.H
         });
         
-        // Wait for QR to render
         setTimeout(() => {
           resolve();
-        }, 300);
+        }, 500);
       } catch(e) {
         console.error('QR Error:', e);
         resolve();
@@ -798,11 +797,11 @@
     document.getElementById('rollCode').innerText = examData.rollCode || student.rollCode || '55075';
     document.getElementById('rollNumber').innerText = student.rollNo || student.rollNumber || '-';
     
-    // ✅ Generate QR Code with result link
+    // ✅ Generate QR Code
     const publicUrl = `${window.location.origin}${window.location.pathname}?examId=${currentExamId}&rollNo=${student.rollNo}`;
     generateQRCode(publicUrl, 'qrcode').then(() => {
       qrCodeGenerated = true;
-      console.log('✅ QR Code generated successfully!');
+      console.log('✅ QR Code generated');
     });
     
     // Marks Table
@@ -880,13 +879,25 @@
     document.getElementById('errorMessage').innerHTML = message;
   }
   
-  // ✅ PDF Generation - FIXED with QR Code
+  // ✅ FIXED PDF Generation
+  function getQRImageData() {
+    const qrContainer = document.getElementById('qrcode');
+    if (!qrContainer) return null;
+    
+    const canvas = qrContainer.querySelector('canvas');
+    if (canvas) {
+      return canvas.toDataURL('image/png');
+    }
+    return null;
+  }
+  
   function createPDFClone() {
     const originalCard = document.getElementById('resultCard');
     const cloneContainer = document.getElementById('pdfCloneContainer');
     
     cloneContainer.innerHTML = '';
     
+    // Deep clone
     const clone = originalCard.cloneNode(true);
     clone.classList.add('pdf-clone');
     clone.style.display = 'block';
@@ -917,34 +928,18 @@
       photoImg.src = currentStudentData.photoUrl;
     }
     
-    // ✅ Fix QR Code - Generate image from canvas
+    // ✅ FIX: Convert QR Code canvas to image
     const qrContainer = clone.querySelector('#qrcode');
     if (qrContainer) {
-      // Try to get the canvas from the original QR
-      const originalQr = document.getElementById('qrcode');
-      const canvas = originalQr ? originalQr.querySelector('canvas') : null;
-      
-      if (canvas) {
+      const qrData = getQRImageData();
+      if (qrData) {
         const img = document.createElement('img');
-        img.src = canvas.toDataURL('image/png');
+        img.src = qrData;
         img.style.width = '65px';
         img.style.height = '65px';
         img.style.display = 'block';
         qrContainer.innerHTML = '';
         qrContainer.appendChild(img);
-      } else {
-        // Fallback: try to regenerate
-        const url = `${window.location.origin}${window.location.pathname}?examId=${currentExamId}&rollNo=${currentStudentData?.rollNo}`;
-        qrContainer.innerHTML = '';
-        try {
-          new QRCode(qrContainer, {
-            text: url,
-            width: 65,
-            height: 65,
-            colorDark: "#1a3a5c",
-            colorLight: "#ffffff"
-          });
-        } catch(e) {}
       }
     }
     
@@ -976,7 +971,7 @@
     btn.disabled = true;
     
     try {
-      // Wait for QR Code to be generated
+      // Wait for QR Code
       if (!qrCodeGenerated) {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
@@ -984,7 +979,7 @@
       const clone = createPDFClone();
       const cloneContainer = document.getElementById('pdfCloneContainer');
       
-      // Wait for images to load
+      // Wait for images
       const cloneLogo = clone.querySelector('#coachingLogo');
       const clonePhoto = clone.querySelector('#studentPhoto');
       
@@ -993,31 +988,43 @@
         waitForImageLoad(clonePhoto)
       ]);
       
-      // Extra wait for QR
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      const opt = {
-        margin: { top: 5, bottom: 5, left: 5, right: 5 },
-        filename: `Result_${document.getElementById('rollNumber').innerText}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-          scale: 2,
-          useCORS: true,
-          logging: false,
-          backgroundColor: '#ffffff',
-          allowTaint: true,
-          width: 650,
-          height: 900
-        },
-        jsPDF: { 
-          unit: 'mm', 
-          format: 'a4', 
-          orientation: 'portrait' 
-        },
-        pagebreak: { mode: 'avoid-all' }
-      };
+      const element = clone;
       
-      await html2pdf().set(opt).from(clone).save();
+      // ✅ Use html2canvas directly with better options
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        allowTaint: true,
+        width: element.scrollWidth,
+        height: element.scrollHeight,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight
+      });
+      
+      const imgData = canvas.toDataURL('image/jpeg', 0.98);
+      
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait'
+      });
+      
+      const pdfWidth = 190;
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      // Check if height fits in one page, if not scale down
+      let finalHeight = pdfHeight;
+      if (pdfHeight > 277) { // A4 height in mm (297 - margins)
+        finalHeight = 277;
+      }
+      
+      pdf.addImage(imgData, 'JPEG', 10, 10, pdfWidth, finalHeight);
+      pdf.save(`Result_${document.getElementById('rollNumber').innerText}.pdf`);
       
       cloneContainer.innerHTML = '';
       cloneContainer.style.visibility = 'hidden';
