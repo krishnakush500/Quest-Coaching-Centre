@@ -147,7 +147,7 @@
       font-size: 0.6rem;
     }
     
-    /* Yellow stripe */
+    /* Yellow stripe - Sirf exam name */
     .exam-name-strip {
       background: #c5a059;
       color: white;
@@ -343,15 +343,34 @@
       border-top: 2px solid #c5a059;
     }
     
-    .status-pass {
-      color: #16a34a;
-      font-weight: 700;
+    /* ✅ Optional Subject Row */
+    .marks-table .optional-row {
+      background: #fef9e6 !important;
+      font-weight: 600;
+      border-top: 1px dashed #c5a059;
     }
     
-    .status-fail {
-      color: #dc2626;
-      font-weight: 700;
+    .marks-table .optional-row td {
+      color: #1a3a5c;
     }
+    
+    /* Grade Badges */
+    .grade-badge {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 1px solid #c5a059;
+    }
+    
+    .grade-a-plus { background: #d4edda; color: #155724; }
+    .grade-a { background: #d1ecf1; color: #0c5460; }
+    .grade-b-plus { background: #fff3cd; color: #856404; }
+    .grade-b { background: #ffe6b3; color: #856404; }
+    .grade-c { background: #ffe0b3; color: #cc7000; }
+    .grade-d { background: #f8d7da; color: #721c24; }
+    .grade-f { background: #f5c6cb; color: #721c24; }
     
     /* Summary */
     .result-summary {
@@ -455,7 +474,7 @@
       font-weight: 600;
     }
     
-    /* ✅ PDF Clone - FIXED A4 SIZE (No responsive) */
+    /* PDF Clone - FIXED A4 SIZE */
     .pdf-clone-container {
       position: fixed;
       top: 0;
@@ -489,7 +508,6 @@
       margin: 0 auto;
     }
     
-    /* ✅ PDF Clone - Fixed sizes (No responsive) */
     .pdf-clone .logo-box { width: 85px; height: 85px; }
     .pdf-clone .header-text h1 { font-size: 1.5rem; }
     .pdf-clone .result-header { padding: 14px 20px; }
@@ -535,7 +553,7 @@
     .pdf-clone .result-footer { padding: 8px 18px; font-size: 0.65rem; }
     .pdf-clone .coaching-contact { font-size: 0.6rem; gap: 12px; }
     
-    /* Responsive - Only for screen, NOT for PDF */
+    /* Responsive - Only for screen */
     @media (max-width: 820px) {
       .result-container { max-width: 100%; padding: 0 10px; }
       .admit-card-result { max-width: 100%; }
@@ -627,9 +645,9 @@
       </div>
     </div>
     
-    <!-- Yellow stripe -->
+    <!-- ✅ Yellow stripe - Sirf exam name (Exam: text hatao) -->
     <div class="exam-name-strip">
-      <i class="fas fa-trophy"></i> Exam: <span id="examName">Final Examination 2025</span>
+      <i class="fas fa-trophy"></i> <span id="examName">Final Examination 2025</span>
     </div>
     
     <!-- MARKSHEET heading -->
@@ -672,7 +690,7 @@
             <th>Subject</th>
             <th>Total Marks</th>
             <th>Marks Obtained</th>
-            <th>Status</th>
+            <th>Grade</th>
           </tr>
         </thead>
         <tbody id="marksTableBody"></tbody>
@@ -745,13 +763,15 @@
     window.location.href = 'index.html';
   }
   
-  function getSubjectStatus(obtained, total) {
-    const percentage = (obtained / total) * 100;
-    if (percentage >= 30) {
-      return { text: "PASS ✅", className: "status-pass" };
-    } else {
-      return { text: "FAIL ❌", className: "status-fail" };
-    }
+  // ✅ Grade function (jo pehle tha)
+  function getGrade(percentage) {
+    if(percentage >= 90) return { grade: "A+", className: "grade-a-plus" };
+    if(percentage >= 75) return { grade: "A", className: "grade-a" };
+    if(percentage >= 65) return { grade: "B+", className: "grade-b-plus" };
+    if(percentage >= 55) return { grade: "B", className: "grade-b" };
+    if(percentage >= 45) return { grade: "C", className: "grade-c" };
+    if(percentage >= 33) return { grade: "D", className: "grade-d" };
+    return { grade: "F", className: "grade-f" };
   }
   
   function calculateDivision(percentage) {
@@ -838,7 +858,8 @@
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('resultCard').style.display = 'block';
     
-    document.getElementById('examName').innerText = examData.examName || "Examination";
+    // ✅ Sirf exam name (Exam: text nahi)
+    document.getElementById('examName').innerText = examData.examName || "Final Examination 2025";
     
     const photoImg = document.getElementById('studentPhoto');
     if (student.photoUrl) {
@@ -889,49 +910,72 @@
       }, 300);
     }
     
-    // MARKS TABLE
+    // ✅ MARKS TABLE - Grade column (Status hatao)
     let marksHtml = '';
     let totalObtained = 0;
     let totalMax = 0;
-    let subjectFail = false;
+    let optionalSubject = null;
+    let optionalObtained = 0;
+    let optionalTotal = 0;
     
     if (student.marks && examData.subjects) {
       for (const subject of examData.subjects) {
         const subjectName = subject.name;
         const subjectTotal = subject.total || 100;
         const marksObtained = student.marks[subjectName] !== undefined ? student.marks[subjectName] : 0;
-        const statusInfo = getSubjectStatus(marksObtained, subjectTotal);
+        const percentage = subjectTotal > 0 ? (marksObtained / subjectTotal) * 100 : 0;
+        const gradeInfo = getGrade(percentage);
         
-        if (statusInfo.text.includes('FAIL')) subjectFail = true;
-        
-        marksHtml += `<tr>
-          <td><strong>${subjectName}</strong></td>
-          <td>${subjectTotal}</td>
-          <td><strong>${marksObtained}</strong></td>
-          <td><span class="${statusInfo.className}">${statusInfo.text}</span></td>
-        </tr>`;
-        totalObtained += marksObtained;
-        totalMax += subjectTotal;
+        // ✅ Check if optional subject
+        if (subject.isOptional) {
+          optionalSubject = subjectName;
+          optionalObtained = marksObtained;
+          optionalTotal = subjectTotal;
+        } else {
+          marksHtml += `<tr>
+            <td><strong>${subjectName}</strong></td>
+            <td>${subjectTotal}</td>
+            <td><strong>${marksObtained}</strong></td>
+            <td><span class="grade-badge ${gradeInfo.className}">${gradeInfo.grade}</span></td>
+          </tr>`;
+          totalObtained += marksObtained;
+          totalMax += subjectTotal;
+        }
       }
     }
     
-    const totalPercentage = totalMax > 0 ? ((totalObtained / totalMax) * 100) : 0;
-    const roundedPercentage = totalPercentage.toFixed(2);
-    const divisionInfo = calculateDivision(totalPercentage);
-    
-    let overallStatus;
-    if (subjectFail) {
-      overallStatus = { text: "FAIL ❌", className: "division-fail" };
-    } else {
-      overallStatus = getResultStatus(totalPercentage);
-    }
-    
+    // ✅ Total Row
     marksHtml += `<tr class="total-row">
       <td><strong>TOTAL</strong></td>
       <td><strong>${totalMax}</strong></td>
       <td><strong>${totalObtained}</strong></td>
       <td></td>
     </tr>`;
+    
+    // ✅ Optional Subject Row (agar data hai to)
+    if (optionalSubject) {
+      const optionalPercentage = optionalTotal > 0 ? (optionalObtained / optionalTotal) * 100 : 0;
+      const optionalGrade = getGrade(optionalPercentage);
+      marksHtml += `<tr class="optional-row">
+        <td><strong>${optionalSubject} (Optional)</strong></td>
+        <td>${optionalTotal}</td>
+        <td><strong>${optionalObtained}</strong></td>
+        <td><span class="grade-badge ${optionalGrade.className}">${optionalGrade.grade}</span></td>
+      </tr>`;
+    } else {
+      // ✅ Agar optional subject data nahi hai to khali row
+      marksHtml += `<tr class="optional-row">
+        <td><strong>Optional Subject</strong></td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>`;
+    }
+    
+    const totalPercentage = totalMax > 0 ? ((totalObtained / totalMax) * 100) : 0;
+    const roundedPercentage = totalPercentage.toFixed(2);
+    const divisionInfo = calculateDivision(totalPercentage);
+    const overallStatus = getResultStatus(totalPercentage);
     
     document.getElementById('marksTableBody').innerHTML = marksHtml;
     
@@ -953,7 +997,7 @@
     document.getElementById('errorMessage').innerHTML = message;
   }
   
-  // ✅ PDF Generation - FIXED A4 (Phone + Desktop same)
+  // ✅ PDF Generation
   function createPDFClone() {
     const originalCard = document.getElementById('resultCard');
     const cloneContainer = document.getElementById('pdfCloneContainer');
@@ -972,7 +1016,6 @@
     clone.style.boxShadow = 'none';
     clone.style.borderRadius = '8px';
     
-    // ✅ FORCE remove any responsive styles from clone
     const card = clone.querySelector('.admit-card-result');
     if (card) {
       card.style.width = '794px';
@@ -981,7 +1024,6 @@
       card.style.margin = '0 auto';
     }
     
-    // ✅ FORCE student info row to be horizontal
     const infoRow = clone.querySelector('.student-info-row');
     if (infoRow) {
       infoRow.style.display = 'flex';
@@ -991,14 +1033,12 @@
       infoRow.style.gap = '14px';
     }
     
-    // ✅ FORCE student details grid
     const details = clone.querySelector('.student-details');
     if (details) {
       details.style.display = 'grid';
       details.style.gridTemplateColumns = '1fr 1fr';
     }
     
-    // ✅ FORCE summary row
     const summary = clone.querySelector('.result-summary');
     if (summary) {
       summary.style.display = 'flex';
@@ -1006,11 +1046,9 @@
       summary.style.flexWrap = 'wrap';
     }
     
-    // Remove action buttons
     const actionDiv = clone.querySelector('.action-buttons');
     if (actionDiv) actionDiv.remove();
     
-    // Fix images
     const logoImg = clone.querySelector('#coachingLogo');
     if (logoImg) {
       logoImg.crossOrigin = 'Anonymous';
@@ -1023,7 +1061,6 @@
       photoImg.src = currentStudentData.photoUrl;
     }
     
-    // QR Code for PDF
     const qrContainer = clone.querySelector('#qrcode');
     if (qrContainer) {
       const cloneUrl = window.location.href;
@@ -1071,7 +1108,6 @@
       
       await new Promise(resolve => setTimeout(resolve, 800));
       
-      // Convert QR canvas to image for PDF
       const qrContainer = clone.querySelector('#qrcode');
       if (qrContainer) {
         const canvas = qrContainer.querySelector('canvas');
