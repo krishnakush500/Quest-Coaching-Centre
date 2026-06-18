@@ -118,61 +118,53 @@
         .photo-fetch-success { color: #16a34a; }
         .photo-fetch-missing { color: #dc2626; }
         
-        /* Template Selection Styles */
+        /* ✅ Template Selection - Compact */
         .template-selector {
             display: flex;
-            gap: 20px;
-            padding: 15px;
+            gap: 12px;
+            padding: 10px 15px;
             background: #f8fafc;
-            border-radius: 16px;
-            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
             margin-bottom: 20px;
             flex-wrap: wrap;
+            align-items: center;
+        }
+        .template-selector .selector-label {
+            font-weight: 600;
+            color: #1a237e;
+            font-size: 0.85rem;
+            margin-right: 10px;
         }
         .template-option {
-            flex: 1;
-            min-width: 180px;
-            padding: 15px;
-            border-radius: 12px;
+            padding: 8px 16px;
+            border-radius: 30px;
             border: 2px solid #e2e8f0;
             cursor: pointer;
             text-align: center;
             transition: all 0.3s;
             background: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         .template-option:hover {
             border-color: #1a237e;
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
         .template-option.selected {
             border-color: #1a237e;
             background: #e8eafe;
-            box-shadow: 0 0 0 3px rgba(26,35,126,0.2);
+            box-shadow: 0 0 0 2px rgba(26,35,126,0.15);
         }
-        .template-option input[type="radio"] {
-            display: none;
-        }
-        .template-option .template-icon {
-            font-size: 2rem;
-            color: #1a237e;
-            margin-bottom: 8px;
-        }
-        .template-option .template-name {
-            font-weight: 700;
-            color: #1a237e;
-            font-size: 1rem;
-        }
-        .template-option .template-desc {
-            font-size: 0.75rem;
-            color: #64748b;
-            margin-top: 4px;
-        }
+        .template-option input[type="radio"] { display: none; }
+        .template-option .template-icon { font-size: 1.1rem; color: #1a237e; }
+        .template-option .template-name { font-weight: 600; color: #1a237e; font-size: 0.85rem; }
         .template-option .template-preview-badge {
             display: inline-block;
-            margin-top: 6px;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 0.65rem;
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-size: 0.55rem;
             font-weight: 600;
             background: #e2e8f0;
             color: #475569;
@@ -182,6 +174,40 @@
             color: white;
         }
         
+        /* ✅ Optional Subject Styles */
+        .optional-subject-box {
+            background: #fef9e6;
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 12px;
+            border: 2px dashed #c5a059;
+        }
+        .optional-subject-box .form-label {
+            color: #c5a059;
+            font-weight: 600;
+        }
+        .btn-remove-optional {
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+        .btn-remove-optional:hover { background: #b91c1c; }
+        .btn-add-optional {
+            background: #c5a059;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 18px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-add-optional:hover { background: #a8894a; }
+        
         @media (max-width: 768px) {
             body { padding: 15px; }
             .header-section { flex-direction: column; text-align: center; }
@@ -190,8 +216,8 @@
             .action-card { padding: 20px 15px; }
             .action-icon { width: 55px; height: 55px; font-size: 26px; }
             .action-title { font-size: 1.1rem; }
-            .template-selector { flex-direction: column; }
-            .template-option { min-width: unset; }
+            .template-selector { flex-direction: column; align-items: stretch; }
+            .template-option { justify-content: center; }
         }
     </style>
 </head>
@@ -230,23 +256,19 @@
             <button class="back-btn" id="backFromCreateBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button>
         </div>
         
-        <!-- TEMPLATE SELECTION - NEW -->
+        <!-- ✅ TEMPLATE SELECTION - Compact -->
         <div class="template-selector" id="templateSelector">
-            <label style="width:100%; font-weight:700; color:#1a237e; margin-bottom:8px;">
-                <i class="fas fa-palette"></i> Select Result Template:
-            </label>
+            <span class="selector-label"><i class="fas fa-palette"></i> Template:</span>
             <div class="template-option selected" id="templateResult">
                 <input type="radio" name="template" value="result" checked>
-                <div class="template-icon"><i class="fas fa-file-alt"></i></div>
-                <div class="template-name">Classic Result</div>
-                <div class="template-desc">Traditional marksheet style</div>
+                <span class="template-icon"><i class="fas fa-file-alt"></i></span>
+                <span class="template-name">Classic</span>
                 <span class="template-preview-badge">Default</span>
             </div>
             <div class="template-option" id="templateResult1">
                 <input type="radio" name="template" value="result1">
-                <div class="template-icon"><i class="fas fa-id-card"></i></div>
-                <div class="template-name">Admit Card Style</div>
-                <div class="template-desc">Same as admit card with marksheet</div>
+                <span class="template-icon"><i class="fas fa-id-card"></i></span>
+                <span class="template-name">Admit Card</span>
                 <span class="template-preview-badge">New</span>
             </div>
         </div>
@@ -263,8 +285,21 @@
                 </div>
             </div>
             <div id="subjectFields" class="mb-4"></div>
-            <div id="step1NextBtn" class="d-none"><button id="nextToStudentEntryBtn" class="btn btn-success">Next →</button></div>
+            <!-- ✅ Optional Subject Section -->
+            <div id="optionalSubjectSection" style="display:none; margin-top:10px;">
+                <div class="optional-subject-box" id="optionalSubjectBox">
+                    <div class="row">
+                        <div class="col-md-5"><label class="form-label">Optional Subject Name</label><input type="text" class="form-control" id="optionalSubjectName" placeholder="e.g., Computer Science"></div>
+                        <div class="col-md-4"><label class="form-label">Total Marks</label><input type="number" class="form-control" id="optionalSubjectTotal" min="1" value="100"></div>
+                        <div class="col-md-3 d-flex align-items-end"><button class="btn btn-danger btn-sm" id="removeOptionalBtn"><i class="fas fa-trash"></i> Remove</button></div>
+                    </div>
+                    <small class="text-muted">Optional subject marks will NOT be added to total marks.</small>
+                </div>
+            </div>
+            <button class="btn-add-optional" id="addOptionalBtn"><i class="fas fa-plus"></i> Add Optional Subject</button>
+            <div id="step1NextBtn" class="d-none mt-3"><button id="nextToStudentEntryBtn" class="btn btn-success">Next →</button></div>
         </div>
+        
         <div id="studentEntryStep" style="display: none;">
             <div class="card mb-4">
                 <div class="card-header bg-white fw-bold">Step 2: Student Marks Entry 
@@ -300,6 +335,14 @@
                         </div>
                     </div>
                     <div id="marksFields" class="mb-3"></div>
+                    <!-- ✅ Optional Subject Marks Field -->
+                    <div id="optionalMarksField" style="display:none;" class="mb-3">
+                        <div class="optional-subject-box">
+                            <label class="form-label" id="optionalMarkLabel">Optional Subject (Max: 100)</label>
+                            <input type="number" class="form-control" id="optionalMarkInput" min="0" placeholder="Enter optional subject marks">
+                            <small class="text-muted">Optional subject marks will NOT be added to total.</small>
+                        </div>
+                    </div>
                     <div class="d-flex gap-2 flex-wrap">
                         <button id="addStudentBtn" class="btn btn-primary"><i class="fas fa-user-plus"></i> Add Student</button>
                         <button id="updateStudentBtn" class="btn btn-warning d-none">Update Student</button>
@@ -360,15 +403,13 @@
         <div class="template-selector" id="editTemplateSelector" style="border:none; padding:0;">
             <div class="template-option" id="editTemplateResult">
                 <input type="radio" name="editTemplate" value="result">
-                <div class="template-icon"><i class="fas fa-file-alt"></i></div>
-                <div class="template-name">Classic Result</div>
-                <div class="template-desc">Traditional marksheet style</div>
+                <span class="template-icon"><i class="fas fa-file-alt"></i></span>
+                <span class="template-name">Classic Result</span>
             </div>
             <div class="template-option" id="editTemplateResult1">
                 <input type="radio" name="editTemplate" value="result1">
-                <div class="template-icon"><i class="fas fa-id-card"></i></div>
-                <div class="template-name">Admit Card Style</div>
-                <div class="template-desc">Same as admit card with marksheet</div>
+                <span class="template-icon"><i class="fas fa-id-card"></i></span>
+                <span class="template-name">Admit Card Style</span>
             </div>
         </div>
         <input type="hidden" id="editTemplateResultId">
@@ -446,11 +487,23 @@
     const saveChangesConfirmBtn = document.getElementById('saveChangesConfirmBtn');
     const editTemplateModal = new bootstrap.Modal(document.getElementById('editTemplateModal'));
 
+    // ✅ Optional Subject Elements
+    const addOptionalBtn = document.getElementById('addOptionalBtn');
+    const removeOptionalBtn = document.getElementById('removeOptionalBtn');
+    const optionalSubjectSection = document.getElementById('optionalSubjectSection');
+    const optionalSubjectName = document.getElementById('optionalSubjectName');
+    const optionalSubjectTotal = document.getElementById('optionalSubjectTotal');
+    const optionalMarksField = document.getElementById('optionalMarksField');
+    const optionalMarkLabel = document.getElementById('optionalMarkLabel');
+    const optionalMarkInput = document.getElementById('optionalMarkInput');
+
     let subjects = [], students = [], editingStudentIndex = null, editingDraftId = null;
     let isEditingPublishedResult = false, editingPublishedResultId = null, hasChanges = false;
     let currentResultDataForPdf = null, currentExamNameForPdf = '';
     let currentStudentPhotoUrl = '';
-    let selectedTemplate = 'result'; // Default template
+    let selectedTemplate = 'result';
+    let hasOptionalSubject = false;
+    let optionalSubjectData = null;
 
     function showFullScreen(section) { actionCardsContainer.style.display = 'none'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; section.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
     function showActionCards() { actionCardsContainer.style.display = 'grid'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -466,7 +519,6 @@
         });
     });
 
-    // Edit Template Selection
     document.querySelectorAll('#editTemplateSelector .template-option').forEach(opt => {
         opt.addEventListener('click', function() {
             document.querySelectorAll('#editTemplateSelector .template-option').forEach(o => o.classList.remove('selected'));
@@ -474,6 +526,54 @@
             this.querySelector('input[type="radio"]').checked = true;
         });
     });
+
+    // ✅ Optional Subject Functions
+    addOptionalBtn.addEventListener('click', function() {
+        optionalSubjectSection.style.display = 'block';
+        hasOptionalSubject = true;
+        this.style.display = 'none';
+        // Show optional marks field in student entry
+        if (optionalMarksField) {
+            optionalMarksField.style.display = 'block';
+            const label = document.getElementById('optionalMarkLabel');
+            if (label && optionalSubjectName.value) {
+                label.textContent = `${optionalSubjectName.value} (Optional) (Max: ${optionalSubjectTotal.value || 100})`;
+            }
+        }
+    });
+
+    removeOptionalBtn.addEventListener('click', function() {
+        if (confirm('Remove optional subject? This will remove it from all students.')) {
+            optionalSubjectSection.style.display = 'none';
+            hasOptionalSubject = false;
+            optionalSubjectData = null;
+            optionalSubjectName.value = '';
+            optionalSubjectTotal.value = '100';
+            document.getElementById('addOptionalBtn').style.display = 'inline-block';
+            if (optionalMarksField) optionalMarksField.style.display = 'none';
+            if (optionalMarkInput) optionalMarkInput.value = '';
+            // Remove optional marks from all students
+            students.forEach(s => {
+                if (s.optionalMarks !== undefined) delete s.optionalMarks;
+                if (s.optionalSubject) delete s.optionalSubject;
+            });
+            updateStudentsTable();
+            showToast('Optional subject removed');
+        }
+    });
+
+    // Update optional label when name/total changes
+    optionalSubjectName.addEventListener('input', updateOptionalLabel);
+    optionalSubjectTotal.addEventListener('input', updateOptionalLabel);
+
+    function updateOptionalLabel() {
+        const name = optionalSubjectName.value || 'Optional Subject';
+        const total = optionalSubjectTotal.value || 100;
+        const label = document.getElementById('optionalMarkLabel');
+        if (label) label.textContent = `${name} (Optional) (Max: ${total})`;
+        // Update in student entry
+        if (optionalMarkInput) optionalMarkInput.max = total;
+    }
 
     createResultMainCard.addEventListener('click', () => { resetCreateResultForm(); showFullScreen(createResultSection); });
     draftResultsMainCard.addEventListener('click', () => { loadDraftResults(); showFullScreen(draftResultsSection); });
@@ -483,7 +583,6 @@
     backFromDraftBtn.addEventListener('click', showActionCards);
     backFromOldBtn.addEventListener('click', showActionCards);
 
-    // Fetch student from admissions
     async function fetchStudentFromAdmission(rollNumber) {
         try {
             const q = query(collection(db, "admissions"), where("rollNumber", "==", String(rollNumber)));
@@ -572,6 +671,24 @@
             subjects.push({ name, total });
         }
         if (!valid) { alert('Fill all subject fields'); return; }
+        
+        // ✅ Check optional subject
+        if (hasOptionalSubject && optionalSubjectName.value.trim()) {
+            optionalSubjectData = {
+                name: optionalSubjectName.value.trim(),
+                total: parseInt(optionalSubjectTotal.value) || 100,
+                isOptional: true
+            };
+            subjects.push(optionalSubjectData);
+            // Show optional marks field in student entry
+            optionalMarksField.style.display = 'block';
+            const label = document.getElementById('optionalMarkLabel');
+            if (label) label.textContent = `${optionalSubjectData.name} (Optional) (Max: ${optionalSubjectData.total})`;
+            optionalMarkInput.max = optionalSubjectData.total;
+        } else {
+            optionalMarksField.style.display = 'none';
+        }
+        
         generateMarksFields();
         examSetupStep.style.display = 'none';
         studentEntryStep.style.display = 'block';
@@ -580,6 +697,8 @@
     function generateMarksFields() {
         marksFields.innerHTML = '<h5 class="mb-3">Enter Marks</h5>';
         subjects.forEach(sub => {
+            // ✅ Skip optional subject - it has separate field
+            if (sub.isOptional) return;
             const div = document.createElement('div');
             div.className = 'mb-2';
             div.innerHTML = `<label class="form-label">${sub.name} (Max: ${sub.total})</label><input type="number" class="form-control subject-mark" data-subject="${sub.name}" min="0" max="${sub.total}">`;
@@ -605,16 +724,33 @@
         });
         if (!valid) return;
         
+        // ✅ Optional subject marks
+        let optionalMarks = null;
+        if (hasOptionalSubject && optionalSubjectData && optionalMarkInput.value !== '') {
+            const optMark = parseInt(optionalMarkInput.value);
+            if (!isNaN(optMark) && optMark >= 0) {
+                if (optMark > optionalSubjectData.total) {
+                    alert(`Optional subject marks cannot exceed ${optionalSubjectData.total}`);
+                    return;
+                }
+                optionalMarks = optMark;
+                marks[optionalSubjectData.name] = optMark;
+            }
+        }
+        
         students.push({ 
             rollNo: roll, 
             name, 
             fatherName: fatherNameInput.value.trim(), 
             marks,
-            photoUrl: currentStudentPhotoUrl || null
+            photoUrl: currentStudentPhotoUrl || null,
+            optionalMarks: optionalMarks,
+            optionalSubject: optionalSubjectData ? optionalSubjectData.name : null
         });
         updateStudentsTable();
         studentNameInput.value = ''; fatherNameInput.value = '';
         document.querySelectorAll('.subject-mark').forEach(inp => inp.value = '');
+        if (optionalMarkInput) optionalMarkInput.value = '';
         studentPhotoPreview.style.display = 'none';
         photoFetchStatus.innerHTML = '';
         currentStudentPhotoUrl = '';
@@ -627,7 +763,18 @@
         studentsTableBody.innerHTML = '';
         students.forEach((s, idx) => {
             let marksHtml = '';
-            subjects.forEach(sub => marksHtml += `<div>${sub.name}: ${s.marks[sub.name] || 0}/${sub.total}</div>`);
+            // ✅ Show only main subjects (not optional) in marks list
+            subjects.forEach(sub => {
+                if (sub.isOptional) return;
+                marksHtml += `<div>${sub.name}: ${s.marks[sub.name] || 0}/${sub.total}</div>`;
+            });
+            // ✅ Show optional subject if exists
+            if (s.optionalSubject && s.optionalMarks !== null) {
+                const optSub = subjects.find(sub => sub.name === s.optionalSubject);
+                if (optSub) {
+                    marksHtml += `<div style="color:#c5a059;">${s.optionalSubject} (Optional): ${s.optionalMarks}/${optSub.total}</div>`;
+                }
+            }
             const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" class="student-photo-thumb" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷 No photo</span>';
             const row = `<tr><td>${photoHtml}</td><td>${s.rollNo}</td><td>${s.name}</td><td>${s.fatherName || '-'}</td><td>${marksHtml}</td><td><button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button> <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button></td></tr>`;
             studentsTableBody.insertAdjacentHTML('beforeend', row);
@@ -650,6 +797,12 @@
             studentPhotoPreview.style.display = 'none';
         }
         document.querySelectorAll('.subject-mark').forEach(inp => inp.value = s.marks[inp.dataset.subject] || 0);
+        // ✅ Optional subject marks
+        if (optionalMarkInput && s.optionalMarks !== null && s.optionalMarks !== undefined) {
+            optionalMarkInput.value = s.optionalMarks;
+        } else {
+            optionalMarkInput.value = '';
+        }
         addStudentBtn.classList.add('d-none'); updateStudentBtn.classList.remove('d-none'); cancelEditBtn.classList.remove('d-none');
     }
 
@@ -669,7 +822,30 @@
             marks[sub] = mark;
         });
         if (!valid) return;
-        students[editingStudentIndex] = { rollNo: roll, name, fatherName: fatherNameInput.value.trim(), marks, photoUrl: currentStudentPhotoUrl };
+        
+        // ✅ Optional subject marks
+        let optionalMarks = null;
+        if (hasOptionalSubject && optionalSubjectData && optionalMarkInput.value !== '') {
+            const optMark = parseInt(optionalMarkInput.value);
+            if (!isNaN(optMark) && optMark >= 0) {
+                if (optMark > optionalSubjectData.total) {
+                    alert(`Optional subject marks cannot exceed ${optionalSubjectData.total}`);
+                    return;
+                }
+                optionalMarks = optMark;
+                marks[optionalSubjectData.name] = optMark;
+            }
+        }
+        
+        students[editingStudentIndex] = { 
+            rollNo: roll, 
+            name, 
+            fatherName: fatherNameInput.value.trim(), 
+            marks, 
+            photoUrl: currentStudentPhotoUrl,
+            optionalMarks: optionalMarks,
+            optionalSubject: optionalSubjectData ? optionalSubjectData.name : null
+        };
         updateStudentsTable();
         cancelEdit();
         hasChanges = true;
@@ -684,6 +860,7 @@
         photoFetchStatus.innerHTML = '';
         currentStudentPhotoUrl = '';
         document.querySelectorAll('.subject-mark').forEach(inp => inp.value = '');
+        if (optionalMarkInput) optionalMarkInput.value = '';
         addStudentBtn.classList.remove('d-none'); updateStudentBtn.classList.add('d-none'); cancelEditBtn.classList.add('d-none');
     }
 
@@ -699,7 +876,8 @@
                 examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
                 rollCode: rollCodeInput.value || '55075',
                 template: selectedTemplate,
-                subjects, 
+                subjects: subjects.filter(s => !s.isOptional), // Main subjects only
+                optionalSubject: optionalSubjectData || null,
                 students, 
                 createdAt: serverTimestamp() 
             };
@@ -711,24 +889,81 @@
         } catch(e) { alert(e.message); }
     });
 
+    // ✅ Publish Result with Optional Subject
     publishResultBtn.addEventListener('click', async () => {
         if (!examNameInput.value.trim() || students.length === 0) { alert('Exam name and at least one student required'); return; }
-        if (isEditingPublishedResult) { alert('Use "Save Changes" to update published result'); return; }
+        if (isEditingPublishedResult) { 
+            // ✅ Show confirmation modal for editing published result
+            editPublishedConfirmModal.show();
+            return;
+        }
         try {
-            await addDoc(collection(db, "results"), { 
+            const data = { 
                 examName: examNameInput.value,
                 examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
                 rollCode: rollCodeInput.value || '55075',
                 template: selectedTemplate,
-                subjects, 
+                subjects: subjects.filter(s => !s.isOptional), // Main subjects only
+                optionalSubject: optionalSubjectData || null,
                 students, 
                 createdAt: serverTimestamp() 
-            });
+            };
+            await addDoc(collection(db, "results"), data);
             if (editingDraftId) await deleteDoc(doc(db, "draft_results", editingDraftId));
             showToast('', true);
             resetCreateResultForm();
             showActionCards();
         } catch(e) { alert(e.message); }
+    });
+
+    // ✅ Save Changes (for published result edit)
+    saveChangesConfirmBtn.addEventListener('click', async () => {
+        if (!editingPublishedResultId) { editPublishedConfirmModal.hide(); return; }
+        try {
+            const data = { 
+                examName: examNameInput.value,
+                examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
+                rollCode: rollCodeInput.value || '55075',
+                template: selectedTemplate,
+                subjects: subjects.filter(s => !s.isOptional),
+                optionalSubject: optionalSubjectData || null,
+                students
+            };
+            await updateDoc(doc(db, "results", editingPublishedResultId), data);
+            editPublishedConfirmModal.hide();
+            showToast('Result updated successfully!');
+            resetCreateResultForm();
+            showActionCards();
+            loadOldResults();
+        } catch(e) { alert(e.message); }
+    });
+
+    // ✅ Save as Draft (from published result edit)
+    saveDraftConfirmBtn.addEventListener('click', async () => {
+        try {
+            const data = { 
+                examName: examNameInput.value,
+                examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
+                rollCode: rollCodeInput.value || '55075',
+                template: selectedTemplate,
+                subjects: subjects.filter(s => !s.isOptional),
+                optionalSubject: optionalSubjectData || null,
+                students,
+                createdAt: serverTimestamp() 
+            };
+            await addDoc(collection(db, "draft_results"), data);
+            editPublishedConfirmModal.hide();
+            showToast('Saved as draft!');
+            resetCreateResultForm();
+            showActionCards();
+            loadDraftResults();
+        } catch(e) { alert(e.message); }
+    });
+
+    dontSaveConfirmBtn.addEventListener('click', () => {
+        editPublishedConfirmModal.hide();
+        resetCreateResultForm();
+        showActionCards();
     });
 
     function resetCreateResultForm() {
@@ -743,7 +978,16 @@
         students = []; updateStudentsTable();
         editingDraftId = null; isEditingPublishedResult = false; editingPublishedResultId = null; hasChanges = false;
         cancelEdit();
-        // Reset template selection to default
+        // ✅ Reset optional subject
+        hasOptionalSubject = false;
+        optionalSubjectData = null;
+        optionalSubjectSection.style.display = 'none';
+        optionalSubjectName.value = '';
+        optionalSubjectTotal.value = '100';
+        optionalMarksField.style.display = 'none';
+        optionalMarkInput.value = '';
+        document.getElementById('addOptionalBtn').style.display = 'inline-block';
+        // Reset template
         document.querySelectorAll('#templateSelector .template-option').forEach(o => o.classList.remove('selected'));
         document.getElementById('templateResult').classList.add('selected');
         document.getElementById('templateResult').querySelector('input[type="radio"]').checked = true;
@@ -758,7 +1002,8 @@
         snap.forEach(doc => {
             const d = doc.data();
             const templateLabel = d.template === 'result1' ? '🎫 Admit Card Style' : '📄 Classic';
-            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">Template: ${templateLabel} | Subjects: ${d.subjects.length} | Students: ${d.students.length}</p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary edit-draft" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-danger delete-draft" data-id="${doc.id}">Delete</button></div></div></div></div>`;
+            const optLabel = d.optionalSubject ? ` | Optional: ${d.optionalSubject.name}` : '';
+            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">Template: ${templateLabel} | Subjects: ${d.subjects.length}${optLabel} | Students: ${d.students.length}</p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary edit-draft" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-danger delete-draft" data-id="${doc.id}">Delete</button></div></div></div></div>`;
             draftResultsList.insertAdjacentHTML('beforeend', card);
         });
         document.querySelectorAll('.edit-draft').forEach(btn => btn.addEventListener('click', e => editDraft(e.target.dataset.id)));
@@ -787,6 +1032,22 @@
             selectedTemplate = 'result';
         }
         
+        // ✅ Restore optional subject
+        if (data.optionalSubject) {
+            hasOptionalSubject = true;
+            optionalSubjectData = data.optionalSubject;
+            optionalSubjectSection.style.display = 'block';
+            optionalSubjectName.value = data.optionalSubject.name || '';
+            optionalSubjectTotal.value = data.optionalSubject.total || 100;
+            document.getElementById('addOptionalBtn').style.display = 'none';
+            // Show optional marks field
+            if (optionalMarksField) {
+                optionalMarksField.style.display = 'block';
+                const label = document.getElementById('optionalMarkLabel');
+                if (label) label.textContent = `${data.optionalSubject.name} (Optional) (Max: ${data.optionalSubject.total || 100})`;
+            }
+        }
+        
         subjectCountInput.value = data.subjects.length;
         generateSubjectFieldsBtn.click();
         setTimeout(() => {
@@ -813,7 +1074,8 @@
             const d = doc.data();
             const date = d.createdAt ? new Date(d.createdAt.toDate()).toLocaleDateString() : 'Unknown';
             const templateLabel = d.template === 'result1' ? '🎫 Admit Card Style' : '📄 Classic';
-            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">${date} | Template: ${templateLabel} | Subjects: ${d.subjects.length} | Students: ${d.students.length}</p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary view-result" data-id="${doc.id}">View</button><button class="btn btn-sm btn-warning edit-result" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-info change-template" data-id="${doc.id}">🎨 Template</button><button class="btn btn-sm btn-danger delete-result" data-id="${doc.id}">Delete</button></div></div></div></div>`;
+            const optLabel = d.optionalSubject ? ` | Optional: ${d.optionalSubject.name}` : '';
+            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">${date} | Template: ${templateLabel} | Subjects: ${d.subjects.length}${optLabel} | Students: ${d.students.length}</p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary view-result" data-id="${doc.id}">View</button><button class="btn btn-sm btn-warning edit-result" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-info change-template" data-id="${doc.id}">🎨 Template</button><button class="btn btn-sm btn-danger delete-result" data-id="${doc.id}">Delete</button></div></div></div></div>`;
             oldResultsList.insertAdjacentHTML('beforeend', card);
         });
         document.querySelectorAll('.view-result').forEach(btn => btn.addEventListener('click', e => viewResult(e.target.dataset.id)));
@@ -824,7 +1086,6 @@
 
     function openTemplateEditor(resultId) {
         document.getElementById('editTemplateResultId').value = resultId;
-        // Load current template
         const q = query(collection(db, "results"), where("__name__", "==", resultId));
         getDocs(q).then(snap => {
             if (!snap.empty) {
@@ -867,10 +1128,14 @@
         const sorted = sortStudentsByPercentage(data.students, data.subjects);
         resultModalTitle.innerText = data.examName + ' (Ranked)';
         let html = `<p><strong>Total Students:</strong> ${data.students.length}</p>`;
+        if (data.optionalSubject) {
+            html += `<p><strong>Optional Subject:</strong> ${data.optionalSubject.name} (${data.optionalSubject.total} marks) - <span class="text-muted">Not added to total</span></p>`;
+        }
         html += `<p><strong>Template:</strong> ${data.template === 'result1' ? '🎫 Admit Card Style' : '📄 Classic'}</p>`;
         if (sorted.length) html += `<div class="alert alert-success">🏆 Top Student: ${sorted[0].name} (Roll: ${sorted[0].rollNo})</div>`;
         html += `<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Photo</th><th>Rank</th><th>Roll</th><th>Name</th><th>Father</th>`;
         data.subjects.forEach(s => html += `<th>${s.name}</th>`);
+        if (data.optionalSubject) html += `<th>${data.optionalSubject.name}<br><small>(Optional)</small></th>`;
         html += `<th>Total</th><th>%</th></tr></thead><tbody>`;
         sorted.forEach((s, idx) => {
             let total = 0, maxTotal = 0;
@@ -881,6 +1146,11 @@
                 total += mark; maxTotal += sub.total;
                 html += `<td>${mark}/${sub.total}</td>`;
             });
+            // Optional subject
+            if (data.optionalSubject) {
+                const optMark = s.marks[data.optionalSubject.name] || '-';
+                html += `<td style="color:#c5a059;">${optMark}${optMark !== '-' ? `/${data.optionalSubject.total}` : ''}</td>`;
+            }
             const percent = maxTotal ? ((total/maxTotal)*100).toFixed(2) : 0;
             html += `<td><strong>${total}/${maxTotal}</strong></td><td><strong>${percent}%</strong></td></tr>`;
         });
@@ -906,7 +1176,6 @@
         examCentreInput.value = data.examCentre || '';
         rollCodeInput.value = data.rollCode || '55075';
         
-        // Set template
         const template = data.template || 'result';
         document.querySelectorAll('#templateSelector .template-option').forEach(o => o.classList.remove('selected'));
         if (template === 'result1') {
@@ -917,6 +1186,21 @@
             document.getElementById('templateResult').classList.add('selected');
             document.getElementById('templateResult').querySelector('input[type="radio"]').checked = true;
             selectedTemplate = 'result';
+        }
+        
+        // ✅ Restore optional subject
+        if (data.optionalSubject) {
+            hasOptionalSubject = true;
+            optionalSubjectData = data.optionalSubject;
+            optionalSubjectSection.style.display = 'block';
+            optionalSubjectName.value = data.optionalSubject.name || '';
+            optionalSubjectTotal.value = data.optionalSubject.total || 100;
+            document.getElementById('addOptionalBtn').style.display = 'none';
+            if (optionalMarksField) {
+                optionalMarksField.style.display = 'block';
+                const label = document.getElementById('optionalMarkLabel');
+                if (label) label.textContent = `${data.optionalSubject.name} (Optional) (Max: ${data.optionalSubject.total || 100})`;
+            }
         }
         
         subjectCountInput.value = data.subjects.length;
@@ -946,6 +1230,9 @@
         const sorted = sortStudentsByPercentage(data.students, data.subjects);
         let columns = [{ header: 'Rank', dataKey: 'rank' }, { header: 'Roll No', dataKey: 'rollNo' }, { header: 'Name', dataKey: 'name' }, { header: 'Father', dataKey: 'father' }];
         data.subjects.forEach(s => columns.push({ header: `${s.name}\n(${s.total})`, dataKey: s.name }));
+        if (data.optionalSubject) {
+            columns.push({ header: `${data.optionalSubject.name}\n(Optional)`, dataKey: 'optional' });
+        }
         columns.push({ header: 'Total', dataKey: 'total' }, { header: '%', dataKey: 'percentage' });
         const rows = sorted.map((s, idx) => {
             let row = { rank: idx+1, rollNo: s.rollNo, name: s.name, father: s.fatherName||'-' };
@@ -955,6 +1242,10 @@
                 row[sub.name] = `${mark}/${sub.total}`;
                 total+=mark; maxTotal+=sub.total;
             });
+            if (data.optionalSubject) {
+                const optMark = s.marks[data.optionalSubject.name] || '-';
+                row.optional = optMark !== '-' ? `${optMark}/${data.optionalSubject.total}` : '-';
+            }
             row.total = `${total}/${maxTotal}`;
             row.percentage = maxTotal ? `${((total/maxTotal)*100).toFixed(2)}%` : '0%';
             return row;
