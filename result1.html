@@ -645,7 +645,7 @@
       </div>
     </div>
     
-    <!-- ✅ Yellow stripe - Sirf exam name (Exam: text hatao) -->
+    <!-- Yellow stripe - Sirf exam name -->
     <div class="exam-name-strip">
       <i class="fas fa-trophy"></i> <span id="examName">Final Examination 2025</span>
     </div>
@@ -763,7 +763,6 @@
     window.location.href = 'index.html';
   }
   
-  // ✅ Grade function (jo pehle tha)
   function getGrade(percentage) {
     if(percentage >= 90) return { grade: "A+", className: "grade-a-plus" };
     if(percentage >= 75) return { grade: "A", className: "grade-a" };
@@ -858,7 +857,6 @@
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('resultCard').style.display = 'block';
     
-    // ✅ Sirf exam name (Exam: text nahi)
     document.getElementById('examName').innerText = examData.examName || "Final Examination 2025";
     
     const photoImg = document.getElementById('studentPhoto');
@@ -910,37 +908,49 @@
       }, 300);
     }
     
-    // ✅ MARKS TABLE - Grade column (Status hatao)
+    // ✅ MARKS TABLE - Handle Optional Subject properly
     let marksHtml = '';
     let totalObtained = 0;
     let totalMax = 0;
-    let optionalSubject = null;
+    let hasOptional = false;
+    let optionalName = '';
     let optionalObtained = 0;
     let optionalTotal = 0;
     
+    // ✅ Check if optional subject exists in exam data
+    if (examData.optionalSubject) {
+      hasOptional = true;
+      optionalName = examData.optionalSubject.name;
+      optionalTotal = examData.optionalSubject.total || 100;
+      
+      // Check if student has marks for optional subject
+      if (student.marks && student.marks[optionalName] !== undefined) {
+        optionalObtained = student.marks[optionalName];
+      } else {
+        optionalObtained = '-';
+      }
+    }
+    
+    // ✅ Main subjects (excluding optional)
     if (student.marks && examData.subjects) {
       for (const subject of examData.subjects) {
+        // Skip if this is the optional subject (already handled)
+        if (hasOptional && subject.name === optionalName) continue;
+        
         const subjectName = subject.name;
         const subjectTotal = subject.total || 100;
         const marksObtained = student.marks[subjectName] !== undefined ? student.marks[subjectName] : 0;
         const percentage = subjectTotal > 0 ? (marksObtained / subjectTotal) * 100 : 0;
         const gradeInfo = getGrade(percentage);
         
-        // ✅ Check if optional subject
-        if (subject.isOptional) {
-          optionalSubject = subjectName;
-          optionalObtained = marksObtained;
-          optionalTotal = subjectTotal;
-        } else {
-          marksHtml += `<tr>
-            <td><strong>${subjectName}</strong></td>
-            <td>${subjectTotal}</td>
-            <td><strong>${marksObtained}</strong></td>
-            <td><span class="grade-badge ${gradeInfo.className}">${gradeInfo.grade}</span></td>
-          </tr>`;
-          totalObtained += marksObtained;
-          totalMax += subjectTotal;
-        }
+        marksHtml += `<tr>
+          <td><strong>${subjectName}</strong></td>
+          <td>${subjectTotal}</td>
+          <td><strong>${marksObtained}</strong></td>
+          <td><span class="grade-badge ${gradeInfo.className}">${gradeInfo.grade}</span></td>
+        </tr>`;
+        totalObtained += marksObtained;
+        totalMax += subjectTotal;
       }
     }
     
@@ -952,18 +962,23 @@
       <td></td>
     </tr>`;
     
-    // ✅ Optional Subject Row (agar data hai to)
-    if (optionalSubject) {
-      const optionalPercentage = optionalTotal > 0 ? (optionalObtained / optionalTotal) * 100 : 0;
-      const optionalGrade = getGrade(optionalPercentage);
+    // ✅ Optional Subject Row
+    if (hasOptional) {
+      let optionalGrade = '-';
+      if (optionalObtained !== '-' && optionalTotal > 0) {
+        const optPercent = (optionalObtained / optionalTotal) * 100;
+        const gradeInfo = getGrade(optPercent);
+        optionalGrade = `<span class="grade-badge ${gradeInfo.className}">${gradeInfo.grade}</span>`;
+      }
+      
       marksHtml += `<tr class="optional-row">
-        <td><strong>${optionalSubject} (Optional)</strong></td>
+        <td><strong>${optionalName} (Optional)</strong></td>
         <td>${optionalTotal}</td>
         <td><strong>${optionalObtained}</strong></td>
-        <td><span class="grade-badge ${optionalGrade.className}">${optionalGrade.grade}</span></td>
+        <td>${optionalGrade}</td>
       </tr>`;
     } else {
-      // ✅ Agar optional subject data nahi hai to khali row
+      // ✅ No optional subject - show empty row
       marksHtml += `<tr class="optional-row">
         <td><strong>Optional Subject</strong></td>
         <td>-</td>
@@ -997,7 +1012,7 @@
     document.getElementById('errorMessage').innerHTML = message;
   }
   
-  // ✅ PDF Generation
+  // PDF Generation
   function createPDFClone() {
     const originalCard = document.getElementById('resultCard');
     const cloneContainer = document.getElementById('pdfCloneContainer');
