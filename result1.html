@@ -61,7 +61,6 @@
     .btn-print { background: #1a237e; color: white; }
     .btn-back { background: #6c757d; color: white; }
     
-    /* ----- ADMIT CARD STYLE RESULT - FIXED A4 SIZE ----- */
     .admit-card-result {
       background: white;
       border-radius: 12px;
@@ -73,7 +72,6 @@
       margin: 0 auto;
     }
     
-    /* Header */
     .result-header {
       background: linear-gradient(135deg, #1a3a5c, #0f2b44);
       padding: 16px 22px;
@@ -150,7 +148,6 @@
       font-size: 0.5rem;
     }
     
-    /* Yellow stripe - Exam Name */
     .exam-name-strip {
       background: #c5a059;
       color: white;
@@ -166,7 +163,6 @@
       margin-right: 6px;
     }
     
-    /* MARKSHEET heading */
     .marksheet-heading {
       background: #f8f9fc;
       text-align: center;
@@ -186,7 +182,6 @@
       font-size: 0.7rem;
     }
     
-    /* Student Info Row */
     .student-info-row {
       display: flex;
       padding: 14px 20px;
@@ -248,7 +243,6 @@
       color: #dc2626;
     }
     
-    /* ✅ QR Code - Chhota border */
     .qr-area {
       width: 105px;
       flex-shrink: 0;
@@ -291,7 +285,6 @@
       font-size: 0.4rem;
     }
     
-    /* MARKS TABLE */
     .marks-section {
       padding: 12px 20px 10px 20px;
       background: white;
@@ -374,7 +367,6 @@
     .grade-d { background: #f8d7da; color: #721c24; }
     .grade-f { background: #f5c6cb; color: #721c24; }
     
-    /* Summary */
     .result-summary {
       display: flex;
       gap: 12px;
@@ -425,7 +417,6 @@
       color: #dc2626;
     }
     
-    /* Signature & Stamp Section */
     .signature-stamp-section {
       display: flex;
       justify-content: space-between;
@@ -540,7 +531,6 @@
       font-weight: 600;
     }
     
-    /* ✅ PDF Clone - Full A4 */
     .pdf-clone-container {
       position: fixed;
       top: 0;
@@ -624,7 +614,6 @@
     .pdf-clone .result-footer { padding: 5px 16px; font-size: 0.55rem; }
     .pdf-clone .coaching-contact { font-size: 0.5rem; gap: 8px; }
     
-    /* ✅ Print - Full A4 */
     @media print {
       body { 
         background: white; 
@@ -729,7 +718,6 @@
 <body>
 
 <div class="result-container">
-  <!-- Action Buttons -->
   <div class="action-buttons">
     <button class="action-btn btn-download" onclick="downloadResultPDF()"><i class="fas fa-download"></i> Download PDF</button>
     <button class="action-btn btn-share" onclick="shareResult()"><i class="fab fa-whatsapp"></i> Share</button>
@@ -737,22 +725,18 @@
     <button class="action-btn btn-back" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back</button>
   </div>
   
-  <!-- Loading -->
   <div id="loadingState" class="loading-state">
     <i class="fas fa-spinner fa-spin"></i>
     <p>Loading your result...</p>
   </div>
   
-  <!-- Error -->
   <div id="errorState" class="error-state" style="display:none;">
     <i class="fas fa-exclamation-triangle"></i>
     <p id="errorMessage">Something went wrong!</p>
     <button onclick="goBack()"><i class="fas fa-arrow-left"></i> Go Back</button>
   </div>
   
-  <!-- Result Card -->
   <div id="resultCard" class="admit-card-result" style="display:none;">
-    <!-- Header -->
     <div class="result-header">
       <div class="header-content">
         <div class="logo-box">
@@ -771,17 +755,14 @@
       </div>
     </div>
     
-    <!-- Yellow stripe - Exam Name -->
     <div class="exam-name-strip">
       <i class="fas fa-trophy"></i> <span id="examName">Final Examination 2025</span>
     </div>
     
-    <!-- MARKSHEET heading -->
     <div class="marksheet-heading">
       <h2><i class="fas fa-star"></i> MARKSHEET <i class="fas fa-star"></i></h2>
     </div>
     
-    <!-- Student Info -->
     <div class="student-info-row">
       <div class="student-photo-area">
         <img id="studentPhoto" class="student-photo" src="" alt="Student Photo" style="display:none;">
@@ -800,14 +781,12 @@
         <div class="detail-item"><span class="label">Roll Number</span><span class="value" id="rollNumber">-</span></div>
       </div>
       
-      <!-- QR Code - Chhota Border -->
       <div class="qr-area">
         <div id="qrcode"></div>
         <div class="qr-label"><i class="fas fa-check-circle"></i> QR CODE</div>
       </div>
     </div>
     
-    <!-- MARKS TABLE -->
     <div class="marks-section">
       <div class="marks-section-title">
         <i class="fas fa-chart-bar"></i> Marks Obtained
@@ -825,7 +804,6 @@
       </table>
     </div>
     
-    <!-- Summary -->
     <div class="result-summary">
       <div class="summary-box">
         <div class="label">Total Marks</div>
@@ -845,7 +823,6 @@
       </div>
     </div>
     
-    <!-- Signature & Stamp Section -->
     <div class="signature-stamp-section">
       <div class="signature-box">
         <div class="sig-line"></div>
@@ -863,7 +840,6 @@
       </div>
     </div>
     
-    <!-- Footer -->
     <div class="result-footer">
       <p>This result is published by <strong>QUEST COACHING CENTRE</strong>, Gopalganj | Director: <strong>MR. RAVI SIR</strong></p>
       <p style="font-size:0.55rem; margin-top:2px;">For queries: +91 9708442525 | questcoachingcentre@gmail.com</p>
@@ -871,11 +847,9 @@
   </div>
 </div>
 
-<!-- PDF Clone Container -->
 <div id="pdfCloneContainer" class="pdf-clone-container"></div>
 
 <script>
-  // Firebase Config
   const firebaseConfig = {
     apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
     authDomain: "quest-coaching.firebaseapp.com",
@@ -909,7 +883,6 @@
     window.location.href = 'index.html';
   }
   
-  // ✅ Print function - Direct print view
   function printResult() {
     window.print();
   }
@@ -1042,7 +1015,6 @@
     document.getElementById('rollCode').innerText = examData.rollCode || student.rollCode || '55075';
     document.getElementById('rollNumber').innerText = student.rollNo || student.rollNumber || '-';
     
-    // QR Code
     const publicUrl = window.location.href;
     
     if (!qrGenerated) {
@@ -1063,30 +1035,20 @@
       }, 300);
     }
     
-    // MARKS TABLE
+    // ✅ MARKS TABLE - Multiple Optional Subjects Support
     let marksHtml = '';
     let totalObtained = 0;
     let totalMax = 0;
-    let hasOptional = false;
-    let optionalName = '';
-    let optionalObtained = 0;
-    let optionalTotal = 0;
     
-    if (examData.optionalSubject) {
-      hasOptional = true;
-      optionalName = examData.optionalSubject.name;
-      optionalTotal = examData.optionalSubject.total || 100;
-      
-      if (student.marks && student.marks[optionalName] !== undefined) {
-        optionalObtained = student.marks[optionalName];
-      } else {
-        optionalObtained = '-';
-      }
-    }
+    // ✅ Get optional subjects from examData
+    const optionalSubjects = examData.optionalSubjects || [];
+    const optionalNames = optionalSubjects.map(o => o.name);
     
+    // ✅ Main subjects (excluding optional)
     if (student.marks && examData.subjects) {
       for (const subject of examData.subjects) {
-        if (hasOptional && subject.name === optionalName) continue;
+        // Skip if this is an optional subject
+        if (optionalNames.includes(subject.name)) continue;
         
         const subjectName = subject.name;
         const subjectTotal = subject.total || 100;
@@ -1105,7 +1067,7 @@
       }
     }
     
-    // Total Row
+    // ✅ Total Row
     marksHtml += `<tr class="total-row">
       <td><strong>TOTAL</strong></td>
       <td><strong>${totalMax}</strong></td>
@@ -1113,22 +1075,39 @@
       <td></td>
     </tr>`;
     
-    // Optional Subject Row
-    if (hasOptional) {
-      let optionalGrade = '-';
-      if (optionalObtained !== '-' && optionalTotal > 0) {
-        const optPercent = (optionalObtained / optionalTotal) * 100;
-        const gradeInfo = getGrade(optPercent);
-        optionalGrade = `<span class="grade-badge ${gradeInfo.className}">${gradeInfo.grade}</span>`;
+    // ✅ Optional Subjects Rows (Multiple)
+    if (optionalSubjects.length > 0) {
+      for (const opt of optionalSubjects) {
+        const optName = opt.name;
+        const optTotal = opt.total || 100;
+        let optObtained = '-';
+        let optGrade = '-';
+        
+        if (student.optionalMarks && student.optionalMarks[optName] !== undefined) {
+          optObtained = student.optionalMarks[optName];
+          if (optObtained !== null && optObtained !== '-') {
+            const optPercent = (optObtained / optTotal) * 100;
+            const gradeInfo = getGrade(optPercent);
+            optGrade = `<span class="grade-badge ${gradeInfo.className}">${gradeInfo.grade}</span>`;
+          }
+        } else if (student.marks && student.marks[optName] !== undefined) {
+          optObtained = student.marks[optName];
+          if (optObtained !== null && optObtained !== '-') {
+            const optPercent = (optObtained / optTotal) * 100;
+            const gradeInfo = getGrade(optPercent);
+            optGrade = `<span class="grade-badge ${gradeInfo.className}">${gradeInfo.grade}</span>`;
+          }
+        }
+        
+        marksHtml += `<tr class="optional-row">
+          <td><strong>${optName} (Optional)</strong></td>
+          <td>${optTotal}</td>
+          <td><strong>${optObtained}</strong></td>
+          <td>${optGrade}</td>
+        </tr>`;
       }
-      
-      marksHtml += `<tr class="optional-row">
-        <td><strong>${optionalName} (Optional)</strong></td>
-        <td>${optionalTotal}</td>
-        <td><strong>${optionalObtained}</strong></td>
-        <td>${optionalGrade}</td>
-      </tr>`;
     } else {
+      // ✅ No optional subjects - show empty row
       marksHtml += `<tr class="optional-row">
         <td><strong>Optional Subject</strong></td>
         <td>-</td>
@@ -1162,7 +1141,6 @@
     document.getElementById('errorMessage').innerHTML = message;
   }
   
-  // PDF Generation
   function createPDFClone() {
     const originalCard = document.getElementById('resultCard');
     const cloneContainer = document.getElementById('pdfCloneContainer');
