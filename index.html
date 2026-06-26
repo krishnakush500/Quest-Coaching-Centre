@@ -112,6 +112,99 @@
       100% { transform: translateX(-100%); }
     }
 
+    /* Registration Search Section - NEW */
+    .registration-search-section {
+      background: linear-gradient(to right, #1a237e, #283593);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      border-bottom: 3px solid #ffc107;
+    }
+    .registration-search-section .search-label {
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .registration-search-section .search-label i {
+      color: #ffc107;
+      font-size: 1.2rem;
+    }
+    .registration-search-section input {
+      padding: 10px 16px;
+      font-size: 0.95rem;
+      border-radius: 30px;
+      border: none;
+      width: 100%;
+      max-width: 220px;
+      outline: 2px solid transparent;
+      transition: outline 0.3s;
+    }
+    .registration-search-section input:focus {
+      outline: 2px solid #ffc107;
+    }
+    .registration-search-section .reg-search-btn {
+      padding: 10px 25px;
+      background: #ffc107;
+      color: #1a237e;
+      border: none;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .registration-search-section .reg-search-btn:hover {
+      background: #ffca28;
+      transform: scale(1.02);
+      box-shadow: 0 4px 15px rgba(255,193,7,0.4);
+    }
+    .registration-search-section .reg-search-btn i {
+      font-size: 1rem;
+    }
+    .reg-search-error {
+      color: #ff6b6b;
+      background: rgba(255,255,255,0.9);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: none;
+    }
+    .reg-search-loading {
+      color: white;
+      font-size: 0.85rem;
+      display: none;
+    }
+    .reg-search-loading i {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 600px) {
+      .registration-search-section {
+        flex-direction: column;
+        padding: 14px 16px;
+      }
+      .registration-search-section input {
+        max-width: 100%;
+      }
+      .registration-search-section .search-label {
+        font-size: 0.9rem;
+      }
+    }
+
     /* Main Tabs Navigation */
     .main-tabs {
       display: flex;
@@ -712,6 +805,19 @@
       </div>
     </div>
 
+    <!-- NEW: Registration Search Section -->
+    <div class="registration-search-section">
+      <div class="search-label">
+        <i class="fas fa-id-card"></i> 📌 Check your Registration!
+      </div>
+      <input type="text" id="regSearchInput" placeholder="Enter Roll Number" onkeypress="if(event.key==='Enter') searchRegistration()">
+      <button class="reg-search-btn" onclick="searchRegistration()">
+        <i class="fas fa-search"></i> Search
+      </button>
+      <span class="reg-search-loading" id="regSearchLoading"><i class="fas fa-spinner"></i> Searching...</span>
+      <span class="reg-search-error" id="regSearchError">❌ Student not found!</span>
+    </div>
+
     <div class="main-tabs">
       <button class="tab-btn active" id="results-tab" onclick="switchTab('results')">
         <i class="fas fa-chart-line"></i> Check Results
@@ -849,6 +955,59 @@
     let showAllResults = false;
     let viewedResults = [];
 
+    // ---- Registration Search Function ----
+    async function searchRegistration() {
+      const rollInput = document.getElementById('regSearchInput');
+      const errorEl = document.getElementById('regSearchError');
+      const loadingEl = document.getElementById('regSearchLoading');
+      const rollNo = rollInput.value.trim();
+
+      if (!rollNo) {
+        errorEl.textContent = '⚠️ Please enter a roll number!';
+        errorEl.style.display = 'inline-block';
+        setTimeout(() => { errorEl.style.display = 'none'; }, 3000);
+        return;
+      }
+
+      // Show loading
+      loadingEl.style.display = 'inline-block';
+      errorEl.style.display = 'none';
+
+      try {
+        // Search for student with this roll number in admissions collection
+        const snapshot = await db.collection('admissions')
+          .where('rollNumber', '==', rollNo)
+          .get();
+
+        loadingEl.style.display = 'none';
+
+        if (snapshot.empty) {
+          errorEl.textContent = '❌ No student found with Roll No: ' + rollNo;
+          errorEl.style.display = 'inline-block';
+          setTimeout(() => { errorEl.style.display = 'none'; }, 4000);
+          return;
+        }
+
+        // Found student - get the first matching document
+        const doc = snapshot.docs[0];
+        const studentId = doc.id;
+        // Open the registration form in view mode (same as "View" button in manage-students)
+        window.open(`new-admission.html?mode=view&id=${studentId}`, '_blank');
+
+        // Clear input after successful search
+        rollInput.value = '';
+
+      } catch (error) {
+        console.error('Search error:', error);
+        loadingEl.style.display = 'none';
+        errorEl.textContent = '❌ Error searching. Please try again.';
+        errorEl.style.display = 'inline-block';
+        setTimeout(() => { errorEl.style.display = 'none'; }, 4000);
+      }
+    }
+
+    // ---- End of Registration Search ----
+
     function loadViewedResults() {
       const stored = localStorage.getItem('quest_viewed_results');
       viewedResults = stored ? JSON.parse(stored) : [];
@@ -967,7 +1126,6 @@
       document.querySelectorAll('.result-item').forEach(item => item.classList.remove('active'));
     }
 
-    // ✅ getResult() function with template check
     function getResult() {
       const rollInput = document.getElementById('roll-input').value.trim();
       if (!rollInput) {
@@ -979,17 +1137,14 @@
         return;
       }
       
-      // Check if student exists
       const student = selectedExamData.students.find(s => String(s.rollNo) == String(rollInput));
       if (!student) {
         alert("Roll number not found in this exam.");
         return;
       }
       
-      // ✅ Check which template to use
       const template = selectedExamData.template || 'result';
       
-      // ✅ Redirect to the correct template file
       let url;
       if (template === 'result1') {
         url = `result1.html?examId=${selectedExamId}&rollNo=${rollInput}`;
@@ -1075,6 +1230,11 @@
     });
     document.getElementById('passwordModal').addEventListener('click', function(e) {
       if (e.target.id === 'passwordModal') closePasswordModal();
+    });
+
+    // Enter key support for registration search
+    document.getElementById('regSearchInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') searchRegistration();
     });
 
     document.addEventListener('DOMContentLoaded', function() {
