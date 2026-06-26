@@ -118,7 +118,6 @@
         .photo-fetch-success { color: #16a34a; }
         .photo-fetch-missing { color: #dc2626; }
         
-        /* ✅ Template Selection - Compact */
         .template-selector {
             display: flex;
             gap: 12px;
@@ -174,7 +173,7 @@
             color: white;
         }
         
-        /* ✅ Optional Subject Styles */
+        /* ✅ Optional Subject Styles - Multiple */
         .optional-subject-box {
             background: #fef9e6;
             border-radius: 16px;
@@ -186,7 +185,29 @@
             color: #c5a059;
             font-weight: 600;
         }
-        .btn-remove-optional {
+        .optional-subject-item {
+            background: white;
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .optional-subject-item .opt-name {
+            flex: 2;
+            min-width: 120px;
+        }
+        .optional-subject-item .opt-total {
+            flex: 1;
+            min-width: 80px;
+        }
+        .optional-subject-item .opt-remove {
+            flex: 0 0 auto;
+        }
+        .btn-remove-optional-item {
             background: #dc2626;
             color: white;
             border: none;
@@ -195,7 +216,7 @@
             font-size: 0.75rem;
             cursor: pointer;
         }
-        .btn-remove-optional:hover { background: #b91c1c; }
+        .btn-remove-optional-item:hover { background: #b91c1c; }
         .btn-add-optional {
             background: #c5a059;
             color: white;
@@ -208,6 +229,25 @@
         }
         .btn-add-optional:hover { background: #a8894a; }
         
+        /* ✅ Optional Marks Field - Multiple */
+        .optional-marks-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .optional-marks-item .opt-mark-label {
+            font-weight: 600;
+            color: #c5a059;
+            font-size: 0.85rem;
+            min-width: 120px;
+        }
+        .optional-marks-item .opt-mark-input {
+            flex: 1;
+            min-width: 80px;
+        }
+        
         @media (max-width: 768px) {
             body { padding: 15px; }
             .header-section { flex-direction: column; text-align: center; }
@@ -218,6 +258,7 @@
             .action-title { font-size: 1.1rem; }
             .template-selector { flex-direction: column; align-items: stretch; }
             .template-option { justify-content: center; }
+            .optional-subject-item { flex-direction: column; align-items: stretch; }
         }
     </style>
 </head>
@@ -256,13 +297,12 @@
             <button class="back-btn" id="backFromCreateBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button>
         </div>
         
-        <!-- ✅ TEMPLATE SELECTION - Compact -->
         <div class="template-selector" id="templateSelector">
             <span class="selector-label"><i class="fas fa-palette"></i> Template:</span>
             <div class="template-option selected" id="templateResult">
                 <input type="radio" name="template" value="result" checked>
                 <span class="template-icon"><i class="fas fa-file-alt"></i></span>
-                <span class="template-name">Test restul</span>
+                <span class="template-name">Test Result</span>
                 <span class="template-preview-badge">Default</span>
             </div>
             <div class="template-option" id="templateResult1">
@@ -285,18 +325,22 @@
                 </div>
             </div>
             <div id="subjectFields" class="mb-4"></div>
-            <!-- ✅ Optional Subject Section -->
+            
+            <!-- ✅ Optional Subject Section - Multiple -->
             <div id="optionalSubjectSection" style="display:none; margin-top:10px;">
                 <div class="optional-subject-box" id="optionalSubjectBox">
-                    <div class="row">
-                        <div class="col-md-5"><label class="form-label">Optional Subject Name</label><input type="text" class="form-control" id="optionalSubjectName" placeholder="e.g., Computer Science"></div>
-                        <div class="col-md-4"><label class="form-label">Total Marks</label><input type="number" class="form-control" id="optionalSubjectTotal" min="1" value="100"></div>
-                        <div class="col-md-3 d-flex align-items-end"><button class="btn btn-danger btn-sm" id="removeOptionalBtn"><i class="fas fa-trash"></i> Remove</button></div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong style="color:#c5a059;"><i class="fas fa-book"></i> Optional Subjects</strong>
+                        <small class="text-muted">Marks will NOT be added to total</small>
                     </div>
-                    <small class="text-muted">Optional subject marks will NOT be added to total marks.</small>
+                    <div id="optionalSubjectsList"></div>
+                    <button class="btn-add-optional" id="addOptionalBtn"><i class="fas fa-plus-circle"></i> Add Optional Subject</button>
                 </div>
             </div>
-            <button class="btn-add-optional" id="addOptionalBtn"><i class="fas fa-plus"></i> Add Optional Subject</button>
+            <button class="btn-add-optional" id="showOptionalSectionBtn" style="background:#c5a059; color:white; border:none; border-radius:20px; padding:6px 18px; font-size:0.8rem; cursor:pointer; margin-top:10px;">
+                <i class="fas fa-plus"></i> Add Optional Subject
+            </button>
+            
             <div id="step1NextBtn" class="d-none mt-3"><button id="nextToStudentEntryBtn" class="btn btn-success">Next →</button></div>
         </div>
         
@@ -335,14 +379,16 @@
                         </div>
                     </div>
                     <div id="marksFields" class="mb-3"></div>
-                    <!-- ✅ Optional Subject Marks Field -->
-                    <div id="optionalMarksField" style="display:none;" class="mb-3">
+                    
+                    <!-- ✅ Optional Subjects Marks Fields - Multiple -->
+                    <div id="optionalMarksFields" style="display:none;" class="mb-3">
                         <div class="optional-subject-box">
-                            <label class="form-label" id="optionalMarkLabel">Optional Subject (Max: 100)</label>
-                            <input type="number" class="form-control" id="optionalMarkInput" min="0" placeholder="Enter optional subject marks">
-                            <small class="text-muted">Optional subject marks will NOT be added to total.</small>
+                            <strong style="color:#c5a059;"><i class="fas fa-book"></i> Optional Subjects Marks</strong>
+                            <small class="text-muted d-block mb-2">These marks will NOT be added to total.</small>
+                            <div id="optionalMarksList"></div>
                         </div>
                     </div>
+                    
                     <div class="d-flex gap-2 flex-wrap">
                         <button id="addStudentBtn" class="btn btn-primary"><i class="fas fa-user-plus"></i> Add Student</button>
                         <button id="updateStudentBtn" class="btn btn-warning d-none">Update Student</button>
@@ -395,7 +441,6 @@
     <div class="modal-footer"><button type="button" class="btn btn-secondary" id="dontSaveConfirmBtn">Don't Save</button><button type="button" class="btn btn-warning" id="saveDraftConfirmBtn">Save as Draft</button><button type="button" class="btn save-changes-btn" id="saveChangesConfirmBtn">Save Changes</button></div></div></div>
 </div>
 
-<!-- Edit Template Modal -->
 <div class="modal fade" id="editTemplateModal" tabindex="-1">
     <div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title"><i class="fas fa-palette"></i> Change Template</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
     <div class="modal-body">
@@ -487,23 +532,20 @@
     const saveChangesConfirmBtn = document.getElementById('saveChangesConfirmBtn');
     const editTemplateModal = new bootstrap.Modal(document.getElementById('editTemplateModal'));
 
-    // ✅ Optional Subject Elements
+    // ✅ Optional Subject Elements - Multiple
     const addOptionalBtn = document.getElementById('addOptionalBtn');
-    const removeOptionalBtn = document.getElementById('removeOptionalBtn');
+    const showOptionalSectionBtn = document.getElementById('showOptionalSectionBtn');
     const optionalSubjectSection = document.getElementById('optionalSubjectSection');
-    const optionalSubjectName = document.getElementById('optionalSubjectName');
-    const optionalSubjectTotal = document.getElementById('optionalSubjectTotal');
-    const optionalMarksField = document.getElementById('optionalMarksField');
-    const optionalMarkLabel = document.getElementById('optionalMarkLabel');
-    const optionalMarkInput = document.getElementById('optionalMarkInput');
+    const optionalSubjectsList = document.getElementById('optionalSubjectsList');
+    const optionalMarksFields = document.getElementById('optionalMarksFields');
+    const optionalMarksList = document.getElementById('optionalMarksList');
 
     let subjects = [], students = [], editingStudentIndex = null, editingDraftId = null;
     let isEditingPublishedResult = false, editingPublishedResultId = null, hasChanges = false;
     let currentResultDataForPdf = null, currentExamNameForPdf = '';
     let currentStudentPhotoUrl = '';
     let selectedTemplate = 'result';
-    let hasOptionalSubject = false;
-    let optionalSubjectData = null;
+    let optionalSubjects = []; // Array of {name, total}
 
     function showFullScreen(section) { actionCardsContainer.style.display = 'none'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; section.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
     function showActionCards() { actionCardsContainer.style.display = 'grid'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -527,52 +569,104 @@
         });
     });
 
-    // ✅ Optional Subject Functions
-    addOptionalBtn.addEventListener('click', function() {
+    // ✅ Show Optional Subject Section
+    showOptionalSectionBtn.addEventListener('click', function() {
         optionalSubjectSection.style.display = 'block';
-        hasOptionalSubject = true;
         this.style.display = 'none';
-        // Show optional marks field in student entry
-        if (optionalMarksField) {
-            optionalMarksField.style.display = 'block';
-            const label = document.getElementById('optionalMarkLabel');
-            if (label && optionalSubjectName.value) {
-                label.textContent = `${optionalSubjectName.value} (Optional) (Max: ${optionalSubjectTotal.value || 100})`;
-            }
+        // Agar koi optional subject nahi hai to ek default add karo
+        if (optionalSubjects.length === 0) {
+            addOptionalSubject();
         }
+        renderOptionalSubjects();
+        renderOptionalMarksFields();
     });
 
-    removeOptionalBtn.addEventListener('click', function() {
-        if (confirm('Remove optional subject? This will remove it from all students.')) {
-            optionalSubjectSection.style.display = 'none';
-            hasOptionalSubject = false;
-            optionalSubjectData = null;
-            optionalSubjectName.value = '';
-            optionalSubjectTotal.value = '100';
-            document.getElementById('addOptionalBtn').style.display = 'inline-block';
-            if (optionalMarksField) optionalMarksField.style.display = 'none';
-            if (optionalMarkInput) optionalMarkInput.value = '';
-            // Remove optional marks from all students
+    // ✅ Add Optional Subject
+    addOptionalBtn.addEventListener('click', function() {
+        addOptionalSubject();
+        renderOptionalSubjects();
+        renderOptionalMarksFields();
+    });
+
+    function addOptionalSubject() {
+        optionalSubjects.push({ name: '', total: 100 });
+    }
+
+    // ✅ Remove Optional Subject
+    function removeOptionalSubject(index) {
+        if (confirm('Remove this optional subject?')) {
+            optionalSubjects.splice(index, 1);
+            renderOptionalSubjects();
+            renderOptionalMarksFields();
+            // Remove from students
             students.forEach(s => {
-                if (s.optionalMarks !== undefined) delete s.optionalMarks;
-                if (s.optionalSubject) delete s.optionalSubject;
+                if (s.optionalMarks && s.optionalMarks[index] !== undefined) {
+                    delete s.optionalMarks[index];
+                }
             });
             updateStudentsTable();
             showToast('Optional subject removed');
         }
-    });
+    }
 
-    // Update optional label when name/total changes
-    optionalSubjectName.addEventListener('input', updateOptionalLabel);
-    optionalSubjectTotal.addEventListener('input', updateOptionalLabel);
+    // ✅ Render Optional Subjects in Step 1
+    function renderOptionalSubjects() {
+        optionalSubjectsList.innerHTML = '';
+        optionalSubjects.forEach((opt, idx) => {
+            const div = document.createElement('div');
+            div.className = 'optional-subject-item';
+            div.innerHTML = `
+                <div class="opt-name">
+                    <input type="text" class="form-control opt-name-input" placeholder="Optional Subject Name" value="${opt.name || ''}">
+                </div>
+                <div class="opt-total">
+                    <input type="number" class="form-control opt-total-input" placeholder="Total Marks" min="1" value="${opt.total || 100}">
+                </div>
+                <div class="opt-remove">
+                    <button class="btn-remove-optional-item" data-index="${idx}"><i class="fas fa-trash"></i> Remove</button>
+                </div>
+            `;
+            optionalSubjectsList.appendChild(div);
+            
+            // Event listeners for name and total
+            const nameInput = div.querySelector('.opt-name-input');
+            const totalInput = div.querySelector('.opt-total-input');
+            
+            nameInput.addEventListener('input', function() {
+                optionalSubjects[idx].name = this.value.trim();
+                renderOptionalMarksFields();
+            });
+            
+            totalInput.addEventListener('input', function() {
+                optionalSubjects[idx].total = parseInt(this.value) || 100;
+                renderOptionalMarksFields();
+            });
+            
+            // Remove button
+            div.querySelector('.btn-remove-optional-item').addEventListener('click', function() {
+                removeOptionalSubject(parseInt(this.dataset.index));
+            });
+        });
+    }
 
-    function updateOptionalLabel() {
-        const name = optionalSubjectName.value || 'Optional Subject';
-        const total = optionalSubjectTotal.value || 100;
-        const label = document.getElementById('optionalMarkLabel');
-        if (label) label.textContent = `${name} (Optional) (Max: ${total})`;
-        // Update in student entry
-        if (optionalMarkInput) optionalMarkInput.max = total;
+    // ✅ Render Optional Marks Fields in Step 2
+    function renderOptionalMarksFields() {
+        optionalMarksList.innerHTML = '';
+        if (optionalSubjects.length === 0) {
+            optionalMarksFields.style.display = 'none';
+            return;
+        }
+        optionalMarksFields.style.display = 'block';
+        
+        optionalSubjects.forEach((opt, idx) => {
+            const div = document.createElement('div');
+            div.className = 'optional-marks-item';
+            div.innerHTML = `
+                <span class="opt-mark-label">${opt.name || `Optional ${idx+1}`} (Max: ${opt.total || 100})</span>
+                <input type="number" class="form-control opt-mark-input" data-opt-index="${idx}" min="0" max="${opt.total || 100}" placeholder="Enter marks">
+            `;
+            optionalMarksList.appendChild(div);
+        });
     }
 
     createResultMainCard.addEventListener('click', () => { resetCreateResultForm(); showFullScreen(createResultSection); });
@@ -672,32 +766,26 @@
         }
         if (!valid) { alert('Fill all subject fields'); return; }
         
-        // ✅ Check optional subject
-        if (hasOptionalSubject && optionalSubjectName.value.trim()) {
-            optionalSubjectData = {
-                name: optionalSubjectName.value.trim(),
-                total: parseInt(optionalSubjectTotal.value) || 100,
-                isOptional: true
-            };
-            subjects.push(optionalSubjectData);
-            // Show optional marks field in student entry
-            optionalMarksField.style.display = 'block';
-            const label = document.getElementById('optionalMarkLabel');
-            if (label) label.textContent = `${optionalSubjectData.name} (Optional) (Max: ${optionalSubjectData.total})`;
-            optionalMarkInput.max = optionalSubjectData.total;
-        } else {
-            optionalMarksField.style.display = 'none';
-        }
+        // ✅ Add optional subjects to subjects array
+        optionalSubjects.forEach(opt => {
+            if (opt.name && opt.name.trim()) {
+                subjects.push({ 
+                    name: opt.name.trim(), 
+                    total: opt.total || 100,
+                    isOptional: true 
+                });
+            }
+        });
         
         generateMarksFields();
         examSetupStep.style.display = 'none';
         studentEntryStep.style.display = 'block';
+        renderOptionalMarksFields();
     });
 
     function generateMarksFields() {
         marksFields.innerHTML = '<h5 class="mb-3">Enter Marks</h5>';
         subjects.forEach(sub => {
-            // ✅ Skip optional subject - it has separate field
             if (sub.isOptional) return;
             const div = document.createElement('div');
             div.className = 'mb-2';
@@ -725,18 +813,26 @@
         if (!valid) return;
         
         // ✅ Optional subject marks
-        let optionalMarks = null;
-        if (hasOptionalSubject && optionalSubjectData && optionalMarkInput.value !== '') {
-            const optMark = parseInt(optionalMarkInput.value);
-            if (!isNaN(optMark) && optMark >= 0) {
-                if (optMark > optionalSubjectData.total) {
-                    alert(`Optional subject marks cannot exceed ${optionalSubjectData.total}`);
-                    return;
+        const optionalMarks = {};
+        document.querySelectorAll('.opt-mark-input').forEach(inp => {
+            const idx = parseInt(inp.dataset.optIndex);
+            const opt = optionalSubjects[idx];
+            if (opt && opt.name) {
+                const mark = parseInt(inp.value);
+                if (!isNaN(mark) && mark >= 0) {
+                    if (mark > opt.total) {
+                        alert(`${opt.name} marks cannot exceed ${opt.total}`);
+                        valid = false;
+                        return;
+                    }
+                    optionalMarks[opt.name] = mark;
+                    marks[opt.name] = mark;
+                } else {
+                    optionalMarks[opt.name] = null;
                 }
-                optionalMarks = optMark;
-                marks[optionalSubjectData.name] = optMark;
             }
-        }
+        });
+        if (!valid) return;
         
         students.push({ 
             rollNo: roll, 
@@ -744,13 +840,12 @@
             fatherName: fatherNameInput.value.trim(), 
             marks,
             photoUrl: currentStudentPhotoUrl || null,
-            optionalMarks: optionalMarks,
-            optionalSubject: optionalSubjectData ? optionalSubjectData.name : null
+            optionalMarks: optionalMarks
         });
         updateStudentsTable();
         studentNameInput.value = ''; fatherNameInput.value = '';
         document.querySelectorAll('.subject-mark').forEach(inp => inp.value = '');
-        if (optionalMarkInput) optionalMarkInput.value = '';
+        document.querySelectorAll('.opt-mark-input').forEach(inp => inp.value = '');
         studentPhotoPreview.style.display = 'none';
         photoFetchStatus.innerHTML = '';
         currentStudentPhotoUrl = '';
@@ -763,18 +858,15 @@
         studentsTableBody.innerHTML = '';
         students.forEach((s, idx) => {
             let marksHtml = '';
-            // ✅ Show only main subjects (not optional) in marks list
             subjects.forEach(sub => {
-                if (sub.isOptional) return;
-                marksHtml += `<div>${sub.name}: ${s.marks[sub.name] || 0}/${sub.total}</div>`;
-            });
-            // ✅ Show optional subject if exists
-            if (s.optionalSubject && s.optionalMarks !== null) {
-                const optSub = subjects.find(sub => sub.name === s.optionalSubject);
-                if (optSub) {
-                    marksHtml += `<div style="color:#c5a059;">${s.optionalSubject} (Optional): ${s.optionalMarks}/${optSub.total}</div>`;
+                if (sub.isOptional) {
+                    // Show optional subject
+                    const optMark = s.optionalMarks && s.optionalMarks[sub.name] !== undefined ? s.optionalMarks[sub.name] : '-';
+                    marksHtml += `<div style="color:#c5a059;">${sub.name} (Optional): ${optMark !== null ? optMark : '-'}/${sub.total}</div>`;
+                } else {
+                    marksHtml += `<div>${sub.name}: ${s.marks[sub.name] || 0}/${sub.total}</div>`;
                 }
-            }
+            });
             const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" class="student-photo-thumb" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷 No photo</span>';
             const row = `<tr><td>${photoHtml}</td><td>${s.rollNo}</td><td>${s.name}</td><td>${s.fatherName || '-'}</td><td>${marksHtml}</td><td><button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button> <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button></td></tr>`;
             studentsTableBody.insertAdjacentHTML('beforeend', row);
@@ -798,11 +890,15 @@
         }
         document.querySelectorAll('.subject-mark').forEach(inp => inp.value = s.marks[inp.dataset.subject] || 0);
         // ✅ Optional subject marks
-        if (optionalMarkInput && s.optionalMarks !== null && s.optionalMarks !== undefined) {
-            optionalMarkInput.value = s.optionalMarks;
-        } else {
-            optionalMarkInput.value = '';
-        }
+        document.querySelectorAll('.opt-mark-input').forEach(inp => {
+            const idx2 = parseInt(inp.dataset.optIndex);
+            const opt = optionalSubjects[idx2];
+            if (opt && s.optionalMarks && s.optionalMarks[opt.name] !== undefined) {
+                inp.value = s.optionalMarks[opt.name] !== null ? s.optionalMarks[opt.name] : '';
+            } else {
+                inp.value = '';
+            }
+        });
         addStudentBtn.classList.add('d-none'); updateStudentBtn.classList.remove('d-none'); cancelEditBtn.classList.remove('d-none');
     }
 
@@ -824,18 +920,26 @@
         if (!valid) return;
         
         // ✅ Optional subject marks
-        let optionalMarks = null;
-        if (hasOptionalSubject && optionalSubjectData && optionalMarkInput.value !== '') {
-            const optMark = parseInt(optionalMarkInput.value);
-            if (!isNaN(optMark) && optMark >= 0) {
-                if (optMark > optionalSubjectData.total) {
-                    alert(`Optional subject marks cannot exceed ${optionalSubjectData.total}`);
-                    return;
+        const optionalMarks = {};
+        document.querySelectorAll('.opt-mark-input').forEach(inp => {
+            const idx2 = parseInt(inp.dataset.optIndex);
+            const opt = optionalSubjects[idx2];
+            if (opt && opt.name) {
+                const mark = parseInt(inp.value);
+                if (!isNaN(mark) && mark >= 0) {
+                    if (mark > opt.total) {
+                        alert(`${opt.name} marks cannot exceed ${opt.total}`);
+                        valid = false;
+                        return;
+                    }
+                    optionalMarks[opt.name] = mark;
+                    marks[opt.name] = mark;
+                } else {
+                    optionalMarks[opt.name] = null;
                 }
-                optionalMarks = optMark;
-                marks[optionalSubjectData.name] = optMark;
             }
-        }
+        });
+        if (!valid) return;
         
         students[editingStudentIndex] = { 
             rollNo: roll, 
@@ -843,8 +947,7 @@
             fatherName: fatherNameInput.value.trim(), 
             marks, 
             photoUrl: currentStudentPhotoUrl,
-            optionalMarks: optionalMarks,
-            optionalSubject: optionalSubjectData ? optionalSubjectData.name : null
+            optionalMarks: optionalMarks
         };
         updateStudentsTable();
         cancelEdit();
@@ -860,7 +963,7 @@
         photoFetchStatus.innerHTML = '';
         currentStudentPhotoUrl = '';
         document.querySelectorAll('.subject-mark').forEach(inp => inp.value = '');
-        if (optionalMarkInput) optionalMarkInput.value = '';
+        document.querySelectorAll('.opt-mark-input').forEach(inp => inp.value = '');
         addStudentBtn.classList.remove('d-none'); updateStudentBtn.classList.add('d-none'); cancelEditBtn.classList.add('d-none');
     }
 
@@ -876,8 +979,8 @@
                 examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
                 rollCode: rollCodeInput.value || '55075',
                 template: selectedTemplate,
-                subjects: subjects.filter(s => !s.isOptional), // Main subjects only
-                optionalSubject: optionalSubjectData || null,
+                subjects: subjects.filter(s => !s.isOptional),
+                optionalSubjects: optionalSubjects.filter(o => o.name && o.name.trim()),
                 students, 
                 createdAt: serverTimestamp() 
             };
@@ -889,11 +992,9 @@
         } catch(e) { alert(e.message); }
     });
 
-    // ✅ Publish Result with Optional Subject
     publishResultBtn.addEventListener('click', async () => {
         if (!examNameInput.value.trim() || students.length === 0) { alert('Exam name and at least one student required'); return; }
         if (isEditingPublishedResult) { 
-            // ✅ Show confirmation modal for editing published result
             editPublishedConfirmModal.show();
             return;
         }
@@ -903,8 +1004,8 @@
                 examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
                 rollCode: rollCodeInput.value || '55075',
                 template: selectedTemplate,
-                subjects: subjects.filter(s => !s.isOptional), // Main subjects only
-                optionalSubject: optionalSubjectData || null,
+                subjects: subjects.filter(s => !s.isOptional),
+                optionalSubjects: optionalSubjects.filter(o => o.name && o.name.trim()),
                 students, 
                 createdAt: serverTimestamp() 
             };
@@ -916,7 +1017,6 @@
         } catch(e) { alert(e.message); }
     });
 
-    // ✅ Save Changes (for published result edit)
     saveChangesConfirmBtn.addEventListener('click', async () => {
         if (!editingPublishedResultId) { editPublishedConfirmModal.hide(); return; }
         try {
@@ -926,7 +1026,7 @@
                 rollCode: rollCodeInput.value || '55075',
                 template: selectedTemplate,
                 subjects: subjects.filter(s => !s.isOptional),
-                optionalSubject: optionalSubjectData || null,
+                optionalSubjects: optionalSubjects.filter(o => o.name && o.name.trim()),
                 students
             };
             await updateDoc(doc(db, "results", editingPublishedResultId), data);
@@ -938,7 +1038,6 @@
         } catch(e) { alert(e.message); }
     });
 
-    // ✅ Save as Draft (from published result edit)
     saveDraftConfirmBtn.addEventListener('click', async () => {
         try {
             const data = { 
@@ -947,7 +1046,7 @@
                 rollCode: rollCodeInput.value || '55075',
                 template: selectedTemplate,
                 subjects: subjects.filter(s => !s.isOptional),
-                optionalSubject: optionalSubjectData || null,
+                optionalSubjects: optionalSubjects.filter(o => o.name && o.name.trim()),
                 students,
                 createdAt: serverTimestamp() 
             };
@@ -978,15 +1077,13 @@
         students = []; updateStudentsTable();
         editingDraftId = null; isEditingPublishedResult = false; editingPublishedResultId = null; hasChanges = false;
         cancelEdit();
-        // ✅ Reset optional subject
-        hasOptionalSubject = false;
-        optionalSubjectData = null;
+        // ✅ Reset optional subjects
+        optionalSubjects = [];
+        optionalSubjectsList.innerHTML = '';
+        optionalMarksList.innerHTML = '';
         optionalSubjectSection.style.display = 'none';
-        optionalSubjectName.value = '';
-        optionalSubjectTotal.value = '100';
-        optionalMarksField.style.display = 'none';
-        optionalMarkInput.value = '';
-        document.getElementById('addOptionalBtn').style.display = 'inline-block';
+        showOptionalSectionBtn.style.display = 'inline-block';
+        optionalMarksFields.style.display = 'none';
         // Reset template
         document.querySelectorAll('#templateSelector .template-option').forEach(o => o.classList.remove('selected'));
         document.getElementById('templateResult').classList.add('selected');
@@ -1002,7 +1099,7 @@
         snap.forEach(doc => {
             const d = doc.data();
             const templateLabel = d.template === 'result1' ? '🎫 Admit Card Style' : '📄 Classic';
-            const optLabel = d.optionalSubject ? ` | Optional: ${d.optionalSubject.name}` : '';
+            const optLabel = d.optionalSubjects && d.optionalSubjects.length ? ` | Optional: ${d.optionalSubjects.length}` : '';
             const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">Template: ${templateLabel} | Subjects: ${d.subjects.length}${optLabel} | Students: ${d.students.length}</p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary edit-draft" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-danger delete-draft" data-id="${doc.id}">Delete</button></div></div></div></div>`;
             draftResultsList.insertAdjacentHTML('beforeend', card);
         });
@@ -1019,7 +1116,6 @@
         examCentreInput.value = data.examCentre || '';
         rollCodeInput.value = data.rollCode || '55075';
         
-        // Set template
         const template = data.template || 'result';
         document.querySelectorAll('#templateSelector .template-option').forEach(o => o.classList.remove('selected'));
         if (template === 'result1') {
@@ -1032,20 +1128,12 @@
             selectedTemplate = 'result';
         }
         
-        // ✅ Restore optional subject
-        if (data.optionalSubject) {
-            hasOptionalSubject = true;
-            optionalSubjectData = data.optionalSubject;
+        // ✅ Restore optional subjects
+        if (data.optionalSubjects && data.optionalSubjects.length) {
+            optionalSubjects = data.optionalSubjects;
             optionalSubjectSection.style.display = 'block';
-            optionalSubjectName.value = data.optionalSubject.name || '';
-            optionalSubjectTotal.value = data.optionalSubject.total || 100;
-            document.getElementById('addOptionalBtn').style.display = 'none';
-            // Show optional marks field
-            if (optionalMarksField) {
-                optionalMarksField.style.display = 'block';
-                const label = document.getElementById('optionalMarkLabel');
-                if (label) label.textContent = `${data.optionalSubject.name} (Optional) (Max: ${data.optionalSubject.total || 100})`;
-            }
+            showOptionalSectionBtn.style.display = 'none';
+            renderOptionalSubjects();
         }
         
         subjectCountInput.value = data.subjects.length;
@@ -1074,7 +1162,7 @@
             const d = doc.data();
             const date = d.createdAt ? new Date(d.createdAt.toDate()).toLocaleDateString() : 'Unknown';
             const templateLabel = d.template === 'result1' ? '🎫 Admit Card Style' : '📄 Classic';
-            const optLabel = d.optionalSubject ? ` | Optional: ${d.optionalSubject.name}` : '';
+            const optLabel = d.optionalSubjects && d.optionalSubjects.length ? ` | Optional: ${d.optionalSubjects.length}` : '';
             const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">${date} | Template: ${templateLabel} | Subjects: ${d.subjects.length}${optLabel} | Students: ${d.students.length}</p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary view-result" data-id="${doc.id}">View</button><button class="btn btn-sm btn-warning edit-result" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-info change-template" data-id="${doc.id}">🎨 Template</button><button class="btn btn-sm btn-danger delete-result" data-id="${doc.id}">Delete</button></div></div></div></div>`;
             oldResultsList.insertAdjacentHTML('beforeend', card);
         });
@@ -1128,14 +1216,16 @@
         const sorted = sortStudentsByPercentage(data.students, data.subjects);
         resultModalTitle.innerText = data.examName + ' (Ranked)';
         let html = `<p><strong>Total Students:</strong> ${data.students.length}</p>`;
-        if (data.optionalSubject) {
-            html += `<p><strong>Optional Subject:</strong> ${data.optionalSubject.name} (${data.optionalSubject.total} marks) - <span class="text-muted">Not added to total</span></p>`;
+        if (data.optionalSubjects && data.optionalSubjects.length) {
+            html += `<p><strong>Optional Subjects:</strong> ${data.optionalSubjects.map(o => o.name).join(', ')} - <span class="text-muted">Not added to total</span></p>`;
         }
         html += `<p><strong>Template:</strong> ${data.template === 'result1' ? '🎫 Admit Card Style' : '📄 Classic'}</p>`;
         if (sorted.length) html += `<div class="alert alert-success">🏆 Top Student: ${sorted[0].name} (Roll: ${sorted[0].rollNo})</div>`;
         html += `<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Photo</th><th>Rank</th><th>Roll</th><th>Name</th><th>Father</th>`;
         data.subjects.forEach(s => html += `<th>${s.name}</th>`);
-        if (data.optionalSubject) html += `<th>${data.optionalSubject.name}<br><small>(Optional)</small></th>`;
+        if (data.optionalSubjects && data.optionalSubjects.length) {
+            data.optionalSubjects.forEach(o => html += `<th>${o.name}<br><small>(Optional)</small></th>`);
+        }
         html += `<th>Total</th><th>%</th></tr></thead><tbody>`;
         sorted.forEach((s, idx) => {
             let total = 0, maxTotal = 0;
@@ -1146,10 +1236,11 @@
                 total += mark; maxTotal += sub.total;
                 html += `<td>${mark}/${sub.total}</td>`;
             });
-            // Optional subject
-            if (data.optionalSubject) {
-                const optMark = s.marks[data.optionalSubject.name] || '-';
-                html += `<td style="color:#c5a059;">${optMark}${optMark !== '-' ? `/${data.optionalSubject.total}` : ''}</td>`;
+            if (data.optionalSubjects && data.optionalSubjects.length) {
+                data.optionalSubjects.forEach(o => {
+                    const optMark = s.optionalMarks && s.optionalMarks[o.name] !== undefined ? s.optionalMarks[o.name] : '-';
+                    html += `<td style="color:#c5a059;">${optMark !== null ? optMark : '-'}${optMark !== null && optMark !== '-' ? `/${o.total}` : ''}</td>`;
+                });
             }
             const percent = maxTotal ? ((total/maxTotal)*100).toFixed(2) : 0;
             html += `<td><strong>${total}/${maxTotal}</strong></td><td><strong>${percent}%</strong></td></tr>`;
@@ -1188,19 +1279,12 @@
             selectedTemplate = 'result';
         }
         
-        // ✅ Restore optional subject
-        if (data.optionalSubject) {
-            hasOptionalSubject = true;
-            optionalSubjectData = data.optionalSubject;
+        // ✅ Restore optional subjects
+        if (data.optionalSubjects && data.optionalSubjects.length) {
+            optionalSubjects = data.optionalSubjects;
             optionalSubjectSection.style.display = 'block';
-            optionalSubjectName.value = data.optionalSubject.name || '';
-            optionalSubjectTotal.value = data.optionalSubject.total || 100;
-            document.getElementById('addOptionalBtn').style.display = 'none';
-            if (optionalMarksField) {
-                optionalMarksField.style.display = 'block';
-                const label = document.getElementById('optionalMarkLabel');
-                if (label) label.textContent = `${data.optionalSubject.name} (Optional) (Max: ${data.optionalSubject.total || 100})`;
-            }
+            showOptionalSectionBtn.style.display = 'none';
+            renderOptionalSubjects();
         }
         
         subjectCountInput.value = data.subjects.length;
@@ -1230,8 +1314,10 @@
         const sorted = sortStudentsByPercentage(data.students, data.subjects);
         let columns = [{ header: 'Rank', dataKey: 'rank' }, { header: 'Roll No', dataKey: 'rollNo' }, { header: 'Name', dataKey: 'name' }, { header: 'Father', dataKey: 'father' }];
         data.subjects.forEach(s => columns.push({ header: `${s.name}\n(${s.total})`, dataKey: s.name }));
-        if (data.optionalSubject) {
-            columns.push({ header: `${data.optionalSubject.name}\n(Optional)`, dataKey: 'optional' });
+        if (data.optionalSubjects && data.optionalSubjects.length) {
+            data.optionalSubjects.forEach(o => {
+                columns.push({ header: `${o.name}\n(Optional)`, dataKey: `opt_${o.name}` });
+            });
         }
         columns.push({ header: 'Total', dataKey: 'total' }, { header: '%', dataKey: 'percentage' });
         const rows = sorted.map((s, idx) => {
@@ -1242,9 +1328,11 @@
                 row[sub.name] = `${mark}/${sub.total}`;
                 total+=mark; maxTotal+=sub.total;
             });
-            if (data.optionalSubject) {
-                const optMark = s.marks[data.optionalSubject.name] || '-';
-                row.optional = optMark !== '-' ? `${optMark}/${data.optionalSubject.total}` : '-';
+            if (data.optionalSubjects && data.optionalSubjects.length) {
+                data.optionalSubjects.forEach(o => {
+                    const optMark = s.optionalMarks && s.optionalMarks[o.name] !== undefined ? s.optionalMarks[o.name] : '-';
+                    row[`opt_${o.name}`] = optMark !== null && optMark !== '-' ? `${optMark}/${o.total}` : '-';
+                });
             }
             row.total = `${total}/${maxTotal}`;
             row.percentage = maxTotal ? `${((total/maxTotal)*100).toFixed(2)}%` : '0%';
