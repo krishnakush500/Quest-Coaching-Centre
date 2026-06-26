@@ -28,6 +28,34 @@
             margin-bottom: 20px;
             box-shadow: 0 8px 18px rgba(0,20,40,0.08);
         }
+        
+        /* Logo Area - New Design with Logo Image */
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .logo-image {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #1b4f9b;
+            flex-shrink: 0;
+            background: #f0f4fa;
+        }
+        .logo-text h1 {
+            font-size: 1.4rem;
+            color: #1b4f9b;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .logo-text p {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+        
         .back-btn {
             background: #e8f0fe;
             border: none;
@@ -136,9 +164,16 @@
             .filter-card { flex-direction: column; }
             .action-buttons { flex-direction: column; }
             td, th { font-size: 0.7rem; padding: 8px 5px; }
-            .header-bar { flex-direction: column; gap: 10px; }
+            .header-bar { flex-direction: column; gap: 10px; align-items: stretch; }
+            .logo-area { justify-content: center; }
             .stats-summary { justify-content: center; }
             .stat-box span:last-child { font-size: 1.2rem; }
+            .header-bar > div:last-child { display: flex; flex-direction: column; gap: 8px; }
+        }
+        @media (max-width: 480px) {
+            .logo-image { width: 45px; height: 45px; }
+            .logo-text h1 { font-size: 1.1rem; }
+            .logo-text p { font-size: 0.65rem; }
         }
     </style>
 </head>
@@ -152,10 +187,14 @@
     <div class="container">
         <div class="header-bar">
             <div class="logo-area">
-                <h1>📋 Manage Students</h1>
-                <p>Quest Coaching Centre | Under MR. RAVI SIR</p>
+                <!-- Coaching Logo - Replace src with your actual logo URL -->
+                <img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" alt="Quest Coaching Logo" class="logo-image" onerror="this.style.display='none'">
+                <div class="logo-text">
+                    <h1>📋 Manage Students</h1>
+                    <p>Quest Coaching Centre | Under MR. RAVI SIR</p>
+                </div>
             </div>
-            <div style="display: flex; gap: 12px;">
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                 <button class="download-pdf-btn" id="downloadPdfBtn">
                     <i class="fas fa-file-pdf"></i> Download PDF Report
                 </button>
