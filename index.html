@@ -141,7 +141,7 @@
       border-radius: 30px;
       border: none;
       width: 100%;
-      max-width: 220px;
+      max-width: 250px;
       outline: 2px solid transparent;
       transition: outline 0.3s;
     }
@@ -810,7 +810,7 @@
       <div class="search-label">
         <i class="fas fa-id-card"></i> 📌 Check your Registration!
       </div>
-      <input type="text" id="regSearchInput" placeholder="Enter Roll Number" onkeypress="if(event.key==='Enter') searchRegistration()">
+      <input type="text" id="regSearchInput" placeholder="Enter Aadhaar or Mobile Number" onkeypress="if(event.key==='Enter') searchRegistration()">
       <button class="reg-search-btn" onclick="searchRegistration()">
         <i class="fas fa-search"></i> Search
       </button>
@@ -955,15 +955,15 @@
     let showAllResults = false;
     let viewedResults = [];
 
-    // ---- Registration Search Function ----
+    // ---- Registration Search Function (Aadhaar or Mobile) ----
     async function searchRegistration() {
       const rollInput = document.getElementById('regSearchInput');
       const errorEl = document.getElementById('regSearchError');
       const loadingEl = document.getElementById('regSearchLoading');
-      const rollNo = rollInput.value.trim();
+      const searchValue = rollInput.value.trim();
 
-      if (!rollNo) {
-        errorEl.textContent = '⚠️ Please enter a roll number!';
+      if (!searchValue) {
+        errorEl.textContent = '⚠️ Please enter Aadhaar or Mobile number!';
         errorEl.style.display = 'inline-block';
         setTimeout(() => { errorEl.style.display = 'none'; }, 3000);
         return;
@@ -974,24 +974,38 @@
       errorEl.style.display = 'none';
 
       try {
-        // Search for student with this roll number in admissions collection
-        const snapshot = await db.collection('admissions')
-          .where('rollNumber', '==', rollNo)
+        // Search by Aadhaar Number OR Mobile Number
+        const aadhaarSnapshot = await db.collection('admissions')
+          .where('aadhaarNumber', '==', searchValue)
           .get();
+
+        let foundDoc = null;
+
+        if (!aadhaarSnapshot.empty) {
+          foundDoc = aadhaarSnapshot.docs[0];
+        } else {
+          // If not found by Aadhaar, search by Mobile Number
+          const mobileSnapshot = await db.collection('admissions')
+            .where('parentMobile', '==', searchValue)
+            .get();
+          
+          if (!mobileSnapshot.empty) {
+            foundDoc = mobileSnapshot.docs[0];
+          }
+        }
 
         loadingEl.style.display = 'none';
 
-        if (snapshot.empty) {
-          errorEl.textContent = '❌ No student found with Roll No: ' + rollNo;
+        if (!foundDoc) {
+          errorEl.textContent = '❌ No student found with Aadhaar or Mobile: ' + searchValue;
           errorEl.style.display = 'inline-block';
           setTimeout(() => { errorEl.style.display = 'none'; }, 4000);
           return;
         }
 
-        // Found student - get the first matching document
-        const doc = snapshot.docs[0];
-        const studentId = doc.id;
-        // Open the registration form in view mode (same as "View" button in manage-students)
+        // Found student - get the document
+        const studentId = foundDoc.id;
+        // Open the registration form in view mode
         window.open(`new-admission.html?mode=view&id=${studentId}`, '_blank');
 
         // Clear input after successful search
