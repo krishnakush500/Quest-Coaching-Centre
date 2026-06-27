@@ -112,7 +112,7 @@
       100% { transform: translateX(-100%); }
     }
 
-    /* Registration Search Section - NEW */
+    /* Registration Search Section */
     .registration-search-section {
       background: linear-gradient(to right, #1a237e, #283593);
       padding: 16px 20px;
@@ -805,7 +805,7 @@
       </div>
     </div>
 
-    <!-- NEW: Registration Search Section -->
+    <!-- Registration Search Section -->
     <div class="registration-search-section">
       <div class="search-label">
         <i class="fas fa-id-card"></i> 📌 Check your Registration!
@@ -974,9 +974,9 @@
       errorEl.style.display = 'none';
 
       try {
-        // Search by Aadhaar Number OR Mobile Number
+        // Search by Aadhaar (field name: 'aadhar') OR Mobile Number
         const aadhaarSnapshot = await db.collection('admissions')
-          .where('aadhaarNumber', '==', searchValue)
+          .where('aadhar', '==', searchValue)
           .get();
 
         let foundDoc = null;
