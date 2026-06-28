@@ -417,6 +417,7 @@
       color: #dc2626;
     }
     
+    /* ✅ Signature & Stamp Section - Updated */
     .signature-stamp-section {
       display: flex;
       justify-content: space-between;
@@ -823,10 +824,11 @@
       </div>
     </div>
     
+    <!-- ✅ Signature & Stamp Section - Updated -->
     <div class="signature-stamp-section">
       <div class="signature-box">
         <div class="sig-line"></div>
-        <div class="sig-label">Parent / Guardian Signature</div>
+        <div class="sig-label">Director Signature</div>
       </div>
       <div class="stamp-box">
         <div class="stamp-circle">
@@ -836,7 +838,7 @@
       </div>
       <div class="signature-box">
         <div class="sig-line"></div>
-        <div class="sig-label">Student Signature</div>
+        <div class="sig-label">Principal Signature</div>
       </div>
     </div>
     
@@ -1035,19 +1037,16 @@
       }, 300);
     }
     
-    // ✅ MARKS TABLE - Multiple Optional Subjects Support
+    // MARKS TABLE - Multiple Optional Subjects Support
     let marksHtml = '';
     let totalObtained = 0;
     let totalMax = 0;
     
-    // ✅ Get optional subjects from examData
     const optionalSubjects = examData.optionalSubjects || [];
     const optionalNames = optionalSubjects.map(o => o.name);
     
-    // ✅ Main subjects (excluding optional)
     if (student.marks && examData.subjects) {
       for (const subject of examData.subjects) {
-        // Skip if this is an optional subject
         if (optionalNames.includes(subject.name)) continue;
         
         const subjectName = subject.name;
@@ -1067,7 +1066,6 @@
       }
     }
     
-    // ✅ Total Row
     marksHtml += `<tr class="total-row">
       <td><strong>TOTAL</strong></td>
       <td><strong>${totalMax}</strong></td>
@@ -1075,7 +1073,6 @@
       <td></td>
     </tr>`;
     
-    // ✅ Optional Subjects Rows (Multiple)
     if (optionalSubjects.length > 0) {
       for (const opt of optionalSubjects) {
         const optName = opt.name;
@@ -1107,7 +1104,6 @@
         </tr>`;
       }
     } else {
-      // ✅ No optional subjects - show empty row
       marksHtml += `<tr class="optional-row">
         <td><strong>Optional Subject</strong></td>
         <td>-</td>
