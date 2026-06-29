@@ -13,7 +13,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   
   <style>
-    /* Same CSS as before */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { 
       background: #e8ecf1;
@@ -980,7 +979,7 @@
     }
   }
   
-  // ✅✅✅ FIXED: displayResult function - All subjects show properly ✅✅✅
+  // ✅✅✅ FINAL FIXED: displayResult function ✅✅✅
   function displayResult(examData, student) {
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('resultCard').style.display = 'block';
@@ -1037,39 +1036,24 @@
       }, 300);
     }
     
-    // ✅✅✅ FIXED: MARKS TABLE - Simple aur sahi logic ✅✅✅
+    // ✅✅✅ FINAL FIXED: MARKS TABLE ✅✅✅
     let marksHtml = '';
     let totalObtained = 0;
     let totalMax = 0;
     
-    // 1. Sab subjects (main + optional)
+    // 1️⃣ MAIN SUBJECTS - examData.subjects se (sirf main subjects)
     const allSubjects = examData.subjects || [];
     
-    // 2. Optional subjects ke naam (jo teacher ne optional add kiye)
+    // 2️⃣ OPTIONAL SUBJECTS - examData.optionalSubjects se DIRECT
     const optionalSubjects = examData.optionalSubjects || [];
-    const optionalNames = optionalSubjects.map(o => o.name);
     
-    // 3. ✅ MAIN SUBJECTS = Woh subjects jo optional nahi hain
-    const mainSubjects = allSubjects.filter(sub => {
-      // Agar subject optional hai toh skip karo
-      if (sub.isOptional === true) return false;
-      // Agar subject optionalNames mein hai toh skip karo
-      if (optionalNames.includes(sub.name)) return false;
-      return true;
-    });
-    
-    // 4. ✅ OPTIONAL SUBJECTS = Woh subjects jo optional hain
-    const optSubjects = allSubjects.filter(sub => {
-      // Agar subject optional hai toh include karo
-      if (sub.isOptional === true) return true;
-      // Agar subject optionalNames mein hai toh include karo
-      if (optionalNames.includes(sub.name)) return true;
-      return false;
-    });
-    
-    // 5. ✅ MAIN SUBJECTS SHOW KARO
+    // 3️⃣ MAIN SUBJECTS SHOW KARO (optional ko skip karo)
     if (student.marks) {
-      for (const subject of mainSubjects) {
+      for (const subject of allSubjects) {
+        // Agar subject optionalSubjects list mein hai toh skip karo
+        const isOptional = optionalSubjects.some(opt => opt.name === subject.name);
+        if (isOptional) continue;
+        
         const subjectName = subject.name;
         const subjectTotal = subject.total || 100;
         const marksObtained = student.marks[subjectName] !== undefined ? student.marks[subjectName] : 0;
@@ -1087,7 +1071,7 @@
       }
     }
     
-    // 6. ✅ TOTAL ROW
+    // 4️⃣ TOTAL ROW (sirf main subjects ka total)
     marksHtml += `<tr class="total-row">
       <td><strong>TOTAL</strong></td>
       <td><strong>${totalMax}</strong></td>
@@ -1095,9 +1079,11 @@
       <td></td>
     </tr>`;
     
-    // 7. ✅ OPTIONAL SUBJECTS SHOW KARO
-    if (optSubjects.length > 0) {
-      for (const opt of optSubjects) {
+    // 5️⃣ OPTIONAL SUBJECTS SHOW KARO (optionalSubjects array se DIRECT)
+    console.log('Optional Subjects from Firebase:', optionalSubjects);
+    
+    if (optionalSubjects.length > 0) {
+      for (const opt of optionalSubjects) {
         const optName = opt.name;
         const optTotal = opt.total || 100;
         let optObtained = '-';
@@ -1139,7 +1125,7 @@
       </tr>`;
     }
     
-    // 8. ✅ PERCENTAGE & DIVISION
+    // 6️⃣ PERCENTAGE & DIVISION (sirf main subjects ke base par)
     const totalPercentage = totalMax > 0 ? ((totalObtained / totalMax) * 100) : 0;
     const roundedPercentage = totalPercentage.toFixed(2);
     const divisionInfo = calculateDivision(totalPercentage);
