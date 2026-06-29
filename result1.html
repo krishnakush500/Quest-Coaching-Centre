@@ -417,7 +417,6 @@
       color: #dc2626;
     }
     
-    /* ✅ Signature & Stamp Section - Updated */
     .signature-stamp-section {
       display: flex;
       justify-content: space-between;
@@ -824,7 +823,6 @@
       </div>
     </div>
     
-    <!-- ✅ Signature & Stamp Section - Updated -->
     <div class="signature-stamp-section">
       <div class="signature-box">
         <div class="sig-line"></div>
@@ -981,6 +979,7 @@
     }
   }
   
+  // ✅✅✅ FIXED: displayResult function - All subjects show properly ✅✅✅
   function displayResult(examData, student) {
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('resultCard').style.display = 'block';
@@ -1037,18 +1036,31 @@
       }, 300);
     }
     
-    // MARKS TABLE - Multiple Optional Subjects Support
+    // ✅✅✅ FIXED: MARKS TABLE - Simple aur sahi logic ✅✅✅
     let marksHtml = '';
     let totalObtained = 0;
     let totalMax = 0;
     
+    // 1. Sab subjects (main + optional)
+    const allSubjects = examData.subjects || [];
+    
+    // 2. Optional subjects ke naam (jo teacher ne optional add kiye)
     const optionalSubjects = examData.optionalSubjects || [];
     const optionalNames = optionalSubjects.map(o => o.name);
     
-    if (student.marks && examData.subjects) {
-      for (const subject of examData.subjects) {
-        if (optionalNames.includes(subject.name)) continue;
-        
+    // 3. ✅ MAIN SUBJECTS = Woh subjects jo optional nahi hain
+    const mainSubjects = allSubjects.filter(sub => {
+      return !sub.isOptional && !optionalNames.includes(sub.name);
+    });
+    
+    // 4. ✅ OPTIONAL SUBJECTS = Woh subjects jo optional hain
+    const optSubjects = allSubjects.filter(sub => {
+      return sub.isOptional || optionalNames.includes(sub.name);
+    });
+    
+    // 5. ✅ MAIN SUBJECTS SHOW KARO (SAARE)
+    if (student.marks) {
+      for (const subject of mainSubjects) {
         const subjectName = subject.name;
         const subjectTotal = subject.total || 100;
         const marksObtained = student.marks[subjectName] !== undefined ? student.marks[subjectName] : 0;
@@ -1066,6 +1078,7 @@
       }
     }
     
+    // 6. ✅ TOTAL ROW
     marksHtml += `<tr class="total-row">
       <td><strong>TOTAL</strong></td>
       <td><strong>${totalMax}</strong></td>
@@ -1073,13 +1086,15 @@
       <td></td>
     </tr>`;
     
-    if (optionalSubjects.length > 0) {
-      for (const opt of optionalSubjects) {
+    // 7. ✅ OPTIONAL SUBJECTS SHOW KARO (SAARE)
+    if (optSubjects.length > 0) {
+      for (const opt of optSubjects) {
         const optName = opt.name;
         const optTotal = opt.total || 100;
         let optObtained = '-';
         let optGrade = '-';
         
+        // Student ke optionalMarks mein check karo
         if (student.optionalMarks && student.optionalMarks[optName] !== undefined) {
           optObtained = student.optionalMarks[optName];
           if (optObtained !== null && optObtained !== '-') {
@@ -1104,6 +1119,7 @@
         </tr>`;
       }
     } else {
+      // ✅ No optional subjects - empty row
       marksHtml += `<tr class="optional-row">
         <td><strong>Optional Subject</strong></td>
         <td>-</td>
@@ -1112,6 +1128,7 @@
       </tr>`;
     }
     
+    // 8. ✅ PERCENTAGE & DIVISION
     const totalPercentage = totalMax > 0 ? ((totalObtained / totalMax) * 100) : 0;
     const roundedPercentage = totalPercentage.toFixed(2);
     const divisionInfo = calculateDivision(totalPercentage);
