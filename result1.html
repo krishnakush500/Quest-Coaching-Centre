@@ -13,6 +13,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   
   <style>
+    /* Same CSS as before */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { 
       background: #e8ecf1;
@@ -1050,15 +1051,23 @@
     
     // 3. ✅ MAIN SUBJECTS = Woh subjects jo optional nahi hain
     const mainSubjects = allSubjects.filter(sub => {
-      return !sub.isOptional && !optionalNames.includes(sub.name);
+      // Agar subject optional hai toh skip karo
+      if (sub.isOptional === true) return false;
+      // Agar subject optionalNames mein hai toh skip karo
+      if (optionalNames.includes(sub.name)) return false;
+      return true;
     });
     
     // 4. ✅ OPTIONAL SUBJECTS = Woh subjects jo optional hain
     const optSubjects = allSubjects.filter(sub => {
-      return sub.isOptional || optionalNames.includes(sub.name);
+      // Agar subject optional hai toh include karo
+      if (sub.isOptional === true) return true;
+      // Agar subject optionalNames mein hai toh include karo
+      if (optionalNames.includes(sub.name)) return true;
+      return false;
     });
     
-    // 5. ✅ MAIN SUBJECTS SHOW KARO (SAARE)
+    // 5. ✅ MAIN SUBJECTS SHOW KARO
     if (student.marks) {
       for (const subject of mainSubjects) {
         const subjectName = subject.name;
@@ -1086,7 +1095,7 @@
       <td></td>
     </tr>`;
     
-    // 7. ✅ OPTIONAL SUBJECTS SHOW KARO (SAARE)
+    // 7. ✅ OPTIONAL SUBJECTS SHOW KARO
     if (optSubjects.length > 0) {
       for (const opt of optSubjects) {
         const optName = opt.name;
@@ -1094,7 +1103,7 @@
         let optObtained = '-';
         let optGrade = '-';
         
-        // Student ke optionalMarks mein check karo
+        // Pehle student.optionalMarks mein check karo
         if (student.optionalMarks && student.optionalMarks[optName] !== undefined) {
           optObtained = student.optionalMarks[optName];
           if (optObtained !== null && optObtained !== '-') {
@@ -1102,7 +1111,9 @@
             const gradeInfo = getGrade(optPercent);
             optGrade = `<span class="grade-badge ${gradeInfo.className}">${gradeInfo.grade}</span>`;
           }
-        } else if (student.marks && student.marks[optName] !== undefined) {
+        } 
+        // Phir student.marks mein check karo
+        else if (student.marks && student.marks[optName] !== undefined) {
           optObtained = student.marks[optName];
           if (optObtained !== null && optObtained !== '-') {
             const optPercent = (optObtained / optTotal) * 100;
@@ -1119,7 +1130,7 @@
         </tr>`;
       }
     } else {
-      // ✅ No optional subjects - empty row
+      // Agar koi optional subject nahi hai toh empty row
       marksHtml += `<tr class="optional-row">
         <td><strong>Optional Subject</strong></td>
         <td>-</td>
