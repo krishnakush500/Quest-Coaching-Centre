@@ -146,6 +146,20 @@
     .marks-table tr:nth-child(even) { background: #f9f9f9; }
     .total-marks { background: #e8f5e8 !important; font-weight: 600; }
     
+    /* ✅ Optional Subject Row Style */
+    .optional-row {
+      background: #fef9e6 !important;
+      font-weight: 600;
+      border-top: 1px dashed #c5a059;
+    }
+    .optional-row td {
+      color: #1a3a5c;
+    }
+    .inactive-subject {
+      color: #999;
+      text-decoration: line-through;
+    }
+    
     .grade-a-plus { background: #d4edda; color: #155724; font-weight: 600; text-align: center; border-radius: 20px; display: inline-block; padding: 2px 8px; font-size: 0.75rem; }
     .grade-a { background: #d1ecf1; color: #0c5460; font-weight: 600; text-align: center; border-radius: 20px; display: inline-block; padding: 2px 8px; font-size: 0.75rem; }
     .grade-b-plus { background: #fff3cd; color: #856404; font-weight: 600; text-align: center; border-radius: 20px; display: inline-block; padding: 2px 8px; font-size: 0.75rem; }
@@ -272,7 +286,14 @@
     </div>
     
     <table class="marks-table">
-      <thead><tr><th>Subject</th><th>Marks Obtained</th><th>Total Marks</th><th>Grade</th></tr></thead>
+      <thead>
+        <tr>
+          <th>Subject</th>
+          <th>Marks Obtained</th>
+          <th>Total Marks</th>
+          <th>Grade</th>
+        </tr>
+      </thead>
       <tbody id="marksTableBody"></tbody>
     </table>
     
@@ -350,9 +371,6 @@
     }
   }
   
-  // =============================================
-  // ✅ UPDATED: loadResult() with template redirect
-  // =============================================
   async function loadResult() {
     const params = getUrlParams();
     const examId = params.examId;
@@ -380,7 +398,6 @@
         return;
       }
       
-      // ✅ Agar template 'result' hai to normal flow continue karo
       console.log('📄 Using Classic Result Template');
       
       const student = currentExamData.students?.find(s => String(s.rollNo) == String(rollNo));
@@ -402,6 +419,7 @@
     }
   }
   
+  // ✅✅✅ UPDATED: displayResult with Optional Subjects Support ✅✅✅
   function displayResult(examData, student) {
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('resultCard').style.display = 'block';
@@ -410,9 +428,9 @@
     document.getElementById('coachingName').innerText = COACHING_NAME;
     document.getElementById('directorName').innerText = DIRECTOR_NAME;
     document.getElementById('examName').innerText = examData.examName || "Examination";
-    document.getElementById('studentName').innerText = student.name || "-";
+    document.getElementById('studentName').innerText = student.name || student.studentName || "-";
     document.getElementById('fatherName').innerText = student.fatherName || "-";
-    document.getElementById('studentRoll').innerText = student.rollNo || "-";
+    document.getElementById('studentRoll').innerText = student.rollNo || student.rollNumber || "-";
     
     const studentPhotoImg = document.getElementById('studentPhoto');
     if (student.photoUrl) {
@@ -427,32 +445,100 @@
       <p>For queries: ${COACHING_PHONE}</p>
     `;
     
+    // ✅ Get subjects data
+    const allSubjects = examData.subjects || [];
+    const optionalSubjects = examData.optionalSubjects || [];
+    const optionalNames = optionalSubjects.map(o => o.name);
+    const activeSubjects = student.activeSubjects || {};
+    
     let marksHtml = '';
     let totalObtained = 0;
     let totalMax = 0;
     
-    if (student.marks && examData.subjects) {
-      for (const subject of examData.subjects) {
-        const subjectName = subject.name;
-        const subjectTotal = subject.total || 100;
-        const marksObtained = student.marks[subjectName] || 0;
-        const percentage = (marksObtained / subjectTotal) * 100;
-        const gradeInfo = getGrade(percentage);
-        
-        marksHtml += `<tr><td>${escapeHtml(subjectName)}</td><td>${marksObtained}</td><td>${subjectTotal}</td><td><span class="${gradeInfo.className}">${gradeInfo.grade}</span></td></tr>`;
-        totalObtained += marksObtained;
-        totalMax += subjectTotal;
-      }
+    // ✅ MAIN SUBJECTS - ALL subjects from examData.subjects
+    const mainSubjects = allSubjects;
+    
+    // ✅ Show MAIN subjects
+    for (const subject of mainSubjects) {
+      const subName = subject.name;
+      const isActive = activeSubjects[subName] !== undefined ? activeSubjects[subName] : true;
+      
+      // Skip if inactive
+      if (!isActive) continue;
+      
+      const subTotal = subject.total || 100;
+      const marksObtained = student.marks && student.marks[subName] !== undefined ? student.marks[subName] : 0;
+      const percentage = subTotal > 0 ? (marksObtained / subTotal) * 100 : 0;
+      const gradeInfo = getGrade(percentage);
+      
+      marksHtml += `<tr>
+        <td><strong>${escapeHtml(subName)}</strong></td>
+        <td>${marksObtained}</td>
+        <td>${subTotal}</td>
+        <td><span class="${gradeInfo.className}">${gradeInfo.grade}</span></td>
+      </tr>`;
+      totalObtained += marksObtained;
+      totalMax += subTotal;
     }
     
-    const totalPercentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) : 0;
-    const division = calculateDivision(parseFloat(totalPercentage));
+    // ✅ TOTAL ROW
+    marksHtml += `<tr class="total-marks">
+      <td><strong>Total</strong></td>
+      <td><strong>${totalObtained}</strong></td>
+      <td><strong>${totalMax}</strong></td>
+      <td style="background:#e8f5e8;"></td>
+    </tr>`;
     
-    marksHtml += `<tr class="total-marks"><td><strong>Total</strong></td><td><strong>${totalObtained}</strong></td><td><strong>${totalMax}</strong></td><td style="background:#e8f5e8;"></td></tr>`;
+    // ✅ OPTIONAL SUBJECTS
+    if (optionalSubjects.length > 0) {
+      for (const opt of optionalSubjects) {
+        const optName = opt.name;
+        const optTotal = opt.total || 100;
+        let optObtained = '-';
+        let optGrade = '-';
+        
+        // Check in optionalMarks first
+        if (student.optionalMarks && student.optionalMarks[optName] !== undefined) {
+          optObtained = student.optionalMarks[optName];
+          if (optObtained !== null && optObtained !== '-') {
+            const optPercent = (optObtained / optTotal) * 100;
+            const gradeInfo = getGrade(optPercent);
+            optGrade = `<span class="${gradeInfo.className}">${gradeInfo.grade}</span>`;
+          }
+        } 
+        // Then in marks
+        else if (student.marks && student.marks[optName] !== undefined) {
+          optObtained = student.marks[optName];
+          if (optObtained !== null && optObtained !== '-') {
+            const optPercent = (optObtained / optTotal) * 100;
+            const gradeInfo = getGrade(optPercent);
+            optGrade = `<span class="${gradeInfo.className}">${gradeInfo.grade}</span>`;
+          }
+        }
+        
+        marksHtml += `<tr class="optional-row">
+          <td><strong>${escapeHtml(optName)} (Optional)</strong></td>
+          <td><strong>${optObtained}</strong></td>
+          <td>${optTotal}</td>
+          <td>${optGrade}</td>
+        </tr>`;
+      }
+    } else {
+      // No optional subjects
+      marksHtml += `<tr class="optional-row">
+        <td><strong>Optional Subject</strong></td>
+        <td>-</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>`;
+    }
     
     document.getElementById('marksTableBody').innerHTML = marksHtml;
+    
+    const totalPercentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) : 0;
     document.getElementById('totalPercentage').innerHTML = `Total Percentage: ${totalPercentage}%`;
     
+    const division = calculateDivision(parseFloat(totalPercentage));
     const divisionBox = document.getElementById('divisionBox');
     if (division === 'FIRST DIVISION') {
       divisionBox.style.background = '#d4edda';
