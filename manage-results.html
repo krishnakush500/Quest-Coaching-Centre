@@ -173,7 +173,7 @@
             color: white;
         }
         
-        /* ✅ Subject Selection Dialog Styles */
+        /* Subject Dialog Styles */
         .subject-dialog-overlay {
             position: fixed;
             top: 0;
@@ -190,9 +190,9 @@
         .subject-dialog {
             background: white;
             border-radius: 20px;
-            max-width: 600px;
+            max-width: 650px;
             width: 100%;
-            max-height: 80vh;
+            max-height: 85vh;
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
@@ -270,6 +270,30 @@
             background: white;
             border-color: #1a237e;
         }
+        .subject-select-item .validation-error {
+            color: #dc2626;
+            font-size: 0.7rem;
+            display: none;
+        }
+        
+        .btn-show-subjects {
+            background: #0d6efd;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 6px 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-show-subjects:hover {
+            background: #0b5ed7;
+            transform: translateY(-1px);
+        }
         
         .btn-add-subject {
             background: #1a237e;
@@ -335,6 +359,17 @@
             padding: 2px 8px;
             font-size: 0.7rem;
             font-weight: 700;
+        }
+        
+        .student-subject-tag {
+            background: #e8eafe;
+            color: #1a237e;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
+            margin: 2px;
         }
         
         @media (max-width: 768px) {
@@ -406,13 +441,16 @@
         
         <div id="examSetupStep">
             <div class="card mb-4">
-                <div class="card-header bg-white fw-bold">Step 1: Exam Setup</div>
+                <div class="card-header bg-white fw-bold">
+                    Step 1: Exam Setup
+                    <button class="btn-show-subjects ms-2" id="showSubjectsBtnStep1"><i class="fas fa-eye"></i> Show Subjects</button>
+                </div>
                 <div class="card-body">
                     <div class="mb-3"><label class="form-label">Exam Name <span style="color:#dc2626;">*</span></label><input type="text" class="form-control" id="examName" placeholder="e.g., Final Examination 2025"></div>
                     <div class="mb-3"><label class="form-label">Examination Centre</label><input type="text" class="form-control" id="examCentre" placeholder="e.g., QUEST COACHING CENTRE, GOPALGANJ"></div>
                     <div class="mb-3"><label class="form-label">Roll Code</label><input type="text" class="form-control" id="rollCode" value="55075"></div>
                     
-                    <!-- ✅ Subject Selection Area -->
+                    <!-- Subject Selection Area -->
                     <div class="mb-3">
                         <label class="form-label">Subjects <span style="color:#dc2626;">*</span></label>
                         <div class="d-flex gap-2 flex-wrap">
@@ -442,7 +480,9 @@
         
         <div id="studentEntryStep" style="display: none;">
             <div class="card mb-4">
-                <div class="card-header bg-white fw-bold">Step 2: Student Marks Entry 
+                <div class="card-header bg-white fw-bold">
+                    Step 2: Student Marks Entry
+                    <button class="btn-show-subjects ms-2" id="showSubjectsBtnStep2"><i class="fas fa-eye"></i> Show Subjects</button>
                     <span class="auto-fetch-badge"><i class="fas fa-sync-alt"></i> Auto-fetch from Admission</span>
                 </div>
                 <div class="card-body">
@@ -476,7 +516,7 @@
                     </div>
                     <div id="marksFields" class="mb-3"></div>
                     
-                    <!-- ✅ Optional Subjects Marks Fields -->
+                    <!-- Optional Subjects Marks Fields -->
                     <div id="optionalMarksFields" style="display:none;" class="mb-3">
                         <div class="optional-subject-box">
                             <strong style="color:#c5a059;"><i class="fas fa-book"></i> Optional Subjects Marks</strong>
@@ -498,7 +538,7 @@
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead class="table-light">
-                                <tr><th>Photo</th><th>Roll</th><th>Name</th><th>Father</th><th>Marks</th><th>Actions</th></tr>
+                                <tr><th>Photo</th><th>Roll</th><th>Name</th><th>Father</th><th>Subjects</th><th>Marks</th><th>Actions</th></tr>
                             </thead>
                             <tbody id="studentsTableBody"></tbody>
                         </table>
@@ -525,7 +565,7 @@
     </div>
 </div>
 
-<!-- ✅ Subject Selection Dialog -->
+<!-- Subject Selection Dialog -->
 <div class="subject-dialog-overlay" id="subjectDialog">
     <div class="subject-dialog">
         <div class="subject-dialog-header">
@@ -596,7 +636,7 @@
 
     onAuthStateChanged(auth, (user) => { if (!user) { alert('Please login first!'); window.location.href = 'index.html'; } });
 
-    // ✅ All Subjects List
+    // All Subjects List
     const ALL_SUBJECTS = [
         "MATHEMATICS", "SCIENCE", "SOCIAL SCIENCE", "HINDI", "SANSKRIT",
         "PHYSICS", "CHEMISTRY", "BIOLOGY", "HISTORY", "GEOGRAPHY",
@@ -653,7 +693,7 @@
     const saveChangesConfirmBtn = document.getElementById('saveChangesConfirmBtn');
     const editTemplateModal = new bootstrap.Modal(document.getElementById('editTemplateModal'));
 
-    // ✅ Subject Dialog Elements
+    // Subject Dialog Elements
     const subjectDialog = document.getElementById('subjectDialog');
     const dialogTitle = document.getElementById('dialogTitle');
     const dialogBody = document.getElementById('dialogBody');
@@ -661,7 +701,7 @@
     const dialogCancelBtn = document.getElementById('dialogCancelBtn');
     const dialogSaveBtn = document.getElementById('dialogSaveBtn');
 
-    // ✅ Selected Subjects
+    // Selected Subjects
     let selectedMainSubjects = [];
     let selectedOptionalSubjects = [];
     let subjects = [];
@@ -675,7 +715,7 @@
     let currentExamNameForPdf = '';
     let currentStudentPhotoUrl = '';
     let selectedTemplate = 'result';
-    let dialogMode = 'main'; // 'main' or 'optional'
+    let dialogMode = 'main';
     let tempSelectedSubjects = [];
 
     function showFullScreen(section) { actionCardsContainer.style.display = 'none'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; section.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -707,7 +747,6 @@
         const title = isMain ? 'Select Main Subjects' : 'Select Optional Subjects';
         dialogTitle.textContent = title;
         
-        // Get currently selected subjects for this mode
         const currentSelected = isMain ? selectedMainSubjects : selectedOptionalSubjects;
         tempSelectedSubjects = currentSelected.map(s => ({ ...s }));
         
@@ -722,33 +761,37 @@
         allSubjects.forEach(subName => {
             const existing = tempSelectedSubjects.find(s => s.name === subName);
             const isChecked = existing !== undefined;
-            const totalMarks = existing ? existing.total : 100;
+            const totalMarks = existing ? existing.total : '';
             
             const div = document.createElement('div');
             div.className = 'subject-select-item';
             div.innerHTML = `
                 <input type="checkbox" class="subject-checkbox" ${isChecked ? 'checked' : ''} data-subject="${subName}">
                 <span class="subject-name">${subName}</span>
-                <input type="number" class="subject-total-input" min="1" value="${totalMarks}" ${isChecked ? '' : 'disabled'} data-subject="${subName}">
+                <input type="number" class="subject-total-input" min="1" value="${totalMarks}" ${isChecked ? '' : 'disabled'} placeholder="Marks" data-subject="${subName}">
+                <span class="validation-error">Please enter total marks</span>
             `;
             dialogBody.appendChild(div);
             
             const checkbox = div.querySelector('.subject-checkbox');
             const totalInput = div.querySelector('.subject-total-input');
+            const errorMsg = div.querySelector('.validation-error');
             
             checkbox.addEventListener('change', function() {
                 const subject = this.dataset.subject;
                 const checked = this.checked;
                 totalInput.disabled = !checked;
                 if (!checked) {
-                    totalInput.value = 100;
+                    totalInput.value = '';
+                    errorMsg.style.display = 'none';
+                } else {
+                    totalInput.focus();
                 }
                 
-                // Update tempSelectedSubjects
                 const idx = tempSelectedSubjects.findIndex(s => s.name === subject);
                 if (checked) {
                     if (idx === -1) {
-                        tempSelectedSubjects.push({ name: subject, total: parseInt(totalInput.value) || 100 });
+                        tempSelectedSubjects.push({ name: subject, total: parseInt(totalInput.value) || '' });
                     }
                 } else {
                     if (idx !== -1) {
@@ -757,15 +800,51 @@
                 }
             });
             
-            totalInput.addEventListener('change', function() {
+            totalInput.addEventListener('input', function() {
                 const subject = this.dataset.subject;
-                const value = parseInt(this.value) || 100;
+                const value = this.value.trim();
                 const idx = tempSelectedSubjects.findIndex(s => s.name === subject);
+                
                 if (idx !== -1) {
-                    tempSelectedSubjects[idx].total = value;
+                    if (value === '') {
+                        tempSelectedSubjects[idx].total = '';
+                        errorMsg.style.display = 'block';
+                    } else {
+                        const numValue = parseInt(value);
+                        if (isNaN(numValue) || numValue < 1) {
+                            errorMsg.style.display = 'block';
+                            tempSelectedSubjects[idx].total = '';
+                        } else {
+                            errorMsg.style.display = 'none';
+                            tempSelectedSubjects[idx].total = numValue;
+                        }
+                    }
                 }
             });
+            
+            // If already checked, validate
+            if (isChecked && totalMarks === '') {
+                errorMsg.style.display = 'block';
+            }
         });
+    }
+
+    function validateDialogSelection() {
+        let valid = true;
+        const errors = [];
+        
+        tempSelectedSubjects.forEach(sub => {
+            if (!sub.total || sub.total === '') {
+                valid = false;
+                errors.push(sub.name);
+            }
+        });
+        
+        if (!valid) {
+            alert(`Please enter total marks for: ${errors.join(', ')}`);
+            return false;
+        }
+        return true;
     }
 
     function closeDialog() {
@@ -774,6 +853,13 @@
     }
 
     function saveDialogSelection() {
+        // Validate that all selected subjects have total marks
+        const invalid = tempSelectedSubjects.filter(s => !s.total || s.total === '');
+        if (invalid.length > 0) {
+            alert(`Please enter total marks for: ${invalid.map(s => s.name).join(', ')}`);
+            return;
+        }
+        
         const isMain = dialogMode === 'main';
         if (isMain) {
             selectedMainSubjects = tempSelectedSubjects.map(s => ({ ...s }));
@@ -792,7 +878,6 @@
     function renderSelectedSubjects() {
         // Main Subjects
         const mainContainer = document.getElementById('selectedMainSubjects');
-        const mainPlaceholder = document.getElementById('mainSubjectsPlaceholder');
         mainContainer.innerHTML = '';
         if (selectedMainSubjects.length === 0) {
             mainContainer.innerHTML = `<span style="color:#94a3b8; font-size:0.85rem;" id="mainSubjectsPlaceholder">No main subjects selected. Click "Add Main Subjects" to select.</span>`;
@@ -803,7 +888,6 @@
                 tag.innerHTML = `${sub.name} (${sub.total}) <span class="remove-subject" data-subject="${sub.name}" data-type="main">×</span>`;
                 mainContainer.appendChild(tag);
             });
-            // Remove handlers
             mainContainer.querySelectorAll('.remove-subject').forEach(el => {
                 el.addEventListener('click', function() {
                     const name = this.dataset.subject;
@@ -818,7 +902,6 @@
         
         // Optional Subjects
         const optContainer = document.getElementById('selectedOptionalSubjects');
-        const optPlaceholder = document.getElementById('optionalSubjectsPlaceholder');
         optContainer.innerHTML = '';
         if (selectedOptionalSubjects.length === 0) {
             optContainer.innerHTML = `<span style="color:#94a3b8; font-size:0.85rem;" id="optionalSubjectsPlaceholder">No optional subjects selected. Click "Add Optional Subjects" to select.</span>`;
@@ -859,6 +942,24 @@
         }
     }
 
+    // ✅ Show Subjects Button - Step 1
+    document.getElementById('showSubjectsBtnStep1').addEventListener('click', function() {
+        if (selectedMainSubjects.length === 0 && selectedOptionalSubjects.length === 0) {
+            alert('No subjects selected yet. Please add subjects first.');
+            return;
+        }
+        openSubjectDialog('main');
+    });
+
+    // ✅ Show Subjects Button - Step 2
+    document.getElementById('showSubjectsBtnStep2').addEventListener('click', function() {
+        if (selectedMainSubjects.length === 0 && selectedOptionalSubjects.length === 0) {
+            alert('No subjects selected yet. Please add subjects first.');
+            return;
+        }
+        openSubjectDialog('main');
+    });
+
     // Dialog Event Listeners
     document.getElementById('addMainSubjectBtn').addEventListener('click', () => openSubjectDialog('main'));
     document.getElementById('addOptionalSubjectBtn').addEventListener('click', () => openSubjectDialog('optional'));
@@ -877,7 +978,7 @@
     backFromDraftBtn.addEventListener('click', showActionCards);
     backFromOldBtn.addEventListener('click', showActionCards);
 
-    // ✅ Generate Subject Fields from selected subjects
+    // Generate Subject Fields
     generateSubjectFieldsBtn.addEventListener('click', function() {
         if (selectedMainSubjects.length === 0) {
             alert('Please select at least one main subject.');
@@ -887,17 +988,14 @@
         subjectFields.innerHTML = '';
         subjects = [];
         
-        // Main subjects
         selectedMainSubjects.forEach(sub => {
             subjects.push({ name: sub.name, total: sub.total });
         });
         
-        // Optional subjects (for display in fields, but will be handled separately)
         selectedOptionalSubjects.forEach(sub => {
             subjects.push({ name: sub.name, total: sub.total, isOptional: true });
         });
         
-        // Show main subject fields
         let html = '<h5 class="mb-3 mt-3">Main Subjects</h5>';
         selectedMainSubjects.forEach(sub => {
             const box = document.createElement('div');
@@ -917,7 +1015,6 @@
             subjectFields.appendChild(box);
         });
         
-        // Show optional subjects info
         if (selectedOptionalSubjects.length > 0) {
             const optDiv = document.createElement('div');
             optDiv.className = 'alert alert-warning mt-3';
@@ -1048,7 +1145,6 @@
         });
         if (!valid) return;
         
-        // ✅ Optional subject marks
         const optionalMarks = {};
         document.querySelectorAll('.opt-mark-input').forEach(inp => {
             const idx = parseInt(inp.dataset.optIndex);
@@ -1094,17 +1190,22 @@
         studentsTableBody.innerHTML = '';
         students.forEach((s, idx) => {
             let marksHtml = '';
-            // Main subjects
+            let subjectsHtml = '';
+            
+            // Show subjects for this student
             selectedMainSubjects.forEach(sub => {
+                subjectsHtml += `<span class="student-subject-tag">${sub.name}</span>`;
                 marksHtml += `<div>${sub.name}: ${s.marks[sub.name] || 0}/${sub.total}</div>`;
             });
-            // Optional subjects
+            
             selectedOptionalSubjects.forEach(opt => {
+                subjectsHtml += `<span class="student-subject-tag" style="background:#fef9e6;color:#c5a059;">${opt.name} (Opt)</span>`;
                 const optMark = s.optionalMarks && s.optionalMarks[opt.name] !== undefined ? s.optionalMarks[opt.name] : '-';
                 marksHtml += `<div style="color:#c5a059;">${opt.name} (Optional): ${optMark !== null ? optMark : '-'}/${opt.total}</div>`;
             });
+            
             const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" class="student-photo-thumb" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷 No photo</span>';
-            const row = `<tr><td>${photoHtml}</td><td>${s.rollNo}</td><td>${s.name}</td><td>${s.fatherName || '-'}</td><td>${marksHtml}</td><td><button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button> <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button></td></tr>`;
+            const row = `<tr><td>${photoHtml}</td><td>${s.rollNo}</td><td>${s.name}</td><td>${s.fatherName || '-'}</td><td>${subjectsHtml}</td><td>${marksHtml}</td><td><button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button> <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button></td></tr>`;
             studentsTableBody.insertAdjacentHTML('beforeend', row);
         });
         document.querySelectorAll('.edit-student').forEach(btn => btn.addEventListener('click', e => editStudent(parseInt(e.target.dataset.index))));
@@ -1363,7 +1464,6 @@
             selectedTemplate = 'result';
         }
         
-        // Restore subjects
         if (data.subjects) {
             selectedMainSubjects = data.subjects.map(s => ({ name: s.name, total: s.total }));
         }
@@ -1373,10 +1473,8 @@
         renderSelectedSubjects();
         updateSubjectCounts();
         
-        subjectCountInput.value = data.subjects.length;
         generateSubjectFieldsBtn.click();
         setTimeout(() => {
-            // Populate marks fields
             students = data.students || [];
             updateStudentsTable();
             editingDraftId = id;
@@ -1513,7 +1611,6 @@
             selectedTemplate = 'result';
         }
         
-        // Restore subjects
         if (data.subjects) {
             selectedMainSubjects = data.subjects.map(s => ({ name: s.name, total: s.total }));
         }
@@ -1523,7 +1620,6 @@
         renderSelectedSubjects();
         updateSubjectCounts();
         
-        subjectCountInput.value = data.subjects.length;
         generateSubjectFieldsBtn.click();
         setTimeout(() => {
             students = data.students || [];
