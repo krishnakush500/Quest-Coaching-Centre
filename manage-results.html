@@ -173,79 +173,168 @@
             color: white;
         }
         
-        /* ✅ Optional Subject Styles - Multiple */
-        .optional-subject-box {
-            background: #fef9e6;
-            border-radius: 16px;
-            padding: 15px;
-            margin-top: 12px;
-            border: 2px dashed #c5a059;
+        /* ✅ Subject Selection Dialog Styles */
+        .subject-dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
-        .optional-subject-box .form-label {
-            color: #c5a059;
-            font-weight: 600;
-        }
-        .optional-subject-item {
+        .subject-dialog {
             background: white;
-            border-radius: 12px;
-            padding: 12px 15px;
-            margin-bottom: 10px;
-            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .subject-dialog-header {
+            padding: 18px 24px;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fc;
+        }
+        .subject-dialog-header h4 {
+            margin: 0;
+            color: #1a237e;
+            font-weight: 700;
+        }
+        .subject-dialog-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        .subject-dialog-close:hover { color: #dc2626; }
+        .subject-dialog-body {
+            padding: 20px 24px;
+            max-height: 55vh;
+            overflow-y: auto;
+        }
+        .subject-dialog-footer {
+            padding: 15px 24px;
+            border-top: 2px solid #e9ecef;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: #f8f9fc;
+        }
+        .subject-select-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            flex-wrap: wrap;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f1f3f5;
         }
-        .optional-subject-item .opt-name {
-            flex: 2;
-            min-width: 120px;
+        .subject-select-item:hover {
+            background: #f8f9fc;
         }
-        .optional-subject-item .opt-total {
+        .subject-select-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #1a237e;
+            flex-shrink: 0;
+        }
+        .subject-select-item .subject-name {
             flex: 1;
-            min-width: 80px;
+            font-weight: 500;
+            color: #1e293b;
+            font-size: 0.95rem;
         }
-        .optional-subject-item .opt-remove {
-            flex: 0 0 auto;
+        .subject-select-item .subject-total-input {
+            width: 80px;
+            padding: 4px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            background: #f1f5f9;
         }
-        .btn-remove-optional-item {
-            background: #dc2626;
+        .subject-select-item .subject-total-input:disabled {
+            background: #f1f5f9;
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .subject-select-item .subject-total-input:enabled {
+            background: white;
+            border-color: #1a237e;
+        }
+        
+        .btn-add-subject {
+            background: #1a237e;
             color: white;
             border: none;
-            border-radius: 20px;
-            padding: 4px 14px;
-            font-size: 0.75rem;
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
-        .btn-remove-optional-item:hover { background: #b91c1c; }
-        .btn-add-optional {
+        .btn-add-subject:hover {
+            background: #283593;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26,35,126,0.3);
+        }
+        .btn-add-subject.optional {
             background: #c5a059;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 6px 18px;
-            font-size: 0.8rem;
-            cursor: pointer;
+        }
+        .btn-add-subject.optional:hover {
+            background: #a8894a;
+            box-shadow: 0 4px 12px rgba(197,160,89,0.3);
+        }
+        
+        .selected-subjects-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 12px;
+            min-height: 50px;
+            border: 1px dashed #e2e8f0;
             margin-top: 10px;
         }
-        .btn-add-optional:hover { background: #a8894a; }
-        
-        /* ✅ Optional Marks Field - Multiple */
-        .optional-marks-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-        }
-        .optional-marks-item .opt-mark-label {
+        .selected-subject-tag {
+            background: #e8eafe;
+            color: #1a237e;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
             font-weight: 600;
-            color: #c5a059;
-            font-size: 0.85rem;
-            min-width: 120px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
-        .optional-marks-item .opt-mark-input {
-            flex: 1;
-            min-width: 80px;
+        .selected-subject-tag .remove-subject {
+            cursor: pointer;
+            color: #dc2626;
+            font-weight: 700;
+            font-size: 0.7rem;
+        }
+        .selected-subject-tag .remove-subject:hover { color: #991b1b; }
+        
+        .subject-count-badge {
+            background: #1a237e;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
         }
         
         @media (max-width: 768px) {
@@ -258,7 +347,9 @@
             .action-title { font-size: 1.1rem; }
             .template-selector { flex-direction: column; align-items: stretch; }
             .template-option { justify-content: center; }
-            .optional-subject-item { flex-direction: column; align-items: stretch; }
+            .subject-dialog { max-width: 100%; margin: 10px; }
+            .subject-select-item { flex-wrap: wrap; }
+            .subject-select-item .subject-total-input { width: 100%; }
         }
     </style>
 </head>
@@ -320,27 +411,32 @@
                     <div class="mb-3"><label class="form-label">Exam Name <span style="color:#dc2626;">*</span></label><input type="text" class="form-control" id="examName" placeholder="e.g., Final Examination 2025"></div>
                     <div class="mb-3"><label class="form-label">Examination Centre</label><input type="text" class="form-control" id="examCentre" placeholder="e.g., QUEST COACHING CENTRE, GOPALGANJ"></div>
                     <div class="mb-3"><label class="form-label">Roll Code</label><input type="text" class="form-control" id="rollCode" value="55075"></div>
-                    <div class="mb-3"><label class="form-label">Number of Subjects <span style="color:#dc2626;">*</span></label><input type="number" class="form-control" id="subjectCount" min="1"></div>
-                    <button id="generateSubjectFieldsBtn" class="btn btn-primary"><i class="fas fa-magic"></i> Generate Subject Fields</button>
+                    
+                    <!-- ✅ Subject Selection Area -->
+                    <div class="mb-3">
+                        <label class="form-label">Subjects <span style="color:#dc2626;">*</span></label>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button class="btn-add-subject" id="addMainSubjectBtn">
+                                <i class="fas fa-plus"></i> Add Main Subjects
+                                <span class="subject-count-badge" id="mainSubjectCount">0</span>
+                            </button>
+                            <button class="btn-add-subject optional" id="addOptionalSubjectBtn">
+                                <i class="fas fa-plus"></i> Add Optional Subjects
+                                <span class="subject-count-badge" id="optionalSubjectCount">0</span>
+                            </button>
+                        </div>
+                        <div class="selected-subjects-container" id="selectedMainSubjects">
+                            <span style="color:#94a3b8; font-size:0.85rem;" id="mainSubjectsPlaceholder">No main subjects selected. Click "Add Main Subjects" to select.</span>
+                        </div>
+                        <div class="selected-subjects-container mt-2" id="selectedOptionalSubjects">
+                            <span style="color:#94a3b8; font-size:0.85rem;" id="optionalSubjectsPlaceholder">No optional subjects selected. Click "Add Optional Subjects" to select.</span>
+                        </div>
+                    </div>
+                    
+                    <button id="generateSubjectFieldsBtn" class="btn btn-primary" style="display:none;"><i class="fas fa-magic"></i> Generate Subject Fields</button>
                 </div>
             </div>
             <div id="subjectFields" class="mb-4"></div>
-            
-            <!-- ✅ Optional Subject Section - Multiple -->
-            <div id="optionalSubjectSection" style="display:none; margin-top:10px;">
-                <div class="optional-subject-box" id="optionalSubjectBox">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <strong style="color:#c5a059;"><i class="fas fa-book"></i> Optional Subjects</strong>
-                        <small class="text-muted">Marks will NOT be added to total</small>
-                    </div>
-                    <div id="optionalSubjectsList"></div>
-                    <button class="btn-add-optional" id="addOptionalBtn"><i class="fas fa-plus-circle"></i> Add Optional Subject</button>
-                </div>
-            </div>
-            <button class="btn-add-optional" id="showOptionalSectionBtn" style="background:#c5a059; color:white; border:none; border-radius:20px; padding:6px 18px; font-size:0.8rem; cursor:pointer; margin-top:10px;">
-                <i class="fas fa-plus"></i> Add Optional Subject
-            </button>
-            
             <div id="step1NextBtn" class="d-none mt-3"><button id="nextToStudentEntryBtn" class="btn btn-success">Next →</button></div>
         </div>
         
@@ -380,7 +476,7 @@
                     </div>
                     <div id="marksFields" class="mb-3"></div>
                     
-                    <!-- ✅ Optional Subjects Marks Fields - Multiple -->
+                    <!-- ✅ Optional Subjects Marks Fields -->
                     <div id="optionalMarksFields" style="display:none;" class="mb-3">
                         <div class="optional-subject-box">
                             <strong style="color:#c5a059;"><i class="fas fa-book"></i> Optional Subjects Marks</strong>
@@ -426,6 +522,23 @@
     <div id="oldResultsSection" class="fullscreen-section">
         <div class="section-header"><h3><i class="fas fa-history me-2"></i> Published Results</h3><button class="back-btn" id="backFromOldBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button></div>
         <div id="oldResultsList" class="row g-4"></div>
+    </div>
+</div>
+
+<!-- ✅ Subject Selection Dialog -->
+<div class="subject-dialog-overlay" id="subjectDialog">
+    <div class="subject-dialog">
+        <div class="subject-dialog-header">
+            <h4 id="dialogTitle">Select Subjects</h4>
+            <button class="subject-dialog-close" id="dialogCloseBtn">&times;</button>
+        </div>
+        <div class="subject-dialog-body" id="dialogBody">
+            <!-- Subjects will be rendered here -->
+        </div>
+        <div class="subject-dialog-footer">
+            <button class="btn btn-secondary" id="dialogCancelBtn">Cancel</button>
+            <button class="btn btn-primary" id="dialogSaveBtn"><i class="fas fa-check"></i> Add Selected</button>
+        </div>
     </div>
 </div>
 
@@ -483,6 +596,15 @@
 
     onAuthStateChanged(auth, (user) => { if (!user) { alert('Please login first!'); window.location.href = 'index.html'; } });
 
+    // ✅ All Subjects List
+    const ALL_SUBJECTS = [
+        "MATHEMATICS", "SCIENCE", "SOCIAL SCIENCE", "HINDI", "SANSKRIT",
+        "PHYSICS", "CHEMISTRY", "BIOLOGY", "HISTORY", "GEOGRAPHY",
+        "POLITICAL SCIENCE", "ECONOMIC", "SOCIOLOGY", "PSYCHOLOGY",
+        "PHILOSOPHY", "HOME SCIENCE", "ACCOUNTANCY", "BUSINESS STUDIES",
+        "COMPUTER SCIENCE", "ENGLISH"
+    ];
+
     // DOM Elements
     const actionCardsContainer = document.getElementById('actionCardsContainer');
     const createResultSection = document.getElementById('createResultSection');
@@ -500,7 +622,6 @@
     const examNameInput = document.getElementById('examName');
     const examCentreInput = document.getElementById('examCentre');
     const rollCodeInput = document.getElementById('rollCode');
-    const subjectCountInput = document.getElementById('subjectCount');
     const generateSubjectFieldsBtn = document.getElementById('generateSubjectFieldsBtn');
     const subjectFields = document.getElementById('subjectFields');
     const step1NextBtn = document.getElementById('step1NextBtn');
@@ -532,20 +653,30 @@
     const saveChangesConfirmBtn = document.getElementById('saveChangesConfirmBtn');
     const editTemplateModal = new bootstrap.Modal(document.getElementById('editTemplateModal'));
 
-    // ✅ Optional Subject Elements - Multiple
-    const addOptionalBtn = document.getElementById('addOptionalBtn');
-    const showOptionalSectionBtn = document.getElementById('showOptionalSectionBtn');
-    const optionalSubjectSection = document.getElementById('optionalSubjectSection');
-    const optionalSubjectsList = document.getElementById('optionalSubjectsList');
-    const optionalMarksFields = document.getElementById('optionalMarksFields');
-    const optionalMarksList = document.getElementById('optionalMarksList');
+    // ✅ Subject Dialog Elements
+    const subjectDialog = document.getElementById('subjectDialog');
+    const dialogTitle = document.getElementById('dialogTitle');
+    const dialogBody = document.getElementById('dialogBody');
+    const dialogCloseBtn = document.getElementById('dialogCloseBtn');
+    const dialogCancelBtn = document.getElementById('dialogCancelBtn');
+    const dialogSaveBtn = document.getElementById('dialogSaveBtn');
 
-    let subjects = [], students = [], editingStudentIndex = null, editingDraftId = null;
-    let isEditingPublishedResult = false, editingPublishedResultId = null, hasChanges = false;
-    let currentResultDataForPdf = null, currentExamNameForPdf = '';
+    // ✅ Selected Subjects
+    let selectedMainSubjects = [];
+    let selectedOptionalSubjects = [];
+    let subjects = [];
+    let students = [];
+    let editingStudentIndex = null;
+    let editingDraftId = null;
+    let isEditingPublishedResult = false;
+    let editingPublishedResultId = null;
+    let hasChanges = false;
+    let currentResultDataForPdf = null;
+    let currentExamNameForPdf = '';
     let currentStudentPhotoUrl = '';
     let selectedTemplate = 'result';
-    let optionalSubjects = []; // Array of {name, total}
+    let dialogMode = 'main'; // 'main' or 'optional'
+    let tempSelectedSubjects = [];
 
     function showFullScreen(section) { actionCardsContainer.style.display = 'none'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; section.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
     function showActionCards() { actionCardsContainer.style.display = 'grid'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -569,105 +700,174 @@
         });
     });
 
-    // ✅ Show Optional Subject Section
-    showOptionalSectionBtn.addEventListener('click', function() {
-        optionalSubjectSection.style.display = 'block';
-        this.style.display = 'none';
-        // Agar koi optional subject nahi hai to ek default add karo
-        if (optionalSubjects.length === 0) {
-            addOptionalSubject();
-        }
-        renderOptionalSubjects();
-        renderOptionalMarksFields();
-    });
-
-    // ✅ Add Optional Subject
-    addOptionalBtn.addEventListener('click', function() {
-        addOptionalSubject();
-        renderOptionalSubjects();
-        renderOptionalMarksFields();
-    });
-
-    function addOptionalSubject() {
-        optionalSubjects.push({ name: '', total: 100 });
+    // ✅ Subject Dialog Functions
+    function openSubjectDialog(mode) {
+        dialogMode = mode;
+        const isMain = mode === 'main';
+        const title = isMain ? 'Select Main Subjects' : 'Select Optional Subjects';
+        dialogTitle.textContent = title;
+        
+        // Get currently selected subjects for this mode
+        const currentSelected = isMain ? selectedMainSubjects : selectedOptionalSubjects;
+        tempSelectedSubjects = currentSelected.map(s => ({ ...s }));
+        
+        renderDialogSubjects(isMain);
+        subjectDialog.style.display = 'flex';
     }
 
-    // ✅ Remove Optional Subject
-    function removeOptionalSubject(index) {
-        if (confirm('Remove this optional subject?')) {
-            optionalSubjects.splice(index, 1);
-            renderOptionalSubjects();
-            renderOptionalMarksFields();
-            // Remove from students
-            students.forEach(s => {
-                if (s.optionalMarks && s.optionalMarks[index] !== undefined) {
-                    delete s.optionalMarks[index];
+    function renderDialogSubjects(isMain) {
+        dialogBody.innerHTML = '';
+        const allSubjects = ALL_SUBJECTS;
+        
+        allSubjects.forEach(subName => {
+            const existing = tempSelectedSubjects.find(s => s.name === subName);
+            const isChecked = existing !== undefined;
+            const totalMarks = existing ? existing.total : 100;
+            
+            const div = document.createElement('div');
+            div.className = 'subject-select-item';
+            div.innerHTML = `
+                <input type="checkbox" class="subject-checkbox" ${isChecked ? 'checked' : ''} data-subject="${subName}">
+                <span class="subject-name">${subName}</span>
+                <input type="number" class="subject-total-input" min="1" value="${totalMarks}" ${isChecked ? '' : 'disabled'} data-subject="${subName}">
+            `;
+            dialogBody.appendChild(div);
+            
+            const checkbox = div.querySelector('.subject-checkbox');
+            const totalInput = div.querySelector('.subject-total-input');
+            
+            checkbox.addEventListener('change', function() {
+                const subject = this.dataset.subject;
+                const checked = this.checked;
+                totalInput.disabled = !checked;
+                if (!checked) {
+                    totalInput.value = 100;
+                }
+                
+                // Update tempSelectedSubjects
+                const idx = tempSelectedSubjects.findIndex(s => s.name === subject);
+                if (checked) {
+                    if (idx === -1) {
+                        tempSelectedSubjects.push({ name: subject, total: parseInt(totalInput.value) || 100 });
+                    }
+                } else {
+                    if (idx !== -1) {
+                        tempSelectedSubjects.splice(idx, 1);
+                    }
                 }
             });
-            updateStudentsTable();
-            showToast('Optional subject removed');
-        }
-    }
-
-    // ✅ Render Optional Subjects in Step 1
-    function renderOptionalSubjects() {
-        optionalSubjectsList.innerHTML = '';
-        optionalSubjects.forEach((opt, idx) => {
-            const div = document.createElement('div');
-            div.className = 'optional-subject-item';
-            div.innerHTML = `
-                <div class="opt-name">
-                    <input type="text" class="form-control opt-name-input" placeholder="Optional Subject Name" value="${opt.name || ''}">
-                </div>
-                <div class="opt-total">
-                    <input type="number" class="form-control opt-total-input" placeholder="Total Marks" min="1" value="${opt.total || 100}">
-                </div>
-                <div class="opt-remove">
-                    <button class="btn-remove-optional-item" data-index="${idx}"><i class="fas fa-trash"></i> Remove</button>
-                </div>
-            `;
-            optionalSubjectsList.appendChild(div);
             
-            // Event listeners for name and total
-            const nameInput = div.querySelector('.opt-name-input');
-            const totalInput = div.querySelector('.opt-total-input');
-            
-            nameInput.addEventListener('input', function() {
-                optionalSubjects[idx].name = this.value.trim();
-                renderOptionalMarksFields();
-            });
-            
-            totalInput.addEventListener('input', function() {
-                optionalSubjects[idx].total = parseInt(this.value) || 100;
-                renderOptionalMarksFields();
-            });
-            
-            // Remove button
-            div.querySelector('.btn-remove-optional-item').addEventListener('click', function() {
-                removeOptionalSubject(parseInt(this.dataset.index));
+            totalInput.addEventListener('change', function() {
+                const subject = this.dataset.subject;
+                const value = parseInt(this.value) || 100;
+                const idx = tempSelectedSubjects.findIndex(s => s.name === subject);
+                if (idx !== -1) {
+                    tempSelectedSubjects[idx].total = value;
+                }
             });
         });
     }
 
-    // ✅ Render Optional Marks Fields in Step 2
-    function renderOptionalMarksFields() {
-        optionalMarksList.innerHTML = '';
-        if (optionalSubjects.length === 0) {
-            optionalMarksFields.style.display = 'none';
-            return;
+    function closeDialog() {
+        subjectDialog.style.display = 'none';
+        tempSelectedSubjects = [];
+    }
+
+    function saveDialogSelection() {
+        const isMain = dialogMode === 'main';
+        if (isMain) {
+            selectedMainSubjects = tempSelectedSubjects.map(s => ({ ...s }));
+            renderSelectedSubjects();
+            updateSubjectCounts();
+            checkAndShowGenerateButton();
+        } else {
+            selectedOptionalSubjects = tempSelectedSubjects.map(s => ({ ...s }));
+            renderSelectedSubjects();
+            updateSubjectCounts();
         }
-        optionalMarksFields.style.display = 'block';
+        closeDialog();
+        showToast(`${isMain ? 'Main' : 'Optional'} subjects updated!`);
+    }
+
+    function renderSelectedSubjects() {
+        // Main Subjects
+        const mainContainer = document.getElementById('selectedMainSubjects');
+        const mainPlaceholder = document.getElementById('mainSubjectsPlaceholder');
+        mainContainer.innerHTML = '';
+        if (selectedMainSubjects.length === 0) {
+            mainContainer.innerHTML = `<span style="color:#94a3b8; font-size:0.85rem;" id="mainSubjectsPlaceholder">No main subjects selected. Click "Add Main Subjects" to select.</span>`;
+        } else {
+            selectedMainSubjects.forEach(sub => {
+                const tag = document.createElement('span');
+                tag.className = 'selected-subject-tag';
+                tag.innerHTML = `${sub.name} (${sub.total}) <span class="remove-subject" data-subject="${sub.name}" data-type="main">×</span>`;
+                mainContainer.appendChild(tag);
+            });
+            // Remove handlers
+            mainContainer.querySelectorAll('.remove-subject').forEach(el => {
+                el.addEventListener('click', function() {
+                    const name = this.dataset.subject;
+                    selectedMainSubjects = selectedMainSubjects.filter(s => s.name !== name);
+                    renderSelectedSubjects();
+                    updateSubjectCounts();
+                    checkAndShowGenerateButton();
+                    showToast(`Removed: ${name}`);
+                });
+            });
+        }
         
-        optionalSubjects.forEach((opt, idx) => {
-            const div = document.createElement('div');
-            div.className = 'optional-marks-item';
-            div.innerHTML = `
-                <span class="opt-mark-label">${opt.name || `Optional ${idx+1}`} (Max: ${opt.total || 100})</span>
-                <input type="number" class="form-control opt-mark-input" data-opt-index="${idx}" min="0" max="${opt.total || 100}" placeholder="Enter marks">
-            `;
-            optionalMarksList.appendChild(div);
-        });
+        // Optional Subjects
+        const optContainer = document.getElementById('selectedOptionalSubjects');
+        const optPlaceholder = document.getElementById('optionalSubjectsPlaceholder');
+        optContainer.innerHTML = '';
+        if (selectedOptionalSubjects.length === 0) {
+            optContainer.innerHTML = `<span style="color:#94a3b8; font-size:0.85rem;" id="optionalSubjectsPlaceholder">No optional subjects selected. Click "Add Optional Subjects" to select.</span>`;
+        } else {
+            selectedOptionalSubjects.forEach(sub => {
+                const tag = document.createElement('span');
+                tag.className = 'selected-subject-tag';
+                tag.style.background = '#fef9e6';
+                tag.style.color = '#c5a059';
+                tag.innerHTML = `${sub.name} (${sub.total}) <span class="remove-subject" data-subject="${sub.name}" data-type="optional">×</span>`;
+                optContainer.appendChild(tag);
+            });
+            optContainer.querySelectorAll('.remove-subject').forEach(el => {
+                el.addEventListener('click', function() {
+                    const name = this.dataset.subject;
+                    selectedOptionalSubjects = selectedOptionalSubjects.filter(s => s.name !== name);
+                    renderSelectedSubjects();
+                    updateSubjectCounts();
+                    showToast(`Removed: ${name}`);
+                });
+            });
+        }
     }
+
+    function updateSubjectCounts() {
+        document.getElementById('mainSubjectCount').textContent = selectedMainSubjects.length;
+        document.getElementById('optionalSubjectCount').textContent = selectedOptionalSubjects.length;
+    }
+
+    function checkAndShowGenerateButton() {
+        if (selectedMainSubjects.length > 0) {
+            generateSubjectFieldsBtn.style.display = 'inline-block';
+            generateSubjectFieldsBtn.click();
+        } else {
+            generateSubjectFieldsBtn.style.display = 'none';
+            subjectFields.innerHTML = '';
+            step1NextBtn.classList.add('d-none');
+        }
+    }
+
+    // Dialog Event Listeners
+    document.getElementById('addMainSubjectBtn').addEventListener('click', () => openSubjectDialog('main'));
+    document.getElementById('addOptionalSubjectBtn').addEventListener('click', () => openSubjectDialog('optional'));
+    dialogCloseBtn.addEventListener('click', closeDialog);
+    dialogCancelBtn.addEventListener('click', closeDialog);
+    dialogSaveBtn.addEventListener('click', saveDialogSelection);
+    subjectDialog.addEventListener('click', function(e) {
+        if (e.target === this) closeDialog();
+    });
 
     createResultMainCard.addEventListener('click', () => { resetCreateResultForm(); showFullScreen(createResultSection); });
     draftResultsMainCard.addEventListener('click', () => { loadDraftResults(); showFullScreen(draftResultsSection); });
@@ -676,6 +876,99 @@
     backFromCreateBtn.addEventListener('click', showActionCards);
     backFromDraftBtn.addEventListener('click', showActionCards);
     backFromOldBtn.addEventListener('click', showActionCards);
+
+    // ✅ Generate Subject Fields from selected subjects
+    generateSubjectFieldsBtn.addEventListener('click', function() {
+        if (selectedMainSubjects.length === 0) {
+            alert('Please select at least one main subject.');
+            return;
+        }
+        
+        subjectFields.innerHTML = '';
+        subjects = [];
+        
+        // Main subjects
+        selectedMainSubjects.forEach(sub => {
+            subjects.push({ name: sub.name, total: sub.total });
+        });
+        
+        // Optional subjects (for display in fields, but will be handled separately)
+        selectedOptionalSubjects.forEach(sub => {
+            subjects.push({ name: sub.name, total: sub.total, isOptional: true });
+        });
+        
+        // Show main subject fields
+        let html = '<h5 class="mb-3 mt-3">Main Subjects</h5>';
+        selectedMainSubjects.forEach(sub => {
+            const box = document.createElement('div');
+            box.className = 'subject-box';
+            box.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <label><strong>${sub.name}</strong></label>
+                        <input type="text" class="form-control subject-name" value="${sub.name}" readonly style="background:#f1f5f9;">
+                    </div>
+                    <div class="col-md-6">
+                        <label>Total Marks</label>
+                        <input type="number" class="form-control subject-total" value="${sub.total}" readonly style="background:#f1f5f9;">
+                    </div>
+                </div>
+            `;
+            subjectFields.appendChild(box);
+        });
+        
+        // Show optional subjects info
+        if (selectedOptionalSubjects.length > 0) {
+            const optDiv = document.createElement('div');
+            optDiv.className = 'alert alert-warning mt-3';
+            optDiv.innerHTML = `<strong><i class="fas fa-info-circle"></i> Optional Subjects:</strong> ${selectedOptionalSubjects.map(s => s.name).join(', ')} (Marks will NOT be added to total)`;
+            subjectFields.appendChild(optDiv);
+        }
+        
+        step1NextBtn.classList.remove('d-none');
+    });
+
+    nextToStudentEntryBtn.addEventListener('click', () => {
+        generateMarksFields();
+        examSetupStep.style.display = 'none';
+        studentEntryStep.style.display = 'block';
+        renderOptionalMarksFields();
+    });
+
+    function generateMarksFields() {
+        marksFields.innerHTML = '<h5 class="mb-3">Enter Marks for Main Subjects</h5>';
+        selectedMainSubjects.forEach(sub => {
+            const div = document.createElement('div');
+            div.className = 'mb-2';
+            div.innerHTML = `<label class="form-label">${sub.name} (Max: ${sub.total})</label><input type="number" class="form-control subject-mark" data-subject="${sub.name}" min="0" max="${sub.total}">`;
+            marksFields.appendChild(div);
+        });
+    }
+
+    function renderOptionalMarksFields() {
+        const container = document.getElementById('optionalMarksFields');
+        const list = document.getElementById('optionalMarksList');
+        
+        if (selectedOptionalSubjects.length === 0) {
+            container.style.display = 'none';
+            return;
+        }
+        
+        container.style.display = 'block';
+        list.innerHTML = '';
+        
+        selectedOptionalSubjects.forEach((opt, idx) => {
+            const div = document.createElement('div');
+            div.className = 'optional-marks-item';
+            div.innerHTML = `
+                <span class="opt-mark-label">${opt.name} (Max: ${opt.total})</span>
+                <input type="number" class="form-control opt-mark-input" data-opt-index="${idx}" min="0" max="${opt.total}" placeholder="Enter marks">
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    incrementRollBtn.addEventListener('click', () => rollNoInput.value = parseInt(rollNoInput.value) + 1);
 
     async function fetchStudentFromAdmission(rollNumber) {
         try {
@@ -739,63 +1032,6 @@
         }
     });
 
-    generateSubjectFieldsBtn.addEventListener('click', () => {
-        const cnt = parseInt(subjectCountInput.value);
-        if (cnt < 1) return;
-        subjectFields.innerHTML = '';
-        subjects = [];
-        for (let i = 0; i < cnt; i++) {
-            const box = document.createElement('div');
-            box.className = 'subject-box';
-            box.innerHTML = `<div class="row"><div class="col-md-6"><label>Subject ${i+1} Name</label><input type="text" class="form-control subject-name"></div><div class="col-md-6"><label>Total Marks</label><input type="number" class="form-control subject-total" min="1"></div></div>`;
-            subjectFields.appendChild(box);
-        }
-        step1NextBtn.classList.remove('d-none');
-    });
-
-    nextToStudentEntryBtn.addEventListener('click', () => {
-        const nameInputs = document.querySelectorAll('.subject-name');
-        const totalInputs = document.querySelectorAll('.subject-total');
-        subjects = [];
-        let valid = true;
-        for (let i = 0; i < nameInputs.length; i++) {
-            const name = nameInputs[i].value.trim();
-            const total = parseInt(totalInputs[i].value);
-            if (!name || isNaN(total) || total < 1) { valid = false; break; }
-            subjects.push({ name, total });
-        }
-        if (!valid) { alert('Fill all subject fields'); return; }
-        
-        // ✅ Add optional subjects to subjects array
-        optionalSubjects.forEach(opt => {
-            if (opt.name && opt.name.trim()) {
-                subjects.push({ 
-                    name: opt.name.trim(), 
-                    total: opt.total || 100,
-                    isOptional: true 
-                });
-            }
-        });
-        
-        generateMarksFields();
-        examSetupStep.style.display = 'none';
-        studentEntryStep.style.display = 'block';
-        renderOptionalMarksFields();
-    });
-
-    function generateMarksFields() {
-        marksFields.innerHTML = '<h5 class="mb-3">Enter Marks</h5>';
-        subjects.forEach(sub => {
-            if (sub.isOptional) return;
-            const div = document.createElement('div');
-            div.className = 'mb-2';
-            div.innerHTML = `<label class="form-label">${sub.name} (Max: ${sub.total})</label><input type="number" class="form-control subject-mark" data-subject="${sub.name}" min="0" max="${sub.total}">`;
-            marksFields.appendChild(div);
-        });
-    }
-
-    incrementRollBtn.addEventListener('click', () => rollNoInput.value = parseInt(rollNoInput.value) + 1);
-
     addStudentBtn.addEventListener('click', () => {
         const roll = parseInt(rollNoInput.value);
         const name = studentNameInput.value.trim();
@@ -806,7 +1042,7 @@
             const sub = inp.dataset.subject;
             const mark = parseInt(inp.value);
             if (isNaN(mark) || mark < 0) valid = false;
-            const subObj = subjects.find(s => s.name === sub);
+            const subObj = selectedMainSubjects.find(s => s.name === sub);
             if (mark > subObj.total) { alert(`${sub} marks cannot exceed ${subObj.total}`); valid = false; }
             marks[sub] = mark;
         });
@@ -816,7 +1052,7 @@
         const optionalMarks = {};
         document.querySelectorAll('.opt-mark-input').forEach(inp => {
             const idx = parseInt(inp.dataset.optIndex);
-            const opt = optionalSubjects[idx];
+            const opt = selectedOptionalSubjects[idx];
             if (opt && opt.name) {
                 const mark = parseInt(inp.value);
                 if (!isNaN(mark) && mark >= 0) {
@@ -858,14 +1094,14 @@
         studentsTableBody.innerHTML = '';
         students.forEach((s, idx) => {
             let marksHtml = '';
-            subjects.forEach(sub => {
-                if (sub.isOptional) {
-                    // Show optional subject
-                    const optMark = s.optionalMarks && s.optionalMarks[sub.name] !== undefined ? s.optionalMarks[sub.name] : '-';
-                    marksHtml += `<div style="color:#c5a059;">${sub.name} (Optional): ${optMark !== null ? optMark : '-'}/${sub.total}</div>`;
-                } else {
-                    marksHtml += `<div>${sub.name}: ${s.marks[sub.name] || 0}/${sub.total}</div>`;
-                }
+            // Main subjects
+            selectedMainSubjects.forEach(sub => {
+                marksHtml += `<div>${sub.name}: ${s.marks[sub.name] || 0}/${sub.total}</div>`;
+            });
+            // Optional subjects
+            selectedOptionalSubjects.forEach(opt => {
+                const optMark = s.optionalMarks && s.optionalMarks[opt.name] !== undefined ? s.optionalMarks[opt.name] : '-';
+                marksHtml += `<div style="color:#c5a059;">${opt.name} (Optional): ${optMark !== null ? optMark : '-'}/${opt.total}</div>`;
             });
             const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" class="student-photo-thumb" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷 No photo</span>';
             const row = `<tr><td>${photoHtml}</td><td>${s.rollNo}</td><td>${s.name}</td><td>${s.fatherName || '-'}</td><td>${marksHtml}</td><td><button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button> <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button></td></tr>`;
@@ -889,10 +1125,9 @@
             studentPhotoPreview.style.display = 'none';
         }
         document.querySelectorAll('.subject-mark').forEach(inp => inp.value = s.marks[inp.dataset.subject] || 0);
-        // ✅ Optional subject marks
         document.querySelectorAll('.opt-mark-input').forEach(inp => {
             const idx2 = parseInt(inp.dataset.optIndex);
-            const opt = optionalSubjects[idx2];
+            const opt = selectedOptionalSubjects[idx2];
             if (opt && s.optionalMarks && s.optionalMarks[opt.name] !== undefined) {
                 inp.value = s.optionalMarks[opt.name] !== null ? s.optionalMarks[opt.name] : '';
             } else {
@@ -913,17 +1148,16 @@
             const sub = inp.dataset.subject;
             const mark = parseInt(inp.value);
             if (isNaN(mark) || mark < 0) valid = false;
-            const subObj = subjects.find(s => s.name === sub);
+            const subObj = selectedMainSubjects.find(s => s.name === sub);
             if (mark > subObj.total) { alert(`${sub} exceeds max`); valid = false; }
             marks[sub] = mark;
         });
         if (!valid) return;
         
-        // ✅ Optional subject marks
         const optionalMarks = {};
         document.querySelectorAll('.opt-mark-input').forEach(inp => {
             const idx2 = parseInt(inp.dataset.optIndex);
-            const opt = optionalSubjects[idx2];
+            const opt = selectedOptionalSubjects[idx2];
             if (opt && opt.name) {
                 const mark = parseInt(inp.value);
                 if (!isNaN(mark) && mark >= 0) {
@@ -973,14 +1207,15 @@
 
     saveDraftBtn.addEventListener('click', async () => {
         if (!examNameInput.value.trim() || students.length === 0) { alert('Exam name and at least one student required'); return; }
+        if (selectedMainSubjects.length === 0) { alert('Please select at least one main subject'); return; }
         try {
             const data = { 
                 examName: examNameInput.value, 
                 examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
                 rollCode: rollCodeInput.value || '55075',
                 template: selectedTemplate,
-                subjects: subjects.filter(s => !s.isOptional),
-                optionalSubjects: optionalSubjects.filter(o => o.name && o.name.trim()),
+                subjects: selectedMainSubjects,
+                optionalSubjects: selectedOptionalSubjects,
                 students, 
                 createdAt: serverTimestamp() 
             };
@@ -994,6 +1229,7 @@
 
     publishResultBtn.addEventListener('click', async () => {
         if (!examNameInput.value.trim() || students.length === 0) { alert('Exam name and at least one student required'); return; }
+        if (selectedMainSubjects.length === 0) { alert('Please select at least one main subject'); return; }
         if (isEditingPublishedResult) { 
             editPublishedConfirmModal.show();
             return;
@@ -1004,8 +1240,8 @@
                 examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
                 rollCode: rollCodeInput.value || '55075',
                 template: selectedTemplate,
-                subjects: subjects.filter(s => !s.isOptional),
-                optionalSubjects: optionalSubjects.filter(o => o.name && o.name.trim()),
+                subjects: selectedMainSubjects,
+                optionalSubjects: selectedOptionalSubjects,
                 students, 
                 createdAt: serverTimestamp() 
             };
@@ -1025,8 +1261,8 @@
                 examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
                 rollCode: rollCodeInput.value || '55075',
                 template: selectedTemplate,
-                subjects: subjects.filter(s => !s.isOptional),
-                optionalSubjects: optionalSubjects.filter(o => o.name && o.name.trim()),
+                subjects: selectedMainSubjects,
+                optionalSubjects: selectedOptionalSubjects,
                 students
             };
             await updateDoc(doc(db, "results", editingPublishedResultId), data);
@@ -1045,8 +1281,8 @@
                 examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
                 rollCode: rollCodeInput.value || '55075',
                 template: selectedTemplate,
-                subjects: subjects.filter(s => !s.isOptional),
-                optionalSubjects: optionalSubjects.filter(o => o.name && o.name.trim()),
+                subjects: selectedMainSubjects,
+                optionalSubjects: selectedOptionalSubjects,
                 students,
                 createdAt: serverTimestamp() 
             };
@@ -1069,7 +1305,6 @@
         examNameInput.value = ''; 
         examCentreInput.value = '';
         rollCodeInput.value = '55075';
-        subjectCountInput.value = ''; 
         subjectFields.innerHTML = '';
         step1NextBtn.classList.add('d-none');
         examSetupStep.style.display = 'block';
@@ -1077,13 +1312,13 @@
         students = []; updateStudentsTable();
         editingDraftId = null; isEditingPublishedResult = false; editingPublishedResultId = null; hasChanges = false;
         cancelEdit();
-        // ✅ Reset optional subjects
-        optionalSubjects = [];
-        optionalSubjectsList.innerHTML = '';
-        optionalMarksList.innerHTML = '';
-        optionalSubjectSection.style.display = 'none';
-        showOptionalSectionBtn.style.display = 'inline-block';
-        optionalMarksFields.style.display = 'none';
+        // Reset subjects
+        selectedMainSubjects = [];
+        selectedOptionalSubjects = [];
+        subjects = [];
+        renderSelectedSubjects();
+        updateSubjectCounts();
+        generateSubjectFieldsBtn.style.display = 'none';
         // Reset template
         document.querySelectorAll('#templateSelector .template-option').forEach(o => o.classList.remove('selected'));
         document.getElementById('templateResult').classList.add('selected');
@@ -1128,21 +1363,20 @@
             selectedTemplate = 'result';
         }
         
-        // ✅ Restore optional subjects
-        if (data.optionalSubjects && data.optionalSubjects.length) {
-            optionalSubjects = data.optionalSubjects;
-            optionalSubjectSection.style.display = 'block';
-            showOptionalSectionBtn.style.display = 'none';
-            renderOptionalSubjects();
+        // Restore subjects
+        if (data.subjects) {
+            selectedMainSubjects = data.subjects.map(s => ({ name: s.name, total: s.total }));
         }
+        if (data.optionalSubjects) {
+            selectedOptionalSubjects = data.optionalSubjects.map(s => ({ name: s.name, total: s.total }));
+        }
+        renderSelectedSubjects();
+        updateSubjectCounts();
         
         subjectCountInput.value = data.subjects.length;
         generateSubjectFieldsBtn.click();
         setTimeout(() => {
-            const nameInps = document.querySelectorAll('.subject-name');
-            const totalInps = document.querySelectorAll('.subject-total');
-            data.subjects.forEach((sub, idx) => { if (nameInps[idx]) nameInps[idx].value = sub.name; if (totalInps[idx]) totalInps[idx].value = sub.total; });
-            nextToStudentEntryBtn.click();
+            // Populate marks fields
             students = data.students || [];
             updateStudentsTable();
             editingDraftId = id;
@@ -1279,21 +1513,19 @@
             selectedTemplate = 'result';
         }
         
-        // ✅ Restore optional subjects
-        if (data.optionalSubjects && data.optionalSubjects.length) {
-            optionalSubjects = data.optionalSubjects;
-            optionalSubjectSection.style.display = 'block';
-            showOptionalSectionBtn.style.display = 'none';
-            renderOptionalSubjects();
+        // Restore subjects
+        if (data.subjects) {
+            selectedMainSubjects = data.subjects.map(s => ({ name: s.name, total: s.total }));
         }
+        if (data.optionalSubjects) {
+            selectedOptionalSubjects = data.optionalSubjects.map(s => ({ name: s.name, total: s.total }));
+        }
+        renderSelectedSubjects();
+        updateSubjectCounts();
         
         subjectCountInput.value = data.subjects.length;
         generateSubjectFieldsBtn.click();
         setTimeout(() => {
-            const nameInps = document.querySelectorAll('.subject-name');
-            const totalInps = document.querySelectorAll('.subject-total');
-            data.subjects.forEach((sub, idx) => { if (nameInps[idx]) nameInps[idx].value = sub.name; if (totalInps[idx]) totalInps[idx].value = sub.total; });
-            nextToStudentEntryBtn.click();
             students = data.students || [];
             updateStudentsTable();
             editingDraftId = null;
