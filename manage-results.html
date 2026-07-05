@@ -190,7 +190,7 @@
         .subject-dialog {
             background: white;
             border-radius: 20px;
-            max-width: 650px;
+            max-width: 700px;
             width: 100%;
             max-height: 85vh;
             overflow: hidden;
@@ -230,6 +230,46 @@
             gap: 12px;
             background: #f8f9fc;
         }
+        
+        /* ✅ Tab Styles */
+        .dialog-tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 15px;
+        }
+        .dialog-tab {
+            padding: 10px 20px;
+            border: none;
+            background: none;
+            font-weight: 600;
+            color: #6c757d;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        .dialog-tab.active {
+            color: #1a237e;
+            border-bottom-color: #1a237e;
+            background: #f0f7ff;
+        }
+        .dialog-tab:hover {
+            color: #1a237e;
+            background: #f8f9fc;
+        }
+        .dialog-tab .badge-count {
+            background: #1a237e;
+            color: white;
+            border-radius: 50%;
+            padding: 1px 8px;
+            font-size: 0.65rem;
+            margin-left: 5px;
+        }
+        .dialog-tab.active .badge-count {
+            background: #1a237e;
+        }
+        
         .subject-select-item {
             display: flex;
             align-items: center;
@@ -322,36 +362,6 @@
             box-shadow: 0 4px 12px rgba(197,160,89,0.3);
         }
         
-        .selected-subjects-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 12px;
-            background: #f8fafc;
-            border-radius: 12px;
-            min-height: 50px;
-            border: 1px dashed #e2e8f0;
-            margin-top: 10px;
-        }
-        .selected-subject-tag {
-            background: #e8eafe;
-            color: #1a237e;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .selected-subject-tag .remove-subject {
-            cursor: pointer;
-            color: #dc2626;
-            font-weight: 700;
-            font-size: 0.7rem;
-        }
-        .selected-subject-tag .remove-subject:hover { color: #991b1b; }
-        
         .subject-count-badge {
             background: #1a237e;
             color: white;
@@ -377,7 +387,7 @@
             text-decoration: line-through;
         }
         
-        /* ✅ Subject Toggle Switch Styles */
+        /* Subject Toggle Switch Styles */
         .subject-mark-row {
             background: #f8fafc;
             border-radius: 10px;
@@ -424,6 +434,8 @@
             .subject-select-item .subject-total-input { width: 100%; }
             .subject-mark-row .d-flex { flex-direction: column; align-items: stretch !important; gap: 8px; }
             .subject-mark-row .subject-mark { max-width: 100% !important; }
+            .dialog-tabs { flex-direction: column; }
+            .dialog-tab { text-align: center; }
         }
     </style>
 </head>
@@ -501,12 +513,9 @@
                                 <span class="subject-count-badge" id="optionalSubjectCount">0</span>
                             </button>
                         </div>
-                        <div class="selected-subjects-container" id="selectedMainSubjects">
-                            <span style="color:#94a3b8; font-size:0.85rem;" id="mainSubjectsPlaceholder">No main subjects selected. Click "Add Main Subjects" to select.</span>
-                        </div>
-                        <div class="selected-subjects-container mt-2" id="selectedOptionalSubjects">
-                            <span style="color:#94a3b8; font-size:0.85rem;" id="optionalSubjectsPlaceholder">No optional subjects selected. Click "Add Optional Subjects" to select.</span>
-                        </div>
+                        <!-- ✅ Subjects list hidden - only show via "Show Subjects" button -->
+                        <div style="display:none;" id="selectedMainSubjects"></div>
+                        <div style="display:none;" id="selectedOptionalSubjects"></div>
                     </div>
                     
                     <button id="generateSubjectFieldsBtn" class="btn btn-primary" style="display:none;"><i class="fas fa-magic"></i> Generate Subject Fields</button>
@@ -602,19 +611,30 @@
     </div>
 </div>
 
-<!-- Subject Selection Dialog -->
+<!-- Subject Selection Dialog with Tabs -->
 <div class="subject-dialog-overlay" id="subjectDialog">
     <div class="subject-dialog">
         <div class="subject-dialog-header">
-            <h4 id="dialogTitle">Select Subjects</h4>
+            <h4 id="dialogTitle"><i class="fas fa-book"></i> Manage Subjects</h4>
             <button class="subject-dialog-close" id="dialogCloseBtn">&times;</button>
         </div>
-        <div class="subject-dialog-body" id="dialogBody">
-            <!-- Subjects will be rendered here -->
+        <div class="subject-dialog-body">
+            <!-- ✅ Tabs -->
+            <div class="dialog-tabs">
+                <button class="dialog-tab active" data-tab="main" id="tabMain">
+                    <i class="fas fa-list"></i> Main Subjects
+                    <span class="badge-count" id="mainTabCount">0</span>
+                </button>
+                <button class="dialog-tab" data-tab="optional" id="tabOptional">
+                    <i class="fas fa-star" style="color:#c5a059;"></i> Optional Subjects
+                    <span class="badge-count" id="optionalTabCount" style="background:#c5a059;">0</span>
+                </button>
+            </div>
+            <div id="dialogBody"></div>
         </div>
         <div class="subject-dialog-footer">
             <button class="btn btn-secondary" id="dialogCancelBtn">Cancel</button>
-            <button class="btn btn-primary" id="dialogSaveBtn"><i class="fas fa-check"></i> Add Selected</button>
+            <button class="btn btn-primary" id="dialogSaveBtn"><i class="fas fa-check"></i> Save Changes</button>
         </div>
     </div>
 </div>
@@ -736,6 +756,8 @@
     const dialogCloseBtn = document.getElementById('dialogCloseBtn');
     const dialogCancelBtn = document.getElementById('dialogCancelBtn');
     const dialogSaveBtn = document.getElementById('dialogSaveBtn');
+    const tabMain = document.getElementById('tabMain');
+    const tabOptional = document.getElementById('tabOptional');
 
     let selectedMainSubjects = [];
     let selectedOptionalSubjects = [];
@@ -750,8 +772,9 @@
     let currentExamNameForPdf = '';
     let currentStudentPhotoUrl = '';
     let selectedTemplate = 'result';
-    let dialogMode = 'main';
-    let tempSelectedSubjects = [];
+    let tempMainSubjects = [];
+    let tempOptionalSubjects = [];
+    let currentTab = 'main';
 
     function showFullScreen(section) { actionCardsContainer.style.display = 'none'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; section.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
     function showActionCards() { actionCardsContainer.style.display = 'grid'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -775,26 +798,89 @@
         });
     });
 
-    // Subject Dialog Functions
-    function openSubjectDialog(mode) {
-        dialogMode = mode;
-        const isMain = mode === 'main';
-        const title = isMain ? 'Select Main Subjects' : 'Select Optional Subjects';
-        dialogTitle.textContent = title;
+    // ✅ Tab Switching
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.dialog-tab').forEach(t => t.classList.remove('active'));
+        if (tab === 'main') {
+            tabMain.classList.add('active');
+            renderDialogSubjects(true);
+        } else {
+            tabOptional.classList.add('active');
+            renderDialogSubjects(false);
+        }
+    }
+
+    tabMain.addEventListener('click', () => switchTab('main'));
+    tabOptional.addEventListener('click', () => switchTab('optional'));
+
+    // ✅ Open Subject Dialog with Tabs
+    function openSubjectDialog() {
+        tempMainSubjects = selectedMainSubjects.map(s => ({ ...s }));
+        tempOptionalSubjects = selectedOptionalSubjects.map(s => ({ ...s }));
         
-        const currentSelected = isMain ? selectedMainSubjects : selectedOptionalSubjects;
-        tempSelectedSubjects = currentSelected.map(s => ({ ...s }));
+        document.getElementById('mainTabCount').textContent = tempMainSubjects.length;
+        document.getElementById('optionalTabCount').textContent = tempOptionalSubjects.length;
         
-        renderDialogSubjects(isMain);
+        dialogTitle.innerHTML = '<i class="fas fa-book"></i> Manage Subjects';
         subjectDialog.style.display = 'flex';
+        switchTab('main');
     }
 
     function renderDialogSubjects(isMain) {
-        dialogBody.innerHTML = '';
+        const container = dialogBody;
+        container.innerHTML = '';
         const allSubjects = ALL_SUBJECTS;
+        const tempSubjects = isMain ? tempMainSubjects : tempOptionalSubjects;
+        const title = isMain ? 'Main Subjects' : 'Optional Subjects';
+        
+        // Add header
+        const header = document.createElement('div');
+        header.style.cssText = 'padding: 8px 12px; background: #f0f7ff; border-radius: 8px; margin-bottom: 12px; font-weight: 600; color: #1a237e;';
+        header.textContent = `Select ${title}`;
+        container.appendChild(header);
+        
+        // Add "Select All" checkbox
+        const selectAllDiv = document.createElement('div');
+        selectAllDiv.className = 'subject-select-item';
+        selectAllDiv.style.background = '#f8fafc';
+        selectAllDiv.innerHTML = `
+            <input type="checkbox" id="selectAllCheckbox" ${allSubjects.every(s => tempSubjects.some(t => t.name === s)) ? 'checked' : ''}>
+            <span class="subject-name" style="font-weight:600;">Select All</span>
+        `;
+        container.appendChild(selectAllDiv);
+        
+        const selectAllCheckbox = selectAllDiv.querySelector('#selectAllCheckbox');
+        selectAllCheckbox.addEventListener('change', function() {
+            const checked = this.checked;
+            if (isMain) {
+                if (checked) {
+                    allSubjects.forEach(s => {
+                        if (!tempMainSubjects.find(t => t.name === s)) {
+                            tempMainSubjects.push({ name: s, total: '' });
+                        }
+                    });
+                } else {
+                    tempMainSubjects = [];
+                }
+            } else {
+                if (checked) {
+                    allSubjects.forEach(s => {
+                        if (!tempOptionalSubjects.find(t => t.name === s)) {
+                            tempOptionalSubjects.push({ name: s, total: '' });
+                        }
+                    });
+                } else {
+                    tempOptionalSubjects = [];
+                }
+            }
+            document.getElementById('mainTabCount').textContent = tempMainSubjects.length;
+            document.getElementById('optionalTabCount').textContent = tempOptionalSubjects.length;
+            renderDialogSubjects(isMain);
+        });
         
         allSubjects.forEach(subName => {
-            const existing = tempSelectedSubjects.find(s => s.name === subName);
+            const existing = tempSubjects.find(s => s.name === subName);
             const isChecked = existing !== undefined;
             const totalMarks = existing ? existing.total : '';
             
@@ -806,7 +892,7 @@
                 <input type="number" class="subject-total-input" min="1" value="${totalMarks}" ${isChecked ? '' : 'disabled'} placeholder="Marks" data-subject="${subName}">
                 <span class="validation-error">Please enter total marks</span>
             `;
-            dialogBody.appendChild(div);
+            container.appendChild(div);
             
             const checkbox = div.querySelector('.subject-checkbox');
             const totalInput = div.querySelector('.subject-total-input');
@@ -823,35 +909,39 @@
                     totalInput.focus();
                 }
                 
-                const idx = tempSelectedSubjects.findIndex(s => s.name === subject);
+                const arr = isMain ? tempMainSubjects : tempOptionalSubjects;
+                const idx = arr.findIndex(s => s.name === subject);
                 if (checked) {
                     if (idx === -1) {
-                        tempSelectedSubjects.push({ name: subject, total: parseInt(totalInput.value) || '' });
+                        arr.push({ name: subject, total: parseInt(totalInput.value) || '' });
                     }
                 } else {
                     if (idx !== -1) {
-                        tempSelectedSubjects.splice(idx, 1);
+                        arr.splice(idx, 1);
                     }
                 }
+                document.getElementById('mainTabCount').textContent = tempMainSubjects.length;
+                document.getElementById('optionalTabCount').textContent = tempOptionalSubjects.length;
             });
             
             totalInput.addEventListener('input', function() {
                 const subject = this.dataset.subject;
                 const value = this.value.trim();
-                const idx = tempSelectedSubjects.findIndex(s => s.name === subject);
+                const arr = isMain ? tempMainSubjects : tempOptionalSubjects;
+                const idx = arr.findIndex(s => s.name === subject);
                 
                 if (idx !== -1) {
                     if (value === '') {
-                        tempSelectedSubjects[idx].total = '';
+                        arr[idx].total = '';
                         errorMsg.style.display = 'block';
                     } else {
                         const numValue = parseInt(value);
                         if (isNaN(numValue) || numValue < 1) {
                             errorMsg.style.display = 'block';
-                            tempSelectedSubjects[idx].total = '';
+                            arr[idx].total = '';
                         } else {
                             errorMsg.style.display = 'none';
-                            tempSelectedSubjects[idx].total = numValue;
+                            arr[idx].total = numValue;
                         }
                     }
                 }
@@ -867,7 +957,13 @@
         let valid = true;
         const errors = [];
         
-        tempSelectedSubjects.forEach(sub => {
+        tempMainSubjects.forEach(sub => {
+            if (!sub.total || sub.total === '') {
+                valid = false;
+                errors.push(sub.name);
+            }
+        });
+        tempOptionalSubjects.forEach(sub => {
             if (!sub.total || sub.total === '') {
                 valid = false;
                 errors.push(sub.name);
@@ -883,83 +979,31 @@
 
     function closeDialog() {
         subjectDialog.style.display = 'none';
-        tempSelectedSubjects = [];
+        tempMainSubjects = [];
+        tempOptionalSubjects = [];
     }
 
     function saveDialogSelection() {
-        const invalid = tempSelectedSubjects.filter(s => !s.total || s.total === '');
+        const invalid = [...tempMainSubjects, ...tempOptionalSubjects].filter(s => !s.total || s.total === '');
         if (invalid.length > 0) {
             alert(`Please enter total marks for: ${invalid.map(s => s.name).join(', ')}`);
             return;
         }
         
-        const isMain = dialogMode === 'main';
-        if (isMain) {
-            selectedMainSubjects = tempSelectedSubjects.map(s => ({ ...s }));
-            renderSelectedSubjects();
-            updateSubjectCounts();
-            checkAndShowGenerateButton();
-        } else {
-            selectedOptionalSubjects = tempSelectedSubjects.map(s => ({ ...s }));
-            renderSelectedSubjects();
-            updateSubjectCounts();
-        }
-        closeDialog();
-        showToast(`${isMain ? 'Main' : 'Optional'} subjects updated!`);
-    }
-
-    function renderSelectedSubjects() {
-        const mainContainer = document.getElementById('selectedMainSubjects');
-        mainContainer.innerHTML = '';
-        if (selectedMainSubjects.length === 0) {
-            mainContainer.innerHTML = `<span style="color:#94a3b8; font-size:0.85rem;" id="mainSubjectsPlaceholder">No main subjects selected. Click "Add Main Subjects" to select.</span>`;
-        } else {
-            selectedMainSubjects.forEach(sub => {
-                const tag = document.createElement('span');
-                tag.className = 'selected-subject-tag';
-                tag.innerHTML = `${sub.name} (${sub.total}) <span class="remove-subject" data-subject="${sub.name}" data-type="main">×</span>`;
-                mainContainer.appendChild(tag);
-            });
-            mainContainer.querySelectorAll('.remove-subject').forEach(el => {
-                el.addEventListener('click', function() {
-                    const name = this.dataset.subject;
-                    selectedMainSubjects = selectedMainSubjects.filter(s => s.name !== name);
-                    renderSelectedSubjects();
-                    updateSubjectCounts();
-                    checkAndShowGenerateButton();
-                    showToast(`Removed: ${name}`);
-                });
-            });
-        }
+        selectedMainSubjects = tempMainSubjects.map(s => ({ ...s }));
+        selectedOptionalSubjects = tempOptionalSubjects.map(s => ({ ...s }));
         
-        const optContainer = document.getElementById('selectedOptionalSubjects');
-        optContainer.innerHTML = '';
-        if (selectedOptionalSubjects.length === 0) {
-            optContainer.innerHTML = `<span style="color:#94a3b8; font-size:0.85rem;" id="optionalSubjectsPlaceholder">No optional subjects selected. Click "Add Optional Subjects" to select.</span>`;
-        } else {
-            selectedOptionalSubjects.forEach(sub => {
-                const tag = document.createElement('span');
-                tag.className = 'selected-subject-tag';
-                tag.style.background = '#fef9e6';
-                tag.style.color = '#c5a059';
-                tag.innerHTML = `${sub.name} (${sub.total}) <span class="remove-subject" data-subject="${sub.name}" data-type="optional">×</span>`;
-                optContainer.appendChild(tag);
-            });
-            optContainer.querySelectorAll('.remove-subject').forEach(el => {
-                el.addEventListener('click', function() {
-                    const name = this.dataset.subject;
-                    selectedOptionalSubjects = selectedOptionalSubjects.filter(s => s.name !== name);
-                    renderSelectedSubjects();
-                    updateSubjectCounts();
-                    showToast(`Removed: ${name}`);
-                });
-            });
-        }
+        updateSubjectCounts();
+        checkAndShowGenerateButton();
+        closeDialog();
+        showToast('Subjects updated successfully!');
     }
 
     function updateSubjectCounts() {
         document.getElementById('mainSubjectCount').textContent = selectedMainSubjects.length;
         document.getElementById('optionalSubjectCount').textContent = selectedOptionalSubjects.length;
+        document.getElementById('mainTabCount').textContent = selectedMainSubjects.length;
+        document.getElementById('optionalTabCount').textContent = selectedOptionalSubjects.length;
     }
 
     function checkAndShowGenerateButton() {
@@ -973,13 +1017,13 @@
         }
     }
 
-    // Show Subjects Buttons
+    // ✅ Show Subjects Buttons
     document.getElementById('showSubjectsBtnStep1').addEventListener('click', function() {
         if (selectedMainSubjects.length === 0 && selectedOptionalSubjects.length === 0) {
             alert('No subjects selected yet. Please add subjects first.');
             return;
         }
-        openSubjectDialog('main');
+        openSubjectDialog();
     });
 
     document.getElementById('showSubjectsBtnStep2').addEventListener('click', function() {
@@ -987,12 +1031,12 @@
             alert('No subjects selected yet. Please add subjects first.');
             return;
         }
-        openSubjectDialog('main');
+        openSubjectDialog();
     });
 
     // Dialog Event Listeners
-    document.getElementById('addMainSubjectBtn').addEventListener('click', () => openSubjectDialog('main'));
-    document.getElementById('addOptionalSubjectBtn').addEventListener('click', () => openSubjectDialog('optional'));
+    document.getElementById('addMainSubjectBtn').addEventListener('click', openSubjectDialog);
+    document.getElementById('addOptionalSubjectBtn').addEventListener('click', openSubjectDialog);
     dialogCloseBtn.addEventListener('click', closeDialog);
     dialogCancelBtn.addEventListener('click', closeDialog);
     dialogSaveBtn.addEventListener('click', saveDialogSelection);
@@ -1061,7 +1105,6 @@
         renderOptionalMarksFields();
     });
 
-    // ✅✅✅ MAIN CHANGE: generateMarksFields with Toggle Button ✅✅✅
     function generateMarksFields() {
         marksFields.innerHTML = '<h5 class="mb-3">Enter Marks for Main Subjects</h5>';
         
@@ -1081,7 +1124,6 @@
             `;
             marksFields.appendChild(div);
             
-            // Toggle functionality
             const toggle = div.querySelector('.subject-toggle');
             const markInput = div.querySelector('.subject-mark');
             const toggleLabel = div.querySelector('.form-check-label');
@@ -1103,7 +1145,6 @@
                 }
             });
             
-            // Initial state
             toggleLabel.textContent = 'Active ✅';
             toggleLabel.style.color = '#16a34a';
             markInput.style.background = 'white';
@@ -1207,13 +1248,11 @@
         
         document.querySelectorAll('.subject-mark').forEach(inp => {
             const sub = inp.dataset.subject;
-            // ✅ Check if toggle is active
             const row = inp.closest('.subject-mark-row');
             const toggle = row ? row.querySelector('.subject-toggle') : null;
             const isActive = toggle ? toggle.checked : true;
             
             if (!isActive) {
-                // Inactive subject - no marks needed
                 marks[sub] = 0;
                 return;
             }
@@ -1262,7 +1301,7 @@
             marks,
             photoUrl: currentStudentPhotoUrl || null,
             optionalMarks: optionalMarks,
-            activeSubjects: getActiveSubjects() // Store which subjects were active
+            activeSubjects: getActiveSubjects()
         });
         updateStudentsTable();
         studentNameInput.value = ''; fatherNameInput.value = '';
@@ -1557,7 +1596,6 @@
         selectedMainSubjects = [];
         selectedOptionalSubjects = [];
         subjects = [];
-        renderSelectedSubjects();
         updateSubjectCounts();
         generateSubjectFieldsBtn.style.display = 'none';
         document.querySelectorAll('#templateSelector .template-option').forEach(o => o.classList.remove('selected'));
@@ -1609,7 +1647,6 @@
         if (data.optionalSubjects) {
             selectedOptionalSubjects = data.optionalSubjects.map(s => ({ name: s.name, total: s.total }));
         }
-        renderSelectedSubjects();
         updateSubjectCounts();
         
         generateSubjectFieldsBtn.click();
@@ -1756,7 +1793,6 @@
         if (data.optionalSubjects) {
             selectedOptionalSubjects = data.optionalSubjects.map(s => ({ name: s.name, total: s.total }));
         }
-        renderSelectedSubjects();
         updateSubjectCounts();
         
         generateSubjectFieldsBtn.click();
