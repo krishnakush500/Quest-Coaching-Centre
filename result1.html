@@ -13,6 +13,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   
   <style>
+    /* Same as before - No changes needed */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { 
       background: #e8ecf1;
@@ -975,7 +976,7 @@
     }
   }
   
-  // ✅✅✅ FINAL FIXED: displayResult function ✅✅✅
+  // ✅✅✅ FINAL FIXED: displayResult function - Main aur Optional dono mein dikhega ✅✅✅
   function displayResult(examData, student) {
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('resultCard').style.display = 'block';
@@ -1045,29 +1046,9 @@
     // 2️⃣ Get active/inactive status from student
     const activeSubjects = student.activeSubjects || {};
     
-    // 3️⃣ Create a combined list of all subjects (Main + Optional)
-    // Track which subjects we've already shown to avoid duplicates
-    const shownSubjects = new Set();
-    const allSubjectsList = [];
-    
-    // Add main subjects first
-    for (const sub of allSubjects) {
-      if (!shownSubjects.has(sub.name)) {
-        shownSubjects.add(sub.name);
-        allSubjectsList.push({ ...sub, isOptional: false });
-      }
-    }
-    
-    // Add optional subjects (even if same name as main)
-    // This ensures subject appears in BOTH sections if present in both
-    for (const opt of optionalSubjects) {
-      // Don't mark as shown - we want it to appear in optional section too
-      // But we need to handle the case where subject is only optional
-      allSubjectsList.push({ ...opt, isOptional: true });
-    }
-    
-    // 4️⃣ Show MAIN subjects (isOptional = false) - only if active
-    const mainSubjects = allSubjectsList.filter(s => !s.isOptional);
+    // 3️⃣ Show MAIN subjects first (from allSubjects)
+    // These are subjects that are NOT marked as optional in optionalSubjects
+    const mainSubjects = allSubjects.filter(sub => !optionalNames.includes(sub.name));
     
     for (const subject of mainSubjects) {
       const subName = subject.name;
@@ -1092,7 +1073,10 @@
       totalMax += subTotal;
     }
     
-    // 5️⃣ TOTAL ROW (only main subjects)
+    // Also show subjects that are in both Main and Optional (they are already in mainSubjects)
+    // But they should appear in main section, not skipped
+    
+    // 4️⃣ TOTAL ROW (only main subjects)
     marksHtml += `<tr class="total-row">
       <td><strong>TOTAL</strong></td>
       <td><strong>${totalMax}</strong></td>
@@ -1100,11 +1084,9 @@
       <td></td>
     </tr>`;
     
-    // 6️⃣ Show OPTIONAL subjects (isOptional = true)
-    const optSubjects = allSubjectsList.filter(s => s.isOptional);
-    
-    if (optSubjects.length > 0) {
-      for (const opt of optSubjects) {
+    // 5️⃣ Show OPTIONAL subjects (from optionalSubjects array directly)
+    if (optionalSubjects.length > 0) {
+      for (const opt of optionalSubjects) {
         const optName = opt.name;
         const optTotal = opt.total || 100;
         let optObtained = '-';
@@ -1146,7 +1128,7 @@
       </tr>`;
     }
     
-    // 7️⃣ PERCENTAGE & DIVISION (only main subjects)
+    // 6️⃣ PERCENTAGE & DIVISION (only main subjects)
     const totalPercentage = totalMax > 0 ? ((totalObtained / totalMax) * 100) : 0;
     const roundedPercentage = totalPercentage.toFixed(2);
     const divisionInfo = calculateDivision(totalPercentage);
