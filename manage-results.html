@@ -231,7 +231,7 @@
             background: #f8f9fc;
         }
         
-        /* ✅ Tab Styles */
+        /* Tab Styles */
         .dialog-tabs {
             display: flex;
             gap: 0;
@@ -387,7 +387,7 @@
             text-decoration: line-through;
         }
         
-        /* Subject Toggle Switch Styles */
+        /* ✅ Subject Toggle Switch Styles - Main & Optional */
         .subject-mark-row {
             background: #f8fafc;
             border-radius: 10px;
@@ -419,6 +419,38 @@
             min-width: 70px;
         }
         
+        /* ✅ Optional Subject Row with Toggle */
+        .optional-mark-row {
+            background: #fef9e6;
+            border-radius: 10px;
+            padding: 10px 15px;
+            border: 1px solid #c5a059;
+            transition: all 0.3s;
+        }
+        .optional-mark-row.inactive {
+            background: #fef2f2;
+            border-color: #fca5a5;
+            opacity: 0.7;
+        }
+        .optional-mark-row .form-switch .form-check-input {
+            width: 2.5rem;
+            height: 1.3rem;
+            cursor: pointer;
+        }
+        .optional-mark-row .form-switch .form-check-input:checked {
+            background-color: #16a34a;
+            border-color: #16a34a;
+        }
+        .optional-mark-row .form-switch .form-check-input:not(:checked) {
+            background-color: #dc2626;
+            border-color: #dc2626;
+        }
+        .optional-mark-row .form-switch .form-check-label {
+            font-weight: 600;
+            font-size: 0.8rem;
+            min-width: 70px;
+        }
+        
         @media (max-width: 768px) {
             body { padding: 15px; }
             .header-section { flex-direction: column; text-align: center; }
@@ -432,8 +464,10 @@
             .subject-dialog { max-width: 100%; margin: 10px; }
             .subject-select-item { flex-wrap: wrap; }
             .subject-select-item .subject-total-input { width: 100%; }
-            .subject-mark-row .d-flex { flex-direction: column; align-items: stretch !important; gap: 8px; }
-            .subject-mark-row .subject-mark { max-width: 100% !important; }
+            .subject-mark-row .d-flex,
+            .optional-mark-row .d-flex { flex-direction: column; align-items: stretch !important; gap: 8px; }
+            .subject-mark-row .subject-mark,
+            .optional-mark-row .optional-mark { max-width: 100% !important; }
             .dialog-tabs { flex-direction: column; }
             .dialog-tab { text-align: center; }
         }
@@ -513,7 +547,6 @@
                                 <span class="subject-count-badge" id="optionalSubjectCount">0</span>
                             </button>
                         </div>
-                        <!-- ✅ Subjects list hidden - only show via "Show Subjects" button -->
                         <div style="display:none;" id="selectedMainSubjects"></div>
                         <div style="display:none;" id="selectedOptionalSubjects"></div>
                     </div>
@@ -561,12 +594,15 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- ✅ Main Subjects with Toggle -->
                     <div id="marksFields" class="mb-3"></div>
                     
+                    <!-- ✅ Optional Subjects Marks with Toggle -->
                     <div id="optionalMarksFields" style="display:none;" class="mb-3">
-                        <div class="optional-subject-box">
+                        <div class="optional-subject-box" style="border-color:#c5a059;">
                             <strong style="color:#c5a059;"><i class="fas fa-book"></i> Optional Subjects Marks</strong>
-                            <small class="text-muted d-block mb-2">These marks will NOT be added to total.</small>
+                            <small class="text-muted d-block mb-2">These marks will NOT be added to total. Use toggle to enable/disable.</small>
                             <div id="optionalMarksList"></div>
                         </div>
                     </div>
@@ -619,7 +655,6 @@
             <button class="subject-dialog-close" id="dialogCloseBtn">&times;</button>
         </div>
         <div class="subject-dialog-body">
-            <!-- ✅ Tabs -->
             <div class="dialog-tabs">
                 <button class="dialog-tab active" data-tab="main" id="tabMain">
                     <i class="fas fa-list"></i> Main Subjects
@@ -798,7 +833,7 @@
         });
     });
 
-    // ✅ Tab Switching
+    // Tab Switching
     function switchTab(tab) {
         currentTab = tab;
         document.querySelectorAll('.dialog-tab').forEach(t => t.classList.remove('active'));
@@ -814,7 +849,6 @@
     tabMain.addEventListener('click', () => switchTab('main'));
     tabOptional.addEventListener('click', () => switchTab('optional'));
 
-    // ✅ Open Subject Dialog with Tabs
     function openSubjectDialog() {
         tempMainSubjects = selectedMainSubjects.map(s => ({ ...s }));
         tempOptionalSubjects = selectedOptionalSubjects.map(s => ({ ...s }));
@@ -834,13 +868,11 @@
         const tempSubjects = isMain ? tempMainSubjects : tempOptionalSubjects;
         const title = isMain ? 'Main Subjects' : 'Optional Subjects';
         
-        // Add header
         const header = document.createElement('div');
         header.style.cssText = 'padding: 8px 12px; background: #f0f7ff; border-radius: 8px; margin-bottom: 12px; font-weight: 600; color: #1a237e;';
         header.textContent = `Select ${title}`;
         container.appendChild(header);
         
-        // Add "Select All" checkbox
         const selectAllDiv = document.createElement('div');
         selectAllDiv.className = 'subject-select-item';
         selectAllDiv.style.background = '#f8fafc';
@@ -1017,7 +1049,7 @@
         }
     }
 
-    // ✅ Show Subjects Buttons
+    // Show Subjects Buttons
     document.getElementById('showSubjectsBtnStep1').addEventListener('click', function() {
         if (selectedMainSubjects.length === 0 && selectedOptionalSubjects.length === 0) {
             alert('No subjects selected yet. Please add subjects first.');
@@ -1100,11 +1132,12 @@
 
     nextToStudentEntryBtn.addEventListener('click', () => {
         generateMarksFields();
+        renderOptionalMarksFields();
         examSetupStep.style.display = 'none';
         studentEntryStep.style.display = 'block';
-        renderOptionalMarksFields();
     });
 
+    // ✅ MAIN SUBJECTS with Toggle
     function generateMarksFields() {
         marksFields.innerHTML = '<h5 class="mb-3">Enter Marks for Main Subjects</h5>';
         
@@ -1116,8 +1149,8 @@
                 <div class="d-flex align-items-center gap-3 flex-wrap">
                     <label class="form-label mb-0" style="min-width:120px; font-weight:600;">${sub.name} (Max: ${sub.total})</label>
                     <div class="form-check form-switch">
-                        <input class="form-check-input subject-toggle" type="checkbox" role="switch" id="toggle_${index}" checked data-subject="${sub.name}">
-                        <label class="form-check-label" for="toggle_${index}" style="font-size:0.85rem; font-weight:600; min-width:70px;">Active ✅</label>
+                        <input class="form-check-input subject-toggle" type="checkbox" role="switch" id="toggle_main_${index}" checked data-subject="${sub.name}">
+                        <label class="form-check-label" for="toggle_main_${index}" style="font-size:0.85rem; font-weight:600; min-width:70px;">Active ✅</label>
                     </div>
                     <input type="number" class="form-control subject-mark flex-grow-1" data-subject="${sub.name}" min="0" max="${sub.total}" placeholder="Enter marks" style="max-width:150px;">
                 </div>
@@ -1152,6 +1185,7 @@
         });
     }
 
+    // ✅ OPTIONAL SUBJECTS with Toggle
     function renderOptionalMarksFields() {
         const container = document.getElementById('optionalMarksFields');
         const list = document.getElementById('optionalMarksList');
@@ -1166,12 +1200,45 @@
         
         selectedOptionalSubjects.forEach((opt, idx) => {
             const div = document.createElement('div');
-            div.className = 'optional-marks-item';
+            div.className = 'mb-2 optional-mark-row';
+            div.dataset.subject = opt.name;
             div.innerHTML = `
-                <span class="opt-mark-label">${opt.name} (Max: ${opt.total})</span>
-                <input type="number" class="form-control opt-mark-input" data-opt-index="${idx}" min="0" max="${opt.total}" placeholder="Enter marks">
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <label class="form-label mb-0" style="min-width:120px; font-weight:600; color:#c5a059;">${opt.name} (Optional) (Max: ${opt.total})</label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input optional-toggle" type="checkbox" role="switch" id="toggle_opt_${idx}" checked data-subject="${opt.name}">
+                        <label class="form-check-label" for="toggle_opt_${idx}" style="font-size:0.85rem; font-weight:600; min-width:70px;">Active ✅</label>
+                    </div>
+                    <input type="number" class="form-control optional-mark flex-grow-1" data-subject="${opt.name}" min="0" max="${opt.total}" placeholder="Enter marks" style="max-width:150px;">
+                </div>
             `;
             list.appendChild(div);
+            
+            const toggle = div.querySelector('.optional-toggle');
+            const markInput = div.querySelector('.optional-mark');
+            const toggleLabel = div.querySelector('.form-check-label');
+            const row = div;
+            
+            toggle.addEventListener('change', function() {
+                const isChecked = this.checked;
+                markInput.disabled = !isChecked;
+                toggleLabel.textContent = isChecked ? 'Active ✅' : 'Inactive ❌';
+                toggleLabel.style.color = isChecked ? '#16a34a' : '#dc2626';
+                if (!isChecked) {
+                    markInput.value = '';
+                    markInput.style.background = '#f1f5f9';
+                    row.classList.add('inactive');
+                } else {
+                    markInput.style.background = 'white';
+                    row.classList.remove('inactive');
+                    markInput.focus();
+                }
+            });
+            
+            toggleLabel.textContent = 'Active ✅';
+            toggleLabel.style.color = '#16a34a';
+            markInput.style.background = 'white';
+            row.classList.remove('inactive');
         });
     }
 
@@ -1239,6 +1306,7 @@
         }
     });
 
+    // ✅ Add Student with Optional Toggle Support
     addStudentBtn.addEventListener('click', () => {
         const roll = parseInt(rollNoInput.value);
         const name = studentNameInput.value.trim();
@@ -1246,6 +1314,7 @@
         const marks = {};
         let valid = true;
         
+        // Main subjects
         document.querySelectorAll('.subject-mark').forEach(inp => {
             const sub = inp.dataset.subject;
             const row = inp.closest('.subject-mark-row');
@@ -1273,26 +1342,38 @@
         });
         if (!valid) return;
         
+        // Optional subjects with toggle
         const optionalMarks = {};
-        document.querySelectorAll('.opt-mark-input').forEach(inp => {
-            const idx = parseInt(inp.dataset.optIndex);
-            const opt = selectedOptionalSubjects[idx];
-            if (opt && opt.name) {
-                const mark = parseInt(inp.value);
-                if (!isNaN(mark) && mark >= 0) {
-                    if (mark > opt.total) {
-                        alert(`${opt.name} marks cannot exceed ${opt.total}`);
-                        valid = false;
-                        return;
-                    }
-                    optionalMarks[opt.name] = mark;
-                    marks[opt.name] = mark;
-                } else {
-                    optionalMarks[opt.name] = null;
+        document.querySelectorAll('.optional-mark').forEach(inp => {
+            const sub = inp.dataset.subject;
+            const row = inp.closest('.optional-mark-row');
+            const toggle = row ? row.querySelector('.optional-toggle') : null;
+            const isActive = toggle ? toggle.checked : true;
+            
+            if (!isActive) {
+                optionalMarks[sub] = 0;
+                marks[sub] = 0;
+                return;
+            }
+            
+            const mark = parseInt(inp.value);
+            if (!isNaN(mark) && mark >= 0) {
+                const optObj = selectedOptionalSubjects.find(s => s.name === sub);
+                if (mark > optObj.total) {
+                    alert(`${sub} marks cannot exceed ${optObj.total}`);
+                    valid = false;
+                    return;
                 }
+                optionalMarks[sub] = mark;
+                marks[sub] = mark;
+            } else {
+                optionalMarks[sub] = null;
             }
         });
         if (!valid) return;
+        
+        // Store active subjects for both main and optional
+        const activeSubjects = getActiveSubjects();
         
         students.push({ 
             rollNo: roll, 
@@ -1301,12 +1382,12 @@
             marks,
             photoUrl: currentStudentPhotoUrl || null,
             optionalMarks: optionalMarks,
-            activeSubjects: getActiveSubjects()
+            activeSubjects: activeSubjects
         });
         updateStudentsTable();
         studentNameInput.value = ''; fatherNameInput.value = '';
         document.querySelectorAll('.subject-mark').forEach(inp => inp.value = '');
-        document.querySelectorAll('.opt-mark-input').forEach(inp => inp.value = '');
+        document.querySelectorAll('.optional-mark').forEach(inp => inp.value = '');
         studentPhotoPreview.style.display = 'none';
         photoFetchStatus.innerHTML = '';
         currentStudentPhotoUrl = '';
@@ -1317,8 +1398,15 @@
 
     function getActiveSubjects() {
         const active = {};
+        // Main subjects
         document.querySelectorAll('.subject-mark-row').forEach(row => {
             const toggle = row.querySelector('.subject-toggle');
+            const subject = row.dataset.subject;
+            active[subject] = toggle ? toggle.checked : true;
+        });
+        // Optional subjects
+        document.querySelectorAll('.optional-mark-row').forEach(row => {
+            const toggle = row.querySelector('.optional-toggle');
             const subject = row.dataset.subject;
             active[subject] = toggle ? toggle.checked : true;
         });
@@ -1339,9 +1427,10 @@
             });
             
             selectedOptionalSubjects.forEach(opt => {
-                subjectsHtml += `<span class="student-subject-tag" style="background:#fef9e6;color:#c5a059;">${opt.name} (Opt)</span>`;
+                const isActive = s.activeSubjects ? s.activeSubjects[opt.name] !== false : true;
+                subjectsHtml += `<span class="student-subject-tag ${!isActive ? 'inactive' : ''}" style="${!isActive ? '' : 'background:#fef9e6;color:#c5a059;'}">${opt.name} (Opt)${!isActive ? ' (Off)' : ''}</span>`;
                 const optMark = s.optionalMarks && s.optionalMarks[opt.name] !== undefined ? s.optionalMarks[opt.name] : '-';
-                marksHtml += `<div style="color:#c5a059;">${opt.name} (Optional): ${optMark !== null ? optMark : '-'}/${opt.total}</div>`;
+                marksHtml += `<div style="color:#c5a059;">${opt.name} (Optional): ${optMark !== null && optMark !== '-' ? optMark : '-'}/${opt.total}${!isActive ? ' ❌' : ''}</div>`;
             });
             
             const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" class="student-photo-thumb" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷 No photo</span>';
@@ -1366,6 +1455,7 @@
             studentPhotoPreview.style.display = 'none';
         }
         
+        // Main subjects
         document.querySelectorAll('.subject-mark-row').forEach(row => {
             const subject = row.dataset.subject;
             const toggle = row.querySelector('.subject-toggle');
@@ -1387,15 +1477,29 @@
             }
         });
         
-        document.querySelectorAll('.opt-mark-input').forEach(inp => {
-            const idx2 = parseInt(inp.dataset.optIndex);
-            const opt = selectedOptionalSubjects[idx2];
-            if (opt && s.optionalMarks && s.optionalMarks[opt.name] !== undefined) {
-                inp.value = s.optionalMarks[opt.name] !== null ? s.optionalMarks[opt.name] : '';
+        // Optional subjects
+        document.querySelectorAll('.optional-mark-row').forEach(row => {
+            const subject = row.dataset.subject;
+            const toggle = row.querySelector('.optional-toggle');
+            const markInput = row.querySelector('.optional-mark');
+            const toggleLabel = row.querySelector('.form-check-label');
+            
+            const isActive = s.activeSubjects ? s.activeSubjects[subject] !== false : true;
+            toggle.checked = isActive;
+            markInput.disabled = !isActive;
+            toggleLabel.textContent = isActive ? 'Active ✅' : 'Inactive ❌';
+            toggleLabel.style.color = isActive ? '#16a34a' : '#dc2626';
+            const optMark = s.optionalMarks && s.optionalMarks[subject] !== undefined ? s.optionalMarks[subject] : '';
+            markInput.value = optMark !== null && optMark !== '-' ? optMark : '';
+            if (!isActive) {
+                markInput.style.background = '#f1f5f9';
+                row.classList.add('inactive');
             } else {
-                inp.value = '';
+                markInput.style.background = 'white';
+                row.classList.remove('inactive');
             }
         });
+        
         addStudentBtn.classList.add('d-none'); updateStudentBtn.classList.remove('d-none'); cancelEditBtn.classList.remove('d-none');
     }
 
@@ -1407,6 +1511,7 @@
         const marks = {};
         let valid = true;
         
+        // Main subjects
         document.querySelectorAll('.subject-mark').forEach(inp => {
             const sub = inp.dataset.subject;
             const row = inp.closest('.subject-mark-row');
@@ -1434,26 +1539,37 @@
         });
         if (!valid) return;
         
+        // Optional subjects
         const optionalMarks = {};
-        document.querySelectorAll('.opt-mark-input').forEach(inp => {
-            const idx2 = parseInt(inp.dataset.optIndex);
-            const opt = selectedOptionalSubjects[idx2];
-            if (opt && opt.name) {
-                const mark = parseInt(inp.value);
-                if (!isNaN(mark) && mark >= 0) {
-                    if (mark > opt.total) {
-                        alert(`${opt.name} marks cannot exceed ${opt.total}`);
-                        valid = false;
-                        return;
-                    }
-                    optionalMarks[opt.name] = mark;
-                    marks[opt.name] = mark;
-                } else {
-                    optionalMarks[opt.name] = null;
+        document.querySelectorAll('.optional-mark').forEach(inp => {
+            const sub = inp.dataset.subject;
+            const row = inp.closest('.optional-mark-row');
+            const toggle = row ? row.querySelector('.optional-toggle') : null;
+            const isActive = toggle ? toggle.checked : true;
+            
+            if (!isActive) {
+                optionalMarks[sub] = 0;
+                marks[sub] = 0;
+                return;
+            }
+            
+            const mark = parseInt(inp.value);
+            if (!isNaN(mark) && mark >= 0) {
+                const optObj = selectedOptionalSubjects.find(s => s.name === sub);
+                if (mark > optObj.total) {
+                    alert(`${sub} marks cannot exceed ${optObj.total}`);
+                    valid = false;
+                    return;
                 }
+                optionalMarks[sub] = mark;
+                marks[sub] = mark;
+            } else {
+                optionalMarks[sub] = null;
             }
         });
         if (!valid) return;
+        
+        const activeSubjects = getActiveSubjects();
         
         students[editingStudentIndex] = { 
             rollNo: roll, 
@@ -1462,7 +1578,7 @@
             marks, 
             photoUrl: currentStudentPhotoUrl,
             optionalMarks: optionalMarks,
-            activeSubjects: getActiveSubjects()
+            activeSubjects: activeSubjects
         };
         updateStudentsTable();
         cancelEdit();
@@ -1478,7 +1594,7 @@
         photoFetchStatus.innerHTML = '';
         currentStudentPhotoUrl = '';
         document.querySelectorAll('.subject-mark').forEach(inp => inp.value = '');
-        document.querySelectorAll('.opt-mark-input').forEach(inp => inp.value = '');
+        document.querySelectorAll('.optional-mark').forEach(inp => inp.value = '');
         addStudentBtn.classList.remove('d-none'); updateStudentBtn.classList.add('d-none'); cancelEditBtn.classList.add('d-none');
     }
 
