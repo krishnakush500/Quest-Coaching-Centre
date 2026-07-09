@@ -948,6 +948,19 @@
       }
       
       currentExamData = docSnap.data();
+      
+      // ✅ CHECK: Agar template 'result1' hai to redirect karo
+      const template = currentExamData.template || 'result';
+      if (template === 'result1') {
+        console.log('🔄 Using Admit Card Style Template (result1)');
+        // Continue normally - this is result1.html
+      } else {
+        // Agar template 'result' hai to redirect to result.html
+        console.log('🔄 Redirecting to result.html (Classic Style)');
+        window.location.href = `result.html?examId=${examId}&rollNo=${rollNo}`;
+        return;
+      }
+      
       const student = currentExamData.students?.find(s => String(s.rollNo) == String(rollNo));
       
       if (!student) {
@@ -1040,16 +1053,15 @@
     // 1️⃣ Get all subjects
     const allSubjects = examData.subjects || [];
     const optionalSubjects = examData.optionalSubjects || [];
-    const optionalNames = optionalSubjects.map(o => o.name);
     
-    // 2️⃣ Get active/inactive status
+    // 2️⃣ Get active/inactive status from student
     const activeSubjects = student.activeSubjects || {};
     
     // 3️⃣ ✅ MAIN SUBJECTS = ALL subjects from subjects array
-    //    Koi bhi subject filter nahi karna - sab dikhana hai
+    //    Sab dikhana hai, optional names se filter mat karo!
     const mainSubjects = allSubjects;
     
-    // 4️⃣ ✅ Show MAIN subjects (ALL subjects)
+    // 4️⃣ ✅ Show MAIN subjects (ALL subjects, but only if active)
     for (const subject of mainSubjects) {
       const subName = subject.name;
       const isActive = activeSubjects[subName] !== undefined ? activeSubjects[subName] : true;
@@ -1081,10 +1093,18 @@
     </tr>`;
     
     // 6️⃣ ✅ Show OPTIONAL subjects (from optionalSubjects array)
+    //    Optional subjects bhi active/inactive check karo
     if (optionalSubjects.length > 0) {
       for (const opt of optionalSubjects) {
         const optName = opt.name;
         const optTotal = opt.total || 100;
+        
+        // ✅ Check if this optional subject is active
+        const isActive = activeSubjects[optName] !== undefined ? activeSubjects[optName] : true;
+        
+        // Skip if inactive
+        if (!isActive) continue;
+        
         let optObtained = '-';
         let optGrade = '-';
         
