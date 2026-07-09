@@ -419,7 +419,7 @@
     }
   }
   
-  // ✅✅✅ UPDATED: displayResult with Optional Subjects Support ✅✅✅
+  // ✅✅✅ FINAL FIXED: displayResult with Optional Subjects & Active/Inactive Support ✅✅✅
   function displayResult(examData, student) {
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('resultCard').style.display = 'block';
@@ -448,17 +448,16 @@
     // ✅ Get subjects data
     const allSubjects = examData.subjects || [];
     const optionalSubjects = examData.optionalSubjects || [];
-    const optionalNames = optionalSubjects.map(o => o.name);
     const activeSubjects = student.activeSubjects || {};
     
     let marksHtml = '';
     let totalObtained = 0;
     let totalMax = 0;
     
-    // ✅ MAIN SUBJECTS - ALL subjects from examData.subjects
+    // ✅ MAIN SUBJECTS - ALL subjects from examData.subjects (sab dikhao)
     const mainSubjects = allSubjects;
     
-    // ✅ Show MAIN subjects
+    // ✅ Show MAIN subjects (active wale hi dikhein)
     for (const subject of mainSubjects) {
       const subName = subject.name;
       const isActive = activeSubjects[subName] !== undefined ? activeSubjects[subName] : true;
@@ -489,11 +488,18 @@
       <td style="background:#e8f5e8;"></td>
     </tr>`;
     
-    // ✅ OPTIONAL SUBJECTS
+    // ✅ OPTIONAL SUBJECTS (active wale hi dikhein)
     if (optionalSubjects.length > 0) {
       for (const opt of optionalSubjects) {
         const optName = opt.name;
         const optTotal = opt.total || 100;
+        
+        // ✅ Check if this optional subject is active
+        const isActive = activeSubjects[optName] !== undefined ? activeSubjects[optName] : true;
+        
+        // Skip if inactive
+        if (!isActive) continue;
+        
         let optObtained = '-';
         let optGrade = '-';
         
