@@ -1137,7 +1137,7 @@
         studentEntryStep.style.display = 'block';
     });
 
-    // ✅ MAIN SUBJECTS with Toggle
+    // ✅ MAIN SUBJECTS with Toggle - Real-time update
     function generateMarksFields() {
         marksFields.innerHTML = '<h5 class="mb-3">Enter Marks for Main Subjects</h5>';
         
@@ -1145,11 +1145,12 @@
             const div = document.createElement('div');
             div.className = 'mb-2 subject-mark-row';
             div.dataset.subject = sub.name;
+            div.dataset.type = 'main';
             div.innerHTML = `
                 <div class="d-flex align-items-center gap-3 flex-wrap">
                     <label class="form-label mb-0" style="min-width:120px; font-weight:600;">${sub.name} (Max: ${sub.total})</label>
                     <div class="form-check form-switch">
-                        <input class="form-check-input subject-toggle" type="checkbox" role="switch" id="toggle_main_${index}" checked data-subject="${sub.name}">
+                        <input class="form-check-input subject-toggle" type="checkbox" role="switch" id="toggle_main_${index}" checked data-subject="${sub.name}" data-type="main">
                         <label class="form-check-label" for="toggle_main_${index}" style="font-size:0.85rem; font-weight:600; min-width:70px;">Active ✅</label>
                     </div>
                     <input type="number" class="form-control subject-mark flex-grow-1" data-subject="${sub.name}" min="0" max="${sub.total}" placeholder="Enter marks" style="max-width:150px;">
@@ -1157,6 +1158,7 @@
             `;
             marksFields.appendChild(div);
             
+            // ✅ Toggle Event - Real-time update with save
             const toggle = div.querySelector('.subject-toggle');
             const markInput = div.querySelector('.subject-mark');
             const toggleLabel = div.querySelector('.form-check-label');
@@ -1164,9 +1166,14 @@
             
             toggle.addEventListener('change', function() {
                 const isChecked = this.checked;
+                const subject = this.dataset.subject;
+                const type = this.dataset.type;
+                const uniqueKey = type === 'main' ? `main_${subject}` : `opt_${subject}`;
+                
                 markInput.disabled = !isChecked;
                 toggleLabel.textContent = isChecked ? 'Active ✅' : 'Inactive ❌';
                 toggleLabel.style.color = isChecked ? '#16a34a' : '#dc2626';
+                
                 if (!isChecked) {
                     markInput.value = '';
                     markInput.style.background = '#f1f5f9';
@@ -1176,6 +1183,21 @@
                     row.classList.remove('inactive');
                     markInput.focus();
                 }
+                
+                // ✅ Update the currently editing student's activeSubjects
+                if (editingStudentIndex !== null) {
+                    const currentStudent = students[editingStudentIndex];
+                    if (currentStudent) {
+                        if (!currentStudent.activeSubjects) currentStudent.activeSubjects = {};
+                        currentStudent.activeSubjects[uniqueKey] = isChecked;
+                        // Also update the simple name for backward compatibility
+                        currentStudent.activeSubjects[subject] = isChecked;
+                    }
+                }
+                
+                // ✅ Update students list real-time
+                updateStudentsTable();
+                hasChanges = true;
             });
             
             toggleLabel.textContent = 'Active ✅';
@@ -1185,7 +1207,7 @@
         });
     }
 
-    // ✅ OPTIONAL SUBJECTS with Toggle
+    // ✅ OPTIONAL SUBJECTS with Toggle - Real-time update
     function renderOptionalMarksFields() {
         const container = document.getElementById('optionalMarksFields');
         const list = document.getElementById('optionalMarksList');
@@ -1202,11 +1224,12 @@
             const div = document.createElement('div');
             div.className = 'mb-2 optional-mark-row';
             div.dataset.subject = opt.name;
+            div.dataset.type = 'optional';
             div.innerHTML = `
                 <div class="d-flex align-items-center gap-3 flex-wrap">
                     <label class="form-label mb-0" style="min-width:120px; font-weight:600; color:#c5a059;">${opt.name} (Optional) (Max: ${opt.total})</label>
                     <div class="form-check form-switch">
-                        <input class="form-check-input optional-toggle" type="checkbox" role="switch" id="toggle_opt_${idx}" checked data-subject="${opt.name}">
+                        <input class="form-check-input optional-toggle" type="checkbox" role="switch" id="toggle_opt_${idx}" checked data-subject="${opt.name}" data-type="optional">
                         <label class="form-check-label" for="toggle_opt_${idx}" style="font-size:0.85rem; font-weight:600; min-width:70px;">Active ✅</label>
                     </div>
                     <input type="number" class="form-control optional-mark flex-grow-1" data-subject="${opt.name}" min="0" max="${opt.total}" placeholder="Enter marks" style="max-width:150px;">
@@ -1214,6 +1237,7 @@
             `;
             list.appendChild(div);
             
+            // ✅ Toggle Event - Real-time update with save
             const toggle = div.querySelector('.optional-toggle');
             const markInput = div.querySelector('.optional-mark');
             const toggleLabel = div.querySelector('.form-check-label');
@@ -1221,9 +1245,14 @@
             
             toggle.addEventListener('change', function() {
                 const isChecked = this.checked;
+                const subject = this.dataset.subject;
+                const type = this.dataset.type;
+                const uniqueKey = type === 'main' ? `main_${subject}` : `opt_${subject}`;
+                
                 markInput.disabled = !isChecked;
                 toggleLabel.textContent = isChecked ? 'Active ✅' : 'Inactive ❌';
                 toggleLabel.style.color = isChecked ? '#16a34a' : '#dc2626';
+                
                 if (!isChecked) {
                     markInput.value = '';
                     markInput.style.background = '#f1f5f9';
@@ -1233,6 +1262,21 @@
                     row.classList.remove('inactive');
                     markInput.focus();
                 }
+                
+                // ✅ Update the currently editing student's activeSubjects
+                if (editingStudentIndex !== null) {
+                    const currentStudent = students[editingStudentIndex];
+                    if (currentStudent) {
+                        if (!currentStudent.activeSubjects) currentStudent.activeSubjects = {};
+                        currentStudent.activeSubjects[uniqueKey] = isChecked;
+                        // Also update the simple name for backward compatibility
+                        currentStudent.activeSubjects[subject] = isChecked;
+                    }
+                }
+                
+                // ✅ Update students list real-time
+                updateStudentsTable();
+                hasChanges = true;
             });
             
             toggleLabel.textContent = 'Active ✅';
@@ -1320,6 +1364,7 @@
             const row = inp.closest('.subject-mark-row');
             const toggle = row ? row.querySelector('.subject-toggle') : null;
             const isActive = toggle ? toggle.checked : true;
+            const uniqueKey = `main_${sub}`;
             
             if (!isActive) {
                 marks[sub] = 0;
@@ -1349,6 +1394,7 @@
             const row = inp.closest('.optional-mark-row');
             const toggle = row ? row.querySelector('.optional-toggle') : null;
             const isActive = toggle ? toggle.checked : true;
+            const uniqueKey = `opt_${sub}`;
             
             if (!isActive) {
                 optionalMarks[sub] = 0;
@@ -1372,7 +1418,7 @@
         });
         if (!valid) return;
         
-        // Store active subjects for both main and optional
+        // Store active subjects for both main and optional with unique keys
         const activeSubjects = getActiveSubjects();
         
         students.push({ 
@@ -1398,17 +1444,25 @@
 
     function getActiveSubjects() {
         const active = {};
-        // Main subjects
+        // Main subjects - unique key
         document.querySelectorAll('.subject-mark-row').forEach(row => {
             const toggle = row.querySelector('.subject-toggle');
             const subject = row.dataset.subject;
-            active[subject] = toggle ? toggle.checked : true;
+            const type = row.dataset.type || 'main';
+            const uniqueKey = type === 'main' ? `main_${subject}` : `opt_${subject}`;
+            const isChecked = toggle ? toggle.checked : true;
+            active[uniqueKey] = isChecked;
+            active[subject] = isChecked; // For backward compatibility
         });
-        // Optional subjects
+        // Optional subjects - unique key
         document.querySelectorAll('.optional-mark-row').forEach(row => {
             const toggle = row.querySelector('.optional-toggle');
             const subject = row.dataset.subject;
-            active[subject] = toggle ? toggle.checked : true;
+            const type = row.dataset.type || 'optional';
+            const uniqueKey = type === 'main' ? `main_${subject}` : `opt_${subject}`;
+            const isChecked = toggle ? toggle.checked : true;
+            active[uniqueKey] = isChecked;
+            active[subject] = isChecked; // For backward compatibility
         });
         return active;
     }
@@ -1420,14 +1474,16 @@
             let subjectsHtml = '';
             
             selectedMainSubjects.forEach(sub => {
-                const isActive = s.activeSubjects ? s.activeSubjects[sub] !== false : true;
+                const uniqueKey = `main_${sub.name}`;
+                const isActive = s.activeSubjects ? s.activeSubjects[uniqueKey] !== false : true;
                 subjectsHtml += `<span class="student-subject-tag ${!isActive ? 'inactive' : ''}">${sub.name}${!isActive ? ' (Off)' : ''}</span>`;
                 const mark = s.marks[sub.name] !== undefined ? s.marks[sub.name] : 0;
                 marksHtml += `<div>${sub.name}: ${mark}/${sub.total}${!isActive ? ' ❌' : ''}</div>`;
             });
             
             selectedOptionalSubjects.forEach(opt => {
-                const isActive = s.activeSubjects ? s.activeSubjects[opt.name] !== false : true;
+                const uniqueKey = `opt_${opt.name}`;
+                const isActive = s.activeSubjects ? s.activeSubjects[uniqueKey] !== false : true;
                 subjectsHtml += `<span class="student-subject-tag ${!isActive ? 'inactive' : ''}" style="${!isActive ? '' : 'background:#fef9e6;color:#c5a059;'}">${opt.name} (Opt)${!isActive ? ' (Off)' : ''}</span>`;
                 const optMark = s.optionalMarks && s.optionalMarks[opt.name] !== undefined ? s.optionalMarks[opt.name] : '-';
                 marksHtml += `<div style="color:#c5a059;">${opt.name} (Optional): ${optMark !== null && optMark !== '-' ? optMark : '-'}/${opt.total}${!isActive ? ' ❌' : ''}</div>`;
@@ -1455,14 +1511,16 @@
             studentPhotoPreview.style.display = 'none';
         }
         
-        // Main subjects
+        // Main subjects - restore toggle state
         document.querySelectorAll('.subject-mark-row').forEach(row => {
             const subject = row.dataset.subject;
+            const type = row.dataset.type || 'main';
+            const uniqueKey = type === 'main' ? `main_${subject}` : `opt_${subject}`;
             const toggle = row.querySelector('.subject-toggle');
             const markInput = row.querySelector('.subject-mark');
             const toggleLabel = row.querySelector('.form-check-label');
             
-            const isActive = s.activeSubjects ? s.activeSubjects[subject] !== false : true;
+            const isActive = s.activeSubjects ? s.activeSubjects[uniqueKey] !== false : true;
             toggle.checked = isActive;
             markInput.disabled = !isActive;
             toggleLabel.textContent = isActive ? 'Active ✅' : 'Inactive ❌';
@@ -1477,14 +1535,16 @@
             }
         });
         
-        // Optional subjects
+        // Optional subjects - restore toggle state
         document.querySelectorAll('.optional-mark-row').forEach(row => {
             const subject = row.dataset.subject;
+            const type = row.dataset.type || 'optional';
+            const uniqueKey = type === 'main' ? `main_${subject}` : `opt_${subject}`;
             const toggle = row.querySelector('.optional-toggle');
             const markInput = row.querySelector('.optional-mark');
             const toggleLabel = row.querySelector('.form-check-label');
             
-            const isActive = s.activeSubjects ? s.activeSubjects[subject] !== false : true;
+            const isActive = s.activeSubjects ? s.activeSubjects[uniqueKey] !== false : true;
             toggle.checked = isActive;
             markInput.disabled = !isActive;
             toggleLabel.textContent = isActive ? 'Active ✅' : 'Inactive ❌';
@@ -1768,6 +1828,10 @@
         generateSubjectFieldsBtn.click();
         setTimeout(() => {
             students = data.students || [];
+            // Restore activeSubjects if exists
+            students.forEach(s => {
+                if (!s.activeSubjects) s.activeSubjects = {};
+            });
             updateStudentsTable();
             editingDraftId = id;
             isEditingPublishedResult = false;
@@ -1914,6 +1978,9 @@
         generateSubjectFieldsBtn.click();
         setTimeout(() => {
             students = data.students || [];
+            students.forEach(s => {
+                if (!s.activeSubjects) s.activeSubjects = {};
+            });
             updateStudentsTable();
             editingDraftId = null;
             isEditingPublishedResult = true;
