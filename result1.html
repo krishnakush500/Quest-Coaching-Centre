@@ -13,7 +13,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   
   <style>
-    /* Same CSS as before - No changes needed */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { 
       background: #e8ecf1;
@@ -950,16 +949,17 @@
       
       currentExamData = docSnap.data();
       
-      // ✅ CHECK: Agar template 'result' hai to redirect karo
+      // ✅ CHECK: Agar template 'result1' hai to redirect karo
       const template = currentExamData.template || 'result';
-      if (template === 'result') {
+      if (template === 'result1') {
+        console.log('🔄 Using Admit Card Style Template (result1)');
+        // Continue normally - this is result1.html
+      } else {
+        // Agar template 'result' hai to redirect to result.html
         console.log('🔄 Redirecting to result.html (Classic Style)');
         window.location.href = `result.html?examId=${examId}&rollNo=${rollNo}`;
         return;
       }
-      
-      // ✅ Agar template 'result1' hai to continue
-      console.log('📄 Using Admit Card Style Template (result1)');
       
       const student = currentExamData.students?.find(s => String(s.rollNo) == String(rollNo));
       
@@ -1045,7 +1045,7 @@
       }, 300);
     }
     
-    // ✅✅✅ FINAL FIXED: MARKS TABLE with Active/Inactive ✅✅✅
+    // ✅✅✅ FINAL FIXED: MARKS TABLE ✅✅✅
     let marksHtml = '';
     let totalObtained = 0;
     let totalMax = 0;
