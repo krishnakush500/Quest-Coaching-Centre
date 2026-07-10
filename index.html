@@ -11,6 +11,9 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
   <style>
     * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { 
@@ -112,7 +115,7 @@
       100% { transform: translateX(-100%); }
     }
 
-    /* Registration Search Section */
+    /* Registration Search Section - Updated with two buttons */
     .registration-search-section {
       background: linear-gradient(to right, #1a237e, #283593);
       padding: 16px 20px;
@@ -148,7 +151,7 @@
     .registration-search-section input:focus {
       outline: 2px solid #ffc107;
     }
-    .registration-search-section .reg-search-btn {
+    .reg-search-btn {
       padding: 10px 25px;
       background: #ffc107;
       color: #1a237e;
@@ -162,14 +165,56 @@
       align-items: center;
       gap: 8px;
     }
-    .registration-search-section .reg-search-btn:hover {
+    .reg-search-btn:hover {
       background: #ffca28;
       transform: scale(1.02);
       box-shadow: 0 4px 15px rgba(255,193,7,0.4);
     }
-    .registration-search-section .reg-search-btn i {
+    .reg-search-btn i {
       font-size: 1rem;
     }
+    /* ✅ New Admit Card Button */
+    .admit-card-btn {
+      padding: 10px 25px;
+      background: #16a34a;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+    .admit-card-btn:hover {
+      background: #15803d;
+      transform: scale(1.02);
+      box-shadow: 0 4px 15px rgba(22,163,74,0.4);
+    }
+    .admit-card-btn i {
+      font-size: 1rem;
+    }
+    /* ✅ New Sticker on Admit Card Button */
+    .new-sticker-btn {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #ff4757;
+      color: white;
+      font-size: 0.6rem;
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 10px;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
     .reg-search-error {
       color: #ff6b6b;
       background: rgba(255,255,255,0.9);
@@ -202,6 +247,10 @@
       }
       .registration-search-section .search-label {
         font-size: 0.9rem;
+      }
+      .reg-search-btn, .admit-card-btn {
+        width: 100%;
+        justify-content: center;
       }
     }
 
@@ -322,10 +371,6 @@
       border-radius: 8px;
       animation: blink 1s infinite;
       z-index: 10;
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
     }
     
     .roll-input-section {
@@ -518,7 +563,7 @@
       z-index: 10;
     }
 
-    /* Toppers Section - ALL 30 TOPPERS */
+    /* Toppers Section */
     .toppers-section {
       padding: 15px;
       background: #f5f5f5;
@@ -729,7 +774,163 @@
       display: none;
     }
     
-    /* Media Queries */
+    /* ✅ Admit Card Dialog Styles */
+    .admit-dialog-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 99999;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      animation: fadeIn 0.3s;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .admit-dialog {
+      background: white;
+      border-radius: 24px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+    }
+    .admit-dialog-header {
+      padding: 20px 24px;
+      border-bottom: 2px solid #e9ecef;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8f9fc;
+    }
+    .admit-dialog-header h3 {
+      margin: 0;
+      color: #1a237e;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .admit-dialog-header h3 i {
+      color: #ffc107;
+    }
+    .admit-dialog-close {
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: #6c757d;
+      transition: 0.2s;
+    }
+    .admit-dialog-close:hover {
+      color: #dc2626;
+      transform: rotate(90deg);
+    }
+    .admit-dialog-body {
+      padding: 24px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    .admit-dialog-body .exam-info {
+      background: #e8eafe;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      border-left: 4px solid #1a237e;
+    }
+    .admit-dialog-body .exam-info p {
+      margin: 4px 0;
+      font-size: 0.9rem;
+      color: #1a237e;
+    }
+    .admit-dialog-body .exam-info p strong {
+      color: #1a237e;
+    }
+    .admit-dialog-body .roll-input-wrapper {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .admit-dialog-body .roll-input-wrapper input {
+      flex: 1;
+      min-width: 150px;
+      padding: 12px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 1rem;
+      transition: 0.3s;
+    }
+    .admit-dialog-body .roll-input-wrapper input:focus {
+      border-color: #1a237e;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(26,35,126,0.1);
+    }
+    .admit-dialog-body .roll-input-wrapper button {
+      padding: 12px 24px;
+      background: #1a237e;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .admit-dialog-body .roll-input-wrapper button:hover {
+      background: #283593;
+      transform: translateY(-2px);
+    }
+    .admit-dialog-body .roll-input-wrapper button i {
+      font-size: 1rem;
+    }
+    .admit-dialog-body .result-msg {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      display: none;
+      font-weight: 600;
+    }
+    .admit-dialog-body .result-msg.success {
+      display: block;
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .admit-dialog-body .result-msg.error {
+      display: block;
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .admit-dialog-footer {
+      padding: 16px 24px;
+      border-top: 2px solid #e9ecef;
+      display: flex;
+      justify-content: flex-end;
+      background: #f8f9fc;
+    }
+    .admit-dialog-footer .btn-close-dialog {
+      padding: 10px 28px;
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .admit-dialog-footer .btn-close-dialog:hover {
+      background: #5a6268;
+    }
+    
     @media (max-width: 768px) {
       body { padding: 0; }
       .container { border-radius: 0; box-shadow: none; margin: 0; width: 100%; }
@@ -745,6 +946,9 @@
       .promo-text { font-size: 0.8rem; }
       .contact-info { flex-direction: column; gap: 8px; }
       .contact-item { padding: 8px 12px; }
+      .admit-dialog { max-width: 100%; margin: 10px; }
+      .admit-dialog-body .roll-input-wrapper { flex-direction: column; }
+      .admit-dialog-body .roll-input-wrapper button { width: 100%; justify-content: center; }
     }
     
     @media (max-width: 480px) {
@@ -805,7 +1009,7 @@
       </div>
     </div>
 
-    <!-- Registration Search Section -->
+    <!-- Registration Search Section - Updated with Admit Card Button -->
     <div class="registration-search-section">
       <div class="search-label">
         <i class="fas fa-id-card"></i> 📌 Check your Registration!
@@ -814,6 +1018,13 @@
       <button class="reg-search-btn" onclick="searchRegistration()">
         <i class="fas fa-search"></i> Search
       </button>
+      
+      <!-- ✅ NEW: Download Admit Card Button with NEW Sticker -->
+      <button class="admit-card-btn" onclick="openAdmitCardDialog()">
+        <i class="fas fa-ticket-alt"></i> Download Admit Card
+        <span class="new-sticker-btn">NEW</span>
+      </button>
+      
       <span class="reg-search-loading" id="regSearchLoading"><i class="fas fa-spinner"></i> Searching...</span>
       <span class="reg-search-error" id="regSearchError">❌ Student not found!</span>
     </div>
@@ -933,6 +1144,44 @@
     </div>
   </div>
 
+  <!-- ✅ Admit Card Dialog -->
+  <div class="admit-dialog-overlay" id="admitDialog">
+    <div class="admit-dialog">
+      <div class="admit-dialog-header">
+        <h3><i class="fas fa-ticket-alt"></i> Download Admit Card</h3>
+        <button class="admit-dialog-close" onclick="closeAdmitDialog()">&times;</button>
+      </div>
+      <div class="admit-dialog-body">
+        <!-- Exam Details -->
+        <div class="exam-info" id="dialogExamInfo">
+          <p><strong>📝 Exam:</strong> <span id="dialogExamName">Loading...</span></p>
+          <p><strong>📍 Centre:</strong> <span id="dialogExamCentre">Loading...</span></p>
+          <p><strong>🏫 Class:</strong> <span id="dialogExamClass">Loading...</span></p>
+        </div>
+        
+        <!-- Roll Number Input -->
+        <div class="roll-input-wrapper">
+          <input type="text" id="dialogRollInput" placeholder="Enter Roll Number" onkeypress="if(event.key==='Enter') fetchAdmitCard()">
+          <button onclick="fetchAdmitCard()"><i class="fas fa-ticket-alt"></i> Get Admit Card</button>
+        </div>
+        
+        <!-- Result Message -->
+        <div class="result-msg" id="dialogResultMsg"></div>
+        
+        <!-- Admit Card Preview will be shown here -->
+        <div id="admitCardPreview" style="margin-top:15px; display:none;">
+          <div style="text-align:center; padding:15px; background:#e8eafe; border-radius:12px;">
+            <i class="fas fa-spinner fa-spin" style="font-size:2rem; color:#1a237e;"></i>
+            <p style="margin-top:8px; color:#1a237e;">Generating Admit Card...</p>
+          </div>
+        </div>
+      </div>
+      <div class="admit-dialog-footer">
+        <button class="btn-close-dialog" onclick="closeAdmitDialog()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Firebase Configuration
     const firebaseConfig = {
@@ -969,12 +1218,10 @@
         return;
       }
 
-      // Show loading
       loadingEl.style.display = 'inline-block';
       errorEl.style.display = 'none';
 
       try {
-        // Search by Aadhaar (field name: 'aadhar') OR Mobile Number
         const aadhaarSnapshot = await db.collection('admissions')
           .where('aadhar', '==', searchValue)
           .get();
@@ -984,7 +1231,6 @@
         if (!aadhaarSnapshot.empty) {
           foundDoc = aadhaarSnapshot.docs[0];
         } else {
-          // If not found by Aadhaar, search by Mobile Number
           const mobileSnapshot = await db.collection('admissions')
             .where('parentMobile', '==', searchValue)
             .get();
@@ -1003,12 +1249,8 @@
           return;
         }
 
-        // Found student - get the document
         const studentId = foundDoc.id;
-        // Open the registration form in view mode
         window.open(`new-admission.html?mode=view&id=${studentId}`, '_blank');
-
-        // Clear input after successful search
         rollInput.value = '';
 
       } catch (error) {
@@ -1020,7 +1262,134 @@
       }
     }
 
-    // ---- End of Registration Search ----
+    // ---- Admit Card Dialog Functions ----
+    let currentExamConfig = null;
+
+    async function openAdmitCardDialog() {
+      const dialog = document.getElementById('admitDialog');
+      dialog.style.display = 'flex';
+      
+      // Load exam config
+      try {
+        const snap = await db.collection('exam_config').doc('current_exam').get();
+        if (snap.exists) {
+          currentExamConfig = snap.data();
+          document.getElementById('dialogExamName').textContent = currentExamConfig.examName || 'Not Set';
+          document.getElementById('dialogExamCentre').textContent = currentExamConfig.examCentre || 'Not Set';
+          document.getElementById('dialogExamClass').textContent = currentExamConfig.studentClass || 'Not Set';
+        } else {
+          document.getElementById('dialogExamName').textContent = 'No exam configured';
+          document.getElementById('dialogExamCentre').textContent = 'Please configure exam first';
+          document.getElementById('dialogExamClass').textContent = '-';
+        }
+      } catch (error) {
+        console.error('Error loading exam config:', error);
+        document.getElementById('dialogExamName').textContent = 'Error loading';
+      }
+      
+      document.getElementById('dialogRollInput').value = '';
+      document.getElementById('dialogRollInput').focus();
+      document.getElementById('dialogResultMsg').className = 'result-msg';
+      document.getElementById('dialogResultMsg').style.display = 'none';
+      document.getElementById('admitCardPreview').style.display = 'none';
+    }
+
+    function closeAdmitDialog() {
+      document.getElementById('admitDialog').style.display = 'none';
+    }
+
+    // Close dialog on outside click
+    document.getElementById('admitDialog').addEventListener('click', function(e) {
+      if (e.target === this) closeAdmitDialog();
+    });
+
+    async function fetchAdmitCard() {
+      const rollInput = document.getElementById('dialogRollInput');
+      const rollNumber = rollInput.value.trim();
+      const msgDiv = document.getElementById('dialogResultMsg');
+      const previewDiv = document.getElementById('admitCardPreview');
+      
+      if (!rollNumber) {
+        msgDiv.className = 'result-msg error';
+        msgDiv.style.display = 'block';
+        msgDiv.textContent = '⚠️ Please enter a roll number!';
+        return;
+      }
+      
+      if (!currentExamConfig) {
+        msgDiv.className = 'result-msg error';
+        msgDiv.style.display = 'block';
+        msgDiv.textContent = '❌ Exam not configured. Please contact admin.';
+        return;
+      }
+      
+      msgDiv.style.display = 'none';
+      previewDiv.style.display = 'block';
+      previewDiv.innerHTML = `
+        <div style="text-align:center; padding:15px; background:#e8eafe; border-radius:12px;">
+          <i class="fas fa-spinner fa-spin" style="font-size:2rem; color:#1a237e;"></i>
+          <p style="margin-top:8px; color:#1a237e;">Searching for student...</p>
+        </div>
+      `;
+      
+      try {
+        // Search student by roll number
+        const studentSnap = await db.collection('admissions')
+          .where('rollNumber', '==', rollNumber)
+          .get();
+        
+        if (studentSnap.empty) {
+          previewDiv.style.display = 'none';
+          msgDiv.className = 'result-msg error';
+          msgDiv.style.display = 'block';
+          msgDiv.textContent = '❌ No student found with Roll Number: ' + rollNumber;
+          return;
+        }
+        
+        let studentData = null;
+        studentSnap.forEach(doc => {
+          studentData = { id: doc.id, ...doc.data() };
+        });
+        
+        // Generate Admit Card - redirect to admit card generator with student data
+        // We'll open the admit card generator in a new tab with pre-filled data
+        const params = new URLSearchParams({
+          rollNumber: studentData.rollNumber,
+          studentName: studentData.studentName,
+          fatherName: studentData.fatherName,
+          motherName: studentData.motherName || '',
+          admissionNo: studentData.admissionNo || '',
+          dob: studentData.dob || '',
+          gender: studentData.gender || '',
+          photoUrl: studentData.photoUrl || '',
+          examName: currentExamConfig.examName || '',
+          examCentre: currentExamConfig.examCentre || '',
+          class: currentExamConfig.studentClass || '',
+          rollCode: currentExamConfig.rollCode || '55075'
+        });
+        
+        // Open admit card generator
+        window.open(`admit-card-generator.html?${params.toString()}`, '_blank');
+        
+        // Show success message
+        previewDiv.style.display = 'none';
+        msgDiv.className = 'result-msg success';
+        msgDiv.style.display = 'block';
+        msgDiv.textContent = '✅ Admit Card generated successfully! Opening in new tab...';
+        
+        // Clear input
+        rollInput.value = '';
+        
+      } catch (error) {
+        console.error('Error fetching admit card:', error);
+        previewDiv.style.display = 'none';
+        msgDiv.className = 'result-msg error';
+        msgDiv.style.display = 'block';
+        msgDiv.textContent = '❌ Error generating admit card. Please try again.';
+      }
+    }
+
+    // ---- End of Admit Card Dialog Functions ----
 
     function loadViewedResults() {
       const stored = localStorage.getItem('quest_viewed_results');
