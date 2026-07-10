@@ -387,7 +387,7 @@
             text-decoration: line-through;
         }
         
-        /* ✅ Subject Toggle Switch Styles - Main & Optional */
+        /* Subject Toggle Switch Styles */
         .subject-mark-row {
             background: #f8fafc;
             border-radius: 10px;
@@ -419,7 +419,6 @@
             min-width: 70px;
         }
         
-        /* ✅ Optional Subject Row with Toggle */
         .optional-mark-row {
             background: #fef9e6;
             border-radius: 10px;
@@ -475,12 +474,16 @@
 </head>
 <body>
 
+<!-- REST OF THE HTML IS SAME AS BEFORE - ONLY JAVASCRIPT CHANGED -->
+
 <div class="manage-container">
+    <!-- Header Section -->
     <div class="header-section">
         <h1 class="page-title"><i class="fas fa-chart-line"></i> Manage Results</h1>
         <button id="backToAdminBtn" class="back-to-admin"><i class="fas fa-arrow-left"></i> Back to Admin Panel</button>
     </div>
 
+    <!-- Action Cards -->
     <div id="actionCardsContainer" class="action-cards">
         <div class="action-card" id="createResultMainCard">
             <div class="action-icon"><i class="fas fa-plus-circle"></i></div>
@@ -502,6 +505,7 @@
         </div>
     </div>
 
+    <!-- Create Result Section -->
     <div id="createResultSection" class="fullscreen-section">
         <div class="section-header">
             <h3><i class="fas fa-plus-circle me-2"></i> Create New Result</h3>
@@ -566,6 +570,7 @@
                     <span class="auto-fetch-badge"><i class="fas fa-sync-alt"></i> Auto-fetch from Admission</span>
                 </div>
                 <div class="card-body">
+                    <!-- Same as before - roll no, name, photo fields -->
                     <div class="row">
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Roll No <span style="color:#dc2626;">*</span></label>
@@ -595,10 +600,10 @@
                         </div>
                     </div>
                     
-                    <!-- ✅ Main Subjects with Toggle -->
+                    <!-- Main Subjects with Toggle -->
                     <div id="marksFields" class="mb-3"></div>
                     
-                    <!-- ✅ Optional Subjects Marks with Toggle -->
+                    <!-- Optional Subjects Marks with Toggle -->
                     <div id="optionalMarksFields" style="display:none;" class="mb-3">
                         <div class="optional-subject-box" style="border-color:#c5a059;">
                             <strong style="color:#c5a059;"><i class="fas fa-book"></i> Optional Subjects Marks</strong>
@@ -636,11 +641,13 @@
         </div>
     </div>
 
+    <!-- Draft Results Section -->
     <div id="draftResultsSection" class="fullscreen-section">
         <div class="section-header"><h3><i class="fas fa-file-draft me-2"></i> Draft Results</h3><button class="back-btn" id="backFromDraftBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button></div>
         <div id="draftResultsList" class="row g-4"></div>
     </div>
 
+    <!-- Old Results Section -->
     <div id="oldResultsSection" class="fullscreen-section">
         <div class="section-header"><h3><i class="fas fa-history me-2"></i> Published Results</h3><button class="back-btn" id="backFromOldBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button></div>
         <div id="oldResultsList" class="row g-4"></div>
@@ -1137,7 +1144,7 @@
         studentEntryStep.style.display = 'block';
     });
 
-    // ✅ MAIN SUBJECTS with Toggle - Real-time update
+    // ✅ FIXED: generateMarksFields() - Main Subjects with Toggle
     function generateMarksFields() {
         marksFields.innerHTML = '<h5 class="mb-3">Enter Marks for Main Subjects</h5>';
         
@@ -1158,7 +1165,6 @@
             `;
             marksFields.appendChild(div);
             
-            // ✅ Toggle Event - Real-time update with save
             const toggle = div.querySelector('.subject-toggle');
             const markInput = div.querySelector('.subject-mark');
             const toggleLabel = div.querySelector('.form-check-label');
@@ -1190,9 +1196,15 @@
                     if (currentStudent) {
                         if (!currentStudent.activeSubjects) currentStudent.activeSubjects = {};
                         currentStudent.activeSubjects[uniqueKey] = isChecked;
-                        // Also update the simple name for backward compatibility
                         currentStudent.activeSubjects[subject] = isChecked;
                     }
+                } else if (students.length > 0 && editingStudentIndex === null) {
+                    // ✅ Agar koi student edit nahi ho raha, toh sabhi students ko update karo
+                    students.forEach(s => {
+                        if (!s.activeSubjects) s.activeSubjects = {};
+                        s.activeSubjects[uniqueKey] = isChecked;
+                        s.activeSubjects[subject] = isChecked;
+                    });
                 }
                 
                 // ✅ Update students list real-time
@@ -1207,7 +1219,7 @@
         });
     }
 
-    // ✅ OPTIONAL SUBJECTS with Toggle - Real-time update
+    // ✅ FIXED: renderOptionalMarksFields() - Optional Subjects with Toggle
     function renderOptionalMarksFields() {
         const container = document.getElementById('optionalMarksFields');
         const list = document.getElementById('optionalMarksList');
@@ -1237,7 +1249,6 @@
             `;
             list.appendChild(div);
             
-            // ✅ Toggle Event - Real-time update with save
             const toggle = div.querySelector('.optional-toggle');
             const markInput = div.querySelector('.optional-mark');
             const toggleLabel = div.querySelector('.form-check-label');
@@ -1263,18 +1274,21 @@
                     markInput.focus();
                 }
                 
-                // ✅ Update the currently editing student's activeSubjects
                 if (editingStudentIndex !== null) {
                     const currentStudent = students[editingStudentIndex];
                     if (currentStudent) {
                         if (!currentStudent.activeSubjects) currentStudent.activeSubjects = {};
                         currentStudent.activeSubjects[uniqueKey] = isChecked;
-                        // Also update the simple name for backward compatibility
                         currentStudent.activeSubjects[subject] = isChecked;
                     }
+                } else if (students.length > 0 && editingStudentIndex === null) {
+                    students.forEach(s => {
+                        if (!s.activeSubjects) s.activeSubjects = {};
+                        s.activeSubjects[uniqueKey] = isChecked;
+                        s.activeSubjects[subject] = isChecked;
+                    });
                 }
                 
-                // ✅ Update students list real-time
                 updateStudentsTable();
                 hasChanges = true;
             });
@@ -1350,7 +1364,56 @@
         }
     });
 
-    // ✅ Add Student with Optional Toggle Support
+    // ✅ FIXED: updateStudentsTable() - Properly shows/hides subjects based on toggle
+    function updateStudentsTable() {
+        studentsTableBody.innerHTML = '';
+        students.forEach((s, idx) => {
+            let marksHtml = '';
+            let subjectsHtml = '';
+            
+            // ✅ Ensure activeSubjects exists
+            if (!s.activeSubjects) s.activeSubjects = {};
+            
+            // ✅ Main subjects - Check unique key
+            selectedMainSubjects.forEach(sub => {
+                const uniqueKey = `main_${sub.name}`;
+                const isActive = s.activeSubjects[uniqueKey] !== undefined ? s.activeSubjects[uniqueKey] : true;
+                
+                if (isActive) {
+                    subjectsHtml += `<span class="student-subject-tag">${sub.name}</span>`;
+                    const mark = s.marks[sub.name] !== undefined ? s.marks[sub.name] : 0;
+                    marksHtml += `<div>${sub.name}: ${mark}/${sub.total}</div>`;
+                } else {
+                    subjectsHtml += `<span class="student-subject-tag inactive">${sub.name} (Off)</span>`;
+                    const mark = s.marks[sub.name] !== undefined ? s.marks[sub.name] : 0;
+                    marksHtml += `<div style="color:#999;text-decoration:line-through;">${sub.name}: ${mark}/${sub.total} ❌</div>`;
+                }
+            });
+            
+            // ✅ Optional subjects - Check unique key
+            selectedOptionalSubjects.forEach(opt => {
+                const uniqueKey = `opt_${opt.name}`;
+                const isActive = s.activeSubjects[uniqueKey] !== undefined ? s.activeSubjects[uniqueKey] : true;
+                
+                if (isActive) {
+                    subjectsHtml += `<span class="student-subject-tag" style="background:#fef9e6;color:#c5a059;">${opt.name} (Opt)</span>`;
+                    const optMark = s.optionalMarks && s.optionalMarks[opt.name] !== undefined ? s.optionalMarks[opt.name] : '-';
+                    marksHtml += `<div style="color:#c5a059;">${opt.name} (Optional): ${optMark !== null && optMark !== '-' ? optMark : '-'}/${opt.total}</div>`;
+                } else {
+                    subjectsHtml += `<span class="student-subject-tag inactive" style="background:#fee2e2;color:#dc2626;">${opt.name} (Opt Off)</span>`;
+                    marksHtml += `<div style="color:#999;text-decoration:line-through;">${opt.name} (Optional): -/${opt.total} ❌</div>`;
+                }
+            });
+            
+            const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" class="student-photo-thumb" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷 No photo</span>';
+            const row = `<tr><td>${photoHtml}</td><td>${s.rollNo}</td><td>${s.name}</td><td>${s.fatherName || '-'}</td><td>${subjectsHtml}</td><td>${marksHtml}</td><td><button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button> <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button></td></tr>`;
+            studentsTableBody.insertAdjacentHTML('beforeend', row);
+        });
+        document.querySelectorAll('.edit-student').forEach(btn => btn.addEventListener('click', e => editStudent(parseInt(e.target.dataset.index))));
+        document.querySelectorAll('.delete-student').forEach(btn => btn.addEventListener('click', e => deleteStudent(parseInt(e.target.dataset.index))));
+    }
+
+    // Add Student
     addStudentBtn.addEventListener('click', () => {
         const roll = parseInt(rollNoInput.value);
         const name = studentNameInput.value.trim();
@@ -1358,13 +1421,11 @@
         const marks = {};
         let valid = true;
         
-        // Main subjects
         document.querySelectorAll('.subject-mark').forEach(inp => {
             const sub = inp.dataset.subject;
             const row = inp.closest('.subject-mark-row');
             const toggle = row ? row.querySelector('.subject-toggle') : null;
             const isActive = toggle ? toggle.checked : true;
-            const uniqueKey = `main_${sub}`;
             
             if (!isActive) {
                 marks[sub] = 0;
@@ -1387,14 +1448,12 @@
         });
         if (!valid) return;
         
-        // Optional subjects with toggle
         const optionalMarks = {};
         document.querySelectorAll('.optional-mark').forEach(inp => {
             const sub = inp.dataset.subject;
             const row = inp.closest('.optional-mark-row');
             const toggle = row ? row.querySelector('.optional-toggle') : null;
             const isActive = toggle ? toggle.checked : true;
-            const uniqueKey = `opt_${sub}`;
             
             if (!isActive) {
                 optionalMarks[sub] = 0;
@@ -1418,7 +1477,6 @@
         });
         if (!valid) return;
         
-        // Store active subjects for both main and optional with unique keys
         const activeSubjects = getActiveSubjects();
         
         students.push({ 
@@ -1444,57 +1502,23 @@
 
     function getActiveSubjects() {
         const active = {};
-        // Main subjects - unique key
         document.querySelectorAll('.subject-mark-row').forEach(row => {
             const toggle = row.querySelector('.subject-toggle');
             const subject = row.dataset.subject;
             const type = row.dataset.type || 'main';
             const uniqueKey = type === 'main' ? `main_${subject}` : `opt_${subject}`;
-            const isChecked = toggle ? toggle.checked : true;
-            active[uniqueKey] = isChecked;
-            active[subject] = isChecked; // For backward compatibility
+            active[uniqueKey] = toggle ? toggle.checked : true;
+            active[subject] = toggle ? toggle.checked : true;
         });
-        // Optional subjects - unique key
         document.querySelectorAll('.optional-mark-row').forEach(row => {
             const toggle = row.querySelector('.optional-toggle');
             const subject = row.dataset.subject;
             const type = row.dataset.type || 'optional';
             const uniqueKey = type === 'main' ? `main_${subject}` : `opt_${subject}`;
-            const isChecked = toggle ? toggle.checked : true;
-            active[uniqueKey] = isChecked;
-            active[subject] = isChecked; // For backward compatibility
+            active[uniqueKey] = toggle ? toggle.checked : true;
+            active[subject] = toggle ? toggle.checked : true;
         });
         return active;
-    }
-
-    function updateStudentsTable() {
-        studentsTableBody.innerHTML = '';
-        students.forEach((s, idx) => {
-            let marksHtml = '';
-            let subjectsHtml = '';
-            
-            selectedMainSubjects.forEach(sub => {
-                const uniqueKey = `main_${sub.name}`;
-                const isActive = s.activeSubjects ? s.activeSubjects[uniqueKey] !== false : true;
-                subjectsHtml += `<span class="student-subject-tag ${!isActive ? 'inactive' : ''}">${sub.name}${!isActive ? ' (Off)' : ''}</span>`;
-                const mark = s.marks[sub.name] !== undefined ? s.marks[sub.name] : 0;
-                marksHtml += `<div>${sub.name}: ${mark}/${sub.total}${!isActive ? ' ❌' : ''}</div>`;
-            });
-            
-            selectedOptionalSubjects.forEach(opt => {
-                const uniqueKey = `opt_${opt.name}`;
-                const isActive = s.activeSubjects ? s.activeSubjects[uniqueKey] !== false : true;
-                subjectsHtml += `<span class="student-subject-tag ${!isActive ? 'inactive' : ''}" style="${!isActive ? '' : 'background:#fef9e6;color:#c5a059;'}">${opt.name} (Opt)${!isActive ? ' (Off)' : ''}</span>`;
-                const optMark = s.optionalMarks && s.optionalMarks[opt.name] !== undefined ? s.optionalMarks[opt.name] : '-';
-                marksHtml += `<div style="color:#c5a059;">${opt.name} (Optional): ${optMark !== null && optMark !== '-' ? optMark : '-'}/${opt.total}${!isActive ? ' ❌' : ''}</div>`;
-            });
-            
-            const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" class="student-photo-thumb" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷 No photo</span>';
-            const row = `<tr><td>${photoHtml}</td><td>${s.rollNo}</td><td>${s.name}</td><td>${s.fatherName || '-'}</td><td>${subjectsHtml}</td><td>${marksHtml}</td><td><button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button> <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button></td></tr>`;
-            studentsTableBody.insertAdjacentHTML('beforeend', row);
-        });
-        document.querySelectorAll('.edit-student').forEach(btn => btn.addEventListener('click', e => editStudent(parseInt(e.target.dataset.index))));
-        document.querySelectorAll('.delete-student').forEach(btn => btn.addEventListener('click', e => deleteStudent(parseInt(e.target.dataset.index))));
     }
 
     function editStudent(idx) {
@@ -1511,7 +1535,6 @@
             studentPhotoPreview.style.display = 'none';
         }
         
-        // Main subjects - restore toggle state
         document.querySelectorAll('.subject-mark-row').forEach(row => {
             const subject = row.dataset.subject;
             const type = row.dataset.type || 'main';
@@ -1535,7 +1558,6 @@
             }
         });
         
-        // Optional subjects - restore toggle state
         document.querySelectorAll('.optional-mark-row').forEach(row => {
             const subject = row.dataset.subject;
             const type = row.dataset.type || 'optional';
@@ -1571,7 +1593,6 @@
         const marks = {};
         let valid = true;
         
-        // Main subjects
         document.querySelectorAll('.subject-mark').forEach(inp => {
             const sub = inp.dataset.subject;
             const row = inp.closest('.subject-mark-row');
@@ -1599,7 +1620,6 @@
         });
         if (!valid) return;
         
-        // Optional subjects
         const optionalMarks = {};
         document.querySelectorAll('.optional-mark').forEach(inp => {
             const sub = inp.dataset.subject;
@@ -1828,7 +1848,6 @@
         generateSubjectFieldsBtn.click();
         setTimeout(() => {
             students = data.students || [];
-            // Restore activeSubjects if exists
             students.forEach(s => {
                 if (!s.activeSubjects) s.activeSubjects = {};
             });
