@@ -363,8 +363,8 @@
         }
         
         .subject-count-badge {
-            background: #1a237e;
-            color: white;
+            background: white;
+            color: #1a237e;
             border-radius: 50%;
             padding: 2px 8px;
             font-size: 0.7rem;
@@ -380,11 +380,6 @@
             font-weight: 600;
             display: inline-block;
             margin: 2px;
-        }
-        .student-subject-tag.inactive {
-            background: #fee2e2;
-            color: #dc2626;
-            text-decoration: line-through;
         }
         
         /* Subject Toggle Switch Styles */
@@ -473,8 +468,6 @@
     </style>
 </head>
 <body>
-
-<!-- REST OF THE HTML IS SAME AS BEFORE - ONLY JAVASCRIPT CHANGED -->
 
 <div class="manage-container">
     <!-- Header Section -->
@@ -570,7 +563,6 @@
                     <span class="auto-fetch-badge"><i class="fas fa-sync-alt"></i> Auto-fetch from Admission</span>
                 </div>
                 <div class="card-body">
-                    <!-- Same as before - roll no, name, photo fields -->
                     <div class="row">
                         <div class="col-md-3 mb-3">
                             <label class="form-label">Roll No <span style="color:#dc2626;">*</span></label>
@@ -1173,8 +1165,6 @@
             toggle.addEventListener('change', function() {
                 const isChecked = this.checked;
                 const subject = this.dataset.subject;
-                const type = this.dataset.type;
-                const uniqueKey = type === 'main' ? `main_${subject}` : `opt_${subject}`;
                 
                 markInput.disabled = !isChecked;
                 toggleLabel.textContent = isChecked ? 'Active ✅' : 'Inactive ❌';
@@ -1190,24 +1180,22 @@
                     markInput.focus();
                 }
                 
-                // ✅ Update the currently editing student's activeSubjects
+                // ✅ Update student's active subjects list
                 if (editingStudentIndex !== null) {
                     const currentStudent = students[editingStudentIndex];
                     if (currentStudent) {
-                        if (!currentStudent.activeSubjects) currentStudent.activeSubjects = {};
-                        currentStudent.activeSubjects[uniqueKey] = isChecked;
-                        currentStudent.activeSubjects[subject] = isChecked;
+                        if (!currentStudent.activeSubjects) currentStudent.activeSubjects = [];
+                        if (isChecked) {
+                            if (!currentStudent.activeSubjects.includes(subject)) {
+                                currentStudent.activeSubjects.push(subject);
+                            }
+                        } else {
+                            currentStudent.activeSubjects = currentStudent.activeSubjects.filter(s => s !== subject);
+                        }
                     }
-                } else if (students.length > 0 && editingStudentIndex === null) {
-                    // ✅ Agar koi student edit nahi ho raha, toh sabhi students ko update karo
-                    students.forEach(s => {
-                        if (!s.activeSubjects) s.activeSubjects = {};
-                        s.activeSubjects[uniqueKey] = isChecked;
-                        s.activeSubjects[subject] = isChecked;
-                    });
                 }
                 
-                // ✅ Update students list real-time
+                // ✅ Update students table
                 updateStudentsTable();
                 hasChanges = true;
             });
@@ -1257,8 +1245,6 @@
             toggle.addEventListener('change', function() {
                 const isChecked = this.checked;
                 const subject = this.dataset.subject;
-                const type = this.dataset.type;
-                const uniqueKey = type === 'main' ? `main_${subject}` : `opt_${subject}`;
                 
                 markInput.disabled = !isChecked;
                 toggleLabel.textContent = isChecked ? 'Active ✅' : 'Inactive ❌';
@@ -1274,19 +1260,19 @@
                     markInput.focus();
                 }
                 
+                // ✅ Update student's active subjects list
                 if (editingStudentIndex !== null) {
                     const currentStudent = students[editingStudentIndex];
                     if (currentStudent) {
-                        if (!currentStudent.activeSubjects) currentStudent.activeSubjects = {};
-                        currentStudent.activeSubjects[uniqueKey] = isChecked;
-                        currentStudent.activeSubjects[subject] = isChecked;
+                        if (!currentStudent.activeSubjects) currentStudent.activeSubjects = [];
+                        if (isChecked) {
+                            if (!currentStudent.activeSubjects.includes(subject)) {
+                                currentStudent.activeSubjects.push(subject);
+                            }
+                        } else {
+                            currentStudent.activeSubjects = currentStudent.activeSubjects.filter(s => s !== subject);
+                        }
                     }
-                } else if (students.length > 0 && editingStudentIndex === null) {
-                    students.forEach(s => {
-                        if (!s.activeSubjects) s.activeSubjects = {};
-                        s.activeSubjects[uniqueKey] = isChecked;
-                        s.activeSubjects[subject] = isChecked;
-                    });
                 }
                 
                 updateStudentsTable();
@@ -1364,44 +1350,31 @@
         }
     });
 
-    // ✅ FIXED: updateStudentsTable() - Properly shows/hides subjects based on toggle
+    // ✅ FIXED: updateStudentsTable() - Only shows active subjects
     function updateStudentsTable() {
         studentsTableBody.innerHTML = '';
         students.forEach((s, idx) => {
+            // ✅ Ensure activeSubjects exists
+            if (!s.activeSubjects) s.activeSubjects = [];
+            
             let marksHtml = '';
             let subjectsHtml = '';
             
-            // ✅ Ensure activeSubjects exists
-            if (!s.activeSubjects) s.activeSubjects = {};
-            
-            // ✅ Main subjects - Check unique key
+            // ✅ Only show active main subjects
             selectedMainSubjects.forEach(sub => {
-                const uniqueKey = `main_${sub.name}`;
-                const isActive = s.activeSubjects[uniqueKey] !== undefined ? s.activeSubjects[uniqueKey] : true;
-                
-                if (isActive) {
+                if (s.activeSubjects.includes(sub.name)) {
                     subjectsHtml += `<span class="student-subject-tag">${sub.name}</span>`;
                     const mark = s.marks[sub.name] !== undefined ? s.marks[sub.name] : 0;
                     marksHtml += `<div>${sub.name}: ${mark}/${sub.total}</div>`;
-                } else {
-                    subjectsHtml += `<span class="student-subject-tag inactive">${sub.name} (Off)</span>`;
-                    const mark = s.marks[sub.name] !== undefined ? s.marks[sub.name] : 0;
-                    marksHtml += `<div style="color:#999;text-decoration:line-through;">${sub.name}: ${mark}/${sub.total} ❌</div>`;
                 }
             });
             
-            // ✅ Optional subjects - Check unique key
+            // ✅ Only show active optional subjects
             selectedOptionalSubjects.forEach(opt => {
-                const uniqueKey = `opt_${opt.name}`;
-                const isActive = s.activeSubjects[uniqueKey] !== undefined ? s.activeSubjects[uniqueKey] : true;
-                
-                if (isActive) {
+                if (s.activeSubjects.includes(opt.name)) {
                     subjectsHtml += `<span class="student-subject-tag" style="background:#fef9e6;color:#c5a059;">${opt.name} (Opt)</span>`;
                     const optMark = s.optionalMarks && s.optionalMarks[opt.name] !== undefined ? s.optionalMarks[opt.name] : '-';
                     marksHtml += `<div style="color:#c5a059;">${opt.name} (Optional): ${optMark !== null && optMark !== '-' ? optMark : '-'}/${opt.total}</div>`;
-                } else {
-                    subjectsHtml += `<span class="student-subject-tag inactive" style="background:#fee2e2;color:#dc2626;">${opt.name} (Opt Off)</span>`;
-                    marksHtml += `<div style="color:#999;text-decoration:line-through;">${opt.name} (Optional): -/${opt.total} ❌</div>`;
                 }
             });
             
@@ -1500,27 +1473,27 @@
         showToast('Student added');
     });
 
+    // ✅ FIXED: getActiveSubjects() - Returns array of active subject names
     function getActiveSubjects() {
-        const active = {};
+        const active = [];
         document.querySelectorAll('.subject-mark-row').forEach(row => {
             const toggle = row.querySelector('.subject-toggle');
             const subject = row.dataset.subject;
-            const type = row.dataset.type || 'main';
-            const uniqueKey = type === 'main' ? `main_${subject}` : `opt_${subject}`;
-            active[uniqueKey] = toggle ? toggle.checked : true;
-            active[subject] = toggle ? toggle.checked : true;
+            if (toggle && toggle.checked) {
+                active.push(subject);
+            }
         });
         document.querySelectorAll('.optional-mark-row').forEach(row => {
             const toggle = row.querySelector('.optional-toggle');
             const subject = row.dataset.subject;
-            const type = row.dataset.type || 'optional';
-            const uniqueKey = type === 'main' ? `main_${subject}` : `opt_${subject}`;
-            active[uniqueKey] = toggle ? toggle.checked : true;
-            active[subject] = toggle ? toggle.checked : true;
+            if (toggle && toggle.checked) {
+                active.push(subject);
+            }
         });
         return active;
     }
 
+    // ✅ FIXED: editStudent() - Properly loads active subjects
     function editStudent(idx) {
         const s = students[idx];
         editingStudentIndex = idx;
@@ -1535,15 +1508,14 @@
             studentPhotoPreview.style.display = 'none';
         }
         
+        // ✅ Set active subjects for main subjects
         document.querySelectorAll('.subject-mark-row').forEach(row => {
             const subject = row.dataset.subject;
-            const type = row.dataset.type || 'main';
-            const uniqueKey = type === 'main' ? `main_${subject}` : `opt_${subject}`;
             const toggle = row.querySelector('.subject-toggle');
             const markInput = row.querySelector('.subject-mark');
             const toggleLabel = row.querySelector('.form-check-label');
             
-            const isActive = s.activeSubjects ? s.activeSubjects[uniqueKey] !== false : true;
+            const isActive = s.activeSubjects ? s.activeSubjects.includes(subject) : true;
             toggle.checked = isActive;
             markInput.disabled = !isActive;
             toggleLabel.textContent = isActive ? 'Active ✅' : 'Inactive ❌';
@@ -1558,15 +1530,14 @@
             }
         });
         
+        // ✅ Set active subjects for optional subjects
         document.querySelectorAll('.optional-mark-row').forEach(row => {
             const subject = row.dataset.subject;
-            const type = row.dataset.type || 'optional';
-            const uniqueKey = type === 'main' ? `main_${subject}` : `opt_${subject}`;
             const toggle = row.querySelector('.optional-toggle');
             const markInput = row.querySelector('.optional-mark');
             const toggleLabel = row.querySelector('.form-check-label');
             
-            const isActive = s.activeSubjects ? s.activeSubjects[uniqueKey] !== false : true;
+            const isActive = s.activeSubjects ? s.activeSubjects.includes(subject) : true;
             toggle.checked = isActive;
             markInput.disabled = !isActive;
             toggleLabel.textContent = isActive ? 'Active ✅' : 'Inactive ❌';
@@ -1582,7 +1553,9 @@
             }
         });
         
-        addStudentBtn.classList.add('d-none'); updateStudentBtn.classList.remove('d-none'); cancelEditBtn.classList.remove('d-none');
+        addStudentBtn.classList.add('d-none'); 
+        updateStudentBtn.classList.remove('d-none'); 
+        cancelEditBtn.classList.remove('d-none');
     }
 
     updateStudentBtn.addEventListener('click', () => {
@@ -1849,7 +1822,7 @@
         setTimeout(() => {
             students = data.students || [];
             students.forEach(s => {
-                if (!s.activeSubjects) s.activeSubjects = {};
+                if (!s.activeSubjects) s.activeSubjects = [];
             });
             updateStudentsTable();
             editingDraftId = id;
@@ -1914,12 +1887,14 @@
         }
     });
 
+    // ✅ FIXED: viewResult() - Only shows active subjects for each student
     async function viewResult(id) {
         const q = query(collection(db, "results"), where("__name__", "==", id));
         const snap = await getDocs(q);
         if (snap.empty) return;
         const data = snap.docs[0].data();
-        currentResultDataForPdf = data; currentExamNameForPdf = data.examName;
+        currentResultDataForPdf = data; 
+        currentExamNameForPdf = data.examName;
         const sorted = sortStudentsByPercentage(data.students, data.subjects);
         resultModalTitle.innerText = data.examName + ' (Ranked)';
         let html = `<p><strong>Total Students:</strong> ${data.students.length}</p>`;
@@ -1929,24 +1904,39 @@
         html += `<p><strong>Template:</strong> ${data.template === 'result1' ? '🎫 Admit Card Style' : '📄 Classic'}</p>`;
         if (sorted.length) html += `<div class="alert alert-success">🏆 Top Student: ${sorted[0].name} (Roll: ${sorted[0].rollNo})</div>`;
         html += `<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Photo</th><th>Rank</th><th>Roll</th><th>Name</th><th>Father</th>`;
+        
+        // ✅ Only show active subjects in header
         data.subjects.forEach(s => html += `<th>${s.name}</th>`);
         if (data.optionalSubjects && data.optionalSubjects.length) {
             data.optionalSubjects.forEach(o => html += `<th>${o.name}<br><small>(Optional)</small></th>`);
         }
         html += `<th>Total</th><th>%</th></tr></thead><tbody>`;
+        
         sorted.forEach((s, idx) => {
             let total = 0, maxTotal = 0;
             const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷</span>';
             html += `<tr${idx===0?' class="top-student-row"':''}><td>${photoHtml}</td><td><strong>#${idx+1}</strong></td><td>${s.rollNo}</td><td>${s.name}${idx===0?' 🏆':''}</td><td>${s.fatherName||'-'}</td>`;
+            
+            // ✅ Only show active subjects for this student
             data.subjects.forEach(sub => {
-                const mark = s.marks[sub.name] || 0;
-                total += mark; maxTotal += sub.total;
-                html += `<td>${mark}/${sub.total}</td>`;
+                if (s.activeSubjects && s.activeSubjects.includes(sub.name)) {
+                    const mark = s.marks[sub.name] || 0;
+                    total += mark; 
+                    maxTotal += sub.total;
+                    html += `<td>${mark}/${sub.total}</td>`;
+                } else {
+                    html += `<td style="color:#ccc;">-</td>`;
+                }
             });
+            
             if (data.optionalSubjects && data.optionalSubjects.length) {
                 data.optionalSubjects.forEach(o => {
-                    const optMark = s.optionalMarks && s.optionalMarks[o.name] !== undefined ? s.optionalMarks[o.name] : '-';
-                    html += `<td style="color:#c5a059;">${optMark !== null ? optMark : '-'}${optMark !== null && optMark !== '-' ? `/${o.total}` : ''}</td>`;
+                    if (s.activeSubjects && s.activeSubjects.includes(o.name)) {
+                        const optMark = s.optionalMarks && s.optionalMarks[o.name] !== undefined ? s.optionalMarks[o.name] : '-';
+                        html += `<td style="color:#c5a059;">${optMark !== null && optMark !== '-' ? optMark : '-'}${optMark !== null && optMark !== '-' ? `/${o.total}` : ''}</td>`;
+                    } else {
+                        html += `<td style="color:#ccc;">-</td>`;
+                    }
                 });
             }
             const percent = maxTotal ? ((total/maxTotal)*100).toFixed(2) : 0;
@@ -1960,7 +1950,16 @@
     function sortStudentsByPercentage(arr, subs) {
         return [...arr].sort((a,b) => {
             let ta=0, ma=0, tb=0, mb=0;
-            subs.forEach(s => { ta += a.marks[s.name]||0; ma += s.total; tb += b.marks[s.name]||0; mb += s.total; });
+            subs.forEach(s => { 
+                if (a.activeSubjects && a.activeSubjects.includes(s.name)) {
+                    ta += a.marks[s.name]||0; 
+                    ma += s.total; 
+                }
+                if (b.activeSubjects && b.activeSubjects.includes(s.name)) {
+                    tb += b.marks[s.name]||0; 
+                    mb += s.total; 
+                }
+            });
             return (tb/mb) - (ta/ma);
         });
     }
@@ -1998,7 +1997,7 @@
         setTimeout(() => {
             students = data.students || [];
             students.forEach(s => {
-                if (!s.activeSubjects) s.activeSubjects = {};
+                if (!s.activeSubjects) s.activeSubjects = [];
             });
             updateStudentsTable();
             editingDraftId = null;
@@ -2010,6 +2009,7 @@
 
     async function deleteResult(id) { if (confirm('Delete published result?')) { await deleteDoc(doc(db, "results", id)); showToast('Result deleted'); loadOldResults(); } }
 
+    // ✅ FIXED: generatePDF() - Only shows active subjects
     downloadPdfBtn.addEventListener('click', () => { if (currentResultDataForPdf) generatePDF(currentResultDataForPdf, currentExamNameForPdf); });
 
     function generatePDF(data, examName) {
@@ -2029,18 +2029,26 @@
             let row = { rank: idx+1, rollNo: s.rollNo, name: s.name, father: s.fatherName||'-' };
             let total=0, maxTotal=0;
             data.subjects.forEach(sub => {
-                const mark = s.marks[sub.name]||0;
-                row[sub.name] = `${mark}/${sub.total}`;
-                total+=mark; maxTotal+=sub.total;
+                if (s.activeSubjects && s.activeSubjects.includes(sub.name)) {
+                    const mark = s.marks[sub.name]||0;
+                    row[sub.name] = `${mark}/${sub.total}`;
+                    total+=mark; maxTotal+=sub.total;
+                } else {
+                    row[sub.name] = '-';
+                }
             });
             if (data.optionalSubjects && data.optionalSubjects.length) {
                 data.optionalSubjects.forEach(o => {
-                    const optMark = s.optionalMarks && s.optionalMarks[o.name] !== undefined ? s.optionalMarks[o.name] : '-';
-                    row[`opt_${o.name}`] = optMark !== null && optMark !== '-' ? `${optMark}/${o.total}` : '-';
+                    if (s.activeSubjects && s.activeSubjects.includes(o.name)) {
+                        const optMark = s.optionalMarks && s.optionalMarks[o.name] !== undefined ? s.optionalMarks[o.name] : '-';
+                        row[`opt_${o.name}`] = optMark !== null && optMark !== '-' ? `${optMark}/${o.total}` : '-';
+                    } else {
+                        row[`opt_${o.name}`] = '-';
+                    }
                 });
             }
-            row.total = `${total}/${maxTotal}`;
-            row.percentage = maxTotal ? `${((total/maxTotal)*100).toFixed(2)}%` : '0%';
+            row.total = maxTotal > 0 ? `${total}/${maxTotal}` : '0/0';
+            row.percentage = maxTotal > 0 ? `${((total/maxTotal)*100).toFixed(2)}%` : '0%';
             return row;
         });
         doc.autoTable({ startY: 25, head: [columns.map(c=>c.header)], body: rows.map(r=>columns.map(c=>r[c.dataKey])), styles: { fontSize: 8 }, headStyles: { fillColor: [41,128,185] } });
