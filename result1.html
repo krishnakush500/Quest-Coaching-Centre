@@ -988,7 +988,7 @@
     }
   }
   
-  // ✅✅✅ FINAL FIXED: displayResult function ✅✅✅
+  // ✅✅✅ FIXED: displayResult function - ONLY ACTIVE SUBJECTS ✅✅✅
   function displayResult(examData, student) {
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('resultCard').style.display = 'block';
@@ -1045,29 +1045,24 @@
       }, 300);
     }
     
-    // ✅✅✅ FINAL FIXED: MARKS TABLE ✅✅✅
+    // ✅✅✅ FINAL FIXED: MARKS TABLE - ONLY ACTIVE SUBJECTS ✅✅✅
     let marksHtml = '';
     let totalObtained = 0;
     let totalMax = 0;
     
-    // 1️⃣ Get all subjects
-    const allSubjects = examData.subjects || [];
-    const optionalSubjects = examData.optionalSubjects || [];
+    // ✅ Get active subjects from student
+    const activeSubjects = student.activeSubjects || [];
     
-    // 2️⃣ Get active/inactive status from student
-    const activeSubjects = student.activeSubjects || {};
+    // 1️⃣ MAIN SUBJECTS - Only show if active
+    const mainSubjects = examData.subjects || [];
     
-    // 3️⃣ ✅ MAIN SUBJECTS = ALL subjects from subjects array
-    //    Sab dikhana hai, optional names se filter mat karo!
-    const mainSubjects = allSubjects;
-    
-    // 4️⃣ ✅ Show MAIN subjects (ALL subjects, but only if active)
     for (const subject of mainSubjects) {
       const subName = subject.name;
-      const isActive = activeSubjects[subName] !== undefined ? activeSubjects[subName] : true;
       
-      // Skip only if explicitly inactive
-      if (!isActive) continue;
+      // ✅ CHECK: Is this subject active for this student?
+      if (!activeSubjects.includes(subName)) {
+        continue; // Skip inactive subjects
+      }
       
       const subTotal = subject.total || 100;
       const marksObtained = student.marks && student.marks[subName] !== undefined ? student.marks[subName] : 0;
@@ -1084,7 +1079,7 @@
       totalMax += subTotal;
     }
     
-    // 5️⃣ TOTAL ROW
+    // 2️⃣ TOTAL ROW
     marksHtml += `<tr class="total-row">
       <td><strong>TOTAL</strong></td>
       <td><strong>${totalMax}</strong></td>
@@ -1092,59 +1087,61 @@
       <td></td>
     </tr>`;
     
-    // 6️⃣ ✅ Show OPTIONAL subjects (from optionalSubjects array)
-    //    Optional subjects bhi active/inactive check karo
-    if (optionalSubjects.length > 0) {
-      for (const opt of optionalSubjects) {
-        const optName = opt.name;
-        const optTotal = opt.total || 100;
-        
-        // ✅ Check if this optional subject is active
-        const isActive = activeSubjects[optName] !== undefined ? activeSubjects[optName] : true;
-        
-        // Skip if inactive
-        if (!isActive) continue;
-        
-        let optObtained = '-';
-        let optGrade = '-';
-        
-        // Check in student.optionalMarks first
-        if (student.optionalMarks && student.optionalMarks[optName] !== undefined) {
-          optObtained = student.optionalMarks[optName];
-          if (optObtained !== null && optObtained !== '-') {
-            const optPercent = (optObtained / optTotal) * 100;
-            const gradeInfo = getGrade(optPercent);
-            optGrade = `<span class="grade-badge ${gradeInfo.className}">${gradeInfo.grade}</span>`;
-          }
-        } 
-        // Then in student.marks
-        else if (student.marks && student.marks[optName] !== undefined) {
-          optObtained = student.marks[optName];
-          if (optObtained !== null && optObtained !== '-') {
-            const optPercent = (optObtained / optTotal) * 100;
-            const gradeInfo = getGrade(optPercent);
-            optGrade = `<span class="grade-badge ${gradeInfo.className}">${gradeInfo.grade}</span>`;
-          }
-        }
-        
-        marksHtml += `<tr class="optional-row">
-          <td><strong>${optName} (Optional)</strong></td>
-          <td>${optTotal}</td>
-          <td><strong>${optObtained}</strong></td>
-          <td>${optGrade}</td>
-        </tr>`;
+    // 3️⃣ OPTIONAL SUBJECTS - Only show if active
+    const optionalSubjects = examData.optionalSubjects || [];
+    let hasActiveOptional = false;
+    
+    for (const opt of optionalSubjects) {
+      const optName = opt.name;
+      
+      // ✅ CHECK: Is this optional subject active for this student?
+      if (!activeSubjects.includes(optName)) {
+        continue; // Skip inactive optional subjects
       }
-    } else {
-      // No optional subjects
+      
+      hasActiveOptional = true;
+      const optTotal = opt.total || 100;
+      let optObtained = '-';
+      let optGrade = '-';
+      
+      // Check in student.optionalMarks first
+      if (student.optionalMarks && student.optionalMarks[optName] !== undefined) {
+        optObtained = student.optionalMarks[optName];
+        if (optObtained !== null && optObtained !== '-') {
+          const optPercent = (optObtained / optTotal) * 100;
+          const gradeInfo = getGrade(optPercent);
+          optGrade = `<span class="grade-badge ${gradeInfo.className}">${gradeInfo.grade}</span>`;
+        }
+      } 
+      // Then in student.marks
+      else if (student.marks && student.marks[optName] !== undefined) {
+        optObtained = student.marks[optName];
+        if (optObtained !== null && optObtained !== '-') {
+          const optPercent = (optObtained / optTotal) * 100;
+          const gradeInfo = getGrade(optPercent);
+          optGrade = `<span class="grade-badge ${gradeInfo.className}">${gradeInfo.grade}</span>`;
+        }
+      }
+      
       marksHtml += `<tr class="optional-row">
-        <td><strong>Optional Subject</strong></td>
+        <td><strong>${optName} (Optional)</strong></td>
+        <td>${optTotal}</td>
+        <td><strong>${optObtained}</strong></td>
+        <td>${optGrade}</td>
+      </tr>`;
+    }
+    
+    // ✅ If no active optional subjects, show a message
+    if (!hasActiveOptional && optionalSubjects.length > 0) {
+      marksHtml += `<tr class="optional-row">
+        <td><strong>No Optional Subjects Active</strong></td>
         <td>-</td>
         <td>-</td>
         <td>-</td>
       </tr>`;
     }
     
-    // 7️⃣ PERCENTAGE & DIVISION (only main subjects)
+    // 4️⃣ PERCENTAGE & DIVISION (only active main subjects)
     const totalPercentage = totalMax > 0 ? ((totalObtained / totalMax) * 100) : 0;
     const roundedPercentage = totalPercentage.toFixed(2);
     const divisionInfo = calculateDivision(totalPercentage);
