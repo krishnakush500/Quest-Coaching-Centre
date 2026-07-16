@@ -949,13 +949,9 @@
       
       currentExamData = docSnap.data();
       
-      // ✅ CHECK: Agar template 'result1' hai to redirect karo
+      // Agar template 'result' hai to redirect to classic result
       const template = currentExamData.template || 'result';
-      if (template === 'result1') {
-        console.log('🔄 Using Admit Card Style Template (result1)');
-        // Continue normally - this is result1.html
-      } else {
-        // Agar template 'result' hai to redirect to result.html
+      if (template === 'result') {
         console.log('🔄 Redirecting to result.html (Classic Style)');
         window.location.href = `result.html?examId=${examId}&rollNo=${rollNo}`;
         return;
@@ -1045,7 +1041,7 @@
       }, 300);
     }
     
-    // ✅✅✅ FINAL FIXED: MARKS TABLE - ONLY ACTIVE SUBJECTS ✅✅✅
+    // ✅✅✅ MARKS TABLE - ONLY ACTIVE SUBJECTS ✅✅✅
     let marksHtml = '';
     let totalObtained = 0;
     let totalMax = 0;
@@ -1131,23 +1127,16 @@
       </tr>`;
     }
     
-    // ✅ If no active optional subjects, show a message
-    if (!hasActiveOptional && optionalSubjects.length > 0) {
-      marksHtml += `<tr class="optional-row">
-        <td><strong>No Optional Subjects Active</strong></td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-      </tr>`;
-    }
+    // ✅ If no active optional subjects, show nothing (don't show message)
+    // Just skip it completely
     
-    // 4️⃣ PERCENTAGE & DIVISION (only active main subjects)
+    document.getElementById('marksTableBody').innerHTML = marksHtml;
+    
+    // ✅ PERCENTAGE & DIVISION (only active main subjects)
     const totalPercentage = totalMax > 0 ? ((totalObtained / totalMax) * 100) : 0;
     const roundedPercentage = totalPercentage.toFixed(2);
     const divisionInfo = calculateDivision(totalPercentage);
     const overallStatus = getResultStatus(totalPercentage);
-    
-    document.getElementById('marksTableBody').innerHTML = marksHtml;
     
     document.getElementById('totalMarks').innerText = `${totalObtained} / ${totalMax}`;
     document.getElementById('percentageDisplay').innerText = `${roundedPercentage}%`;
