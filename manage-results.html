@@ -1,516 +1,218 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Manage Results - Quest Coaching Centre</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <title>Manage Results – Quest Coaching Centre</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; padding: 20px; }
-        .manage-container { max-width: 1400px; margin: 0 auto; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background:#f0f2f5; font-family:'Segoe UI',sans-serif; padding:20px; }
+        .manage-container { max-width:1400px; margin:0 auto; }
         .header-section {
-            background: white;
-            border-radius: 25px;
-            padding: 20px 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
+            background:white; border-radius:25px; padding:20px 30px; margin-bottom:30px;
+            box-shadow:0 5px 15px rgba(0,0,0,0.05);
+            display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;
         }
-        .page-title { font-size: 1.8rem; font-weight: 700; color: #1a237e; margin: 0; }
-        .page-title i { color: #0d6efd; margin-right: 10px; }
+        .page-title { font-size:1.8rem; font-weight:700; color:#1a237e; margin:0; }
+        .page-title i { color:#0d6efd; margin-right:10px; }
         .back-to-admin {
-            background: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 10px 24px;
-            font-weight: 600;
-            transition: 0.2s;
+            background:#6c757d; color:white; border:none; border-radius:50px;
+            padding:10px 24px; font-weight:600; transition:0.2s;
         }
-        .back-to-admin:hover { background: #5a6268; transform: translateY(-2px); }
+        .back-to-admin:hover { background:#5a6268; transform:translateY(-2px); }
         .action-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
+            display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+            gap:25px; margin-bottom:40px;
         }
         .action-card {
-            background: white;
-            border-radius: 25px;
-            padding: 25px 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            background:white; border-radius:25px; padding:25px 20px; text-align:center;
+            transition:all 0.3s ease; cursor:pointer; box-shadow:0 5px 15px rgba(0,0,0,0.05);
         }
-        .action-card:hover { transform: translateY(-8px); box-shadow: 0 20px 30px rgba(0,0,0,0.1); }
-        .action-icon { width: 70px; height: 70px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; border-radius: 25px; font-size: 32px; }
-        .action-card:nth-child(1) .action-icon { background: #e8eafe; color: #1a237e; }
-        .action-card:nth-child(2) .action-icon { background: #fff3cd; color: #ffc107; }
-        .action-card:nth-child(3) .action-icon { background: #d1ecf1; color: #0dcaf0; }
-        .action-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; color: #1e293b; }
-        .action-desc { font-size: 0.85rem; color: #64748b; margin-bottom: 20px; }
-        .action-btn {
-            padding: 8px 24px;
-            border-radius: 40px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border: none;
-            background: #f1f5f9;
-            transition: 0.2s;
-        }
-        .action-card:hover .action-btn { background: #1a237e; color: white; }
-        .fullscreen-section {
-            display: none;
-            background: white;
-            border-radius: 25px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
+        .action-card:hover { transform:translateY(-8px); box-shadow:0 20px 30px rgba(0,0,0,0.1); }
+        .action-icon { width:70px; height:70px; margin:0 auto 20px; display:flex; align-items:center; justify-content:center; border-radius:25px; font-size:32px; }
+        .action-card:nth-child(1) .action-icon { background:#e8eafe; color:#1a237e; }
+        .action-card:nth-child(2) .action-icon { background:#fff3cd; color:#ffc107; }
+        .action-card:nth-child(3) .action-icon { background:#d1ecf1; color:#0dcaf0; }
+        .action-title { font-size:1.3rem; font-weight:700; margin-bottom:10px; color:#1e293b; }
+        .action-desc { font-size:0.85rem; color:#64748b; margin-bottom:20px; }
+        .action-btn { padding:8px 24px; border-radius:40px; font-size:0.9rem; font-weight:600; border:none; background:#f1f5f9; transition:0.2s; }
+        .action-card:hover .action-btn { background:#1a237e; color:white; }
+        .fullscreen-section { display:none; background:white; border-radius:25px; padding:25px; box-shadow:0 5px 15px rgba(0,0,0,0.05); }
         .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e9ecef;
+            display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;
+            margin-bottom:25px; padding-bottom:15px; border-bottom:2px solid #e9ecef;
         }
-        .section-header h3 { font-size: 1.4rem; font-weight: 700; color: #1a237e; margin: 0; }
-        .back-btn {
-            background: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 8px 20px;
-            font-weight: 500;
-        }
-        .subject-box { background: #f8fafc; border-radius: 16px; padding: 15px; margin-bottom: 12px; border: 1px solid #e2e8f0; }
-        .save-changes-btn { background: #20c997; border-color: #20c997; color: white; }
-        .top-student-row { background: #fff3cd !important; font-weight: 500; }
-        .pdf-download-btn { background: #dc3545; border-color: #dc3545; color: white; }
+        .section-header h3 { font-size:1.4rem; font-weight:700; color:#1a237e; margin:0; }
+        .back-btn { background:#6c757d; color:white; border:none; border-radius:50px; padding:8px 20px; font-weight:500; }
+        .subject-box { background:#f8fafc; border-radius:16px; padding:15px; margin-bottom:12px; border:1px solid #e2e8f0; }
+        .save-changes-btn { background:#20c997; border-color:#20c997; color:white; }
+        .top-student-row { background:#fff3cd !important; font-weight:500; }
+        .pdf-download-btn { background:#dc3545; border-color:#dc3545; color:white; }
         .toast-message {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            z-index: 1100;
-            background: #28a745;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 50px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: none;
-            align-items: center;
-            gap: 10px;
-            font-weight: 500;
+            position:fixed; bottom:25px; right:25px; z-index:1100;
+            background:#28a745; color:white; padding:12px 24px; border-radius:50px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.15); display:none; align-items:center; gap:10px; font-weight:500;
         }
-        .auto-fetch-badge { background: #e0f2fe; color: #0369a1; font-size: 11px; border-radius: 20px; padding: 4px 12px; margin-left: 12px; }
-        .student-photo-thumb { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #1a237e; }
-        .photo-fetch-status { font-size: 11px; margin-top: 4px; }
-        .photo-fetch-success { color: #16a34a; }
-        .photo-fetch-missing { color: #dc2626; }
-        
+        .auto-fetch-badge { background:#e0f2fe; color:#0369a1; font-size:11px; border-radius:20px; padding:4px 12px; margin-left:12px; }
+        .student-photo-thumb { width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid #1a237e; }
+        .photo-fetch-status { font-size:11px; margin-top:4px; }
+        .photo-fetch-success { color:#16a34a; }
+        .photo-fetch-missing { color:#dc2626; }
+
         .template-selector {
-            display: flex;
-            gap: 12px;
-            padding: 10px 15px;
-            background: #f8fafc;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            align-items: center;
+            display:flex; gap:12px; padding:10px 15px; background:#f8fafc;
+            border-radius:12px; border:1px solid #e2e8f0; margin-bottom:20px; flex-wrap:wrap; align-items:center;
         }
-        .template-selector .selector-label {
-            font-weight: 600;
-            color: #1a237e;
-            font-size: 0.85rem;
-            margin-right: 10px;
-        }
+        .template-selector .selector-label { font-weight:600; color:#1a237e; font-size:0.85rem; margin-right:10px; }
         .template-option {
-            padding: 8px 16px;
-            border-radius: 30px;
-            border: 2px solid #e2e8f0;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.3s;
-            background: white;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            padding:8px 16px; border-radius:30px; border:2px solid #e2e8f0; cursor:pointer;
+            text-align:center; transition:all 0.3s; background:white; display:inline-flex; align-items:center; gap:8px;
         }
-        .template-option:hover {
-            border-color: #1a237e;
-            transform: translateY(-1px);
-        }
-        .template-option.selected {
-            border-color: #1a237e;
-            background: #e8eafe;
-            box-shadow: 0 0 0 2px rgba(26,35,126,0.15);
-        }
-        .template-option input[type="radio"] { display: none; }
-        .template-option .template-icon { font-size: 1.1rem; color: #1a237e; }
-        .template-option .template-name { font-weight: 600; color: #1a237e; font-size: 0.85rem; }
+        .template-option:hover { border-color:#1a237e; transform:translateY(-1px); }
+        .template-option.selected { border-color:#1a237e; background:#e8eafe; box-shadow:0 0 0 2px rgba(26,35,126,0.15); }
+        .template-option input[type="radio"] { display:none; }
+        .template-option .template-icon { font-size:1.1rem; color:#1a237e; }
+        .template-option .template-name { font-weight:600; color:#1a237e; font-size:0.85rem; }
         .template-option .template-preview-badge {
-            display: inline-block;
-            padding: 1px 8px;
-            border-radius: 10px;
-            font-size: 0.55rem;
-            font-weight: 600;
-            background: #e2e8f0;
-            color: #475569;
+            display:inline-block; padding:1px 8px; border-radius:10px; font-size:0.55rem;
+            font-weight:600; background:#e2e8f0; color:#475569;
         }
-        .template-option.selected .template-preview-badge {
-            background: #1a237e;
-            color: white;
-        }
-        
-        /* Subject Dialog Styles */
+        .template-option.selected .template-preview-badge { background:#1a237e; color:white; }
+
         .subject-dialog-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 9999;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6);
+            z-index:9999; display:none; justify-content:center; align-items:center; padding:20px;
         }
         .subject-dialog {
-            background: white;
-            border-radius: 20px;
-            max-width: 700px;
-            width: 100%;
-            max-height: 85vh;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            background:white; border-radius:20px; max-width:700px; width:100%;
+            max-height:85vh; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.3);
         }
         .subject-dialog-header {
-            padding: 18px 24px;
-            border-bottom: 2px solid #e9ecef;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #f8f9fc;
+            padding:18px 24px; border-bottom:2px solid #e9ecef;
+            display:flex; justify-content:space-between; align-items:center; background:#f8f9fc;
         }
-        .subject-dialog-header h4 {
-            margin: 0;
-            color: #1a237e;
-            font-weight: 700;
-        }
-        .subject-dialog-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #6c757d;
-        }
-        .subject-dialog-close:hover { color: #dc2626; }
-        .subject-dialog-body {
-            padding: 20px 24px;
-            max-height: 55vh;
-            overflow-y: auto;
-        }
-        .subject-dialog-footer {
-            padding: 15px 24px;
-            border-top: 2px solid #e9ecef;
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            background: #f8f9fc;
-        }
-        
-        /* Tab Styles */
+        .subject-dialog-header h4 { margin:0; color:#1a237e; font-weight:700; }
+        .subject-dialog-close { background:none; border:none; font-size:1.5rem; cursor:pointer; color:#6c757d; }
+        .subject-dialog-close:hover { color:#dc2626; }
+        .subject-dialog-body { padding:20px 24px; max-height:55vh; overflow-y:auto; }
+        .subject-dialog-footer { padding:15px 24px; border-top:2px solid #e9ecef; display:flex; justify-content:flex-end; gap:12px; background:#f8f9fc; }
+
         .dialog-tabs {
-            display: flex;
-            gap: 0;
-            border-bottom: 2px solid #e9ecef;
-            margin-bottom: 15px;
+            display:flex; gap:0; border-bottom:2px solid #e9ecef; margin-bottom:15px;
         }
         .dialog-tab {
-            padding: 10px 20px;
-            border: none;
-            background: none;
-            font-weight: 600;
-            color: #6c757d;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
-            font-size: 0.9rem;
+            padding:10px 20px; border:none; background:none; font-weight:600;
+            color:#6c757d; cursor:pointer; border-bottom:3px solid transparent; transition:all 0.3s; font-size:0.9rem;
         }
-        .dialog-tab.active {
-            color: #1a237e;
-            border-bottom-color: #1a237e;
-            background: #f0f7ff;
-        }
-        .dialog-tab:hover {
-            color: #1a237e;
-            background: #f8f9fc;
-        }
+        .dialog-tab.active { color:#1a237e; border-bottom-color:#1a237e; background:#f0f7ff; }
+        .dialog-tab:hover { color:#1a237e; background:#f8f9fc; }
         .dialog-tab .badge-count {
-            background: #1a237e;
-            color: white;
-            border-radius: 50%;
-            padding: 1px 8px;
-            font-size: 0.65rem;
-            margin-left: 5px;
+            background:#1a237e; color:white; border-radius:50%; padding:1px 8px; font-size:0.65rem; margin-left:5px;
         }
-        .dialog-tab.active .badge-count {
-            background: #1a237e;
-        }
-        
+        .dialog-tab.active .badge-count { background:#1a237e; }
+
         .subject-select-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
-            border-bottom: 1px solid #f1f3f5;
+            display:flex; align-items:center; gap:12px; padding:10px 12px; border-bottom:1px solid #f1f3f5;
         }
-        .subject-select-item:hover {
-            background: #f8f9fc;
-        }
-        .subject-select-item input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-            accent-color: #1a237e;
-            flex-shrink: 0;
-        }
-        .subject-select-item .subject-name {
-            flex: 1;
-            font-weight: 500;
-            color: #1e293b;
-            font-size: 0.95rem;
-        }
+        .subject-select-item:hover { background:#f8f9fc; }
+        .subject-select-item input[type="checkbox"] { width:18px; height:18px; cursor:pointer; accent-color:#1a237e; flex-shrink:0; }
+        .subject-select-item .subject-name { flex:1; font-weight:500; color:#1e293b; font-size:0.95rem; }
         .subject-select-item .subject-total-input {
-            width: 80px;
-            padding: 4px 8px;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            background: #f1f5f9;
+            width:80px; padding:4px 8px; border:1px solid #e2e8f0; border-radius:6px;
+            font-size:0.85rem; background:#f1f5f9;
         }
-        .subject-select-item .subject-total-input:disabled {
-            background: #f1f5f9;
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        .subject-select-item .subject-total-input:enabled {
-            background: white;
-            border-color: #1a237e;
-        }
-        .subject-select-item .validation-error {
-            color: #dc2626;
-            font-size: 0.7rem;
-            display: none;
-        }
-        
+        .subject-select-item .subject-total-input:disabled { background:#f1f5f9; opacity:0.5; cursor:not-allowed; }
+        .subject-select-item .subject-total-input:enabled { background:white; border-color:#1a237e; }
+        .subject-select-item .validation-error { color:#dc2626; font-size:0.7rem; display:none; }
+
         .btn-show-subjects {
-            background: #0d6efd;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            padding: 6px 16px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+            background:#0d6efd; color:white; border:none; border-radius:30px;
+            padding:6px 16px; font-size:0.8rem; font-weight:600; cursor:pointer;
+            transition:all 0.3s; display:inline-flex; align-items:center; gap:6px;
         }
-        .btn-show-subjects:hover {
-            background: #0b5ed7;
-            transform: translateY(-1px);
-        }
-        
+        .btn-show-subjects:hover { background:#0b5ed7; transform:translateY(-1px); }
+
         .btn-add-subject {
-            background: #1a237e;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            padding: 8px 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            background:#1a237e; color:white; border:none; border-radius:30px;
+            padding:8px 20px; font-size:0.85rem; font-weight:600; cursor:pointer;
+            transition:all 0.3s; display:inline-flex; align-items:center; gap:8px;
         }
-        .btn-add-subject:hover {
-            background: #283593;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(26,35,126,0.3);
-        }
-        .btn-add-subject.optional {
-            background: #c5a059;
-        }
-        .btn-add-subject.optional:hover {
-            background: #a8894a;
-            box-shadow: 0 4px 12px rgba(197,160,89,0.3);
-        }
-        
+        .btn-add-subject:hover { background:#283593; transform:translateY(-2px); box-shadow:0 4px 12px rgba(26,35,126,0.3); }
+        .btn-add-subject.optional { background:#c5a059; }
+        .btn-add-subject.optional:hover { background:#a8894a; box-shadow:0 4px 12px rgba(197,160,89,0.3); }
+
         .subject-count-badge {
-            background: white;
-            color: #1a237e;
-            border-radius: 50%;
-            padding: 2px 8px;
-            font-size: 0.7rem;
-            font-weight: 700;
+            background:white; color:#1a237e; border-radius:50%; padding:2px 8px; font-size:0.7rem; font-weight:700;
         }
-        
+
         .student-subject-tag {
-            background: #e8eafe;
-            color: #1a237e;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            display: inline-block;
-            margin: 2px;
+            background:#e8eafe; color:#1a237e; padding:2px 10px; border-radius:12px;
+            font-size:0.7rem; font-weight:600; display:inline-block; margin:2px;
         }
-        
-        /* Subject Toggle Switch Styles */
+
         .subject-mark-row {
-            background: #f8fafc;
-            border-radius: 10px;
-            padding: 10px 15px;
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s;
+            background:#f8fafc; border-radius:10px; padding:10px 15px;
+            border:1px solid #e2e8f0; transition:all 0.3s;
         }
-        .subject-mark-row.inactive {
-            background: #fef2f2;
-            border-color: #fca5a5;
-            opacity: 0.7;
-        }
-        .subject-mark-row .form-switch .form-check-input {
-            width: 2.5rem;
-            height: 1.3rem;
-            cursor: pointer;
-        }
-        .subject-mark-row .form-switch .form-check-input:checked {
-            background-color: #16a34a;
-            border-color: #16a34a;
-        }
-        .subject-mark-row .form-switch .form-check-input:not(:checked) {
-            background-color: #dc2626;
-            border-color: #dc2626;
-        }
-        .subject-mark-row .form-switch .form-check-label {
-            font-weight: 600;
-            font-size: 0.8rem;
-            min-width: 70px;
-        }
-        
+        .subject-mark-row.inactive { background:#fef2f2; border-color:#fca5a5; opacity:0.7; }
+        .subject-mark-row .form-switch .form-check-input { width:2.5rem; height:1.3rem; cursor:pointer; }
+        .subject-mark-row .form-switch .form-check-input:checked { background-color:#16a34a; border-color:#16a34a; }
+        .subject-mark-row .form-switch .form-check-input:not(:checked) { background-color:#dc2626; border-color:#dc2626; }
+        .subject-mark-row .form-switch .form-check-label { font-weight:600; font-size:0.8rem; min-width:70px; }
+
         .optional-mark-row {
-            background: #fef9e6;
-            border-radius: 10px;
-            padding: 10px 15px;
-            border: 1px solid #c5a059;
-            transition: all 0.3s;
+            background:#fef9e6; border-radius:10px; padding:10px 15px;
+            border:1px solid #c5a059; transition:all 0.3s;
         }
-        .optional-mark-row.inactive {
-            background: #fef2f2;
-            border-color: #fca5a5;
-            opacity: 0.7;
-        }
-        .optional-mark-row .form-switch .form-check-input {
-            width: 2.5rem;
-            height: 1.3rem;
-            cursor: pointer;
-        }
-        .optional-mark-row .form-switch .form-check-input:checked {
-            background-color: #16a34a;
-            border-color: #16a34a;
-        }
-        .optional-mark-row .form-switch .form-check-input:not(:checked) {
-            background-color: #dc2626;
-            border-color: #dc2626;
-        }
-        .optional-mark-row .form-switch .form-check-label {
-            font-weight: 600;
-            font-size: 0.8rem;
-            min-width: 70px;
-        }
-        
-        /* Compact student table */
-        .student-list-table td, .student-list-table th {
-            padding: 6px 8px !important;
-            vertical-align: middle !important;
-            font-size: 0.85rem;
-        }
-        .student-list-table .subject-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-        }
+        .optional-mark-row.inactive { background:#fef2f2; border-color:#fca5a5; opacity:0.7; }
+        .optional-mark-row .form-switch .form-check-input { width:2.5rem; height:1.3rem; cursor:pointer; }
+        .optional-mark-row .form-switch .form-check-input:checked { background-color:#16a34a; border-color:#16a34a; }
+        .optional-mark-row .form-switch .form-check-input:not(:checked) { background-color:#dc2626; border-color:#dc2626; }
+        .optional-mark-row .form-switch .form-check-label { font-weight:600; font-size:0.8rem; min-width:70px; }
+
+        .student-list-table td, .student-list-table th { padding:6px 8px !important; vertical-align:middle !important; font-size:0.85rem; }
+        .student-list-table .subject-chips { display:flex; flex-wrap:wrap; gap:4px; }
         .student-list-table .subject-chips .chip {
-            background: #e8eafe;
-            color: #1a237e;
-            padding: 1px 8px;
-            border-radius: 10px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            white-space: nowrap;
+            background:#e8eafe; color:#1a237e; padding:1px 8px; border-radius:10px;
+            font-size:0.7rem; font-weight:600; white-space:nowrap;
         }
-        .student-list-table .subject-chips .chip-optional {
-            background: #fef9e6;
-            color: #c5a059;
-        }
-        .student-list-table .marks-compact {
-            font-size: 0.75rem;
-            color: #475569;
-        }
-        .student-list-table .marks-compact span {
-            margin-right: 4px;
-        }
-        
-        @media (max-width: 768px) {
-            body { padding: 15px; }
-            .header-section { flex-direction: column; text-align: center; }
-            .page-title { font-size: 1.4rem; }
-            .action-cards { gap: 15px; }
-            .action-card { padding: 20px 15px; }
-            .action-icon { width: 55px; height: 55px; font-size: 26px; }
-            .action-title { font-size: 1.1rem; }
-            .template-selector { flex-direction: column; align-items: stretch; }
-            .template-option { justify-content: center; }
-            .subject-dialog { max-width: 100%; margin: 10px; }
-            .subject-select-item { flex-wrap: wrap; }
-            .subject-select-item .subject-total-input { width: 100%; }
+        .student-list-table .subject-chips .chip-optional { background:#fef9e6; color:#c5a059; }
+        .student-list-table .marks-compact { font-size:0.75rem; color:#475569; }
+        .student-list-table .marks-compact span { margin-right:4px; }
+
+        @media (max-width:768px) {
+            body { padding:15px; }
+            .header-section { flex-direction:column; text-align:center; }
+            .page-title { font-size:1.4rem; }
+            .action-cards { gap:15px; }
+            .action-card { padding:20px 15px; }
+            .action-icon { width:55px; height:55px; font-size:26px; }
+            .action-title { font-size:1.1rem; }
+            .template-selector { flex-direction:column; align-items:stretch; }
+            .template-option { justify-content:center; }
+            .subject-dialog { max-width:100%; margin:10px; }
+            .subject-select-item { flex-wrap:wrap; }
+            .subject-select-item .subject-total-input { width:100%; }
             .subject-mark-row .d-flex,
-            .optional-mark-row .d-flex { flex-direction: column; align-items: stretch !important; gap: 8px; }
+            .optional-mark-row .d-flex { flex-direction:column; align-items:stretch !important; gap:8px; }
             .subject-mark-row .subject-mark,
-            .optional-mark-row .optional-mark { max-width: 100% !important; }
-            .dialog-tabs { flex-direction: column; }
-            .dialog-tab { text-align: center; }
-            .student-list-table td, .student-list-table th {
-                padding: 4px 6px !important;
-                font-size: 0.75rem;
-            }
-            .student-list-table .subject-chips .chip {
-                font-size: 0.6rem;
-                padding: 0 6px;
-            }
+            .optional-mark-row .optional-mark { max-width:100% !important; }
+            .dialog-tabs { flex-direction:column; }
+            .dialog-tab { text-align:center; }
+            .student-list-table td, .student-list-table th { padding:4px 6px !important; font-size:0.75rem; }
+            .student-list-table .subject-chips .chip { font-size:0.6rem; padding:0 6px; }
         }
     </style>
 </head>
 <body>
 
 <div class="manage-container">
-    <!-- Header Section -->
+
+    <!-- Header -->
     <div class="header-section">
         <h1 class="page-title"><i class="fas fa-chart-line"></i> Manage Results</h1>
         <button id="backToAdminBtn" class="back-to-admin"><i class="fas fa-arrow-left"></i> Back to Admin Panel</button>
@@ -544,7 +246,7 @@
             <h3><i class="fas fa-plus-circle me-2"></i> Create New Result</h3>
             <button class="back-btn" id="backFromCreateBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button>
         </div>
-        
+
         <div class="template-selector" id="templateSelector">
             <span class="selector-label"><i class="fas fa-palette"></i> Template:</span>
             <div class="template-option selected" id="templateResult">
@@ -560,7 +262,7 @@
                 <span class="template-preview-badge">New</span>
             </div>
         </div>
-        
+
         <div id="examSetupStep">
             <div class="card mb-4">
                 <div class="card-header bg-white fw-bold">
@@ -571,7 +273,7 @@
                     <div class="mb-3"><label class="form-label">Exam Name <span style="color:#dc2626;">*</span></label><input type="text" class="form-control" id="examName" placeholder="e.g., Final Examination 2025"></div>
                     <div class="mb-3"><label class="form-label">Examination Centre</label><input type="text" class="form-control" id="examCentre" placeholder="e.g., QUEST COACHING CENTRE, GOPALGANJ"></div>
                     <div class="mb-3"><label class="form-label">Roll Code</label><input type="text" class="form-control" id="rollCode" value="55075"></div>
-                    
+
                     <div class="mb-3">
                         <label class="form-label">Subjects <span style="color:#dc2626;">*</span></label>
                         <div class="d-flex gap-2 flex-wrap">
@@ -584,17 +286,15 @@
                                 <span class="subject-count-badge" id="optionalSubjectCount">0</span>
                             </button>
                         </div>
-                        <div style="display:none;" id="selectedMainSubjects"></div>
-                        <div style="display:none;" id="selectedOptionalSubjects"></div>
                     </div>
-                    
+
                     <button id="generateSubjectFieldsBtn" class="btn btn-primary" style="display:none;"><i class="fas fa-magic"></i> Generate Subject Fields</button>
                 </div>
             </div>
             <div id="subjectFields" class="mb-4"></div>
             <div id="step1NextBtn" class="d-none mt-3"><button id="nextToStudentEntryBtn" class="btn btn-success">Next →</button></div>
         </div>
-        
+
         <div id="studentEntryStep" style="display: none;">
             <div class="card mb-4">
                 <div class="card-header bg-white fw-bold">
@@ -631,10 +331,10 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Main Subjects with Toggle -->
                     <div id="marksFields" class="mb-3"></div>
-                    
+
                     <!-- Optional Subjects Marks with Toggle -->
                     <div id="optionalMarksFields" style="display:none;" class="mb-3">
                         <div class="optional-subject-box" style="border-color:#c5a059;">
@@ -643,7 +343,7 @@
                             <div id="optionalMarksList"></div>
                         </div>
                     </div>
-                    
+
                     <div class="d-flex gap-2 flex-wrap">
                         <button id="addStudentBtn" class="btn btn-primary"><i class="fas fa-user-plus"></i> Add Student</button>
                         <button id="updateStudentBtn" class="btn btn-warning d-none">Update Student</button>
@@ -673,20 +373,20 @@
         </div>
     </div>
 
-    <!-- Draft Results Section -->
+    <!-- Draft Results -->
     <div id="draftResultsSection" class="fullscreen-section">
         <div class="section-header"><h3><i class="fas fa-file-draft me-2"></i> Draft Results</h3><button class="back-btn" id="backFromDraftBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button></div>
         <div id="draftResultsList" class="row g-4"></div>
     </div>
 
-    <!-- Old Results Section -->
+    <!-- Published Results -->
     <div id="oldResultsSection" class="fullscreen-section">
         <div class="section-header"><h3><i class="fas fa-history me-2"></i> Published Results</h3><button class="back-btn" id="backFromOldBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button></div>
         <div id="oldResultsList" class="row g-4"></div>
     </div>
 </div>
 
-<!-- Subject Selection Dialog with Tabs -->
+<!-- Subject Dialog -->
 <div class="subject-dialog-overlay" id="subjectDialog">
     <div class="subject-dialog">
         <div class="subject-dialog-header">
@@ -775,7 +475,7 @@
         "COMPUTER SCIENCE", "ENGLISH"
     ];
 
-    // DOM Elements
+    // DOM refs
     const actionCardsContainer = document.getElementById('actionCardsContainer');
     const createResultSection = document.getElementById('createResultSection');
     const draftResultsSection = document.getElementById('draftResultsSection');
@@ -823,7 +523,7 @@
     const saveChangesConfirmBtn = document.getElementById('saveChangesConfirmBtn');
     const editTemplateModal = new bootstrap.Modal(document.getElementById('editTemplateModal'));
 
-    // Subject Dialog Elements
+    // Subject Dialog
     const subjectDialog = document.getElementById('subjectDialog');
     const dialogTitle = document.getElementById('dialogTitle');
     const dialogBody = document.getElementById('dialogBody');
@@ -853,7 +553,7 @@
     function showActionCards() { actionCardsContainer.style.display = 'grid'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
     function showToast(msg, isPublished = false) { const toast = isPublished ? document.getElementById('publishedToast') : document.getElementById('successToast'); if (!isPublished) document.getElementById('toastMessage').innerText = msg; toast.style.display = 'flex'; setTimeout(() => toast.style.display = 'none', 2000); }
 
-    // Template Selection
+    // Template selection
     document.querySelectorAll('#templateSelector .template-option').forEach(opt => {
         opt.addEventListener('click', function() {
             document.querySelectorAll('#templateSelector .template-option').forEach(o => o.classList.remove('selected'));
@@ -862,7 +562,6 @@
             selectedTemplate = this.querySelector('input[type="radio"]').value;
         });
     });
-
     document.querySelectorAll('#editTemplateSelector .template-option').forEach(opt => {
         opt.addEventListener('click', function() {
             document.querySelectorAll('#editTemplateSelector .template-option').forEach(o => o.classList.remove('selected'));
@@ -871,29 +570,21 @@
         });
     });
 
-    // Tab Switching
+    // Dialog tabs
     function switchTab(tab) {
         currentTab = tab;
         document.querySelectorAll('.dialog-tab').forEach(t => t.classList.remove('active'));
-        if (tab === 'main') {
-            tabMain.classList.add('active');
-            renderDialogSubjects(true);
-        } else {
-            tabOptional.classList.add('active');
-            renderDialogSubjects(false);
-        }
+        if (tab === 'main') { tabMain.classList.add('active'); renderDialogSubjects(true); }
+        else { tabOptional.classList.add('active'); renderDialogSubjects(false); }
     }
-
     tabMain.addEventListener('click', () => switchTab('main'));
     tabOptional.addEventListener('click', () => switchTab('optional'));
 
     function openSubjectDialog() {
         tempMainSubjects = selectedMainSubjects.map(s => ({ ...s }));
         tempOptionalSubjects = selectedOptionalSubjects.map(s => ({ ...s }));
-        
         document.getElementById('mainTabCount').textContent = tempMainSubjects.length;
         document.getElementById('optionalTabCount').textContent = tempOptionalSubjects.length;
-        
         dialogTitle.innerHTML = '<i class="fas fa-book"></i> Manage Subjects';
         subjectDialog.style.display = 'flex';
         switchTab('main');
@@ -905,12 +596,12 @@
         const allSubjects = ALL_SUBJECTS;
         const tempSubjects = isMain ? tempMainSubjects : tempOptionalSubjects;
         const title = isMain ? 'Main Subjects' : 'Optional Subjects';
-        
+
         const header = document.createElement('div');
-        header.style.cssText = 'padding: 8px 12px; background: #f0f7ff; border-radius: 8px; margin-bottom: 12px; font-weight: 600; color: #1a237e;';
+        header.style.cssText = 'padding:8px 12px; background:#f0f7ff; border-radius:8px; margin-bottom:12px; font-weight:600; color:#1a237e;';
         header.textContent = `Select ${title}`;
         container.appendChild(header);
-        
+
         const selectAllDiv = document.createElement('div');
         selectAllDiv.className = 'subject-select-item';
         selectAllDiv.style.background = '#f8fafc';
@@ -919,7 +610,7 @@
             <span class="subject-name" style="font-weight:600;">Select All</span>
         `;
         container.appendChild(selectAllDiv);
-        
+
         const selectAllCheckbox = selectAllDiv.querySelector('#selectAllCheckbox');
         selectAllCheckbox.addEventListener('change', function() {
             const checked = this.checked;
@@ -930,9 +621,7 @@
                             tempMainSubjects.push({ name: s, total: '' });
                         }
                     });
-                } else {
-                    tempMainSubjects = [];
-                }
+                } else { tempMainSubjects = []; }
             } else {
                 if (checked) {
                     allSubjects.forEach(s => {
@@ -940,20 +629,18 @@
                             tempOptionalSubjects.push({ name: s, total: '' });
                         }
                     });
-                } else {
-                    tempOptionalSubjects = [];
-                }
+                } else { tempOptionalSubjects = []; }
             }
             document.getElementById('mainTabCount').textContent = tempMainSubjects.length;
             document.getElementById('optionalTabCount').textContent = tempOptionalSubjects.length;
             renderDialogSubjects(isMain);
         });
-        
+
         allSubjects.forEach(subName => {
             const existing = tempSubjects.find(s => s.name === subName);
             const isChecked = existing !== undefined;
             const totalMarks = existing ? existing.total : '';
-            
+
             const div = document.createElement('div');
             div.className = 'subject-select-item';
             div.innerHTML = `
@@ -963,106 +650,63 @@
                 <span class="validation-error">Please enter total marks</span>
             `;
             container.appendChild(div);
-            
+
             const checkbox = div.querySelector('.subject-checkbox');
             const totalInput = div.querySelector('.subject-total-input');
             const errorMsg = div.querySelector('.validation-error');
-            
+
             checkbox.addEventListener('change', function() {
                 const subject = this.dataset.subject;
                 const checked = this.checked;
                 totalInput.disabled = !checked;
-                if (!checked) {
-                    totalInput.value = '';
-                    errorMsg.style.display = 'none';
-                } else {
-                    totalInput.focus();
-                }
-                
+                if (!checked) { totalInput.value = ''; errorMsg.style.display = 'none'; }
+                else { totalInput.focus(); }
+
                 const arr = isMain ? tempMainSubjects : tempOptionalSubjects;
                 const idx = arr.findIndex(s => s.name === subject);
                 if (checked) {
-                    if (idx === -1) {
-                        arr.push({ name: subject, total: parseInt(totalInput.value) || '' });
-                    }
+                    if (idx === -1) arr.push({ name: subject, total: parseInt(totalInput.value) || '' });
                 } else {
-                    if (idx !== -1) {
-                        arr.splice(idx, 1);
-                    }
+                    if (idx !== -1) arr.splice(idx, 1);
                 }
                 document.getElementById('mainTabCount').textContent = tempMainSubjects.length;
                 document.getElementById('optionalTabCount').textContent = tempOptionalSubjects.length;
             });
-            
+
             totalInput.addEventListener('input', function() {
                 const subject = this.dataset.subject;
                 const value = this.value.trim();
                 const arr = isMain ? tempMainSubjects : tempOptionalSubjects;
                 const idx = arr.findIndex(s => s.name === subject);
-                
                 if (idx !== -1) {
-                    if (value === '') {
-                        arr[idx].total = '';
-                        errorMsg.style.display = 'block';
-                    } else {
+                    if (value === '') { arr[idx].total = ''; errorMsg.style.display = 'block'; }
+                    else {
                         const numValue = parseInt(value);
-                        if (isNaN(numValue) || numValue < 1) {
-                            errorMsg.style.display = 'block';
-                            arr[idx].total = '';
-                        } else {
-                            errorMsg.style.display = 'none';
-                            arr[idx].total = numValue;
-                        }
+                        if (isNaN(numValue) || numValue < 1) { errorMsg.style.display = 'block'; arr[idx].total = ''; }
+                        else { errorMsg.style.display = 'none'; arr[idx].total = numValue; }
                     }
                 }
             });
-            
-            if (isChecked && totalMarks === '') {
-                errorMsg.style.display = 'block';
-            }
+
+            if (isChecked && totalMarks === '') errorMsg.style.display = 'block';
         });
     }
 
     function validateDialogSelection() {
-        let valid = true;
-        const errors = [];
-        
-        tempMainSubjects.forEach(sub => {
-            if (!sub.total || sub.total === '') {
-                valid = false;
-                errors.push(sub.name);
-            }
-        });
-        tempOptionalSubjects.forEach(sub => {
-            if (!sub.total || sub.total === '') {
-                valid = false;
-                errors.push(sub.name);
-            }
-        });
-        
-        if (!valid) {
-            alert(`Please enter total marks for: ${errors.join(', ')}`);
-            return false;
-        }
+        let valid = true, errors = [];
+        tempMainSubjects.forEach(sub => { if (!sub.total || sub.total === '') { valid = false; errors.push(sub.name); } });
+        tempOptionalSubjects.forEach(sub => { if (!sub.total || sub.total === '') { valid = false; errors.push(sub.name); } });
+        if (!valid) { alert(`Please enter total marks for: ${errors.join(', ')}`); return false; }
         return true;
     }
 
-    function closeDialog() {
-        subjectDialog.style.display = 'none';
-        tempMainSubjects = [];
-        tempOptionalSubjects = [];
-    }
+    function closeDialog() { subjectDialog.style.display = 'none'; tempMainSubjects = []; tempOptionalSubjects = []; }
 
     function saveDialogSelection() {
         const invalid = [...tempMainSubjects, ...tempOptionalSubjects].filter(s => !s.total || s.total === '');
-        if (invalid.length > 0) {
-            alert(`Please enter total marks for: ${invalid.map(s => s.name).join(', ')}`);
-            return;
-        }
-        
+        if (invalid.length > 0) { alert(`Please enter total marks for: ${invalid.map(s => s.name).join(', ')}`); return; }
         selectedMainSubjects = tempMainSubjects.map(s => ({ ...s }));
         selectedOptionalSubjects = tempOptionalSubjects.map(s => ({ ...s }));
-        
         updateSubjectCounts();
         checkAndShowGenerateButton();
         closeDialog();
@@ -1087,7 +731,6 @@
         }
     }
 
-    // Show Subjects Buttons
     document.getElementById('showSubjectsBtnStep1').addEventListener('click', function() {
         if (selectedMainSubjects.length === 0 && selectedOptionalSubjects.length === 0) {
             alert('No subjects selected yet. Please add subjects first.');
@@ -1095,7 +738,6 @@
         }
         openSubjectDialog();
     });
-
     document.getElementById('showSubjectsBtnStep2').addEventListener('click', function() {
         if (selectedMainSubjects.length === 0 && selectedOptionalSubjects.length === 0) {
             alert('No subjects selected yet. Please add subjects first.');
@@ -1104,15 +746,12 @@
         openSubjectDialog();
     });
 
-    // Dialog Event Listeners
     document.getElementById('addMainSubjectBtn').addEventListener('click', openSubjectDialog);
     document.getElementById('addOptionalSubjectBtn').addEventListener('click', openSubjectDialog);
     dialogCloseBtn.addEventListener('click', closeDialog);
     dialogCancelBtn.addEventListener('click', closeDialog);
     dialogSaveBtn.addEventListener('click', saveDialogSelection);
-    subjectDialog.addEventListener('click', function(e) {
-        if (e.target === this) closeDialog();
-    });
+    subjectDialog.addEventListener('click', function(e) { if (e.target === this) closeDialog(); });
 
     createResultMainCard.addEventListener('click', () => { resetCreateResultForm(); showFullScreen(createResultSection); });
     draftResultsMainCard.addEventListener('click', () => { loadDraftResults(); showFullScreen(draftResultsSection); });
@@ -1123,39 +762,26 @@
     backFromOldBtn.addEventListener('click', showActionCards);
 
     generateSubjectFieldsBtn.addEventListener('click', function() {
-        if (selectedMainSubjects.length === 0) {
-            alert('Please select at least one main subject.');
-            return;
-        }
-        
+        if (selectedMainSubjects.length === 0) { alert('Please select at least one main subject.'); return; }
         subjectFields.innerHTML = '';
-        
         let html = '<h5 class="mb-3 mt-3">Main Subjects</h5>';
         selectedMainSubjects.forEach(sub => {
             const box = document.createElement('div');
             box.className = 'subject-box';
             box.innerHTML = `
                 <div class="row">
-                    <div class="col-md-6">
-                        <label><strong>${sub.name}</strong></label>
-                        <input type="text" class="form-control subject-name" value="${sub.name}" readonly style="background:#f1f5f9;">
-                    </div>
-                    <div class="col-md-6">
-                        <label>Total Marks</label>
-                        <input type="number" class="form-control subject-total" value="${sub.total}" readonly style="background:#f1f5f9;">
-                    </div>
+                    <div class="col-md-6"><label><strong>${sub.name}</strong></label><input type="text" class="form-control subject-name" value="${sub.name}" readonly style="background:#f1f5f9;"></div>
+                    <div class="col-md-6"><label>Total Marks</label><input type="number" class="form-control subject-total" value="${sub.total}" readonly style="background:#f1f5f9;"></div>
                 </div>
             `;
             subjectFields.appendChild(box);
         });
-        
         if (selectedOptionalSubjects.length > 0) {
             const optDiv = document.createElement('div');
             optDiv.className = 'alert alert-warning mt-3';
             optDiv.innerHTML = `<strong><i class="fas fa-info-circle"></i> Optional Subjects:</strong> ${selectedOptionalSubjects.map(s => s.name).join(', ')} (Marks will NOT be added to total)`;
             subjectFields.appendChild(optDiv);
         }
-        
         step1NextBtn.classList.remove('d-none');
     });
 
@@ -1166,10 +792,9 @@
         studentEntryStep.style.display = 'block';
     });
 
-    // generateMarksFields() - Main Subjects with Toggle
+    // --- Main Subject fields ---
     function generateMarksFields() {
         marksFields.innerHTML = '<h5 class="mb-3">Enter Marks for Main Subjects</h5>';
-        
         selectedMainSubjects.forEach((sub, index) => {
             const div = document.createElement('div');
             div.className = 'mb-2 subject-mark-row';
@@ -1186,20 +811,18 @@
                 </div>
             `;
             marksFields.appendChild(div);
-            
+
             const toggle = div.querySelector('.subject-toggle');
             const markInput = div.querySelector('.subject-mark');
             const toggleLabel = div.querySelector('.form-check-label');
             const row = div;
-            
+
             toggle.addEventListener('change', function() {
                 const isChecked = this.checked;
                 const subject = this.dataset.subject;
-                
                 markInput.disabled = !isChecked;
                 toggleLabel.textContent = isChecked ? 'Active ✅' : 'Inactive ❌';
                 toggleLabel.style.color = isChecked ? '#16a34a' : '#dc2626';
-                
                 if (!isChecked) {
                     markInput.value = '';
                     markInput.style.background = '#f1f5f9';
@@ -1209,8 +832,7 @@
                     row.classList.remove('inactive');
                     markInput.focus();
                 }
-                
-                // Update student's active subjects list
+                // Update activeSubjects for current edit
                 if (editingStudentIndex !== null) {
                     const currentStudent = students[editingStudentIndex];
                     if (currentStudent) {
@@ -1224,11 +846,10 @@
                         }
                     }
                 }
-                
                 updateStudentsTable();
                 hasChanges = true;
             });
-            
+
             toggleLabel.textContent = 'Active ✅';
             toggleLabel.style.color = '#16a34a';
             markInput.style.background = 'white';
@@ -1236,19 +857,14 @@
         });
     }
 
-    // renderOptionalMarksFields() - Optional Subjects with Toggle
+    // --- Optional Subject fields ---
     function renderOptionalMarksFields() {
         const container = document.getElementById('optionalMarksFields');
         const list = document.getElementById('optionalMarksList');
-        
-        if (selectedOptionalSubjects.length === 0) {
-            container.style.display = 'none';
-            return;
-        }
-        
+        if (selectedOptionalSubjects.length === 0) { container.style.display = 'none'; return; }
         container.style.display = 'block';
         list.innerHTML = '';
-        
+
         selectedOptionalSubjects.forEach((opt, idx) => {
             const div = document.createElement('div');
             div.className = 'mb-2 optional-mark-row';
@@ -1265,20 +881,18 @@
                 </div>
             `;
             list.appendChild(div);
-            
+
             const toggle = div.querySelector('.optional-toggle');
             const markInput = div.querySelector('.optional-mark');
             const toggleLabel = div.querySelector('.form-check-label');
             const row = div;
-            
+
             toggle.addEventListener('change', function() {
                 const isChecked = this.checked;
                 const subject = this.dataset.subject;
-                
                 markInput.disabled = !isChecked;
                 toggleLabel.textContent = isChecked ? 'Active ✅' : 'Inactive ❌';
                 toggleLabel.style.color = isChecked ? '#16a34a' : '#dc2626';
-                
                 if (!isChecked) {
                     markInput.value = '';
                     markInput.style.background = '#f1f5f9';
@@ -1288,8 +902,6 @@
                     row.classList.remove('inactive');
                     markInput.focus();
                 }
-                
-                // Update student's active subjects list
                 if (editingStudentIndex !== null) {
                     const currentStudent = students[editingStudentIndex];
                     if (currentStudent) {
@@ -1303,11 +915,10 @@
                         }
                     }
                 }
-                
                 updateStudentsTable();
                 hasChanges = true;
             });
-            
+
             toggleLabel.textContent = 'Active ✅';
             toggleLabel.style.color = '#16a34a';
             markInput.style.background = 'white';
@@ -1327,39 +938,24 @@
                     name: studentData.studentName || '',
                     fatherName: studentData.fatherName || '',
                     photoUrl: studentData.photoUrl || null,
-                    admissionNo: studentData.admissionNo || '',
-                    dob: studentData.dob || '',
-                    gender: studentData.gender || '',
-                    classApplying: studentData.classApplying || ''
                 };
             }
             return null;
-        } catch (error) {
-            console.error("Error fetching admission data:", error);
-            return null;
-        }
+        } catch (error) { console.error(error); return null; }
     }
 
     rollNoInput.addEventListener('blur', async () => {
         const rollVal = rollNoInput.value.trim();
         if (!rollVal) {
-            if (editingStudentIndex === null) {
-                studentNameInput.value = '';
-                fatherNameInput.value = '';
-                studentPhotoPreview.style.display = 'none';
-                photoFetchStatus.innerHTML = '';
-            }
+            if (editingStudentIndex === null) { studentNameInput.value = ''; fatherNameInput.value = ''; studentPhotoPreview.style.display = 'none'; photoFetchStatus.innerHTML = ''; }
             return;
         }
-        
         photoFetchStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching student data...';
         const studentInfo = await fetchStudentFromAdmission(rollVal);
-        
         if (studentInfo) {
             studentNameInput.value = studentInfo.name;
             fatherNameInput.value = studentInfo.fatherName;
             currentStudentPhotoUrl = studentInfo.photoUrl;
-            
             if (studentInfo.photoUrl) {
                 studentPhotoPreview.src = studentInfo.photoUrl;
                 studentPhotoPreview.style.display = 'block';
@@ -1369,28 +965,22 @@
                 photoFetchStatus.innerHTML = '<span class="photo-fetch-missing"><i class="fas fa-image"></i> No photo uploaded.</span>';
             }
         } else {
-            if (editingStudentIndex === null) {
-                studentNameInput.value = '';
-                fatherNameInput.value = '';
-                studentPhotoPreview.style.display = 'none';
-            }
+            if (editingStudentIndex === null) { studentNameInput.value = ''; fatherNameInput.value = ''; studentPhotoPreview.style.display = 'none'; }
             currentStudentPhotoUrl = '';
             photoFetchStatus.innerHTML = '<span class="photo-fetch-missing"><i class="fas fa-exclamation-triangle"></i> Roll number not found.</span>';
         }
     });
 
-    // updateStudentsTable() - Compact view with only active subjects
+    // --- Compact Students Table ---
     function updateStudentsTable() {
         studentsTableBody.innerHTML = '';
         students.forEach((s, idx) => {
             if (!s.activeSubjects) s.activeSubjects = [];
-            
-            // Build subject chips and marks summary
             let chipsHtml = '';
             let marksSummary = '';
             let totalMarks = 0;
             let totalMax = 0;
-            
+
             // Main subjects - only active ones
             selectedMainSubjects.forEach(sub => {
                 if (s.activeSubjects.includes(sub.name)) {
@@ -1401,21 +991,20 @@
                     marksSummary += `<span>${sub.name}:${mark}</span>`;
                 }
             });
-            
+
             // Optional subjects - only active ones
             selectedOptionalSubjects.forEach(opt => {
                 if (s.activeSubjects.includes(opt.name)) {
                     chipsHtml += `<span class="chip chip-optional">${opt.name}*</span>`;
                     const optMark = s.optionalMarks && s.optionalMarks[opt.name] !== undefined ? s.optionalMarks[opt.name] : '-';
                     if (optMark !== '-' && optMark !== null) {
-                        // Optional marks not added to total
                         marksSummary += `<span style="color:#c5a059;">${opt.name}:${optMark}</span>`;
                     } else {
                         marksSummary += `<span style="color:#c5a059;">${opt.name}:-</span>`;
                     }
                 }
             });
-            
+
             const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" class="student-photo-thumb" style="width:35px;height:35px;border-radius:50%;object-fit:cover;border:2px solid #1a237e;">` : '<span class="text-muted">📷</span>';
             const percent = totalMax > 0 ? ((totalMarks/totalMax)*100).toFixed(1) : '0';
             const row = `<tr>
@@ -1438,102 +1027,89 @@
         document.querySelectorAll('.delete-student').forEach(btn => btn.addEventListener('click', e => deleteStudent(parseInt(e.target.dataset.index))));
     }
 
-    // Add Student
+    // --- getActiveSubjects: returns names of active subjects (main + optional) ---
+    function getActiveSubjects() {
+        const active = [];
+        document.querySelectorAll('.subject-mark-row').forEach(row => {
+            const toggle = row.querySelector('.subject-toggle');
+            const subject = row.dataset.subject;
+            if (toggle && toggle.checked) active.push(subject);
+        });
+        document.querySelectorAll('.optional-mark-row').forEach(row => {
+            const toggle = row.querySelector('.optional-toggle');
+            const subject = row.dataset.subject;
+            if (toggle && toggle.checked) active.push(subject);
+        });
+        return active;
+    }
+
+    // --- Add Student ---
     addStudentBtn.addEventListener('click', () => {
         const roll = parseInt(rollNoInput.value);
         const name = studentNameInput.value.trim();
         if (!name) { alert('Enter student name'); return; }
         const marks = {};
         let valid = true;
-        
+
         document.querySelectorAll('.subject-mark').forEach(inp => {
             const sub = inp.dataset.subject;
             const row = inp.closest('.subject-mark-row');
             const toggle = row ? row.querySelector('.subject-toggle') : null;
             const isActive = toggle ? toggle.checked : true;
-            
-            if (!isActive) {
-                // Subject is inactive - do NOT store it at all
-                return;
-            }
-            
+            if (!isActive) return; // do NOT store inactive
             const mark = parseInt(inp.value);
-            if (isNaN(mark) || mark < 0) {
-                valid = false;
-                alert(`Please enter valid marks for ${sub}`);
-                return;
-            }
+            if (isNaN(mark) || mark < 0) { valid = false; alert(`Please enter valid marks for ${sub}`); return; }
             const subObj = selectedMainSubjects.find(s => s.name === sub);
-            if (mark > subObj.total) {
-                alert(`${sub} marks cannot exceed ${subObj.total}`);
-                valid = false;
-                return;
-            }
+            if (mark > subObj.total) { alert(`${sub} marks cannot exceed ${subObj.total}`); valid = false; return; }
             marks[sub] = mark;
         });
         if (!valid) return;
-        
+
         const optionalMarks = {};
         document.querySelectorAll('.optional-mark').forEach(inp => {
             const sub = inp.dataset.subject;
             const row = inp.closest('.optional-mark-row');
             const toggle = row ? row.querySelector('.optional-toggle') : null;
             const isActive = toggle ? toggle.checked : true;
-            
-            if (!isActive) {
-                // Optional subject is inactive - do NOT store it at all
-                return;
-            }
-            
+            if (!isActive) return;
             const mark = parseInt(inp.value);
             if (!isNaN(mark) && mark >= 0) {
                 const optObj = selectedOptionalSubjects.find(s => s.name === sub);
-                if (mark > optObj.total) {
-                    alert(`${sub} marks cannot exceed ${optObj.total}`);
-                    valid = false;
-                    return;
-                }
+                if (mark > optObj.total) { alert(`${sub} marks cannot exceed ${optObj.total}`); valid = false; return; }
                 optionalMarks[sub] = mark;
             } else {
                 optionalMarks[sub] = null;
             }
         });
         if (!valid) return;
-        
+
         const activeSubjects = getActiveSubjects();
-        
-        // Build student object - only store active subjects
-        const studentObj = { 
-            rollNo: roll, 
-            name, 
-            fatherName: fatherNameInput.value.trim(), 
+
+        const studentObj = {
+            rollNo: roll,
+            name,
+            fatherName: fatherNameInput.value.trim(),
             photoUrl: currentStudentPhotoUrl || null,
-            activeSubjects: activeSubjects
+            activeSubjects: activeSubjects,
+            marks: {},
+            optionalMarks: {}
         };
-        
-        // Only add marks for active main subjects
+
+        // Only store marks for active subjects
         activeSubjects.forEach(sub => {
             if (selectedMainSubjects.some(s => s.name === sub)) {
-                const mark = document.querySelector(`.subject-mark[data-subject="${sub}"]`);
-                if (mark) {
-                    studentObj.marks = studentObj.marks || {};
-                    studentObj.marks[sub] = parseInt(mark.value) || 0;
-                }
+                const inp = document.querySelector(`.subject-mark[data-subject="${sub}"]`);
+                if (inp) studentObj.marks[sub] = parseInt(inp.value) || 0;
             }
             if (selectedOptionalSubjects.some(s => s.name === sub)) {
-                const optMark = document.querySelector(`.optional-mark[data-subject="${sub}"]`);
-                if (optMark) {
-                    studentObj.optionalMarks = studentObj.optionalMarks || {};
-                    const val = parseInt(optMark.value);
+                const inp = document.querySelector(`.optional-mark[data-subject="${sub}"]`);
+                if (inp) {
+                    const val = parseInt(inp.value);
                     studentObj.optionalMarks[sub] = isNaN(val) ? null : val;
                 }
             }
         });
-        
-        // Ensure marks object exists even if no active subjects
-        if (!studentObj.marks) studentObj.marks = {};
-        if (!studentObj.optionalMarks) studentObj.optionalMarks = {};
-        
+
         students.push(studentObj);
         updateStudentsTable();
         studentNameInput.value = ''; fatherNameInput.value = '';
@@ -1547,27 +1123,7 @@
         showToast('Student added');
     });
 
-    // getActiveSubjects() - Returns array of active subject names
-    function getActiveSubjects() {
-        const active = [];
-        document.querySelectorAll('.subject-mark-row').forEach(row => {
-            const toggle = row.querySelector('.subject-toggle');
-            const subject = row.dataset.subject;
-            if (toggle && toggle.checked) {
-                active.push(subject);
-            }
-        });
-        document.querySelectorAll('.optional-mark-row').forEach(row => {
-            const toggle = row.querySelector('.optional-toggle');
-            const subject = row.dataset.subject;
-            if (toggle && toggle.checked) {
-                active.push(subject);
-            }
-        });
-        return active;
-    }
-
-    // editStudent() - Only shows active subjects
+    // --- Edit Student ---
     function editStudent(idx) {
         const s = students[idx];
         editingStudentIndex = idx;
@@ -1575,78 +1131,61 @@
         studentNameInput.value = s.name;
         fatherNameInput.value = s.fatherName || '';
         currentStudentPhotoUrl = s.photoUrl;
-        if (s.photoUrl) {
-            studentPhotoPreview.src = s.photoUrl;
-            studentPhotoPreview.style.display = 'block';
-        } else {
-            studentPhotoPreview.style.display = 'none';
-        }
-        
-        // Clear all fields first
+        if (s.photoUrl) { studentPhotoPreview.src = s.photoUrl; studentPhotoPreview.style.display = 'block'; }
+        else { studentPhotoPreview.style.display = 'none'; }
+
+        // Clear fields
         document.querySelectorAll('.subject-mark').forEach(inp => inp.value = '');
         document.querySelectorAll('.optional-mark').forEach(inp => inp.value = '');
-        
-        // Set active subjects for main subjects
+
+        // Set main subject toggles and marks
         document.querySelectorAll('.subject-mark-row').forEach(row => {
             const subject = row.dataset.subject;
             const toggle = row.querySelector('.subject-toggle');
             const markInput = row.querySelector('.subject-mark');
             const toggleLabel = row.querySelector('.form-check-label');
-            
+
             const isActive = s.activeSubjects ? s.activeSubjects.includes(subject) : false;
             toggle.checked = isActive;
             markInput.disabled = !isActive;
             toggleLabel.textContent = isActive ? 'Active ✅' : 'Inactive ❌';
             toggleLabel.style.color = isActive ? '#16a34a' : '#dc2626';
-            
             if (isActive && s.marks && s.marks[subject] !== undefined) {
                 markInput.value = s.marks[subject];
             } else {
                 markInput.value = '';
             }
-            
-            if (!isActive) {
-                markInput.style.background = '#f1f5f9';
-                row.classList.add('inactive');
-            } else {
-                markInput.style.background = 'white';
-                row.classList.remove('inactive');
-            }
+            if (!isActive) { markInput.style.background = '#f1f5f9'; row.classList.add('inactive'); }
+            else { markInput.style.background = 'white'; row.classList.remove('inactive'); }
         });
-        
-        // Set active subjects for optional subjects
+
+        // Set optional subject toggles and marks
         document.querySelectorAll('.optional-mark-row').forEach(row => {
             const subject = row.dataset.subject;
             const toggle = row.querySelector('.optional-toggle');
             const markInput = row.querySelector('.optional-mark');
             const toggleLabel = row.querySelector('.form-check-label');
-            
+
             const isActive = s.activeSubjects ? s.activeSubjects.includes(subject) : false;
             toggle.checked = isActive;
             markInput.disabled = !isActive;
             toggleLabel.textContent = isActive ? 'Active ✅' : 'Inactive ❌';
             toggleLabel.style.color = isActive ? '#16a34a' : '#dc2626';
-            
             if (isActive && s.optionalMarks && s.optionalMarks[subject] !== undefined && s.optionalMarks[subject] !== null) {
                 markInput.value = s.optionalMarks[subject];
             } else {
                 markInput.value = '';
             }
-            
-            if (!isActive) {
-                markInput.style.background = '#f1f5f9';
-                row.classList.add('inactive');
-            } else {
-                markInput.style.background = 'white';
-                row.classList.remove('inactive');
-            }
+            if (!isActive) { markInput.style.background = '#f1f5f9'; row.classList.add('inactive'); }
+            else { markInput.style.background = 'white'; row.classList.remove('inactive'); }
         });
-        
-        addStudentBtn.classList.add('d-none'); 
-        updateStudentBtn.classList.remove('d-none'); 
+
+        addStudentBtn.classList.add('d-none');
+        updateStudentBtn.classList.remove('d-none');
         cancelEditBtn.classList.remove('d-none');
     }
 
+    // --- Update Student ---
     updateStudentBtn.addEventListener('click', () => {
         if (editingStudentIndex === null) return;
         const roll = parseInt(rollNoInput.value);
@@ -1654,91 +1193,65 @@
         if (!name) { alert('Enter name'); return; }
         const marks = {};
         let valid = true;
-        
+
         document.querySelectorAll('.subject-mark').forEach(inp => {
             const sub = inp.dataset.subject;
             const row = inp.closest('.subject-mark-row');
             const toggle = row ? row.querySelector('.subject-toggle') : null;
             const isActive = toggle ? toggle.checked : true;
-            
-            if (!isActive) {
-                // Do NOT store inactive subject
-                return;
-            }
-            
+            if (!isActive) return;
             const mark = parseInt(inp.value);
-            if (isNaN(mark) || mark < 0) {
-                valid = false;
-                alert(`Please enter valid marks for ${sub}`);
-                return;
-            }
+            if (isNaN(mark) || mark < 0) { valid = false; alert(`Please enter valid marks for ${sub}`); return; }
             const subObj = selectedMainSubjects.find(s => s.name === sub);
-            if (mark > subObj.total) {
-                alert(`${sub} marks cannot exceed ${subObj.total}`);
-                valid = false;
-                return;
-            }
+            if (mark > subObj.total) { alert(`${sub} marks cannot exceed ${subObj.total}`); valid = false; return; }
             marks[sub] = mark;
         });
         if (!valid) return;
-        
+
         const optionalMarks = {};
         document.querySelectorAll('.optional-mark').forEach(inp => {
             const sub = inp.dataset.subject;
             const row = inp.closest('.optional-mark-row');
             const toggle = row ? row.querySelector('.optional-toggle') : null;
             const isActive = toggle ? toggle.checked : true;
-            
-            if (!isActive) {
-                // Do NOT store inactive optional subject
-                return;
-            }
-            
+            if (!isActive) return;
             const mark = parseInt(inp.value);
             if (!isNaN(mark) && mark >= 0) {
                 const optObj = selectedOptionalSubjects.find(s => s.name === sub);
-                if (mark > optObj.total) {
-                    alert(`${sub} marks cannot exceed ${optObj.total}`);
-                    valid = false;
-                    return;
-                }
+                if (mark > optObj.total) { alert(`${sub} marks cannot exceed ${optObj.total}`); valid = false; return; }
                 optionalMarks[sub] = mark;
             } else {
                 optionalMarks[sub] = null;
             }
         });
         if (!valid) return;
-        
+
         const activeSubjects = getActiveSubjects();
-        
-        // Build updated student object with only active subjects
-        const updatedStudent = { 
-            rollNo: roll, 
-            name, 
-            fatherName: fatherNameInput.value.trim(), 
+
+        const updatedStudent = {
+            rollNo: roll,
+            name,
+            fatherName: fatherNameInput.value.trim(),
             photoUrl: currentStudentPhotoUrl,
             activeSubjects: activeSubjects,
             marks: {},
             optionalMarks: {}
         };
-        
-        // Only add marks for active main subjects
+
         activeSubjects.forEach(sub => {
             if (selectedMainSubjects.some(s => s.name === sub)) {
-                const mark = document.querySelector(`.subject-mark[data-subject="${sub}"]`);
-                if (mark) {
-                    updatedStudent.marks[sub] = parseInt(mark.value) || 0;
-                }
+                const inp = document.querySelector(`.subject-mark[data-subject="${sub}"]`);
+                if (inp) updatedStudent.marks[sub] = parseInt(inp.value) || 0;
             }
             if (selectedOptionalSubjects.some(s => s.name === sub)) {
-                const optMark = document.querySelector(`.optional-mark[data-subject="${sub}"]`);
-                if (optMark) {
-                    const val = parseInt(optMark.value);
+                const inp = document.querySelector(`.optional-mark[data-subject="${sub}"]`);
+                if (inp) {
+                    const val = parseInt(inp.value);
                     updatedStudent.optionalMarks[sub] = isNaN(val) ? null : val;
                 }
             }
         });
-        
+
         students[editingStudentIndex] = updatedStudent;
         updateStudentsTable();
         cancelEdit();
@@ -1755,29 +1268,30 @@
         currentStudentPhotoUrl = '';
         document.querySelectorAll('.subject-mark').forEach(inp => inp.value = '');
         document.querySelectorAll('.optional-mark').forEach(inp => inp.value = '');
-        addStudentBtn.classList.remove('d-none'); updateStudentBtn.classList.add('d-none'); cancelEditBtn.classList.add('d-none');
+        addStudentBtn.classList.remove('d-none');
+        updateStudentBtn.classList.add('d-none');
+        cancelEditBtn.classList.add('d-none');
     }
 
     function deleteStudent(idx) {
         if (confirm('Delete student?')) { students.splice(idx, 1); updateStudentsTable(); hasChanges = true; showToast('Deleted'); }
     }
 
+    // --- Save Draft ---
     saveDraftBtn.addEventListener('click', async () => {
         if (!examNameInput.value.trim() || students.length === 0) { alert('Exam name and at least one student required'); return; }
         if (selectedMainSubjects.length === 0) { alert('Please select at least one main subject'); return; }
         try {
-            // Clean students data - remove any inactive subjects
             const cleanedStudents = students.map(s => {
-                const cleaned = { 
-                    rollNo: s.rollNo, 
-                    name: s.name, 
+                const cleaned = {
+                    rollNo: s.rollNo,
+                    name: s.name,
                     fatherName: s.fatherName || '',
                     photoUrl: s.photoUrl || null,
                     activeSubjects: s.activeSubjects || [],
                     marks: {},
                     optionalMarks: {}
                 };
-                // Only keep marks for active subjects
                 (s.activeSubjects || []).forEach(sub => {
                     if (selectedMainSubjects.some(m => m.name === sub) && s.marks && s.marks[sub] !== undefined) {
                         cleaned.marks[sub] = s.marks[sub];
@@ -1788,16 +1302,15 @@
                 });
                 return cleaned;
             });
-            
-            const data = { 
-                examName: examNameInput.value, 
+            const data = {
+                examName: examNameInput.value,
                 examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
                 rollCode: rollCodeInput.value || '55075',
                 template: selectedTemplate,
                 subjects: selectedMainSubjects,
                 optionalSubjects: selectedOptionalSubjects,
-                students: cleanedStudents, 
-                createdAt: serverTimestamp() 
+                students: cleanedStudents,
+                createdAt: serverTimestamp()
             };
             if (editingDraftId) await updateDoc(doc(db, "draft_results", editingDraftId), data);
             else await addDoc(collection(db, "draft_results"), data);
@@ -1807,26 +1320,22 @@
         } catch(e) { alert(e.message); }
     });
 
+    // --- Publish Result ---
     publishResultBtn.addEventListener('click', async () => {
         if (!examNameInput.value.trim() || students.length === 0) { alert('Exam name and at least one student required'); return; }
         if (selectedMainSubjects.length === 0) { alert('Please select at least one main subject'); return; }
-        if (isEditingPublishedResult) { 
-            editPublishedConfirmModal.show();
-            return;
-        }
+        if (isEditingPublishedResult) { editPublishedConfirmModal.show(); return; }
         try {
-            // Clean students data - remove any inactive subjects
             const cleanedStudents = students.map(s => {
-                const cleaned = { 
-                    rollNo: s.rollNo, 
-                    name: s.name, 
+                const cleaned = {
+                    rollNo: s.rollNo,
+                    name: s.name,
                     fatherName: s.fatherName || '',
                     photoUrl: s.photoUrl || null,
                     activeSubjects: s.activeSubjects || [],
                     marks: {},
                     optionalMarks: {}
                 };
-                // Only keep marks for active subjects
                 (s.activeSubjects || []).forEach(sub => {
                     if (selectedMainSubjects.some(m => m.name === sub) && s.marks && s.marks[sub] !== undefined) {
                         cleaned.marks[sub] = s.marks[sub];
@@ -1837,16 +1346,15 @@
                 });
                 return cleaned;
             });
-            
-            const data = { 
+            const data = {
                 examName: examNameInput.value,
                 examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
                 rollCode: rollCodeInput.value || '55075',
                 template: selectedTemplate,
                 subjects: selectedMainSubjects,
                 optionalSubjects: selectedOptionalSubjects,
-                students: cleanedStudents, 
-                createdAt: serverTimestamp() 
+                students: cleanedStudents,
+                createdAt: serverTimestamp()
             };
             await addDoc(collection(db, "results"), data);
             if (editingDraftId) await deleteDoc(doc(db, "draft_results", editingDraftId));
@@ -1859,11 +1367,10 @@
     saveChangesConfirmBtn.addEventListener('click', async () => {
         if (!editingPublishedResultId) { editPublishedConfirmModal.hide(); return; }
         try {
-            // Clean students data - remove any inactive subjects
             const cleanedStudents = students.map(s => {
-                const cleaned = { 
-                    rollNo: s.rollNo, 
-                    name: s.name, 
+                const cleaned = {
+                    rollNo: s.rollNo,
+                    name: s.name,
                     fatherName: s.fatherName || '',
                     photoUrl: s.photoUrl || null,
                     activeSubjects: s.activeSubjects || [],
@@ -1880,8 +1387,7 @@
                 });
                 return cleaned;
             });
-            
-            const data = { 
+            const data = {
                 examName: examNameInput.value,
                 examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
                 rollCode: rollCodeInput.value || '55075',
@@ -1901,11 +1407,10 @@
 
     saveDraftConfirmBtn.addEventListener('click', async () => {
         try {
-            // Clean students data - remove any inactive subjects
             const cleanedStudents = students.map(s => {
-                const cleaned = { 
-                    rollNo: s.rollNo, 
-                    name: s.name, 
+                const cleaned = {
+                    rollNo: s.rollNo,
+                    name: s.name,
                     fatherName: s.fatherName || '',
                     photoUrl: s.photoUrl || null,
                     activeSubjects: s.activeSubjects || [],
@@ -1922,8 +1427,7 @@
                 });
                 return cleaned;
             });
-            
-            const data = { 
+            const data = {
                 examName: examNameInput.value,
                 examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
                 rollCode: rollCodeInput.value || '55075',
@@ -1931,7 +1435,7 @@
                 subjects: selectedMainSubjects,
                 optionalSubjects: selectedOptionalSubjects,
                 students: cleanedStudents,
-                createdAt: serverTimestamp() 
+                createdAt: serverTimestamp()
             };
             await addDoc(collection(db, "draft_results"), data);
             editPublishedConfirmModal.hide();
@@ -1949,9 +1453,7 @@
     });
 
     function resetCreateResultForm() {
-        examNameInput.value = ''; 
-        examCentreInput.value = '';
-        rollCodeInput.value = '55075';
+        examNameInput.value = ''; examCentreInput.value = ''; rollCodeInput.value = '55075';
         subjectFields.innerHTML = '';
         step1NextBtn.classList.add('d-none');
         examSetupStep.style.display = 'block';
@@ -1959,8 +1461,7 @@
         students = []; updateStudentsTable();
         editingDraftId = null; isEditingPublishedResult = false; editingPublishedResultId = null; hasChanges = false;
         cancelEdit();
-        selectedMainSubjects = [];
-        selectedOptionalSubjects = [];
+        selectedMainSubjects = []; selectedOptionalSubjects = [];
         updateSubjectCounts();
         generateSubjectFieldsBtn.style.display = 'none';
         document.querySelectorAll('#templateSelector .template-option').forEach(o => o.classList.remove('selected'));
@@ -1969,6 +1470,7 @@
         selectedTemplate = 'result';
     }
 
+    // --- Load Drafts ---
     async function loadDraftResults() {
         const q = query(collection(db, "draft_results"), orderBy("createdAt", "desc"));
         const snap = await getDocs(q);
@@ -1993,7 +1495,7 @@
         examNameInput.value = data.examName || '';
         examCentreInput.value = data.examCentre || '';
         rollCodeInput.value = data.rollCode || '55075';
-        
+
         const template = data.template || 'result';
         document.querySelectorAll('#templateSelector .template-option').forEach(o => o.classList.remove('selected'));
         if (template === 'result1') {
@@ -2005,21 +1507,16 @@
             document.getElementById('templateResult').querySelector('input[type="radio"]').checked = true;
             selectedTemplate = 'result';
         }
-        
-        if (data.subjects) {
-            selectedMainSubjects = data.subjects.map(s => ({ name: s.name, total: s.total }));
-        }
-        if (data.optionalSubjects) {
-            selectedOptionalSubjects = data.optionalSubjects.map(s => ({ name: s.name, total: s.total }));
-        }
+
+        if (data.subjects) selectedMainSubjects = data.subjects.map(s => ({ name: s.name, total: s.total }));
+        if (data.optionalSubjects) selectedOptionalSubjects = data.optionalSubjects.map(s => ({ name: s.name, total: s.total }));
         updateSubjectCounts();
-        
+
         generateSubjectFieldsBtn.click();
         setTimeout(() => {
             students = data.students || [];
             students.forEach(s => {
                 if (!s.activeSubjects) s.activeSubjects = [];
-                // Ensure marks and optionalMarks exist
                 s.marks = s.marks || {};
                 s.optionalMarks = s.optionalMarks || {};
             });
@@ -2032,6 +1529,7 @@
 
     async function deleteDraft(id) { if (confirm('Delete draft?')) { await deleteDoc(doc(db, "draft_results", id)); showToast('Draft deleted'); loadDraftResults(); } }
 
+    // --- Load Published ---
     async function loadOldResults() {
         const q = query(collection(db, "results"), orderBy("createdAt", "desc"));
         const snap = await getDocs(q);
@@ -2081,18 +1579,16 @@
             showToast('Template updated successfully!');
             editTemplateModal.hide();
             loadOldResults();
-        } catch(e) {
-            alert('Error updating template: ' + e.message);
-        }
+        } catch(e) { alert('Error: ' + e.message); }
     });
 
-    // viewResult() - Only shows active subjects for each student
+    // --- View Result ---
     async function viewResult(id) {
         const q = query(collection(db, "results"), where("__name__", "==", id));
         const snap = await getDocs(q);
         if (snap.empty) return;
         const data = snap.docs[0].data();
-        currentResultDataForPdf = data; 
+        currentResultDataForPdf = data;
         currentExamNameForPdf = data.examName;
         const sorted = sortStudentsByPercentage(data.students, data.subjects);
         resultModalTitle.innerText = data.examName + ' (Ranked)';
@@ -2103,31 +1599,25 @@
         html += `<p><strong>Template:</strong> ${data.template === 'result1' ? '🎫 Admit Card Style' : '📄 Classic'}</p>`;
         if (sorted.length) html += `<div class="alert alert-success">🏆 Top Student: ${sorted[0].name} (Roll: ${sorted[0].rollNo})</div>`;
         html += `<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Photo</th><th>Rank</th><th>Roll</th><th>Name</th><th>Father</th>`;
-        
-        // Only show active subjects in header
         data.subjects.forEach(s => html += `<th>${s.name}</th>`);
         if (data.optionalSubjects && data.optionalSubjects.length) {
             data.optionalSubjects.forEach(o => html += `<th>${o.name}<br><small>(Optional)</small></th>`);
         }
         html += `<th>Total</th><th>%</th></tr></thead><tbody>`;
-        
+
         sorted.forEach((s, idx) => {
             let total = 0, maxTotal = 0;
             const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷</span>';
             html += `<tr${idx===0?' class="top-student-row"':''}><td>${photoHtml}</td><td><strong>#${idx+1}</strong></td><td>${s.rollNo}</td><td>${s.name}${idx===0?' 🏆':''}</td><td>${s.fatherName||'-'}</td>`;
-            
-            // Only show active subjects for this student
             data.subjects.forEach(sub => {
                 if (s.activeSubjects && s.activeSubjects.includes(sub.name)) {
                     const mark = s.marks[sub.name] || 0;
-                    total += mark; 
-                    maxTotal += sub.total;
+                    total += mark; maxTotal += sub.total;
                     html += `<td>${mark}/${sub.total}</td>`;
                 } else {
                     html += `<td style="color:#ccc;">-</td>`;
                 }
             });
-            
             if (data.optionalSubjects && data.optionalSubjects.length) {
                 data.optionalSubjects.forEach(o => {
                     if (s.activeSubjects && s.activeSubjects.includes(o.name)) {
@@ -2149,20 +1639,15 @@
     function sortStudentsByPercentage(arr, subs) {
         return [...arr].sort((a,b) => {
             let ta=0, ma=0, tb=0, mb=0;
-            subs.forEach(s => { 
-                if (a.activeSubjects && a.activeSubjects.includes(s.name)) {
-                    ta += a.marks[s.name]||0; 
-                    ma += s.total; 
-                }
-                if (b.activeSubjects && b.activeSubjects.includes(s.name)) {
-                    tb += b.marks[s.name]||0; 
-                    mb += s.total; 
-                }
+            subs.forEach(s => {
+                if (a.activeSubjects && a.activeSubjects.includes(s.name)) { ta += a.marks[s.name]||0; ma += s.total; }
+                if (b.activeSubjects && b.activeSubjects.includes(s.name)) { tb += b.marks[s.name]||0; mb += s.total; }
             });
             return (tb/mb) - (ta/ma);
         });
     }
 
+    // --- Edit Published Result ---
     async function editResult(id) {
         const q = query(collection(db, "results"), where("__name__", "==", id));
         const snap = await getDocs(q);
@@ -2171,7 +1656,7 @@
         examNameInput.value = data.examName || '';
         examCentreInput.value = data.examCentre || '';
         rollCodeInput.value = data.rollCode || '55075';
-        
+
         const template = data.template || 'result';
         document.querySelectorAll('#templateSelector .template-option').forEach(o => o.classList.remove('selected'));
         if (template === 'result1') {
@@ -2183,15 +1668,11 @@
             document.getElementById('templateResult').querySelector('input[type="radio"]').checked = true;
             selectedTemplate = 'result';
         }
-        
-        if (data.subjects) {
-            selectedMainSubjects = data.subjects.map(s => ({ name: s.name, total: s.total }));
-        }
-        if (data.optionalSubjects) {
-            selectedOptionalSubjects = data.optionalSubjects.map(s => ({ name: s.name, total: s.total }));
-        }
+
+        if (data.subjects) selectedMainSubjects = data.subjects.map(s => ({ name: s.name, total: s.total }));
+        if (data.optionalSubjects) selectedOptionalSubjects = data.optionalSubjects.map(s => ({ name: s.name, total: s.total }));
         updateSubjectCounts();
-        
+
         generateSubjectFieldsBtn.click();
         setTimeout(() => {
             students = data.students || [];
@@ -2210,7 +1691,7 @@
 
     async function deleteResult(id) { if (confirm('Delete published result?')) { await deleteDoc(doc(db, "results", id)); showToast('Result deleted'); loadOldResults(); } }
 
-    // generatePDF() - Only shows active subjects
+    // --- PDF ---
     downloadPdfBtn.addEventListener('click', () => { if (currentResultDataForPdf) generatePDF(currentResultDataForPdf, currentExamNameForPdf); });
 
     function generatePDF(data, examName) {
@@ -2221,9 +1702,7 @@
         let columns = [{ header: 'Rank', dataKey: 'rank' }, { header: 'Roll No', dataKey: 'rollNo' }, { header: 'Name', dataKey: 'name' }, { header: 'Father', dataKey: 'father' }];
         data.subjects.forEach(s => columns.push({ header: `${s.name}\n(${s.total})`, dataKey: s.name }));
         if (data.optionalSubjects && data.optionalSubjects.length) {
-            data.optionalSubjects.forEach(o => {
-                columns.push({ header: `${o.name}\n(Optional)`, dataKey: `opt_${o.name}` });
-            });
+            data.optionalSubjects.forEach(o => { columns.push({ header: `${o.name}\n(Optional)`, dataKey: `opt_${o.name}` }); });
         }
         columns.push({ header: 'Total', dataKey: 'total' }, { header: '%', dataKey: 'percentage' });
         const rows = sorted.map((s, idx) => {
@@ -2256,6 +1735,7 @@
         doc.save(`${examName}_Results.pdf`);
         showToast('PDF Downloaded');
     }
+
 </script>
 </body>
 </html>
