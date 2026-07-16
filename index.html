@@ -1030,7 +1030,7 @@
         <div class="roll-input-section" id="roll-input-section">
           <h3 id="selected-exam-name">Enter your Roll Number</h3>
           <div class="input-group">
-            <input type="number" id="roll-input" placeholder="Enter Roll Number">
+            <input type="number" id="roll-input" placeholder="Enter Roll Number" onkeypress="if(event.key==='Enter') getResult()">
             <button class="result-btn" onclick="getResult()">📑 Get Result</button>
             <button class="result-btn" onclick="goBackToResults()" style="background:#666;">⬅ Back</button>
           </div>
@@ -1216,7 +1216,6 @@
       admitExamId = null;
 
       try {
-        // Get all admit cards from Firebase
         const snap = await db.collection('admit_cards')
           .orderBy('createdAt', 'desc')
           .get();
@@ -1229,13 +1228,11 @@
           return;
         }
 
-        // Get the latest admit card (or show list)
         const doc = snap.docs[0];
         const data = doc.data();
         admitExamId = doc.id;
         admitExamData = data;
 
-        // Show exam details
         document.getElementById('admitLoadingMsg').style.display = 'none';
         document.getElementById('admitExamDetails').style.display = 'block';
 
@@ -1295,7 +1292,6 @@
         return;
       }
 
-      // Check if student exists in this admit card
       if (String(admitExamData.rollNumber) !== String(rollInput)) {
         errorEl.textContent = '❌ Roll number not found in this exam!';
         errorEl.style.display = 'block';
@@ -1304,12 +1300,9 @@
 
       errorEl.style.display = 'none';
       closeAdmitDialog();
-
-      // Open view-card.html with the admit card ID
       window.open(`view-card.html?id=${admitExamId}`, '_blank');
     }
 
-    // Click outside to close
     document.getElementById('admitDialog').addEventListener('click', function(e) {
       if (e.target === this) closeAdmitDialog();
     });
@@ -1434,37 +1427,56 @@
       document.querySelectorAll('.result-item').forEach(item => item.classList.remove('active'));
     }
 
-    // ✅ FIXED: getResult() - Ab admin panel automatically nahi khulega
+    // ✅ FIXED: getResult() - Properly opens result.html or result1.html
     function getResult() {
       const rollInput = document.getElementById('roll-input').value.trim();
+      
       if (!rollInput) {
-        alert("Please enter your roll number");
+        Swal.fire({
+          icon: 'warning',
+          title: 'Roll Number Required',
+          text: 'Please enter your roll number',
+          confirmButtonColor: '#1a237e'
+        });
         return;
       }
+      
       if (!selectedExamData || !selectedExamData.students) {
-        alert("Exam data not loaded properly. Please go back and select again.");
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Exam data not loaded properly. Please go back and select again.',
+          confirmButtonColor: '#1a237e'
+        });
         return;
       }
       
       const student = selectedExamData.students.find(s => String(s.rollNo) == String(rollInput));
+      
       if (!student) {
-        alert("Roll number not found in this exam.");
+        Swal.fire({
+          icon: 'error',
+          title: 'Student Not Found',
+          text: 'Roll number not found in this exam.',
+          confirmButtonColor: '#1a237e'
+        });
         return;
       }
       
       const template = selectedExamData.template || 'result';
       
+      // ✅ Proper URL construction with encodeURIComponent
       let url;
       if (template === 'result1') {
-        url = `result1.html?examId=${selectedExamId}&rollNo=${rollInput}`;
+        url = `result1.html?examId=${encodeURIComponent(selectedExamId)}&rollNo=${encodeURIComponent(rollInput)}`;
       } else {
-        url = `result.html?examId=${selectedExamId}&rollNo=${rollInput}`;
+        url = `result.html?examId=${encodeURIComponent(selectedExamId)}&rollNo=${encodeURIComponent(rollInput)}`;
       }
       
-      console.log('Opening template:', template);
-      console.log('URL:', url);
+      console.log('📤 Opening template:', template);
+      console.log('🔗 URL:', url);
       
-      // ✅ NEW TAB mein open karega, admin panel nahi khulega
+      // ✅ Open in new tab
       window.open(url, '_blank');
     }
 
@@ -1532,7 +1544,6 @@
       }
     }
 
-    // ✅ FIXED: Keyboard shortcuts - ab admin panel automatically nahi khulega
     document.getElementById('adminEmail').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') document.getElementById('adminPassword').focus();
     });
@@ -1550,6 +1561,11 @@
     // ✅ Enter key support for admit dialog
     document.getElementById('admitRollInput').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') getAdmitCard();
+    });
+
+    // ✅ Enter key support for roll input in result section
+    document.getElementById('roll-input').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') getResult();
     });
 
     document.addEventListener('DOMContentLoaded', function() {
