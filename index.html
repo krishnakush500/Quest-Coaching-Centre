@@ -11,9 +11,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   
-  <!-- SweetAlert2 -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  
   <style>
     * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { 
@@ -115,85 +112,76 @@
       100% { transform: translateX(-100%); }
     }
 
-    /* Registration Search Section - Updated with two buttons */
+    /* Registration Search Section */
     .registration-search-section {
       background: linear-gradient(to right, #1a237e, #283593);
-      padding: 14px 20px;
+      padding: 16px 20px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
       border-bottom: 3px solid #ffc107;
     }
     .registration-search-section .search-label {
       color: white;
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 1rem;
       display: flex;
       align-items: center;
       gap: 8px;
     }
     .registration-search-section .search-label i {
       color: #ffc107;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
     }
     .registration-search-section input {
       padding: 10px 16px;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       border-radius: 30px;
       border: none;
       width: 100%;
-      max-width: 220px;
+      max-width: 250px;
       outline: 2px solid transparent;
       transition: outline 0.3s;
     }
     .registration-search-section input:focus {
       outline: 2px solid #ffc107;
     }
-    .registration-search-section .reg-btn {
-      padding: 10px 22px;
+    .registration-search-section .reg-search-btn {
+      padding: 10px 25px;
+      background: #ffc107;
+      color: #1a237e;
       border: none;
       border-radius: 30px;
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 0.95rem;
       cursor: pointer;
       transition: all 0.3s;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .registration-search-section .reg-btn:hover {
-      transform: scale(1.02);
-    }
-    .registration-search-section .reg-search-btn {
-      background: #ffc107;
-      color: #1a237e;
-    }
     .registration-search-section .reg-search-btn:hover {
       background: #ffca28;
+      transform: scale(1.02);
       box-shadow: 0 4px 15px rgba(255,193,7,0.4);
     }
-    .registration-search-section .reg-admit-btn {
-      background: #16a34a;
-      color: white;
-    }
-    .registration-search-section .reg-admit-btn:hover {
-      background: #15803d;
-      box-shadow: 0 4px 15px rgba(22,163,74,0.4);
+    .registration-search-section .reg-search-btn i {
+      font-size: 1rem;
     }
     .reg-search-error {
       color: #ff6b6b;
       background: rgba(255,255,255,0.9);
       padding: 4px 14px;
       border-radius: 20px;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       font-weight: 600;
       display: none;
     }
     .reg-search-loading {
       color: white;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       display: none;
     }
     .reg-search-loading i {
@@ -207,19 +195,13 @@
     @media (max-width: 600px) {
       .registration-search-section {
         flex-direction: column;
-        padding: 12px 14px;
+        padding: 14px 16px;
       }
       .registration-search-section input {
         max-width: 100%;
       }
       .registration-search-section .search-label {
-        font-size: 0.85rem;
-      }
-      .registration-search-section .reg-btn {
-        padding: 8px 16px;
-        font-size: 0.8rem;
-        width: 100%;
-        justify-content: center;
+        font-size: 0.9rem;
       }
     }
 
@@ -747,147 +729,6 @@
       display: none;
     }
     
-    /* ✅ Admit Card Dialog Styles */
-    .admit-dialog-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.7);
-      z-index: 10001;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-    .admit-dialog {
-      background: white;
-      border-radius: 24px;
-      max-width: 550px;
-      width: 100%;
-      max-height: 90vh;
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-      animation: slideUp 0.3s ease;
-    }
-    @keyframes slideUp {
-      0% { transform: translateY(30px); opacity: 0; }
-      100% { transform: translateY(0); opacity: 1; }
-    }
-    .admit-dialog-header {
-      background: linear-gradient(135deg, #1a237e, #283593);
-      color: white;
-      padding: 18px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .admit-dialog-header h3 {
-      margin: 0;
-      font-size: 1.2rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .admit-dialog-header h3 i {
-      color: #ffc107;
-    }
-    .admit-dialog-close {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-      opacity: 0.7;
-      transition: 0.2s;
-    }
-    .admit-dialog-close:hover { opacity: 1; }
-    
-    .admit-dialog-body {
-      padding: 20px 24px;
-      max-height: 60vh;
-      overflow-y: auto;
-    }
-    .admit-dialog-body .exam-detail {
-      background: #f8fafc;
-      border-radius: 12px;
-      padding: 12px 16px;
-      margin-bottom: 12px;
-      border-left: 3px solid #1a237e;
-    }
-    .admit-dialog-body .exam-detail .label {
-      font-size: 0.7rem;
-      color: #64748b;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-    .admit-dialog-body .exam-detail .value {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: #1a237e;
-    }
-    .admit-dialog-body .subject-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 6px;
-    }
-    .admit-dialog-body .subject-list .sub-tag {
-      background: #e8eafe;
-      color: #1a237e;
-      padding: 2px 10px;
-      border-radius: 12px;
-      font-size: 0.7rem;
-      font-weight: 600;
-    }
-    
-    .admit-dialog-footer {
-      padding: 16px 24px;
-      border-top: 1px solid #e9ecef;
-      background: #f8f9fc;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .admit-dialog-footer .input-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .admit-dialog-footer .input-row input {
-      flex: 1;
-      padding: 10px 14px;
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      min-width: 120px;
-    }
-    .admit-dialog-footer .input-row input:focus {
-      border-color: #1a237e;
-      outline: none;
-    }
-    .admit-dialog-footer .input-row .get-admit-btn {
-      padding: 10px 24px;
-      background: #1a237e;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-      white-space: nowrap;
-    }
-    .admit-dialog-footer .input-row .get-admit-btn:hover {
-      background: #283593;
-      transform: translateY(-1px);
-    }
-    .admit-dialog-footer .error-msg {
-      color: #dc2626;
-      font-size: 0.8rem;
-      display: none;
-    }
-    
     /* Media Queries */
     @media (max-width: 768px) {
       body { padding: 0; }
@@ -904,7 +745,6 @@
       .promo-text { font-size: 0.8rem; }
       .contact-info { flex-direction: column; gap: 8px; }
       .contact-item { padding: 8px 12px; }
-      .admit-dialog { max-width: 100%; margin: 10px; }
     }
     
     @media (max-width: 480px) {
@@ -939,30 +779,6 @@
     </div>
   </div>
 
-  <!-- ✅ Admit Card Dialog -->
-  <div class="admit-dialog-overlay" id="admitDialog">
-    <div class="admit-dialog">
-      <div class="admit-dialog-header">
-        <h3><i class="fas fa-ticket-alt"></i> Download Admit Card</h3>
-        <button class="admit-dialog-close" onclick="closeAdmitDialog()">&times;</button>
-      </div>
-      <div class="admit-dialog-body" id="admitDialogBody">
-        <div id="admitLoadingMsg" style="text-align:center; padding:20px;">
-          <i class="fas fa-spinner fa-spin" style="font-size:1.5rem; color:#1a237e;"></i>
-          <p style="margin-top:10px; color:#64748b;">Loading exam details...</p>
-        </div>
-        <div id="admitExamDetails" style="display:none;"></div>
-      </div>
-      <div class="admit-dialog-footer">
-        <div class="input-row">
-          <input type="text" id="admitRollInput" placeholder="Enter Roll Number">
-          <button class="get-admit-btn" onclick="getAdmitCard()"><i class="fas fa-download"></i> Get Admit Card</button>
-        </div>
-        <div class="error-msg" id="admitErrorMsg">❌ Roll number not found in this exam!</div>
-      </div>
-    </div>
-  </div>
-
   <div class="container">
     <div class="header">
       <h1 class="school-name">QUEST COACHING CENTRE</h1>
@@ -989,18 +805,14 @@
       </div>
     </div>
 
-    <!-- ✅ Registration Search Section - Two Buttons -->
+    <!-- Registration Search Section -->
     <div class="registration-search-section">
       <div class="search-label">
         <i class="fas fa-id-card"></i> 📌 Check your Registration!
       </div>
       <input type="text" id="regSearchInput" placeholder="Enter Aadhaar or Mobile Number" onkeypress="if(event.key==='Enter') searchRegistration()">
-      <button class="reg-btn reg-search-btn" onclick="searchRegistration()">
+      <button class="reg-search-btn" onclick="searchRegistration()">
         <i class="fas fa-search"></i> Search
-      </button>
-      <button class="reg-btn reg-admit-btn" onclick="openAdmitDialog()">
-        <i class="fas fa-ticket-alt"></i> Download Admit Card
-        <span style="background:#ff4757; color:white; font-size:0.6rem; padding:2px 6px; border-radius:10px; margin-left:4px;">NEW</span>
       </button>
       <span class="reg-search-loading" id="regSearchLoading"><i class="fas fa-spinner"></i> Searching...</span>
       <span class="reg-search-error" id="regSearchError">❌ Student not found!</span>
@@ -1071,7 +883,6 @@
 
       <h2 class="toppers-title">-----OUR TOPPERS ------</h2>
       <div class="all-toppers">
-        <!-- All toppers same as before -->
         <div class="topper-card"><div class="topper-rank">1st</div><div class="topper-photo"><img src="https://i.ibb.co/Jw8CzGzQ/IMG-20250904-WA0012.jpg"></div><h3 class="topper-name">रिंकी कुमारी</h3><div class="topper-percentage">469 अंक</div></div>
         <div class="topper-card"><div class="topper-rank">2nd</div><div class="topper-photo"><img src="https://i.ibb.co/XxMqpmH5/IMG-20250904-WA0013.jpg"></div><h3 class="topper-name">साहिल कुमार</h3><div class="topper-percentage">465 अंक</div></div>
         <div class="topper-card"><div class="topper-rank">3rd</div><div class="topper-photo"><img src="https://i.ibb.co/G3VVPSqZ/IMG-20250904-WA0014.jpg"></div><h3 class="topper-name">रौनक कुमार</h3><div class="topper-percentage">453 अंक</div></div>
@@ -1158,10 +969,12 @@
         return;
       }
 
+      // Show loading
       loadingEl.style.display = 'inline-block';
       errorEl.style.display = 'none';
 
       try {
+        // Search by Aadhaar (field name: 'aadhar') OR Mobile Number
         const aadhaarSnapshot = await db.collection('admissions')
           .where('aadhar', '==', searchValue)
           .get();
@@ -1171,6 +984,7 @@
         if (!aadhaarSnapshot.empty) {
           foundDoc = aadhaarSnapshot.docs[0];
         } else {
+          // If not found by Aadhaar, search by Mobile Number
           const mobileSnapshot = await db.collection('admissions')
             .where('parentMobile', '==', searchValue)
             .get();
@@ -1189,8 +1003,12 @@
           return;
         }
 
+        // Found student - get the document
         const studentId = foundDoc.id;
+        // Open the registration form in view mode
         window.open(`new-admission.html?mode=view&id=${studentId}`, '_blank');
+
+        // Clear input after successful search
         rollInput.value = '';
 
       } catch (error) {
@@ -1202,121 +1020,7 @@
       }
     }
 
-    // ---- Admit Card Dialog Functions ----
-    let admitExamData = null;
-    let admitExamId = null;
-
-    async function openAdmitDialog() {
-      document.getElementById('admitDialog').style.display = 'flex';
-      document.getElementById('admitLoadingMsg').style.display = 'block';
-      document.getElementById('admitExamDetails').style.display = 'none';
-      document.getElementById('admitRollInput').value = '';
-      document.getElementById('admitErrorMsg').style.display = 'none';
-      admitExamData = null;
-      admitExamId = null;
-
-      try {
-        // Get all admit cards from Firebase
-        const snap = await db.collection('admit_cards')
-          .orderBy('createdAt', 'desc')
-          .get();
-        
-        if (snap.empty) {
-          document.getElementById('admitLoadingMsg').innerHTML = `
-            <i class="fas fa-info-circle" style="font-size:1.5rem; color:#c5a059;"></i>
-            <p style="margin-top:10px; color:#64748b;">No admit cards found. Please generate one first.</p>
-          `;
-          return;
-        }
-
-        // Get the latest admit card (or show list)
-        const doc = snap.docs[0];
-        const data = doc.data();
-        admitExamId = doc.id;
-        admitExamData = data;
-
-        // Show exam details
-        document.getElementById('admitLoadingMsg').style.display = 'none';
-        document.getElementById('admitExamDetails').style.display = 'block';
-
-        const subjectsHtml = (data.subjects || []).map(s => 
-          `<span class="sub-tag">${s.name || s}</span>`
-        ).join('');
-
-        document.getElementById('admitExamDetails').innerHTML = `
-          <div class="exam-detail">
-            <div class="label">📝 Exam Name</div>
-            <div class="value">${data.examName || 'N/A'}</div>
-          </div>
-          <div class="exam-detail">
-            <div class="label">📍 Examination Centre</div>
-            <div class="value">${data.examCentre || 'N/A'}</div>
-          </div>
-          <div class="exam-detail">
-            <div class="label">🏫 Class</div>
-            <div class="value">${data.studentClass || 'N/A'}</div>
-          </div>
-          <div class="exam-detail">
-            <div class="label">📚 Subjects</div>
-            <div class="subject-list">${subjectsHtml || '<span class="sub-tag">No subjects</span>'}</div>
-          </div>
-          <div class="exam-detail" style="border-left-color:#c5a059; background:#fef9e6;">
-            <div class="label">🔢 Roll Code</div>
-            <div class="value">${data.rollCode || '55075'}</div>
-          </div>
-        `;
-
-      } catch (error) {
-        console.error('Error loading admit cards:', error);
-        document.getElementById('admitLoadingMsg').innerHTML = `
-          <i class="fas fa-exclamation-triangle" style="font-size:1.5rem; color:#dc2626;"></i>
-          <p style="margin-top:10px; color:#64748b;">Error loading admit cards. Please try again.</p>
-        `;
-      }
-    }
-
-    function closeAdmitDialog() {
-      document.getElementById('admitDialog').style.display = 'none';
-    }
-
-    async function getAdmitCard() {
-      const rollInput = document.getElementById('admitRollInput').value.trim();
-      const errorEl = document.getElementById('admitErrorMsg');
-      
-      if (!rollInput) {
-        errorEl.textContent = '⚠️ Please enter your roll number!';
-        errorEl.style.display = 'block';
-        return;
-      }
-
-      if (!admitExamData || !admitExamId) {
-        errorEl.textContent = '⚠️ Exam data not loaded. Please close and try again.';
-        errorEl.style.display = 'block';
-        return;
-      }
-
-      // Check if student exists in this admit card
-      // admit_cards mein students array nhi hai, sirf ek student ka data hai
-      // So we check if roll number matches
-      if (String(admitExamData.rollNumber) !== String(rollInput)) {
-        errorEl.textContent = '❌ Roll number not found in this exam!';
-        errorEl.style.display = 'block';
-        return;
-      }
-
-      errorEl.style.display = 'none';
-      closeAdmitDialog();
-
-      // Open view-card.html with the admit card ID
-      window.open(`view-card.html?id=${admitExamId}`, '_blank');
-    }
-
-    // Click outside to close
-    document.getElementById('admitDialog').addEventListener('click', function(e) {
-      if (e.target === this) closeAdmitDialog();
-    });
-
-    // ---- End of Admit Card Functions ----
+    // ---- End of Registration Search ----
 
     function loadViewedResults() {
       const stored = localStorage.getItem('quest_viewed_results');
@@ -1542,13 +1246,1267 @@
       if (e.target.id === 'passwordModal') closePasswordModal();
     });
 
+    // Enter key support for registration search
     document.getElementById('regSearchInput').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') searchRegistration();
     });
 
-    // ✅ Enter key support for admit dialog
-    document.getElementById('admitRollInput').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') getAdmitCard();
+    document.addEventListener('DOMContentLoaded', function() {
+      fetchAllResults();
+    });
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QUEST COACHING CENTRE</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { 
+      background:linear-gradient(to bottom, #f5f5f5, #e0e7ff); 
+      min-height:100vh; 
+      padding:0;
+    }
+    .container { 
+      width:100%; 
+      max-width:1200px; 
+      margin:0 auto;
+      background:rgba(255,255,255,0.98); 
+      border-radius:0;
+      box-shadow:0 5px 20px rgba(0,0,0,0.1); 
+      overflow:hidden; 
+      min-height:100vh;
+    }
+
+    /* Header */
+    .header { 
+      background:linear-gradient(to right,#1a237e,#283593,#303f9f); 
+      color:white; 
+      padding:20px 15px;
+      text-align:center; 
+      position:relative; 
+      overflow:hidden; 
+    }
+    .school-name { 
+      font-size:1.8rem;
+      font-weight:700; 
+      line-height:1.2; 
+    }
+    .location { 
+      font-size:0.95rem; 
+      margin-bottom:10px; 
+    }
+    .director-info { 
+      display:flex; 
+      align-items:center; 
+      justify-content:center; 
+      margin-top:15px; 
+      flex-wrap:wrap; 
+    }
+    .director-photo { 
+      width:90px;
+      height:90px; 
+      border-radius:50%; 
+      border:3px solid white;
+      overflow:hidden; 
+      margin-right:12px; 
+      cursor:pointer; 
+      transition:transform 0.3s; 
+    }
+    .director-photo:hover { 
+      transform:scale(1.05); 
+      box-shadow:0 0 15px rgba(255,255,255,0.5); 
+    }
+    .director-photo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+    .director-details{
+      text-align:left;
+    }
+    .director-details h2{
+      font-size:0.95rem; 
+      margin-bottom:4px;
+    }
+    .director-details h3{
+      font-size:1rem; 
+      margin-bottom:4px; 
+      color: white;
+      cursor: default;
+    }
+    .director-details p{
+      font-size:0.85rem;
+    }
+
+    /* Moving Admission Text */
+    .marquee-container {
+      background:#ffc107;
+      overflow:hidden;
+      position:relative;
+      height:45px;
+      display:flex;
+      align-items:center;
+    }
+    .marquee-content {
+      display:flex;
+      animation: marquee 20s linear infinite;
+      white-space:nowrap;
+      font-weight:600;
+      font-size:1rem;
+      color:#333;
+    }
+    @keyframes marquee {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* Registration Search Section */
+    .registration-search-section {
+      background: linear-gradient(to right, #1a237e, #283593);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      border-bottom: 3px solid #ffc107;
+    }
+    .registration-search-section .search-label {
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .registration-search-section .search-label i {
+      color: #ffc107;
+      font-size: 1.2rem;
+    }
+    .registration-search-section input {
+      padding: 10px 16px;
+      font-size: 0.95rem;
+      border-radius: 30px;
+      border: none;
+      width: 100%;
+      max-width: 250px;
+      outline: 2px solid transparent;
+      transition: outline 0.3s;
+    }
+    .registration-search-section input:focus {
+      outline: 2px solid #ffc107;
+    }
+    .registration-search-section .reg-search-btn {
+      padding: 10px 25px;
+      background: #ffc107;
+      color: #1a237e;
+      border: none;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .registration-search-section .reg-search-btn:hover {
+      background: #ffca28;
+      transform: scale(1.02);
+      box-shadow: 0 4px 15px rgba(255,193,7,0.4);
+    }
+    .registration-search-section .reg-search-btn i {
+      font-size: 1rem;
+    }
+    .reg-search-error {
+      color: #ff6b6b;
+      background: rgba(255,255,255,0.9);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: none;
+    }
+    .reg-search-loading {
+      color: white;
+      font-size: 0.85rem;
+      display: none;
+    }
+    .reg-search-loading i {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 600px) {
+      .registration-search-section {
+        flex-direction: column;
+        padding: 14px 16px;
+      }
+      .registration-search-section input {
+        max-width: 100%;
+      }
+      .registration-search-section .search-label {
+        font-size: 0.9rem;
+      }
+    }
+
+    /* Main Tabs Navigation */
+    .main-tabs {
+      display: flex;
+      background: white;
+      border-bottom: 2px solid #1a237e;
+      position: relative;
+      z-index: 10;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 16px 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-bottom: 3px solid transparent;
+    }
+    .tab-btn:hover {
+      background: #f5f5f5;
+      color: #1a237e;
+    }
+    .tab-btn.active {
+      color: #1a237e;
+      border-bottom: 3px solid #1a237e;
+      background: #f0f7ff;
+    }
+    .tab-btn i {
+      font-size: 1.1rem;
+    }
+
+    /* Content Sections */
+    .tab-content {
+      display: none;
+      padding: 0;
+      min-height: 400px;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Results Section */
+    .results-section {
+      padding: 20px 15px;
+      background: #f9f9f9;
+      min-height: 500px;
+    }
+    .section-title {
+      font-size: 1.4rem;
+      color: #1a237e;
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #1a237e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .section-title i {
+      color: #ffc107;
+    }
+    .results-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .result-item {
+      background: white;
+      padding: 12px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: all 0.3s;
+      border-left: 4px solid #1a237e;
+      position: relative;
+    }
+    .result-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+    }
+    .result-item.active {
+      border-left-color: #ffc107;
+      background: #fffae6;
+    }
+    .exam-name {
+      font-size: 0.95rem;
+      color: #1a237e;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .exam-date {
+      font-size: 0.75rem;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    
+    /* NEW Sticker */
+    .new-sticker {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: #ff4757;
+      color: white;
+      font-size: 0.65rem;
+      font-weight: bold;
+      padding: 3px 7px;
+      border-radius: 8px;
+      animation: blink 1s infinite;
+      z-index: 10;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
+    .roll-input-section {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-top: 15px;
+      text-align: center;
+      display: none;
+    }
+    .roll-input-section h3 {
+      color: #1a237e;
+      margin-bottom: 12px;
+      font-size: 1rem;
+    }
+    .input-group {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .input-group input {
+      padding: 8px 10px;
+      font-size: 0.9rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 100%;
+      max-width: 220px;
+    }
+    .result-btn {
+      padding: 8px 16px;
+      background: #1a237e;
+      color: white;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .result-btn:hover {
+      background: #283593;
+    }
+
+    /* Show More/Less Button */
+    .show-more-btn {
+      display: block;
+      margin: 15px auto;
+      padding: 8px 20px;
+      background: #1a237e;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: background 0.3s;
+    }
+    .show-more-btn:hover {
+      background: #283593;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 30px 15px;
+      font-size: 0.95rem;
+      color: #1a237e;
+    }
+    .error {
+      text-align: center;
+      padding: 12px;
+      background: #ffe6e6;
+      color: #b30000;
+      border-radius: 5px;
+      margin: 12px 0;
+    }
+
+    /* Tests Section */
+    .tests-section {
+      padding: 20px 15px;
+      background: #f9f9f9;
+      min-height: 500px;
+    }
+    .tests-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    .test-card {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      border-left: 5px solid #1a237e;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .test-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+    .test-card.new-test {
+      border-left-color: #ff4757;
+    }
+    .test-card h3 {
+      color: #1a237e;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .test-card h3 i {
+      color: #ffc107;
+    }
+    .test-description {
+      color: #555;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+    .test-details {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .test-detail {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #666;
+      font-size: 0.8rem;
+    }
+    .test-detail i {
+      color: #1a237e;
+      font-size: 0.85rem;
+    }
+    .test-btn {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background: linear-gradient(to right, #1a237e, #283593);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+      text-decoration: none;
+    }
+    .test-btn:hover {
+      background: linear-gradient(to right, #283593, #303f9f);
+      transform: scale(1.02);
+    }
+    .test-btn i {
+      margin-right: 6px;
+    }
+    .no-tests-message {
+      text-align: center;
+      padding: 50px 30px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      color: #666;
+      margin-top: 15px;
+    }
+    .no-tests-message i {
+      font-size: 2.5rem;
+      color: #ddd;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .live-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #ff4757;
+      color: white;
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      border-radius: 15px;
+      transform: rotate(10deg);
+      box-shadow: 0 2px 8px rgba(255,71,87,0.3);
+      z-index: 10;
+    }
+
+    /* Toppers Section - ALL 30 TOPPERS */
+    .toppers-section {
+      padding: 15px;
+      background: #f5f5f5;
+      text-align: center;
+    }
+    .promo-text {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #1a237e;
+      font-weight: 600;
+      margin-bottom: 15px;
+      white-space: pre-line;
+      text-align: left;
+      padding: 0 8px;
+    }
+    .toppers-title {
+      font-size: 1.3rem;
+      color: #b21f1f;
+      margin: 15px 0;
+      text-align: center;
+    }
+    .all-toppers {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .topper-card {
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      text-align: center;
+      transition: transform .3s;
+      width: 130px;
+      padding: 6px;
+    }
+    .topper-card:hover {
+      transform: translateY(-3px);
+    }
+    .topper-rank {
+      background: #1a237e;
+      color: white;
+      padding: 4px;
+      font-weight: 600;
+      font-size: 0.75rem;
+    }
+    .topper-photo {
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      margin: 8px auto;
+      border: 2px solid #1a237e;
+      overflow: hidden;
+    }
+    .topper-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .topper-name {
+      font-size: 0.75rem;
+      color: #333;
+      margin-top: 4px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.1;
+    }
+    .topper-percentage {
+      font-size: 0.85rem;
+      color: #1a237e;
+      font-weight: 700;
+      margin: 5px 0;
+    }
+    
+    /* Footer */
+    .footer {
+      background: #1a237e;
+      color: white;
+      text-align: center;
+      padding: 12px;
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    /* Developer Contact Section */
+    .developer-contact {
+      background: #f8f9fa;
+      padding: 15px;
+      text-align: center;
+      border-top: 2px solid #1a237e;
+      margin-top: 15px;
+    }
+    .developer-contact h3 {
+      color: #1a237e;
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+    }
+    .developer-contact p {
+      color: #333;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+    .contact-info {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .contact-item {
+      background: white;
+      padding: 10px 15px;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.3s;
+    }
+    .contact-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .contact-item i {
+      color: #1a237e;
+      font-size: 1rem;
+    }
+    
+    /* Password Modal */
+    .password-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    }
+    .password-box {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      width: 90%;
+      max-width: 400px;
+    }
+    .password-box h3 {
+      color: #1a237e;
+      margin-bottom: 10px;
+      font-size: 1.3rem;
+    }
+    .password-box p {
+      color: #666;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+    }
+    .password-input {
+      width: 100%;
+      padding: 12px 15px;
+      font-size: 1rem;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      text-align: left;
+    }
+    .password-input:focus {
+      border-color: #1a237e;
+      outline: none;
+    }
+    .password-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .password-btn {
+      padding: 10px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .password-btn.submit {
+      background: #1a237e;
+      color: white;
+    }
+    .password-btn.submit:hover {
+      background: #283593;
+    }
+    .password-btn.cancel {
+      background: #6c757d;
+      color: white;
+    }
+    .password-btn.cancel:hover {
+      background: #5a6268;
+    }
+    .password-error {
+      color: #dc3545;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      display: none;
+    }
+    
+    /* Media Queries */
+    @media (max-width: 768px) {
+      body { padding: 0; }
+      .container { border-radius: 0; box-shadow: none; margin: 0; width: 100%; }
+      .school-name { font-size: 1.5rem; }
+      .header { padding: 15px 10px; }
+      .director-info { flex-direction: column; text-align: center; }
+      .director-photo { margin-right: 0; margin-bottom: 8px; width: 80px; height: 80px; }
+      .director-details { text-align: center; }
+      .tab-btn { padding: 14px 8px; font-size: 0.9rem; }
+      .tests-list, .results-list { grid-template-columns: 1fr; }
+      .topper-card { width: 110px; }
+      .topper-name { font-size: 0.7rem; height: 28px; }
+      .promo-text { font-size: 0.8rem; }
+      .contact-info { flex-direction: column; gap: 8px; }
+      .contact-item { padding: 8px 12px; }
+    }
+    
+    @media (max-width: 480px) {
+      .school-name { font-size: 1.3rem; }
+      .section-title { font-size: 1.2rem; }
+      .tab-btn { padding: 12px 6px; font-size: 0.85rem; }
+      .topper-card { width: 90px; padding: 4px; }
+      .topper-photo { width: 45px; height: 45px; }
+      .topper-percentage { font-size: 0.75rem; }
+    }
+    
+    @media (max-width: 360px) {
+      .school-name { font-size: 1.2rem; }
+      .topper-card { width: 85px; }
+      .all-toppers { gap: 6px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Password Modal -->
+  <div class="password-modal" id="passwordModal">
+    <div class="password-box">
+      <h3><i class="fas fa-lock"></i> Admin Login</h3>
+      <p>Enter your email and password to access admin panel</p>
+      <input type="email" id="adminEmail" class="password-input" placeholder="Email address" autocomplete="off">
+      <input type="password" id="adminPassword" class="password-input" placeholder="Password" autocomplete="off">
+      <div class="password-error" id="passwordError">Invalid email or password!</div>
+      <div class="password-buttons">
+        <button class="password-btn submit" onclick="checkAdminPassword()"><i class="fas fa-sign-in-alt"></i> Login</button>
+        <button class="password-btn cancel" onclick="closePasswordModal()"><i class="fas fa-times"></i> Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h1 class="school-name">QUEST COACHING CENTRE</h1>
+      <p class="location">In Front of S.S. Girls High School, Gopalganj</p>
+      <div class="director-info">
+        <div class="director-photo" onclick="openPasswordModal()">
+          <img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg">
+        </div>
+        <div class="director-details">
+          <h2>CEO & FOUNDER</h2>
+          <h3>MR. RAVI SIR</h3>
+          <p><i class="fas fa-phone"></i> Call: +91 9708442525</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="marquee-container">
+      <div class="marquee-content">
+        <span>📚 Admission is going on for 6th to 12th &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        <span>📚 Admission is going on for 6th to 12th &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        <span>📚 Admission is going on for 6th to 12th &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        <span>📚 Admission is going on for 6th to 12th &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        <span>📚 Admission is going on for 6th to 12th &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+      </div>
+    </div>
+
+    <!-- Registration Search Section -->
+    <div class="registration-search-section">
+      <div class="search-label">
+        <i class="fas fa-id-card"></i> 📌 Check your Registration!
+      </div>
+      <input type="text" id="regSearchInput" placeholder="Enter Aadhaar or Mobile Number" onkeypress="if(event.key==='Enter') searchRegistration()">
+      <button class="reg-search-btn" onclick="searchRegistration()">
+        <i class="fas fa-search"></i> Search
+      </button>
+      <span class="reg-search-loading" id="regSearchLoading"><i class="fas fa-spinner"></i> Searching...</span>
+      <span class="reg-search-error" id="regSearchError">❌ Student not found!</span>
+    </div>
+
+    <div class="main-tabs">
+      <button class="tab-btn active" id="results-tab" onclick="switchTab('results')">
+        <i class="fas fa-chart-line"></i> Check Results
+      </button>
+      <button class="tab-btn" id="tests-tab" onclick="openOnlineTest()">
+        <i class="fas fa-laptop-code"></i> Online Tests
+      </button>
+    </div>
+
+    <div class="tab-content active" id="results-content">
+      <div class="results-section">
+        <div class="loading" id="loading-results">
+          <i class="fas fa-spinner fa-spin"></i> Loading available results...
+        </div>
+        
+        <div class="results-list" id="results-list" style="display:none;"></div>
+        
+        <button class="show-more-btn" id="show-more-btn" style="display:none;" onclick="toggleShowMore()">
+          Show More Results
+        </button>
+        
+        <div class="roll-input-section" id="roll-input-section">
+          <h3 id="selected-exam-name">Enter your Roll Number</h3>
+          <div class="input-group">
+            <input type="number" id="roll-input" placeholder="Enter Roll Number">
+            <button class="result-btn" onclick="getResult()">📑 Get Result</button>
+            <button class="result-btn" onclick="goBackToResults()" style="background:#666;">⬅ Back</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tests-content">
+      <div class="tests-section">
+        <h2 class="section-title"><i class="fas fa-laptop-code"></i> Online Live Tests</h2>
+        <div class="loading" id="loading-tests"><i class="fas fa-spinner fa-spin"></i> Loading available tests...</div>
+        <div class="tests-list" id="tests-list" style="display:none;"></div>
+        <div class="no-tests-message" id="no-tests-message" style="display:none;">
+          <i class="fas fa-file-alt"></i>
+          <h3>No Tests Available</h3>
+          <p>There are no online tests available at the moment.</p>
+          <p>Please check back later or contact your teacher.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toppers Section -->
+    <div class="toppers-section">
+      <div class="promo-text">
+मात्र 7,200/- में संपूर्ण विषयों कि तैयारी करे और CBSE बोर्ड  एवं बिहार बोर्ड परीक्षा में 480+ अंक लाए।
+
+1. सभी विषयों का प्रिंटेट नोट्स
+2. चेप्टर वाइज VVI Objective प्रश्न
+3. चेप्टर वाइज VVI Subjective प्रश्न
+4. चेप्टर वाइज टेस्ट सीरीज
+5. पिछले 20 वर्षो का Question Bank का हल
+6. बोर्ड परीक्षा में 480+ अंक लाने का टिप्स & ट्रिक्स
+
+✨ प्रत्येक साल की तरह इस साल भी 2 जनवरी 2026 से सभी क्लासेज का नया बैच शुरू होने जा रहा है।
+
+🎯 जिसका एक ही मकसद होगा कि किसी भी हाल में 2027 में होने वाले बोर्ड परीक्षा में छात्रों को टॉप-10 में शामिल किया जाए।
+      </div>
+
+      <h2 class="toppers-title">-----OUR TOPPERS ------</h2>
+      <div class="all-toppers">
+        <div class="topper-card"><div class="topper-rank">1st</div><div class="topper-photo"><img src="https://i.ibb.co/Jw8CzGzQ/IMG-20250904-WA0012.jpg"></div><h3 class="topper-name">रिंकी कुमारी</h3><div class="topper-percentage">469 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">2nd</div><div class="topper-photo"><img src="https://i.ibb.co/XxMqpmH5/IMG-20250904-WA0013.jpg"></div><h3 class="topper-name">साहिल कुमार</h3><div class="topper-percentage">465 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">3rd</div><div class="topper-photo"><img src="https://i.ibb.co/G3VVPSqZ/IMG-20250904-WA0014.jpg"></div><h3 class="topper-name">रौनक कुमार</h3><div class="topper-percentage">453 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">4th</div><div class="topper-photo"><img src="https://i.ibb.co/TxNS2sQ8/IMG-20250904-WA0015.jpg"></div><h3 class="topper-name">सत्यम कुमार सिंह</h3><div class="topper-percentage">447 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">5th</div><div class="topper-photo"><img src="https://i.ibb.co/991nS5Cx/IMG-20250904-WA0016.jpg"></div><h3 class="topper-name">अभिराज कुमार</h3><div class="topper-percentage">446 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">6th</div><div class="topper-photo"><img src="https://i.ibb.co/pj5mp7JF/IMG-20250904-WA0017.jpg"></div><h3 class="topper-name">सोनी कुमारी</h3><div class="topper-percentage">446 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">7th</div><div class="topper-photo"><img src="https://i.ibb.co/JwGMNwF6/IMG-20250904-WA0018.jpg"></div><h3 class="topper-name">रिशु कुमारी राय</h3><div class="topper-percentage">445 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">8th</div><div class="topper-photo"><img src="https://i.ibb.co/JWhkzfbG/IMG-20250904-WA0019.jpg"></div><h3 class="topper-name">तपेश्वरी कुमारी</h3><div class="topper-percentage">444 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">9th</div><div class="topper-photo"><img src="https://i.ibb.co/21DCkH7y/IMG-20250904-WA0020.jpg"></div><h3 class="topper-name">राजकृत कुमार</h3><div class="topper-percentage">444 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">10th</div><div class="topper-photo"><img src="https://i.ibb.co/4nn6YZdt/IMG-20250904-WA0021-1.jpg"></div><h3 class="topper-name">तरुण कुमार</h3><div class="topper-percentage">439 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">11th</div><div class="topper-photo"><img src="https://i.ibb.co/yFDsffpF/IMG-20250904-WA0022.jpg"></div><h3 class="topper-name">रमिता कुमारी</h3><div class="topper-percentage">439 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">12th</div><div class="topper-photo"><img src="https://i.ibb.co/v6MCpZ4R/IMG-20250904-WA0023.jpg"></div><h3 class="topper-name">जिज्ञासा कुमारी</h3><div class="topper-percentage">434 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">13th</div><div class="topper-photo"><img src="https://i.ibb.co/kggFk370/IMG-20250904-WA0024.jpg"></div><h3 class="topper-name">खुश्बू कुमारी</h3><div class="topper-percentage">431 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">14th</div><div class="topper-photo"><img src="https://i.ibb.co/7J0J30c7/IMG-20250904-WA0025.jpg"></div><h3 class="topper-name">रिया कुमारी</h3><div class="topper-percentage">430 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">15th</div><div class="topper-photo"><img src="https://i.ibb.co/7JRgb628/IMG-20250904-WA0027.jpg"></div><h3 class="topper-name">करण कुमार</h3><div class="topper-percentage">427 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">16th</div><div class="topper-photo"><img src="https://i.ibb.co/bjSNtXPz/IMG-20250904-WA0028.jpg"></div><h3 class="topper-name">रिशु कुमारी</h3><div class="topper-percentage">425 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">17th</div><div class="topper-photo"><img src="https://i.ibb.co/ZpkDP0pF/IMG-20250904-WA0029.jpg"></div><h3 class="topper-name">ईशु कुमारी</h3><div class="topper-percentage">425 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">18th</div><div class="topper-photo"><img src="https://i.ibb.co/4Zcy07cj/IMG-20250904-WA0030.jpg"></div><h3 class="topper-name">लक्की कुमार</h3><div class="topper-percentage">422 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">19th</div><div class="topper-photo"><img src="https://i.ibb.co/Y4b3gBHK/IMG-20250904-WA0031.jpg"></div><h3 class="topper-name">अशोक कुमार</h3><div class="topper-percentage">422 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">20th</div><div class="topper-photo"><img src="https://i.ibb.co/nN8pWkvv/IMG-20250904-WA0032.jpg"></div><h3 class="topper-name">हर्षित कुमार</h3><div class="topper-percentage">422 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">21st</div><div class="topper-photo"><img src="https://i.ibb.co/hhNYK2y/IMG-20250904-WA0033.jpg"></div><h3 class="topper-name">प्रियंका कुमारी</h3><div class="topper-percentage">418 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">22nd</div><div class="topper-photo"><img src="https://i.ibb.co/tp1HQ0DN/IMG-20250904-WA0034.jpg"></div><h3 class="topper-name">संस्कृति कुमारी</h3><div class="topper-percentage">417 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">23rd</div><div class="topper-photo"><img src="https://i.ibb.co/5XSrj1rh/IMG-20250904-WA0035-1.jpg"></div><h3 class="topper-name">नव्या कुमारी</h3><div class="topper-percentage">414 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">24th</div><div class="topper-photo"><img src="https://i.ibb.co/gMGvJ7Xs/IMG-20250905-WA0007.jpg"></div><h3 class="topper-name">अंकुश कुमार</h3><div class="topper-percentage">409 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">25th</div><div class="topper-photo"><img src="https://i.ibb.co/hRD1Jmcm/IMG-20250905-WA0008.jpg"></div><h3 class="topper-name">संजना कुमारी</h3><div class="topper-percentage">404 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">26th</div><div class="topper-photo"><img src="https://i.ibb.co/BHJjbmjY/IMG-20250905-WA0009.jpg"></div><h3 class="topper-name">रोशनी गुप्ता</h3><div class="topper-percentage">403 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">27th</div><div class="topper-photo"><img src="https://i.ibb.co/60r3W27h/IMG-20250905-WA0010.jpg"></div><h3 class="topper-name">आदित्य कुमार</h3><div class="topper-percentage">402 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">28th</div><div class="topper-photo"><img src="https://i.ibb.co/WW1KTJQz/IMG-20250905-WA0011.jpg"></div><h3 class="topper-name">रोशनी कुमारी</h3><div class="topper-percentage">402 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">29th</div><div class="topper-photo"><img src="https://i.ibb.co/gbgfm4S2/IMG-20250905-WA0012-1.jpg"></div><h3 class="topper-name">रुपाली कुमारी</h3><div class="topper-percentage">402 अंक</div></div>
+        <div class="topper-card"><div class="topper-rank">30th</div><div class="topper-photo"><img src="https://i.ibb.co/nSG3RX7/IMG-20250905-WA0013.jpg"></div><h3 class="topper-name">स्नेहा कुमारी</h3><div class="topper-percentage">401 अंक</div></div>
+      </div>
+    </div>
+
+    <div class="developer-contact">
+      <h3><i class="fas fa-laptop-code"></i> Website Development Contact</h3>
+      <p>This website was developed by:</p>
+      <div class="contact-info">
+        <div class="contact-item"><i class="fas fa-phone"></i><span>Phone: 8580594404</span></div>
+        <div class="contact-item"><i class="fas fa-envelope"></i><span>Email: kk5674010@gmail.com</span></div>
+      </div>
+      <p style="margin-top: 15px; color: #666; font-size: 0.9rem;">
+        If you want a similar website for your coaching centre or business, feel free to contact me.
+      </p>
+    </div>
+
+    <div class="footer">
+      <p>&copy; 2023 QUEST COACHING CENTRE. All Rights Reserved.</p>
+    </div>
+  </div>
+
+  <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
+      authDomain: "quest-coaching.firebaseapp.com",
+      databaseURL: "https://quest-coaching-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "quest-coaching",
+      storageBucket: "quest-coaching.firebasestorage.app",
+      messagingSenderId: "131948734089",
+      appId: "1:131948734089:web:f4ba25110c8b1298360858"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    let allResults = [];
+    let selectedExamId = null;
+    let selectedExamData = null;
+    let showAllResults = false;
+    let viewedResults = [];
+
+    // ---- Registration Search Function (Aadhaar or Mobile) ----
+    async function searchRegistration() {
+      const rollInput = document.getElementById('regSearchInput');
+      const errorEl = document.getElementById('regSearchError');
+      const loadingEl = document.getElementById('regSearchLoading');
+      const searchValue = rollInput.value.trim();
+
+      if (!searchValue) {
+        errorEl.textContent = '⚠️ Please enter Aadhaar or Mobile number!';
+        errorEl.style.display = 'inline-block';
+        setTimeout(() => { errorEl.style.display = 'none'; }, 3000);
+        return;
+      }
+
+      // Show loading
+      loadingEl.style.display = 'inline-block';
+      errorEl.style.display = 'none';
+
+      try {
+        // Search by Aadhaar (field name: 'aadhar') OR Mobile Number
+        const aadhaarSnapshot = await db.collection('admissions')
+          .where('aadhar', '==', searchValue)
+          .get();
+
+        let foundDoc = null;
+
+        if (!aadhaarSnapshot.empty) {
+          foundDoc = aadhaarSnapshot.docs[0];
+        } else {
+          // If not found by Aadhaar, search by Mobile Number
+          const mobileSnapshot = await db.collection('admissions')
+            .where('parentMobile', '==', searchValue)
+            .get();
+          
+          if (!mobileSnapshot.empty) {
+            foundDoc = mobileSnapshot.docs[0];
+          }
+        }
+
+        loadingEl.style.display = 'none';
+
+        if (!foundDoc) {
+          errorEl.textContent = '❌ No student found with Aadhaar or Mobile: ' + searchValue;
+          errorEl.style.display = 'inline-block';
+          setTimeout(() => { errorEl.style.display = 'none'; }, 4000);
+          return;
+        }
+
+        // Found student - get the document
+        const studentId = foundDoc.id;
+        // Open the registration form in view mode
+        window.open(`new-admission.html?mode=view&id=${studentId}`, '_blank');
+
+        // Clear input after successful search
+        rollInput.value = '';
+
+      } catch (error) {
+        console.error('Search error:', error);
+        loadingEl.style.display = 'none';
+        errorEl.textContent = '❌ Error searching. Please try again.';
+        errorEl.style.display = 'inline-block';
+        setTimeout(() => { errorEl.style.display = 'none'; }, 4000);
+      }
+    }
+
+    // ---- End of Registration Search ----
+
+    function loadViewedResults() {
+      const stored = localStorage.getItem('quest_viewed_results');
+      viewedResults = stored ? JSON.parse(stored) : [];
+    }
+
+    function saveViewedResults() {
+      localStorage.setItem('quest_viewed_results', JSON.stringify(viewedResults));
+    }
+
+    function markResultAsViewed(resultId) {
+      if (!viewedResults.includes(resultId)) {
+        viewedResults.push(resultId);
+        saveViewedResults();
+      }
+    }
+
+    function isResultNew(resultId) {
+      return !viewedResults.includes(resultId);
+    }
+
+    async function fetchAllResults() {
+      try {
+        loadViewedResults();
+        const querySnapshot = await db.collection("results").get();
+        allResults = [];
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const resultId = doc.id;
+          allResults.push({
+            id: resultId,
+            examName: data.examName || "Unnamed Exam",
+            createdAt: data.createdAt ? new Date(data.createdAt.toDate()).toLocaleDateString('en-IN', {
+              day: 'numeric', month: 'long', year: 'numeric'
+            }) : "Date not available",
+            data: data,
+            isNew: isResultNew(resultId)
+          });
+        });
+        allResults.sort((a, b) => b.data.createdAt?.toDate() - a.data.createdAt?.toDate());
+        displayResultsList();
+      } catch (error) {
+        console.error("Error fetching results:", error);
+        document.getElementById("loading-results").innerHTML = '<div class="error">Error loading results. Please try again later.</div>';
+      }
+    }
+
+    function displayResultsList() {
+      const resultsList = document.getElementById("results-list");
+      const loading = document.getElementById("loading-results");
+      const showMoreBtn = document.getElementById("show-more-btn");
+      
+      if (allResults.length === 0) {
+        loading.innerHTML = '<div class="error">No results available at the moment.</div>';
+        return;
+      }
+      
+      loading.style.display = "none";
+      resultsList.style.display = "grid";
+      
+      const resultsToShow = showAllResults ? allResults : allResults.slice(0, 4);
+      let html = "";
+      resultsToShow.forEach((result, index) => {
+        const newSticker = result.isNew ? '<div class="new-sticker">NEW</div>' : '';
+        html += `<div class="result-item" onclick="selectExam('${result.id}', ${index})" id="result-item-${index}">
+          ${newSticker}
+          <div class="exam-name">${result.examName}</div>
+          <div class="exam-date">📅 Published: ${result.createdAt}</div>
+        </div>`;
+      });
+      resultsList.innerHTML = html;
+      
+      if (allResults.length > 4) {
+        showMoreBtn.style.display = "block";
+        showMoreBtn.textContent = showAllResults ? "Show Less" : "Show More Results";
+      } else {
+        showMoreBtn.style.display = "none";
+      }
+    }
+
+    function toggleShowMore() {
+      showAllResults = !showAllResults;
+      displayResultsList();
+    }
+
+    function selectExam(examId, index) {
+      selectedExamId = examId;
+      const selectedResult = allResults.find(result => result.id === examId);
+      if (selectedResult) {
+        selectedExamData = selectedResult.data;
+      }
+      
+      markResultAsViewed(examId);
+      
+      const resultItem = document.getElementById(`result-item-${index}`);
+      if (resultItem) {
+        const newSticker = resultItem.querySelector('.new-sticker');
+        if (newSticker) newSticker.remove();
+      }
+      
+      document.querySelectorAll('.result-item').forEach(item => item.classList.remove('active'));
+      if (resultItem) resultItem.classList.add('active');
+      
+      document.getElementById('selected-exam-name').textContent = `Enter your Roll Number for: ${selectedExamData.examName}`;
+      document.getElementById('results-list').style.display = 'none';
+      document.getElementById('show-more-btn').style.display = 'none';
+      document.getElementById('roll-input-section').style.display = 'block';
+      document.getElementById('roll-input').value = '';
+    }
+
+    function goBackToResults() {
+      document.getElementById('results-list').style.display = 'grid';
+      document.getElementById('roll-input-section').style.display = 'none';
+      selectedExamId = null;
+      selectedExamData = null;
+      if (allResults.length > 4) document.getElementById('show-more-btn').style.display = 'block';
+      document.querySelectorAll('.result-item').forEach(item => item.classList.remove('active'));
+    }
+
+    function getResult() {
+      const rollInput = document.getElementById('roll-input').value.trim();
+      if (!rollInput) {
+        alert("Please enter your roll number");
+        return;
+      }
+      if (!selectedExamData || !selectedExamData.students) {
+        alert("Exam data not loaded properly. Please go back and select again.");
+        return;
+      }
+      
+      const student = selectedExamData.students.find(s => String(s.rollNo) == String(rollInput));
+      if (!student) {
+        alert("Roll number not found in this exam.");
+        return;
+      }
+      
+      const template = selectedExamData.template || 'result';
+      
+      let url;
+      if (template === 'result1') {
+        url = `result1.html?examId=${selectedExamId}&rollNo=${rollInput}`;
+      } else {
+        url = `result.html?examId=${selectedExamId}&rollNo=${rollInput}`;
+      }
+      
+      console.log('Opening template:', template);
+      console.log('URL:', url);
+      
+      window.open(url, '_blank');
+    }
+
+    function switchTab(tabName) {
+      document.getElementById('results-tab').classList.toggle('active', tabName === 'results');
+      document.getElementById('tests-tab').classList.toggle('active', tabName === 'tests');
+      document.getElementById('results-content').classList.toggle('active', tabName === 'results');
+      document.getElementById('tests-content').classList.toggle('active', tabName === 'tests');
+      if (tabName === 'results' && allResults.length === 0) fetchAllResults();
+    }
+
+    function openOnlineTest() {
+      window.open('onlinetest.html', '_blank');
+    }
+
+    // Password modal functions
+    function openPasswordModal() {
+      document.getElementById('passwordModal').style.display = 'flex';
+      document.getElementById('adminEmail').value = '';
+      document.getElementById('adminPassword').value = '';
+      document.getElementById('passwordError').style.display = 'none';
+    }
+
+    function closePasswordModal() {
+      document.getElementById('passwordModal').style.display = 'none';
+    }
+
+    async function checkAdminPassword() {
+      const email = document.getElementById('adminEmail').value;
+      const password = document.getElementById('adminPassword').value;
+      const errorElement = document.getElementById('passwordError');
+      
+      if(!email || !password) {
+        errorElement.textContent = 'Please enter both email and password!';
+        errorElement.style.display = 'block';
+        return;
+      }
+      
+      const submitBtn = document.querySelector('.password-btn.submit');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+      submitBtn.disabled = true;
+      errorElement.style.display = 'none';
+      
+      try {
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        if(userCredential.user) {
+          sessionStorage.setItem('adminLoggedIn', 'true');
+          sessionStorage.setItem('adminEmail', userCredential.user.email);
+          sessionStorage.setItem('loginTime', Date.now());
+          closePasswordModal();
+          window.open('admin.html', '_blank');
+        }
+      } catch(error) {
+        console.error('Login Error:', error);
+        if(error.code === 'auth/user-not-found') errorElement.textContent = 'Email not found! Please contact admin.';
+        else if(error.code === 'auth/wrong-password') errorElement.textContent = 'Wrong password! Please try again.';
+        else if(error.code === 'auth/invalid-email') errorElement.textContent = 'Invalid email format!';
+        else if(error.code === 'auth/too-many-requests') errorElement.textContent = 'Too many failed attempts! Please try later.';
+        else errorElement.textContent = 'Login failed: ' + error.message;
+        errorElement.style.display = 'block';
+      } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+    }
+
+    document.getElementById('adminEmail').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') document.getElementById('adminPassword').focus();
+    });
+    document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') checkAdminPassword();
+    });
+    document.getElementById('passwordModal').addEventListener('click', function(e) {
+      if (e.target.id === 'passwordModal') closePasswordModal();
+    });
+
+    // Enter key support for registration search
+    document.getElementById('regSearchInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') searchRegistration();
     });
 
     document.addEventListener('DOMContentLoaded', function() {
