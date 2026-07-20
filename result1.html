@@ -949,7 +949,7 @@
       
       currentExamData = docSnap.data();
       
-      // Agar template 'result' hai to redirect to classic result
+      // ✅ Agar template 'result' hai to redirect to classic result
       const template = currentExamData.template || 'result';
       if (template === 'result') {
         console.log('🔄 Redirecting to result.html (Classic Style)');
@@ -1049,8 +1049,11 @@
     // ✅ Get active subjects from student
     const activeSubjects = student.activeSubjects || [];
     
-    // 1️⃣ MAIN SUBJECTS - Only show if active
-    const mainSubjects = examData.subjects || [];
+    // ✅ MAIN SUBJECTS - from mainSubjects OR subjects (backward compatible)
+    const mainSubjects = examData.mainSubjects || examData.subjects || [];
+    
+    // ✅ Track if we have any main subjects shown
+    let mainSubjectsShown = 0;
     
     for (const subject of mainSubjects) {
       const subName = subject.name;
@@ -1060,8 +1063,17 @@
         continue; // Skip inactive subjects
       }
       
+      mainSubjectsShown++;
       const subTotal = subject.total || 100;
-      const marksObtained = student.marks && student.marks[subName] !== undefined ? student.marks[subName] : 0;
+      
+      // ✅ Get marks from mainMarks OR marks (backward compatible)
+      let marksObtained = 0;
+      if (student.mainMarks && student.mainMarks[subName] !== undefined) {
+        marksObtained = student.mainMarks[subName];
+      } else if (student.marks && student.marks[subName] !== undefined) {
+        marksObtained = student.marks[subName];
+      }
+      
       const percentage = subTotal > 0 ? (marksObtained / subTotal) * 100 : 0;
       const gradeInfo = getGrade(percentage);
       
@@ -1075,15 +1087,22 @@
       totalMax += subTotal;
     }
     
-    // 2️⃣ TOTAL ROW
-    marksHtml += `<tr class="total-row">
-      <td><strong>TOTAL</strong></td>
-      <td><strong>${totalMax}</strong></td>
-      <td><strong>${totalObtained}</strong></td>
-      <td></td>
-    </tr>`;
+    // ✅ If no main subjects active, show message
+    if (mainSubjectsShown === 0 && mainSubjects.length > 0) {
+      marksHtml += `<tr><td colspan="4" style="text-align:center; color:#999;">No active subjects found for this student</td></tr>`;
+    }
     
-    // 3️⃣ OPTIONAL SUBJECTS - Only show if active
+    // ✅ TOTAL ROW
+    if (mainSubjectsShown > 0) {
+      marksHtml += `<tr class="total-row">
+        <td><strong>TOTAL</strong></td>
+        <td><strong>${totalMax}</strong></td>
+        <td><strong>${totalObtained}</strong></td>
+        <td></td>
+      </tr>`;
+    }
+    
+    // ✅ OPTIONAL SUBJECTS - Only show if active
     const optionalSubjects = examData.optionalSubjects || [];
     let hasActiveOptional = false;
     
@@ -1103,8 +1122,8 @@
       // Check in student.optionalMarks first
       if (student.optionalMarks && student.optionalMarks[optName] !== undefined) {
         optObtained = student.optionalMarks[optName];
-        if (optObtained !== null && optObtained !== '-') {
-          const optPercent = (optObtained / optTotal) * 100;
+        if (optObtained !== null && optObtained !== '-' && !isNaN(optObtained)) {
+          const optPercent = (parseFloat(optObtained) / optTotal) * 100;
           const gradeInfo = getGrade(optPercent);
           optGrade = `<span class="grade-badge ${gradeInfo.className}">${gradeInfo.grade}</span>`;
         }
@@ -1112,8 +1131,8 @@
       // Then in student.marks
       else if (student.marks && student.marks[optName] !== undefined) {
         optObtained = student.marks[optName];
-        if (optObtained !== null && optObtained !== '-') {
-          const optPercent = (optObtained / optTotal) * 100;
+        if (optObtained !== null && optObtained !== '-' && !isNaN(optObtained)) {
+          const optPercent = (parseFloat(optObtained) / optTotal) * 100;
           const gradeInfo = getGrade(optPercent);
           optGrade = `<span class="grade-badge ${gradeInfo.className}">${gradeInfo.grade}</span>`;
         }
@@ -1126,9 +1145,6 @@
         <td>${optGrade}</td>
       </tr>`;
     }
-    
-    // ✅ If no active optional subjects, show nothing (don't show message)
-    // Just skip it completely
     
     document.getElementById('marksTableBody').innerHTML = marksHtml;
     
