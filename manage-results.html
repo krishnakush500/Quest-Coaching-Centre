@@ -381,6 +381,10 @@
             display: inline-block;
             margin: 2px;
         }
+        .student-subject-tag.optional-tag {
+            background: #fef9e6;
+            color: #c5a059;
+        }
         
         /* Subject Toggle Switch Styles */
         .subject-mark-row {
@@ -1136,7 +1140,9 @@
         studentEntryStep.style.display = 'block';
     });
 
-    // ✅ FIXED: generateMarksFields() - Main Subjects with Toggle
+    // ============================================
+    // GENERATE MAIN SUBJECTS MARKS FIELDS
+    // ============================================
     function generateMarksFields() {
         marksFields.innerHTML = '<h5 class="mb-3">Enter Marks for Main Subjects</h5>';
         
@@ -1180,22 +1186,20 @@
                     markInput.focus();
                 }
                 
-                // ✅ Update student's active subjects list
                 if (editingStudentIndex !== null) {
                     const currentStudent = students[editingStudentIndex];
                     if (currentStudent) {
-                        if (!currentStudent.activeSubjects) currentStudent.activeSubjects = [];
+                        if (!currentStudent.activeMainSubjects) currentStudent.activeMainSubjects = [];
                         if (isChecked) {
-                            if (!currentStudent.activeSubjects.includes(subject)) {
-                                currentStudent.activeSubjects.push(subject);
+                            if (!currentStudent.activeMainSubjects.includes(subject)) {
+                                currentStudent.activeMainSubjects.push(subject);
                             }
                         } else {
-                            currentStudent.activeSubjects = currentStudent.activeSubjects.filter(s => s !== subject);
+                            currentStudent.activeMainSubjects = currentStudent.activeMainSubjects.filter(s => s !== subject);
                         }
                     }
                 }
                 
-                // ✅ Update students table
                 updateStudentsTable();
                 hasChanges = true;
             });
@@ -1207,7 +1211,9 @@
         });
     }
 
-    // ✅ FIXED: renderOptionalMarksFields() - Optional Subjects with Toggle
+    // ============================================
+    // GENERATE OPTIONAL SUBJECTS MARKS FIELDS
+    // ============================================
     function renderOptionalMarksFields() {
         const container = document.getElementById('optionalMarksFields');
         const list = document.getElementById('optionalMarksList');
@@ -1260,17 +1266,16 @@
                     markInput.focus();
                 }
                 
-                // ✅ Update student's active subjects list
                 if (editingStudentIndex !== null) {
                     const currentStudent = students[editingStudentIndex];
                     if (currentStudent) {
-                        if (!currentStudent.activeSubjects) currentStudent.activeSubjects = [];
+                        if (!currentStudent.activeOptionalSubjects) currentStudent.activeOptionalSubjects = [];
                         if (isChecked) {
-                            if (!currentStudent.activeSubjects.includes(subject)) {
-                                currentStudent.activeSubjects.push(subject);
+                            if (!currentStudent.activeOptionalSubjects.includes(subject)) {
+                                currentStudent.activeOptionalSubjects.push(subject);
                             }
                         } else {
-                            currentStudent.activeSubjects = currentStudent.activeSubjects.filter(s => s !== subject);
+                            currentStudent.activeOptionalSubjects = currentStudent.activeOptionalSubjects.filter(s => s !== subject);
                         }
                     }
                 }
@@ -1350,127 +1355,132 @@
         }
     });
 
-    // ✅ FIXED: updateStudentsTable() - Only shows active subjects
+    // ============================================
+    // UPDATE STUDENTS TABLE - MAIN & OPTIONAL SEPARATE
+    // ============================================
     function updateStudentsTable() {
         studentsTableBody.innerHTML = '';
         students.forEach((s, idx) => {
-            // ✅ Ensure activeSubjects exists as array
-            if (!s.activeSubjects) s.activeSubjects = [];
+            if (!s.activeMainSubjects) s.activeMainSubjects = [];
+            if (!s.activeOptionalSubjects) s.activeOptionalSubjects = [];
             
             let marksHtml = '';
             let subjectsHtml = '';
             
-            // ✅ Only show active main subjects
+            // Main Subjects - Only active ones
             selectedMainSubjects.forEach(sub => {
-                if (s.activeSubjects.includes(sub.name)) {
+                if (s.activeMainSubjects.includes(sub.name)) {
                     subjectsHtml += `<span class="student-subject-tag">${sub.name}</span>`;
-                    const mark = s.marks[sub.name] !== undefined ? s.marks[sub.name] : 0;
-                    marksHtml += `<div>${sub.name}: ${mark}/${sub.total}</div>`;
+                    const mark = s.mainMarks && s.mainMarks[sub.name] !== undefined ? s.mainMarks[sub.name] : 0;
+                    marksHtml += `<div>📘 ${sub.name}: ${mark}/${sub.total}</div>`;
                 }
             });
             
-            // ✅ Only show active optional subjects
+            // Optional Subjects - Only active ones
             selectedOptionalSubjects.forEach(opt => {
-                if (s.activeSubjects.includes(opt.name)) {
-                    subjectsHtml += `<span class="student-subject-tag" style="background:#fef9e6;color:#c5a059;">${opt.name} (Opt)</span>`;
+                if (s.activeOptionalSubjects.includes(opt.name)) {
+                    subjectsHtml += `<span class="student-subject-tag optional-tag">${opt.name} (Opt)</span>`;
                     const optMark = s.optionalMarks && s.optionalMarks[opt.name] !== undefined ? s.optionalMarks[opt.name] : '-';
-                    marksHtml += `<div style="color:#c5a059;">${opt.name} (Optional): ${optMark !== null && optMark !== '-' ? optMark : '-'}/${opt.total}</div>`;
+                    marksHtml += `<div style="color:#c5a059;">⭐ ${opt.name}: ${optMark}/${opt.total}</div>`;
                 }
             });
             
-            const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" class="student-photo-thumb" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷 No photo</span>';
-            const row = `<tr><td>${photoHtml}</td><td>${s.rollNo}</td><td>${s.name}</td><td>${s.fatherName || '-'}</td><td>${subjectsHtml}</td><td>${marksHtml}</td><td><button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button> <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button></td></tr>`;
+            const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" class="student-photo-thumb">` : '<span class="text-muted">📷 No photo</span>';
+            const row = `<tr>
+                <td>${photoHtml}</td>
+                <td>${s.rollNo}</td>
+                <td>${s.name}</td>
+                <td>${s.fatherName || '-'}</td>
+                <td>${subjectsHtml}</td>
+                <td>${marksHtml}</td>
+                <td>
+                    <button class="btn btn-sm btn-warning edit-student" data-index="${idx}">Edit</button>
+                    <button class="btn btn-sm btn-danger delete-student" data-index="${idx}">Delete</button>
+                </td>
+            </tr>`;
             studentsTableBody.insertAdjacentHTML('beforeend', row);
         });
         document.querySelectorAll('.edit-student').forEach(btn => btn.addEventListener('click', e => editStudent(parseInt(e.target.dataset.index))));
         document.querySelectorAll('.delete-student').forEach(btn => btn.addEventListener('click', e => deleteStudent(parseInt(e.target.dataset.index))));
     }
 
-    // ✅ FIXED: Add Student - activeSubjects ko initialize karo
+    // ============================================
+    // ADD STUDENT - MAIN & OPTIONAL SEPARATE
+    // ============================================
     addStudentBtn.addEventListener('click', () => {
         const roll = parseInt(rollNoInput.value);
         const name = studentNameInput.value.trim();
         if (!name) { alert('Enter student name'); return; }
-        const marks = {};
+        
+        const mainMarks = {};
+        const activeMainSubjects = [];
         let valid = true;
         
-        // ✅ Get active subjects from toggles
-        const activeSubjects = [];
-        
-        document.querySelectorAll('.subject-mark').forEach(inp => {
-            const sub = inp.dataset.subject;
-            const row = inp.closest('.subject-mark-row');
-            const toggle = row ? row.querySelector('.subject-toggle') : null;
+        document.querySelectorAll('.subject-mark-row').forEach(row => {
+            const subject = row.dataset.subject;
+            const toggle = row.querySelector('.subject-toggle');
+            const markInput = row.querySelector('.subject-mark');
             const isActive = toggle ? toggle.checked : true;
             
-            if (!isActive) {
-                marks[sub] = 0;
-                return;
+            if (isActive) {
+                activeMainSubjects.push(subject);
+                const mark = parseInt(markInput.value);
+                if (isNaN(mark) || mark < 0) {
+                    valid = false;
+                    alert(`Please enter valid marks for ${subject}`);
+                    return;
+                }
+                const subObj = selectedMainSubjects.find(s => s.name === subject);
+                if (mark > subObj.total) {
+                    alert(`${subject} marks cannot exceed ${subObj.total}`);
+                    valid = false;
+                    return;
+                }
+                mainMarks[subject] = mark;
+            } else {
+                mainMarks[subject] = 0;
             }
-            
-            // ✅ Add to active subjects if toggle is ON
-            if (!activeSubjects.includes(sub)) {
-                activeSubjects.push(sub);
-            }
-            
-            const mark = parseInt(inp.value);
-            if (isNaN(mark) || mark < 0) {
-                valid = false;
-                alert(`Please enter valid marks for ${sub}`);
-                return;
-            }
-            const subObj = selectedMainSubjects.find(s => s.name === sub);
-            if (mark > subObj.total) {
-                alert(`${sub} marks cannot exceed ${subObj.total}`);
-                valid = false;
-                return;
-            }
-            marks[sub] = mark;
         });
         if (!valid) return;
         
         const optionalMarks = {};
-        document.querySelectorAll('.optional-mark').forEach(inp => {
-            const sub = inp.dataset.subject;
-            const row = inp.closest('.optional-mark-row');
-            const toggle = row ? row.querySelector('.optional-toggle') : null;
+        const activeOptionalSubjects = [];
+        
+        document.querySelectorAll('.optional-mark-row').forEach(row => {
+            const subject = row.dataset.subject;
+            const toggle = row.querySelector('.optional-toggle');
+            const markInput = row.querySelector('.optional-mark');
             const isActive = toggle ? toggle.checked : true;
             
-            if (!isActive) {
-                optionalMarks[sub] = 0;
-                marks[sub] = 0;
-                return;
-            }
-            
-            // ✅ Add to active subjects if toggle is ON
-            if (!activeSubjects.includes(sub)) {
-                activeSubjects.push(sub);
-            }
-            
-            const mark = parseInt(inp.value);
-            if (!isNaN(mark) && mark >= 0) {
-                const optObj = selectedOptionalSubjects.find(s => s.name === sub);
-                if (mark > optObj.total) {
-                    alert(`${sub} marks cannot exceed ${optObj.total}`);
-                    valid = false;
-                    return;
+            if (isActive) {
+                activeOptionalSubjects.push(subject);
+                const mark = parseInt(markInput.value);
+                if (!isNaN(mark) && mark >= 0) {
+                    const optObj = selectedOptionalSubjects.find(s => s.name === subject);
+                    if (mark > optObj.total) {
+                        alert(`${subject} marks cannot exceed ${optObj.total}`);
+                        valid = false;
+                        return;
+                    }
+                    optionalMarks[subject] = mark;
+                } else {
+                    optionalMarks[subject] = null;
                 }
-                optionalMarks[sub] = mark;
-                marks[sub] = mark;
             } else {
-                optionalMarks[sub] = null;
+                optionalMarks[subject] = 0;
             }
         });
         if (!valid) return;
         
-        students.push({ 
-            rollNo: roll, 
-            name, 
-            fatherName: fatherNameInput.value.trim(), 
-            marks,
+        students.push({
+            rollNo: roll,
+            name: name,
+            fatherName: fatherNameInput.value.trim(),
             photoUrl: currentStudentPhotoUrl || null,
+            mainMarks: mainMarks,
             optionalMarks: optionalMarks,
-            activeSubjects: activeSubjects  // ✅ Only active subjects
+            activeMainSubjects: activeMainSubjects,
+            activeOptionalSubjects: activeOptionalSubjects
         });
         updateStudentsTable();
         studentNameInput.value = ''; fatherNameInput.value = '';
@@ -1484,7 +1494,9 @@
         showToast('Student added');
     });
 
-    // ✅ FIXED: editStudent() - Properly loads active subjects
+    // ============================================
+    // EDIT STUDENT - MAIN & OPTIONAL SEPARATE
+    // ============================================
     function editStudent(idx) {
         const s = students[idx];
         editingStudentIndex = idx;
@@ -1492,6 +1504,7 @@
         studentNameInput.value = s.name;
         fatherNameInput.value = s.fatherName || '';
         currentStudentPhotoUrl = s.photoUrl;
+        
         if (s.photoUrl) {
             studentPhotoPreview.src = s.photoUrl;
             studentPhotoPreview.style.display = 'block';
@@ -1499,19 +1512,20 @@
             studentPhotoPreview.style.display = 'none';
         }
         
-        // ✅ Set active subjects for main subjects
+        // Main subjects load
         document.querySelectorAll('.subject-mark-row').forEach(row => {
             const subject = row.dataset.subject;
             const toggle = row.querySelector('.subject-toggle');
             const markInput = row.querySelector('.subject-mark');
             const toggleLabel = row.querySelector('.form-check-label');
             
-            const isActive = s.activeSubjects ? s.activeSubjects.includes(subject) : true;
+            const isActive = s.activeMainSubjects && s.activeMainSubjects.includes(subject);
             toggle.checked = isActive;
             markInput.disabled = !isActive;
             toggleLabel.textContent = isActive ? 'Active ✅' : 'Inactive ❌';
             toggleLabel.style.color = isActive ? '#16a34a' : '#dc2626';
-            markInput.value = s.marks[subject] || 0;
+            markInput.value = s.mainMarks && s.mainMarks[subject] !== undefined ? s.mainMarks[subject] : 0;
+            
             if (!isActive) {
                 markInput.style.background = '#f1f5f9';
                 row.classList.add('inactive');
@@ -1521,20 +1535,21 @@
             }
         });
         
-        // ✅ Set active subjects for optional subjects
+        // Optional subjects load
         document.querySelectorAll('.optional-mark-row').forEach(row => {
             const subject = row.dataset.subject;
             const toggle = row.querySelector('.optional-toggle');
             const markInput = row.querySelector('.optional-mark');
             const toggleLabel = row.querySelector('.form-check-label');
             
-            const isActive = s.activeSubjects ? s.activeSubjects.includes(subject) : true;
+            const isActive = s.activeOptionalSubjects && s.activeOptionalSubjects.includes(subject);
             toggle.checked = isActive;
             markInput.disabled = !isActive;
             toggleLabel.textContent = isActive ? 'Active ✅' : 'Inactive ❌';
             toggleLabel.style.color = isActive ? '#16a34a' : '#dc2626';
             const optMark = s.optionalMarks && s.optionalMarks[subject] !== undefined ? s.optionalMarks[subject] : '';
             markInput.value = optMark !== null && optMark !== '-' ? optMark : '';
+            
             if (!isActive) {
                 markInput.style.background = '#f1f5f9';
                 row.classList.add('inactive');
@@ -1544,95 +1559,89 @@
             }
         });
         
-        addStudentBtn.classList.add('d-none'); 
-        updateStudentBtn.classList.remove('d-none'); 
+        addStudentBtn.classList.add('d-none');
+        updateStudentBtn.classList.remove('d-none');
         cancelEditBtn.classList.remove('d-none');
     }
 
-    // ✅ FIXED: Update Student
+    // ============================================
+    // UPDATE STUDENT - MAIN & OPTIONAL SEPARATE
+    // ============================================
     updateStudentBtn.addEventListener('click', () => {
         if (editingStudentIndex === null) return;
         const roll = parseInt(rollNoInput.value);
         const name = studentNameInput.value.trim();
         if (!name) { alert('Enter name'); return; }
-        const marks = {};
+        
+        const mainMarks = {};
+        const activeMainSubjects = [];
         let valid = true;
         
-        // ✅ Get active subjects from toggles
-        const activeSubjects = [];
-        
-        document.querySelectorAll('.subject-mark').forEach(inp => {
-            const sub = inp.dataset.subject;
-            const row = inp.closest('.subject-mark-row');
-            const toggle = row ? row.querySelector('.subject-toggle') : null;
+        document.querySelectorAll('.subject-mark-row').forEach(row => {
+            const subject = row.dataset.subject;
+            const toggle = row.querySelector('.subject-toggle');
+            const markInput = row.querySelector('.subject-mark');
             const isActive = toggle ? toggle.checked : true;
             
-            if (!isActive) {
-                marks[sub] = 0;
-                return;
+            if (isActive) {
+                activeMainSubjects.push(subject);
+                const mark = parseInt(markInput.value);
+                if (isNaN(mark) || mark < 0) {
+                    valid = false;
+                    alert(`Please enter valid marks for ${subject}`);
+                    return;
+                }
+                const subObj = selectedMainSubjects.find(s => s.name === subject);
+                if (mark > subObj.total) {
+                    alert(`${subject} marks cannot exceed ${subObj.total}`);
+                    valid = false;
+                    return;
+                }
+                mainMarks[subject] = mark;
+            } else {
+                mainMarks[subject] = 0;
             }
-            
-            if (!activeSubjects.includes(sub)) {
-                activeSubjects.push(sub);
-            }
-            
-            const mark = parseInt(inp.value);
-            if (isNaN(mark) || mark < 0) {
-                valid = false;
-                alert(`Please enter valid marks for ${sub}`);
-                return;
-            }
-            const subObj = selectedMainSubjects.find(s => s.name === sub);
-            if (mark > subObj.total) {
-                alert(`${sub} marks cannot exceed ${subObj.total}`);
-                valid = false;
-                return;
-            }
-            marks[sub] = mark;
         });
         if (!valid) return;
         
         const optionalMarks = {};
-        document.querySelectorAll('.optional-mark').forEach(inp => {
-            const sub = inp.dataset.subject;
-            const row = inp.closest('.optional-mark-row');
-            const toggle = row ? row.querySelector('.optional-toggle') : null;
+        const activeOptionalSubjects = [];
+        
+        document.querySelectorAll('.optional-mark-row').forEach(row => {
+            const subject = row.dataset.subject;
+            const toggle = row.querySelector('.optional-toggle');
+            const markInput = row.querySelector('.optional-mark');
             const isActive = toggle ? toggle.checked : true;
             
-            if (!isActive) {
-                optionalMarks[sub] = 0;
-                marks[sub] = 0;
-                return;
-            }
-            
-            if (!activeSubjects.includes(sub)) {
-                activeSubjects.push(sub);
-            }
-            
-            const mark = parseInt(inp.value);
-            if (!isNaN(mark) && mark >= 0) {
-                const optObj = selectedOptionalSubjects.find(s => s.name === sub);
-                if (mark > optObj.total) {
-                    alert(`${sub} marks cannot exceed ${optObj.total}`);
-                    valid = false;
-                    return;
+            if (isActive) {
+                activeOptionalSubjects.push(subject);
+                const mark = parseInt(markInput.value);
+                if (!isNaN(mark) && mark >= 0) {
+                    const optObj = selectedOptionalSubjects.find(s => s.name === subject);
+                    if (mark > optObj.total) {
+                        alert(`${subject} marks cannot exceed ${optObj.total}`);
+                        valid = false;
+                        return;
+                    }
+                    optionalMarks[subject] = mark;
+                } else {
+                    optionalMarks[subject] = null;
                 }
-                optionalMarks[sub] = mark;
-                marks[sub] = mark;
             } else {
-                optionalMarks[sub] = null;
+                optionalMarks[subject] = 0;
             }
         });
         if (!valid) return;
         
-        students[editingStudentIndex] = { 
-            rollNo: roll, 
-            name, 
-            fatherName: fatherNameInput.value.trim(), 
-            marks, 
+        students[editingStudentIndex] = {
+            rollNo: roll,
+            name: name,
+            fatherName: fatherNameInput.value.trim(),
             photoUrl: currentStudentPhotoUrl,
+            mainMarks: mainMarks,
             optionalMarks: optionalMarks,
-            activeSubjects: activeSubjects  // ✅ Only active subjects
+            activeMainSubjects: activeMainSubjects,
+            activeOptionalSubjects: activeOptionalSubjects
         };
         updateStudentsTable();
         cancelEdit();
@@ -1656,19 +1665,34 @@
         if (confirm('Delete student?')) { students.splice(idx, 1); updateStudentsTable(); hasChanges = true; showToast('Deleted'); }
     }
 
+    // ============================================
+    // SAVE DRAFT - MAIN & OPTIONAL SEPARATE
+    // ============================================
     saveDraftBtn.addEventListener('click', async () => {
         if (!examNameInput.value.trim() || students.length === 0) { alert('Exam name and at least one student required'); return; }
         if (selectedMainSubjects.length === 0) { alert('Please select at least one main subject'); return; }
+        
+        const cleanStudents = students.map(s => ({
+            rollNo: s.rollNo,
+            name: s.name,
+            fatherName: s.fatherName || '',
+            photoUrl: s.photoUrl || null,
+            mainMarks: s.mainMarks || {},
+            optionalMarks: s.optionalMarks || {},
+            activeMainSubjects: s.activeMainSubjects || [],
+            activeOptionalSubjects: s.activeOptionalSubjects || []
+        }));
+        
         try {
-            const data = { 
-                examName: examNameInput.value, 
+            const data = {
+                examName: examNameInput.value,
                 examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
                 rollCode: rollCodeInput.value || '55075',
                 template: selectedTemplate,
-                subjects: selectedMainSubjects,
+                mainSubjects: selectedMainSubjects,
                 optionalSubjects: selectedOptionalSubjects,
-                students, 
-                createdAt: serverTimestamp() 
+                students: cleanStudents,
+                createdAt: serverTimestamp()
             };
             if (editingDraftId) await updateDoc(doc(db, "draft_results", editingDraftId), data);
             else await addDoc(collection(db, "draft_results"), data);
@@ -1678,23 +1702,38 @@
         } catch(e) { alert(e.message); }
     });
 
+    // ============================================
+    // PUBLISH RESULT - MAIN & OPTIONAL SEPARATE
+    // ============================================
     publishResultBtn.addEventListener('click', async () => {
         if (!examNameInput.value.trim() || students.length === 0) { alert('Exam name and at least one student required'); return; }
         if (selectedMainSubjects.length === 0) { alert('Please select at least one main subject'); return; }
-        if (isEditingPublishedResult) { 
+        if (isEditingPublishedResult) {
             editPublishedConfirmModal.show();
             return;
         }
+        
+        const cleanStudents = students.map(s => ({
+            rollNo: s.rollNo,
+            name: s.name,
+            fatherName: s.fatherName || '',
+            photoUrl: s.photoUrl || null,
+            mainMarks: s.mainMarks || {},
+            optionalMarks: s.optionalMarks || {},
+            activeMainSubjects: s.activeMainSubjects || [],
+            activeOptionalSubjects: s.activeOptionalSubjects || []
+        }));
+        
         try {
-            const data = { 
+            const data = {
                 examName: examNameInput.value,
                 examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
                 rollCode: rollCodeInput.value || '55075',
                 template: selectedTemplate,
-                subjects: selectedMainSubjects,
+                mainSubjects: selectedMainSubjects,
                 optionalSubjects: selectedOptionalSubjects,
-                students, 
-                createdAt: serverTimestamp() 
+                students: cleanStudents,
+                createdAt: serverTimestamp()
             };
             await addDoc(collection(db, "results"), data);
             if (editingDraftId) await deleteDoc(doc(db, "draft_results", editingDraftId));
@@ -1706,15 +1745,27 @@
 
     saveChangesConfirmBtn.addEventListener('click', async () => {
         if (!editingPublishedResultId) { editPublishedConfirmModal.hide(); return; }
+        
+        const cleanStudents = students.map(s => ({
+            rollNo: s.rollNo,
+            name: s.name,
+            fatherName: s.fatherName || '',
+            photoUrl: s.photoUrl || null,
+            mainMarks: s.mainMarks || {},
+            optionalMarks: s.optionalMarks || {},
+            activeMainSubjects: s.activeMainSubjects || [],
+            activeOptionalSubjects: s.activeOptionalSubjects || []
+        }));
+        
         try {
-            const data = { 
+            const data = {
                 examName: examNameInput.value,
                 examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
                 rollCode: rollCodeInput.value || '55075',
                 template: selectedTemplate,
-                subjects: selectedMainSubjects,
+                mainSubjects: selectedMainSubjects,
                 optionalSubjects: selectedOptionalSubjects,
-                students
+                students: cleanStudents
             };
             await updateDoc(doc(db, "results", editingPublishedResultId), data);
             editPublishedConfirmModal.hide();
@@ -1726,16 +1777,27 @@
     });
 
     saveDraftConfirmBtn.addEventListener('click', async () => {
+        const cleanStudents = students.map(s => ({
+            rollNo: s.rollNo,
+            name: s.name,
+            fatherName: s.fatherName || '',
+            photoUrl: s.photoUrl || null,
+            mainMarks: s.mainMarks || {},
+            optionalMarks: s.optionalMarks || {},
+            activeMainSubjects: s.activeMainSubjects || [],
+            activeOptionalSubjects: s.activeOptionalSubjects || []
+        }));
+        
         try {
-            const data = { 
+            const data = {
                 examName: examNameInput.value,
                 examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
                 rollCode: rollCodeInput.value || '55075',
                 template: selectedTemplate,
-                subjects: selectedMainSubjects,
+                mainSubjects: selectedMainSubjects,
                 optionalSubjects: selectedOptionalSubjects,
-                students,
-                createdAt: serverTimestamp() 
+                students: cleanStudents,
+                createdAt: serverTimestamp()
             };
             await addDoc(collection(db, "draft_results"), data);
             editPublishedConfirmModal.hide();
@@ -1753,7 +1815,7 @@
     });
 
     function resetCreateResultForm() {
-        examNameInput.value = ''; 
+        examNameInput.value = '';
         examCentreInput.value = '';
         rollCodeInput.value = '55075';
         subjectFields.innerHTML = '';
@@ -1782,8 +1844,10 @@
         snap.forEach(doc => {
             const d = doc.data();
             const templateLabel = d.template === 'result1' ? '🎫 Admit Card Style' : '📄 Classic';
-            const optLabel = d.optionalSubjects && d.optionalSubjects.length ? ` | Optional: ${d.optionalSubjects.length}` : '';
-            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">Template: ${templateLabel} | Subjects: ${d.subjects.length}${optLabel} | Students: ${d.students.length}</p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary edit-draft" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-danger delete-draft" data-id="${doc.id}">Delete</button></div></div></div></div>`;
+            const mainCount = d.mainSubjects ? d.mainSubjects.length : (d.subjects ? d.subjects.length : 0);
+            const optCount = d.optionalSubjects ? d.optionalSubjects.length : 0;
+            const optLabel = optCount > 0 ? ` | Optional: ${optCount}` : '';
+            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">Template: ${templateLabel} | Main: ${mainCount}${optLabel} | Students: ${d.students.length}</p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary edit-draft" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-danger delete-draft" data-id="${doc.id}">Delete</button></div></div></div></div>`;
             draftResultsList.insertAdjacentHTML('beforeend', card);
         });
         document.querySelectorAll('.edit-draft').forEach(btn => btn.addEventListener('click', e => editDraft(e.target.dataset.id)));
@@ -1811,7 +1875,10 @@
             selectedTemplate = 'result';
         }
         
-        if (data.subjects) {
+        // Load subjects - support both old and new format
+        if (data.mainSubjects) {
+            selectedMainSubjects = data.mainSubjects.map(s => ({ name: s.name, total: s.total }));
+        } else if (data.subjects) {
             selectedMainSubjects = data.subjects.map(s => ({ name: s.name, total: s.total }));
         }
         if (data.optionalSubjects) {
@@ -1823,7 +1890,10 @@
         setTimeout(() => {
             students = data.students || [];
             students.forEach(s => {
-                if (!s.activeSubjects) s.activeSubjects = [];
+                if (!s.activeMainSubjects) s.activeMainSubjects = [];
+                if (!s.activeOptionalSubjects) s.activeOptionalSubjects = [];
+                if (!s.mainMarks) s.mainMarks = {};
+                if (!s.optionalMarks) s.optionalMarks = {};
             });
             updateStudentsTable();
             editingDraftId = id;
@@ -1843,8 +1913,10 @@
             const d = doc.data();
             const date = d.createdAt ? new Date(d.createdAt.toDate()).toLocaleDateString() : 'Unknown';
             const templateLabel = d.template === 'result1' ? '🎫 Admit Card Style' : '📄 Classic';
-            const optLabel = d.optionalSubjects && d.optionalSubjects.length ? ` | Optional: ${d.optionalSubjects.length}` : '';
-            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">${date} | Template: ${templateLabel} | Subjects: ${d.subjects.length}${optLabel} | Students: ${d.students.length}</p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary view-result" data-id="${doc.id}">View</button><button class="btn btn-sm btn-warning edit-result" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-info change-template" data-id="${doc.id}">🎨 Template</button><button class="btn btn-sm btn-danger delete-result" data-id="${doc.id}">Delete</button></div></div></div></div>`;
+            const mainCount = d.mainSubjects ? d.mainSubjects.length : (d.subjects ? d.subjects.length : 0);
+            const optCount = d.optionalSubjects ? d.optionalSubjects.length : 0;
+            const optLabel = optCount > 0 ? ` | Optional: ${optCount}` : '';
+            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">${date} | Template: ${templateLabel} | Main: ${mainCount}${optLabel} | Students: ${d.students.length}</p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary view-result" data-id="${doc.id}">View</button><button class="btn btn-sm btn-warning edit-result" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-info change-template" data-id="${doc.id}">🎨 Template</button><button class="btn btn-sm btn-danger delete-result" data-id="${doc.id}">Delete</button></div></div></div></div>`;
             oldResultsList.insertAdjacentHTML('beforeend', card);
         });
         document.querySelectorAll('.view-result').forEach(btn => btn.addEventListener('click', e => viewResult(e.target.dataset.id)));
@@ -1888,27 +1960,35 @@
         }
     });
 
-    // ✅ FIXED: viewResult() - Only shows active subjects for each student
+    // ============================================
+    // VIEW RESULT - MAIN & OPTIONAL SEPARATE
+    // ============================================
     async function viewResult(id) {
         const q = query(collection(db, "results"), where("__name__", "==", id));
         const snap = await getDocs(q);
         if (snap.empty) return;
         const data = snap.docs[0].data();
-        currentResultDataForPdf = data; 
+        currentResultDataForPdf = data;
         currentExamNameForPdf = data.examName;
-        const sorted = sortStudentsByPercentage(data.students, data.subjects);
+        
+        // Use mainSubjects or fallback to subjects
+        const mainSubjects = data.mainSubjects || data.subjects || [];
+        const optionalSubjects = data.optionalSubjects || [];
+        
+        const sorted = sortStudentsByPercentage(data.students, mainSubjects);
         resultModalTitle.innerText = data.examName + ' (Ranked)';
         let html = `<p><strong>Total Students:</strong> ${data.students.length}</p>`;
-        if (data.optionalSubjects && data.optionalSubjects.length) {
-            html += `<p><strong>Optional Subjects:</strong> ${data.optionalSubjects.map(o => o.name).join(', ')} - <span class="text-muted">Not added to total</span></p>`;
+        html += `<p><strong>Main Subjects:</strong> ${mainSubjects.map(s => s.name).join(', ')}</p>`;
+        if (optionalSubjects && optionalSubjects.length) {
+            html += `<p><strong>Optional Subjects:</strong> ${optionalSubjects.map(o => o.name).join(', ')} - <span class="text-muted">Not added to total</span></p>`;
         }
         html += `<p><strong>Template:</strong> ${data.template === 'result1' ? '🎫 Admit Card Style' : '📄 Classic'}</p>`;
         if (sorted.length) html += `<div class="alert alert-success">🏆 Top Student: ${sorted[0].name} (Roll: ${sorted[0].rollNo})</div>`;
         html += `<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Photo</th><th>Rank</th><th>Roll</th><th>Name</th><th>Father</th>`;
         
-        data.subjects.forEach(s => html += `<th>${s.name}</th>`);
-        if (data.optionalSubjects && data.optionalSubjects.length) {
-            data.optionalSubjects.forEach(o => html += `<th>${o.name}<br><small>(Optional)</small></th>`);
+        mainSubjects.forEach(s => html += `<th>${s.name}</th>`);
+        if (optionalSubjects && optionalSubjects.length) {
+            optionalSubjects.forEach(o => html += `<th>${o.name}<br><small>(Optional)</small></th>`);
         }
         html += `<th>Total</th><th>%</th></tr></thead><tbody>`;
         
@@ -1917,11 +1997,10 @@
             const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷</span>';
             html += `<tr${idx===0?' class="top-student-row"':''}><td>${photoHtml}</td><td><strong>#${idx+1}</strong></td><td>${s.rollNo}</td><td>${s.name}${idx===0?' 🏆':''}</td><td>${s.fatherName||'-'}</td>`;
             
-            // ✅ Only show active subjects for this student
-            data.subjects.forEach(sub => {
-                if (s.activeSubjects && s.activeSubjects.includes(sub.name)) {
-                    const mark = s.marks[sub.name] || 0;
-                    total += mark; 
+            mainSubjects.forEach(sub => {
+                if (s.activeMainSubjects && s.activeMainSubjects.includes(sub.name)) {
+                    const mark = s.mainMarks && s.mainMarks[sub.name] !== undefined ? s.mainMarks[sub.name] : 0;
+                    total += mark;
                     maxTotal += sub.total;
                     html += `<td>${mark}/${sub.total}</td>`;
                 } else {
@@ -1929,11 +2008,11 @@
                 }
             });
             
-            if (data.optionalSubjects && data.optionalSubjects.length) {
-                data.optionalSubjects.forEach(o => {
-                    if (s.activeSubjects && s.activeSubjects.includes(o.name)) {
+            if (optionalSubjects && optionalSubjects.length) {
+                optionalSubjects.forEach(o => {
+                    if (s.activeOptionalSubjects && s.activeOptionalSubjects.includes(o.name)) {
                         const optMark = s.optionalMarks && s.optionalMarks[o.name] !== undefined ? s.optionalMarks[o.name] : '-';
-                        html += `<td style="color:#c5a059;">${optMark !== null && optMark !== '-' ? optMark : '-'}${optMark !== null && optMark !== '-' ? `/${o.total}` : ''}</td>`;
+                        html += `<td style="color:#c5a059;">${optMark}/${o.total}</td>`;
                     } else {
                         html += `<td style="color:#ccc;">-</td>`;
                     }
@@ -1947,17 +2026,17 @@
         resultModal.show();
     }
 
-    function sortStudentsByPercentage(arr, subs) {
+    function sortStudentsByPercentage(arr, mainSubjects) {
         return [...arr].sort((a,b) => {
             let ta=0, ma=0, tb=0, mb=0;
-            subs.forEach(s => { 
-                if (a.activeSubjects && a.activeSubjects.includes(s.name)) {
-                    ta += a.marks[s.name]||0; 
-                    ma += s.total; 
+            mainSubjects.forEach(s => {
+                if (a.activeMainSubjects && a.activeMainSubjects.includes(s.name)) {
+                    ta += (a.mainMarks && a.mainMarks[s.name]) || 0;
+                    ma += s.total;
                 }
-                if (b.activeSubjects && b.activeSubjects.includes(s.name)) {
-                    tb += b.marks[s.name]||0; 
-                    mb += s.total; 
+                if (b.activeMainSubjects && b.activeMainSubjects.includes(s.name)) {
+                    tb += (b.mainMarks && b.mainMarks[s.name]) || 0;
+                    mb += s.total;
                 }
             });
             return (tb/mb) - (ta/ma);
@@ -1985,7 +2064,9 @@
             selectedTemplate = 'result';
         }
         
-        if (data.subjects) {
+        if (data.mainSubjects) {
+            selectedMainSubjects = data.mainSubjects.map(s => ({ name: s.name, total: s.total }));
+        } else if (data.subjects) {
             selectedMainSubjects = data.subjects.map(s => ({ name: s.name, total: s.total }));
         }
         if (data.optionalSubjects) {
@@ -1997,7 +2078,10 @@
         setTimeout(() => {
             students = data.students || [];
             students.forEach(s => {
-                if (!s.activeSubjects) s.activeSubjects = [];
+                if (!s.activeMainSubjects) s.activeMainSubjects = [];
+                if (!s.activeOptionalSubjects) s.activeOptionalSubjects = [];
+                if (!s.mainMarks) s.mainMarks = {};
+                if (!s.optionalMarks) s.optionalMarks = {};
             });
             updateStudentsTable();
             editingDraftId = null;
@@ -2011,46 +2095,71 @@
 
     downloadPdfBtn.addEventListener('click', () => { if (currentResultDataForPdf) generatePDF(currentResultDataForPdf, currentExamNameForPdf); });
 
+    // ============================================
+    // GENERATE PDF - MAIN & OPTIONAL SEPARATE
+    // ============================================
     function generatePDF(data, examName) {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
         doc.setFontSize(18); doc.text(`QUEST COACHING CENTRE - ${examName}`, 14, 15);
-        const sorted = sortStudentsByPercentage(data.students, data.subjects);
-        let columns = [{ header: 'Rank', dataKey: 'rank' }, { header: 'Roll No', dataKey: 'rollNo' }, { header: 'Name', dataKey: 'name' }, { header: 'Father', dataKey: 'father' }];
-        data.subjects.forEach(s => columns.push({ header: `${s.name}\n(${s.total})`, dataKey: s.name }));
-        if (data.optionalSubjects && data.optionalSubjects.length) {
-            data.optionalSubjects.forEach(o => {
+        
+        const mainSubjects = data.mainSubjects || data.subjects || [];
+        const optionalSubjects = data.optionalSubjects || [];
+        const sorted = sortStudentsByPercentage(data.students, mainSubjects);
+        
+        let columns = [
+            { header: 'Rank', dataKey: 'rank' },
+            { header: 'Roll No', dataKey: 'rollNo' },
+            { header: 'Name', dataKey: 'name' },
+            { header: 'Father', dataKey: 'father' }
+        ];
+        
+        mainSubjects.forEach(s => columns.push({ header: `${s.name}\n(${s.total})`, dataKey: s.name }));
+        if (optionalSubjects && optionalSubjects.length) {
+            optionalSubjects.forEach(o => {
                 columns.push({ header: `${o.name}\n(Optional)`, dataKey: `opt_${o.name}` });
             });
         }
         columns.push({ header: 'Total', dataKey: 'total' }, { header: '%', dataKey: 'percentage' });
+        
         const rows = sorted.map((s, idx) => {
             let row = { rank: idx+1, rollNo: s.rollNo, name: s.name, father: s.fatherName||'-' };
             let total=0, maxTotal=0;
-            data.subjects.forEach(sub => {
-                if (s.activeSubjects && s.activeSubjects.includes(sub.name)) {
-                    const mark = s.marks[sub.name]||0;
+            
+            mainSubjects.forEach(sub => {
+                if (s.activeMainSubjects && s.activeMainSubjects.includes(sub.name)) {
+                    const mark = (s.mainMarks && s.mainMarks[sub.name]) || 0;
                     row[sub.name] = `${mark}/${sub.total}`;
-                    total+=mark; maxTotal+=sub.total;
+                    total += mark;
+                    maxTotal += sub.total;
                 } else {
                     row[sub.name] = '-';
                 }
             });
-            if (data.optionalSubjects && data.optionalSubjects.length) {
-                data.optionalSubjects.forEach(o => {
-                    if (s.activeSubjects && s.activeSubjects.includes(o.name)) {
-                        const optMark = s.optionalMarks && s.optionalMarks[o.name] !== undefined ? s.optionalMarks[o.name] : '-';
+            
+            if (optionalSubjects && optionalSubjects.length) {
+                optionalSubjects.forEach(o => {
+                    if (s.activeOptionalSubjects && s.activeOptionalSubjects.includes(o.name)) {
+                        const optMark = (s.optionalMarks && s.optionalMarks[o.name] !== undefined) ? s.optionalMarks[o.name] : '-';
                         row[`opt_${o.name}`] = optMark !== null && optMark !== '-' ? `${optMark}/${o.total}` : '-';
                     } else {
                         row[`opt_${o.name}`] = '-';
                     }
                 });
             }
+            
             row.total = maxTotal > 0 ? `${total}/${maxTotal}` : '0/0';
             row.percentage = maxTotal > 0 ? `${((total/maxTotal)*100).toFixed(2)}%` : '0%';
             return row;
         });
-        doc.autoTable({ startY: 25, head: [columns.map(c=>c.header)], body: rows.map(r=>columns.map(c=>r[c.dataKey])), styles: { fontSize: 8 }, headStyles: { fillColor: [41,128,185] } });
+        
+        doc.autoTable({
+            startY: 25,
+            head: [columns.map(c=>c.header)],
+            body: rows.map(r=>columns.map(c=>r[c.dataKey])),
+            styles: { fontSize: 8 },
+            headStyles: { fillColor: [41,128,185] }
+        });
         doc.save(`${examName}_Results.pdf`);
         showToast('PDF Downloaded');
     }
