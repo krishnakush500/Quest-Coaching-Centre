@@ -145,6 +145,7 @@
     }
     .marks-table tr:nth-child(even) { background: #f9f9f9; }
     .total-marks { background: #e8f5e8 !important; font-weight: 600; }
+    .optional-row { background: #fef9e6 !important; border-left: 3px solid #c5a059; }
     
     .grade-a-plus { background: #d4edda; color: #155724; font-weight: 600; text-align: center; border-radius: 20px; display: inline-block; padding: 2px 8px; font-size: 0.75rem; }
     .grade-a { background: #d1ecf1; color: #0c5460; font-weight: 600; text-align: center; border-radius: 20px; display: inline-block; padding: 2px 8px; font-size: 0.75rem; }
@@ -161,6 +162,7 @@
     .loading-state { text-align: center; padding: 50px 20px; background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
     .loading-state i { font-size: 2rem; color: #1a237e; margin-bottom: 15px; }
     .error-state { text-align: center; padding: 40px 20px; background: #ffe6e6; color: #b30000; border-radius: 12px; margin: 20px; }
+    .error-state button { margin-top: 15px; padding: 10px 24px; background: #1a237e; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
     
     .pdf-clone-container {
       position: fixed;
@@ -184,7 +186,6 @@
       background: white;
     }
     
-    /* Force desktop layout for PDF */
     .pdf-clone .student-info-card {
       display: flex !important;
       flex-direction: row !important;
@@ -207,6 +208,91 @@
       font-size: 0.7rem !important;
     }
     
+    /* Progress Bar Styles */
+    .progress-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 10000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .progress-overlay.active {
+      display: flex;
+    }
+    .progress-card {
+      background: white;
+      border-radius: 20px;
+      padding: 40px 50px;
+      max-width: 450px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .progress-card .icon {
+      font-size: 3rem;
+      color: #1a237e;
+      margin-bottom: 15px;
+    }
+    .progress-card .title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1a237e;
+      margin-bottom: 5px;
+    }
+    .progress-card .subtitle {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+    .progress-bar-container {
+      width: 100%;
+      height: 12px;
+      background: #e2e8f0;
+      border-radius: 50px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #1a237e, #4f6f8f, #1a237e);
+      background-size: 200% 100%;
+      border-radius: 50px;
+      transition: width 0.3s ease;
+      animation: shimmer 2s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .progress-status {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #1a237e;
+      margin-top: 10px;
+    }
+    .progress-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 15px;
+    }
+    .progress-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      transition: all 0.3s;
+    }
+    .progress-dot.done { background: #16a34a; }
+    .progress-dot.active { background: #1a237e; transform: scale(1.3); }
+    
     @media (max-width: 600px) {
       body { padding: 15px; }
       .result-logo { width: 65px; height: 65px; }
@@ -217,6 +303,7 @@
       .student-photo-area { order: -1; margin-bottom: 10px; }
       .student-details-area { width: 100%; }
       .student-photo { width: 100px; height: 120px; }
+      .progress-card { padding: 25px 20px; }
     }
     
     @media print {
@@ -286,6 +373,26 @@
   </div>
 </div>
 
+<!-- Progress Overlay -->
+<div class="progress-overlay" id="progressOverlay">
+  <div class="progress-card">
+    <div class="icon"><i class="fas fa-spinner fa-spin"></i></div>
+    <div class="title" id="progressTitle">Loading Result...</div>
+    <div class="subtitle" id="progressSubtitle">Please wait</div>
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-status" id="progressStatus">0%</div>
+    <div class="progress-dots">
+      <div class="progress-dot" id="dot1"></div>
+      <div class="progress-dot" id="dot2"></div>
+      <div class="progress-dot" id="dot3"></div>
+      <div class="progress-dot" id="dot4"></div>
+      <div class="progress-dot" id="dot5"></div>
+    </div>
+  </div>
+</div>
+
 <div id="pdfCloneContainer" class="pdf-clone-container"></div>
 
 <script>
@@ -309,7 +416,48 @@
   
   let currentExamData = null;
   let currentStudentData = null;
+  let currentExamId = null;
+  let currentRollNo = null;
+  let isPublishing = false;
   
+  // ============================================
+  // PROGRESS BAR FUNCTIONS
+  // ============================================
+  function showProgress(title, subtitle) {
+    progressOverlay.classList.add('active');
+    document.getElementById('progressTitle').textContent = title || 'Processing...';
+    document.getElementById('progressSubtitle').textContent = subtitle || 'Please wait';
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('progressStatus').textContent = '0%';
+    document.querySelectorAll('.progress-dot').forEach(d => d.className = 'progress-dot');
+    document.getElementById('dot1').classList.add('active');
+    isPublishing = true;
+  }
+  
+  function updateProgress(percent, statusText, dotIndex) {
+    document.getElementById('progressFill').style.width = percent + '%';
+    document.getElementById('progressStatus').textContent = percent + '%';
+    if (statusText) document.getElementById('progressSubtitle').textContent = statusText;
+    
+    document.querySelectorAll('.progress-dot').forEach(d => d.className = 'progress-dot');
+    for (let i = 0; i < dotIndex; i++) {
+      document.getElementById('dot' + (i+1)).classList.add('done');
+    }
+    if (dotIndex < 5) {
+      document.getElementById('dot' + (dotIndex+1)).classList.add('active');
+    }
+  }
+  
+  function hideProgress() {
+    progressOverlay.classList.remove('active');
+    isPublishing = false;
+  }
+  
+  function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+  
+  // ============================================
+  // HELPER FUNCTIONS
+  // ============================================
   function getGrade(percentage) {
     if(percentage >= 90) return { grade: "A+", className: "grade-a-plus" };
     if(percentage >= 75) return { grade: "A", className: "grade-a" };
@@ -350,9 +498,25 @@
     }
   }
   
-  // =============================================
-  // ✅ UPDATED: loadResult() with template redirect
-  // =============================================
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+  
+  function showError(message) {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('errorState').style.display = 'block';
+    document.getElementById('errorMessage').innerHTML = message;
+  }
+  
+  // ============================================
+  // ✅ FIXED: loadResult() with template redirect
+  // ============================================
   async function loadResult() {
     const params = getUrlParams();
     const examId = params.examId;
@@ -363,9 +527,21 @@
       return;
     }
     
+    currentExamId = examId;
+    currentRollNo = rollNo;
+    
+    showProgress('📄 Loading Result...', 'Connecting to database...');
+    updateProgress(10, 'Validating link...', 1);
+    await sleep(400);
+    
     try {
       const docSnap = await db.collection("results").doc(examId).get();
+      
+      updateProgress(30, 'Fetching exam data...', 2);
+      await sleep(400);
+      
       if (!docSnap.exists) {
+        hideProgress();
         showError('Exam not found. Please check the link and try again.');
         return;
       }
@@ -376,6 +552,7 @@
       const template = currentExamData.template || 'result';
       if (template === 'result1') {
         console.log('🔄 Redirecting to result1.html (Admit Card Style)');
+        hideProgress();
         window.location.href = `result1.html?examId=${examId}&rollNo=${rollNo}`;
         return;
       }
@@ -383,25 +560,44 @@
       // ✅ Agar template 'result' hai to normal flow continue karo
       console.log('📄 Using Classic Result Template');
       
+      updateProgress(50, 'Finding student...', 3);
+      await sleep(400);
+      
       const student = currentExamData.students?.find(s => String(s.rollNo) == String(rollNo));
       
       if (!student) {
+        hideProgress();
         showError(`Student with roll number ${rollNo} not found in this exam.`);
         return;
       }
       
       currentStudentData = student;
+      
+      updateProgress(70, 'Fetching student photo...', 4);
+      await sleep(400);
+      
       const studentPhotoUrl = await fetchStudentPhoto(rollNo);
       student.photoUrl = studentPhotoUrl;
       
+      updateProgress(90, 'Building result...', 4);
+      await sleep(400);
+      
       displayResult(currentExamData, student);
       
+      updateProgress(100, '✅ Done!', 5);
+      await sleep(400);
+      hideProgress();
+      
     } catch (error) {
+      hideProgress();
       console.error('Error loading result:', error);
       showError('Failed to load result. Please try again later.');
     }
   }
   
+  // ============================================
+  // ✅ FIXED: displayResult() with mainSubjects + optionalSubjects + active check
+  // ============================================
   function displayResult(examData, student) {
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('resultCard').style.display = 'block';
@@ -431,26 +627,105 @@
     let totalObtained = 0;
     let totalMax = 0;
     
-    if (student.marks && examData.subjects) {
-      for (const subject of examData.subjects) {
-        const subjectName = subject.name;
-        const subjectTotal = subject.total || 100;
-        const marksObtained = student.marks[subjectName] || 0;
-        const percentage = (marksObtained / subjectTotal) * 100;
-        const gradeInfo = getGrade(percentage);
-        
-        marksHtml += `<tr><td>${escapeHtml(subjectName)}</td><td>${marksObtained}</td><td>${subjectTotal}</td><td><span class="${gradeInfo.className}">${gradeInfo.grade}</span></td></tr>`;
-        totalObtained += marksObtained;
-        totalMax += subjectTotal;
+    // ✅ Get mainSubjects (fallback to subjects for backward compatibility)
+    const mainSubjects = examData.mainSubjects || examData.subjects || [];
+    const optionalSubjects = examData.optionalSubjects || [];
+    
+    // ✅ Get student's active subjects
+    const activeMainSubjects = student.activeMainSubjects || [];
+    const activeOptionalSubjects = student.activeOptionalSubjects || [];
+    const legacyActiveSubjects = student.activeSubjects || [];
+    
+    // ✅ MAIN SUBJECTS - Sirf active wale
+    let mainSubjectsShown = 0;
+    
+    for (const subject of mainSubjects) {
+      const subjectName = subject.name;
+      
+      // ✅ CHECK: Sirf active subjects
+      const isActive = activeMainSubjects.includes(subjectName) || legacyActiveSubjects.includes(subjectName);
+      if (!isActive) continue;
+      
+      mainSubjectsShown++;
+      const subjectTotal = subject.total || 100;
+      
+      // ✅ Get marks from mainMarks or marks
+      let marksObtained = 0;
+      if (student.mainMarks && student.mainMarks[subjectName] !== undefined) {
+        marksObtained = student.mainMarks[subjectName];
+      } else if (student.marks && student.marks[subjectName] !== undefined) {
+        marksObtained = student.marks[subjectName];
       }
+      
+      const percentage = (marksObtained / subjectTotal) * 100;
+      const gradeInfo = getGrade(percentage);
+      
+      marksHtml += `<tr>
+        <td>${escapeHtml(subjectName)}</td>
+        <td><strong>${marksObtained}</strong></td>
+        <td>${subjectTotal}</td>
+        <td><span class="${gradeInfo.className}">${gradeInfo.grade}</span></td>
+      </tr>`;
+      totalObtained += marksObtained;
+      totalMax += subjectTotal;
     }
     
+    // ✅ TOTAL ROW
+    if (mainSubjectsShown > 0) {
+      marksHtml += `<tr class="total-marks">
+        <td><strong>TOTAL</strong></td>
+        <td><strong>${totalObtained}</strong></td>
+        <td><strong>${totalMax}</strong></td>
+        <td style="background:#e8f5e8;"></td>
+      </tr>`;
+    }
+    
+    // ✅ OPTIONAL SUBJECTS - Sirf active wale
+    for (const opt of optionalSubjects) {
+      const optName = opt.name;
+      
+      // ✅ CHECK: Sirf active optional subjects
+      const isActive = activeOptionalSubjects.includes(optName);
+      if (!isActive) continue;
+      
+      const optTotal = opt.total || 100;
+      let optObtained = '-';
+      
+      // Get marks from optionalMarks
+      if (student.optionalMarks && student.optionalMarks[optName] !== undefined) {
+        optObtained = student.optionalMarks[optName];
+      } else if (student.marks && student.marks[optName] !== undefined) {
+        optObtained = student.marks[optName];
+      }
+      
+      let optGrade = '-';
+      if (optObtained !== null && optObtained !== '-' && !isNaN(optObtained)) {
+        const optPercent = (parseFloat(optObtained) / optTotal) * 100;
+        const gradeInfo = getGrade(optPercent);
+        optGrade = `<span class="${gradeInfo.className}">${gradeInfo.grade}</span>`;
+      }
+      
+      marksHtml += `<tr class="optional-row">
+        <td>${escapeHtml(optName)} <span style="color:#c5a059; font-size:0.65rem;">(Optional)</span></td>
+        <td><strong>${optObtained}</strong></td>
+        <td>${optTotal}</td>
+        <td>${optGrade}</td>
+      </tr>`;
+    }
+    
+    // ✅ Agar koi subject nahi dikha toh message
+    if (mainSubjectsShown === 0) {
+      marksHtml = `<tr><td colspan="4" style="text-align:center; color:#dc2626; padding:20px;">
+        <i class="fas fa-exclamation-circle"></i> No active subjects found for this student.
+      </td></tr>`;
+    }
+    
+    document.getElementById('marksTableBody').innerHTML = marksHtml;
+    
+    // ✅ Percentage and Division
     const totalPercentage = totalMax > 0 ? ((totalObtained / totalMax) * 100).toFixed(2) : 0;
     const division = calculateDivision(parseFloat(totalPercentage));
     
-    marksHtml += `<tr class="total-marks"><td><strong>Total</strong></td><td><strong>${totalObtained}</strong></td><td><strong>${totalMax}</strong></td><td style="background:#e8f5e8;"></td></tr>`;
-    
-    document.getElementById('marksTableBody').innerHTML = marksHtml;
     document.getElementById('totalPercentage').innerHTML = `Total Percentage: ${totalPercentage}%`;
     
     const divisionBox = document.getElementById('divisionBox');
@@ -474,22 +749,9 @@
     divisionBox.innerHTML = `Division: ${division}`;
   }
   
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-      if (m === '&') return '&amp;';
-      if (m === '<') return '&lt;';
-      if (m === '>') return '&gt;';
-      return m;
-    });
-  }
-  
-  function showError(message) {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('errorState').style.display = 'block';
-    document.getElementById('errorMessage').innerHTML = message;
-  }
-  
+  // ============================================
+  // PDF FUNCTIONS
+  // ============================================
   function createPDFClone() {
     const originalCard = document.getElementById('resultCard');
     const cloneContainer = document.getElementById('pdfCloneContainer');
@@ -506,11 +768,9 @@
     clone.style.background = 'white';
     clone.style.boxShadow = 'none';
     
-    // Remove action buttons
     const actionDiv = clone.querySelector('.action-buttons');
     if (actionDiv) actionDiv.remove();
     
-    // Force desktop layout
     const studentInfoCard = clone.querySelector('.student-info-card');
     if (studentInfoCard) {
       studentInfoCard.style.display = 'flex';
@@ -533,14 +793,12 @@
       studentPhoto.style.height = '105px';
     }
     
-    // Fix logo
     const logoImg = clone.querySelector('#coachingLogo');
     if (logoImg) {
       logoImg.crossOrigin = 'Anonymous';
       logoImg.src = COACHING_LOGO;
     }
     
-    // Fix student photo
     const clonePhoto = clone.querySelector('#studentPhoto');
     if (clonePhoto && currentStudentData && currentStudentData.photoUrl) {
       clonePhoto.crossOrigin = 'Anonymous';
@@ -575,9 +833,16 @@
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
     btn.disabled = true;
     
+    showProgress('📄 Generating PDF...', 'Please wait...');
+    updateProgress(20, 'Preparing document...', 1);
+    await sleep(400);
+    
     try {
       const clone = createPDFClone();
       const cloneContainer = document.getElementById('pdfCloneContainer');
+      
+      updateProgress(40, 'Loading images...', 2);
+      await sleep(300);
       
       const cloneLogo = clone.querySelector('#coachingLogo');
       const clonePhoto = clone.querySelector('#studentPhoto');
@@ -587,7 +852,8 @@
         waitForImageLoad(clonePhoto)
       ]);
       
-      await new Promise(resolve => setTimeout(resolve, 500));
+      updateProgress(60, 'Generating PDF...', 3);
+      await sleep(400);
       
       const opt = {
         margin: [5, 5, 5, 5],
@@ -604,11 +870,16 @@
       
       await html2pdf().set(opt).from(clone).save();
       
+      updateProgress(100, '✅ Done!', 5);
+      await sleep(400);
+      
       cloneContainer.innerHTML = '';
       cloneContainer.style.visibility = 'hidden';
+      hideProgress();
       
     } catch (error) {
       console.error('PDF Error:', error);
+      hideProgress();
       alert('Error generating PDF. Please try again.');
     } finally {
       btn.innerHTML = originalText;
@@ -616,6 +887,9 @@
     }
   }
   
+  // ============================================
+  // SHARE FUNCTIONS
+  // ============================================
   function shareOnWhatsApp() {
     const studentName = document.getElementById('studentName').innerText;
     const studentRoll = document.getElementById('studentRoll').innerText;
@@ -626,6 +900,9 @@
     window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
   }
   
+  // ============================================
+  // GLOBAL FUNCTIONS
+  // ============================================
   window.downloadResultPDF = downloadResultPDF;
   window.shareOnWhatsApp = shareOnWhatsApp;
   window.goBack = goBack;
