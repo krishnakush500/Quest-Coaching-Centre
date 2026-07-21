@@ -539,6 +539,30 @@
             transform: scale(1.3);
         }
         
+        /* Recycle Bin Badge */
+        .recycle-badge {
+            background: #6c757d;
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            margin-left: 5px;
+        }
+        .restore-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .restore-btn:hover {
+            background: #138496;
+            transform: scale(1.05);
+        }
+        
         @media (max-width: 768px) {
             body { padding: 15px; }
             .header-section { flex-direction: column; text-align: center; }
@@ -651,7 +675,12 @@
                 </div>
             </div>
             <div id="subjectFields" class="mb-4"></div>
-            <div id="step1NextBtn" class="d-none mt-3"><button id="nextToStudentEntryBtn" class="btn btn-success">Next →</button></div>
+            <div id="step1NextBtn" class="mt-3" style="display:none;">
+                <button id="nextToStudentEntryBtn" class="btn btn-success" disabled>
+                    <i class="fas fa-arrow-right"></i> Next →
+                </button>
+                <small class="text-muted d-block mt-1" style="font-size:0.75rem;">⚠️ Please enter exam name and select subjects</small>
+            </div>
         </div>
         
         <div id="studentEntryStep" style="display: none;">
@@ -740,8 +769,27 @@
 
     <!-- Old Results Section -->
     <div id="oldResultsSection" class="fullscreen-section">
-        <div class="section-header"><h3><i class="fas fa-history me-2"></i> Published Results</h3><button class="back-btn" id="backFromOldBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button></div>
+        <div class="section-header">
+            <h3><i class="fas fa-history me-2"></i> Published Results 
+                <span class="recycle-badge"><i class="fas fa-trash-alt"></i> Recycle Bin</span>
+            </h3>
+            <button class="back-btn" id="backFromOldBtn"><i class="fas fa-arrow-left"></i> Back to Menu</button>
+        </div>
         <div id="oldResultsList" class="row g-4"></div>
+        
+        <!-- Recycle Bin Section -->
+        <div class="card mt-4" id="recycleBinCard">
+            <div class="card-header bg-light fw-bold text-muted">
+                <i class="fas fa-trash-alt"></i> Recycle Bin 
+                <span class="badge bg-secondary" id="recycleCount">0</span>
+                <button class="btn btn-sm btn-danger float-end" id="emptyRecycleBtn" style="display:none;">
+                    <i class="fas fa-trash"></i> Empty Recycle Bin
+                </button>
+            </div>
+            <div class="card-body" id="recycleBinList">
+                <p class="text-muted text-center">Recycle bin is empty</p>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -776,8 +824,8 @@
 <div class="progress-overlay" id="progressOverlay">
     <div class="progress-card">
         <div class="icon"><i class="fas fa-spinner fa-spin"></i></div>
-        <div class="title" id="progressTitle">Publishing Result...</div>
-        <div class="subtitle" id="progressSubtitle">Please wait while we process your data</div>
+        <div class="title" id="progressTitle">Processing...</div>
+        <div class="subtitle" id="progressSubtitle">Please wait</div>
         <div class="progress-bar-container">
             <div class="progress-bar-fill" id="progressFill"></div>
         </div>
@@ -823,6 +871,13 @@
         <input type="hidden" id="editTemplateResultId">
     </div>
     <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-primary" id="saveTemplateChangeBtn"><i class="fas fa-save"></i> Update Template</button></div></div></div>
+</div>
+
+<!-- Restore Confirmation Modal -->
+<div class="modal fade" id="restoreConfirmModal" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content"><div class="modal-header"><h5 class="modal-title"><i class="fas fa-trash-restore"></i> Restore Result</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body"><p>Are you sure you want to restore this result from Recycle Bin?</p></div>
+    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-success" id="confirmRestoreBtn">Restore</button></div></div></div>
 </div>
 
 <div id="successToast" class="toast-message"><i class="fas fa-check-circle"></i> <span id="toastMessage">Success!</span></div>
@@ -892,6 +947,9 @@
     const dontSaveBtn = document.getElementById('dontSaveBtn');
     const draftResultsList = document.getElementById('draftResultsList');
     const oldResultsList = document.getElementById('oldResultsList');
+    const recycleBinList = document.getElementById('recycleBinList');
+    const recycleCount = document.getElementById('recycleCount');
+    const emptyRecycleBtn = document.getElementById('emptyRecycleBtn');
     const resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
     const resultModalTitle = document.getElementById('resultModalTitle');
     const resultDetails = document.getElementById('resultDetails');
@@ -901,6 +959,8 @@
     const saveDraftConfirmBtn = document.getElementById('saveDraftConfirmBtn');
     const saveChangesConfirmBtn = document.getElementById('saveChangesConfirmBtn');
     const editTemplateModal = new bootstrap.Modal(document.getElementById('editTemplateModal'));
+    const restoreConfirmModal = new bootstrap.Modal(document.getElementById('restoreConfirmModal'));
+    const confirmRestoreBtn = document.getElementById('confirmRestoreBtn');
     const progressOverlay = document.getElementById('progressOverlay');
     const progressFill = document.getElementById('progressFill');
     const progressStatus = document.getElementById('progressStatus');
@@ -934,6 +994,8 @@
     let tempOptionalSubjects = [];
     let currentTab = 'main';
     let isPublishing = false;
+    let recycleBin = [];
+    let restoreTargetId = null;
 
     function showFullScreen(section) { actionCardsContainer.style.display = 'none'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; section.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
     function showActionCards() { actionCardsContainer.style.display = 'grid'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -971,6 +1033,8 @@
         progressOverlay.classList.remove('active');
         isPublishing = false;
     }
+
+    function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
     // ============================================
     // TEMPLATE SELECTION
@@ -1182,12 +1246,36 @@
         } else {
             generateSubjectFieldsBtn.style.display = 'none';
             subjectFields.innerHTML = '';
-            step1NextBtn.classList.add('d-none');
+            step1NextBtn.style.display = 'none';
         }
     }
 
     // ============================================
-    // SHOW SUBJECTS BUTTON - STEP 2 ONLY SHOW SELECTED SUBJECTS
+    // EXAM NAME VALIDATION & NEXT BUTTON
+    // ============================================
+    function validateNextButton() {
+        const examName = examNameInput.value.trim();
+        const hasSubjects = selectedMainSubjects.length > 0;
+        
+        if (examName.length > 0 && hasSubjects) {
+            step1NextBtn.style.display = 'block';
+            nextToStudentEntryBtn.disabled = false;
+            document.getElementById('examNameError').style.display = 'none';
+        } else {
+            step1NextBtn.style.display = 'block';
+            nextToStudentEntryBtn.disabled = true;
+            if (examName.length === 0) {
+                document.getElementById('examNameError').style.display = 'block';
+            } else {
+                document.getElementById('examNameError').style.display = 'none';
+            }
+        }
+    }
+
+    examNameInput.addEventListener('input', validateNextButton);
+
+    // ============================================
+    // SHOW SUBJECTS BUTTONS
     // ============================================
     document.getElementById('showSubjectsBtnStep1').addEventListener('click', function() {
         if (selectedMainSubjects.length === 0 && selectedOptionalSubjects.length === 0) {
@@ -1198,24 +1286,16 @@
     });
 
     document.getElementById('showSubjectsBtnStep2').addEventListener('click', function() {
-        // ✅ Step 2 mein sirf wahi subjects dikhao jo Step 1 mein select kiye gaye hain
         if (selectedMainSubjects.length === 0 && selectedOptionalSubjects.length === 0) {
             alert('No subjects selected in Step 1. Please go back and add subjects.');
             return;
         }
-        
-        // ✅ Show only selected subjects (read-only view)
         const mainList = selectedMainSubjects.map(s => s.name).join(', ');
         const optList = selectedOptionalSubjects.map(s => s.name).join(', ');
-        let msg = '📚 <strong>Selected Subjects:</strong><br><br>';
-        msg += '<strong>Main Subjects:</strong> ' + (mainList || 'None') + '<br>';
-        msg += '<strong>Optional Subjects:</strong> ' + (optList || 'None');
-        
-        // ✅ Show in a nice alert/modal
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = msg;
-        tempDiv.style.cssText = 'padding: 15px; font-size: 0.95rem;';
-        alert(tempDiv.textContent);
+        let msg = '📚 Selected Subjects:\n\n';
+        msg += 'Main Subjects: ' + (mainList || 'None') + '\n';
+        msg += 'Optional Subjects: ' + (optList || 'None');
+        alert(msg);
     });
 
     // Dialog Event Listeners
@@ -1229,7 +1309,7 @@
     });
 
     // ============================================
-    // NAVIGATION - STEP 1 TO STEP 2
+    // NAVIGATION
     // ============================================
     createResultMainCard.addEventListener('click', () => { resetCreateResultForm(); showFullScreen(createResultSection); });
     draftResultsMainCard.addEventListener('click', () => { loadDraftResults(); showFullScreen(draftResultsSection); });
@@ -1239,22 +1319,6 @@
     backFromDraftBtn.addEventListener('click', showActionCards);
     backFromOldBtn.addEventListener('click', showActionCards);
 
-    // ✅ Exam Name validation for Next button
-    examNameInput.addEventListener('input', function() {
-        const errorEl = document.getElementById('examNameError');
-        if (this.value.trim().length > 0) {
-            errorEl.style.display = 'none';
-            // Check if subjects are selected too
-            if (selectedMainSubjects.length > 0) {
-                step1NextBtn.classList.remove('d-none');
-            }
-        } else {
-            errorEl.style.display = 'block';
-            step1NextBtn.classList.add('d-none');
-        }
-    });
-
-    // ✅ Next button - validate exam name
     nextToStudentEntryBtn.addEventListener('click', function() {
         const examName = examNameInput.value.trim();
         if (!examName) {
@@ -1315,10 +1379,7 @@
             subjectFields.appendChild(optDiv);
         }
         
-        // ✅ Show next button only if exam name is filled
-        if (examNameInput.value.trim().length > 0) {
-            step1NextBtn.classList.remove('d-none');
-        }
+        validateNextButton();
     });
 
     // ============================================
@@ -1548,7 +1609,6 @@
             let marksHtml = '';
             let subjectsHtml = '';
             
-            // Main Subjects - Only active ones
             selectedMainSubjects.forEach(sub => {
                 if (s.activeMainSubjects.includes(sub.name)) {
                     subjectsHtml += `<span class="student-subject-tag">${sub.name}</span>`;
@@ -1557,7 +1617,6 @@
                 }
             });
             
-            // Optional Subjects - Only active ones
             selectedOptionalSubjects.forEach(opt => {
                 if (s.activeOptionalSubjects.includes(opt.name)) {
                     subjectsHtml += `<span class="student-subject-tag optional-tag">${opt.name} (Opt)</span>`;
@@ -1882,7 +1941,7 @@
     });
 
     // ============================================
-    // PUBLISH RESULT WITH PROGRESS BAR
+    // PUBLISH RESULT
     // ============================================
     publishResultBtn.addEventListener('click', async () => {
         if (!examNameInput.value.trim() || students.length === 0) { alert('Exam name and at least one student required'); return; }
@@ -1894,7 +1953,6 @@
             return;
         }
         
-        // ✅ Show progress bar
         showProgress('📤 Publishing Result...', 'Preparing your data...');
         updateProgress(10, 'Validating data...', 1);
         await sleep(500);
@@ -1949,12 +2007,10 @@
         }
     });
 
-    function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
-
     saveChangesConfirmBtn.addEventListener('click', async () => {
         if (!editingPublishedResultId) { editPublishedConfirmModal.hide(); return; }
-        
         if (isPublishing) return;
+        
         showProgress('📤 Updating Result...', 'Saving changes...');
         updateProgress(20, 'Preparing data...', 1);
         await sleep(400);
@@ -2059,7 +2115,7 @@
         examCentreInput.value = '';
         rollCodeInput.value = '55075';
         subjectFields.innerHTML = '';
-        step1NextBtn.classList.add('d-none');
+        step1NextBtn.style.display = 'none';
         document.getElementById('examNameError').style.display = 'none';
         examSetupStep.style.display = 'block';
         studentEntryStep.style.display = 'none';
@@ -2077,6 +2133,7 @@
         selectedTemplate = 'result';
         isPublishing = false;
         hideProgress();
+        nextToStudentEntryBtn.disabled = true;
     }
 
     // ============================================
@@ -2143,6 +2200,7 @@
             updateStudentsTable();
             editingDraftId = id;
             isEditingPublishedResult = false;
+            validateNextButton();
             showFullScreen(createResultSection);
         }, 100);
     }
@@ -2150,7 +2208,83 @@
     async function deleteDraft(id) { if (confirm('Delete draft?')) { await deleteDoc(doc(db, "draft_results", id)); showToast('Draft deleted'); loadDraftResults(); } }
 
     // ============================================
-    // LOAD OLD RESULTS WITH PROGRESS BAR
+    // RECYCLE BIN FUNCTIONS
+    // ============================================
+    async function moveToRecycleBin(resultId, resultData) {
+        try {
+            // Add to recycle bin collection
+            await addDoc(collection(db, "recycle_bin"), {
+                resultId: resultId,
+                data: resultData,
+                deletedAt: serverTimestamp()
+            });
+            
+            // Delete from results
+            await deleteDoc(doc(db, "results", resultId));
+            showToast('Result moved to Recycle Bin');
+            loadOldResults();
+        } catch(e) {
+            alert('Error moving to recycle bin: ' + e.message);
+        }
+    }
+
+    async function restoreFromRecycleBin(recycleId) {
+        try {
+            const q = query(collection(db, "recycle_bin"), where("__name__", "==", recycleId));
+            const snap = await getDocs(q);
+            if (snap.empty) return;
+            
+            const docData = snap.docs[0];
+            const data = docData.data();
+            
+            // Restore to results
+            await addDoc(collection(db, "results"), {
+                ...data.data,
+                restoredAt: serverTimestamp()
+            });
+            
+            // Delete from recycle bin
+            await deleteDoc(doc(db, "recycle_bin", recycleId));
+            showToast('Result restored successfully!');
+            loadOldResults();
+        } catch(e) {
+            alert('Error restoring: ' + e.message);
+        }
+    }
+
+    async function emptyRecycleBin() {
+        if (!confirm('⚠️ Are you sure you want to permanently delete all items in Recycle Bin? This action cannot be undone!')) return;
+        
+        try {
+            const q = query(collection(db, "recycle_bin"));
+            const snap = await getDocs(q);
+            
+            showProgress('🗑️ Emptying Recycle Bin...', 'Permanently deleting items...');
+            updateProgress(20, 'Loading items...', 1);
+            await sleep(400);
+            
+            let count = 0;
+            for (const docSnap of snap.docs) {
+                await deleteDoc(doc(db, "recycle_bin", docSnap.id));
+                count++;
+                const percent = Math.min(20 + (count / snap.size) * 80, 100);
+                updateProgress(percent, `Deleted ${count} of ${snap.size}...`, Math.min(Math.floor(percent/20)+1, 5));
+                await sleep(100);
+            }
+            
+            updateProgress(100, '✅ Done!', 5);
+            await sleep(400);
+            hideProgress();
+            showToast('Recycle Bin emptied successfully!');
+            loadOldResults();
+        } catch(e) {
+            hideProgress();
+            alert('Error emptying recycle bin: ' + e.message);
+        }
+    }
+
+    // ============================================
+    // LOAD OLD RESULTS WITH RECYCLE BIN
     // ============================================
     async function loadOldResults() {
         showProgress('📂 Loading Published Results...', 'Fetching data from database...');
@@ -2158,31 +2292,85 @@
         await sleep(400);
         
         try {
+            // Load published results
             const q = query(collection(db, "results"), orderBy("createdAt", "desc"));
             const snap = await getDocs(q);
             
-            updateProgress(60, 'Processing data...', 3);
-            await sleep(400);
+            updateProgress(40, 'Processing published results...', 2);
+            await sleep(300);
             
             oldResultsList.innerHTML = '';
             if (snap.empty) { 
-                oldResultsList.innerHTML = '<div class="col-12"><p class="text-center text-muted">No published results.</p></div>'; 
-                updateProgress(100, '✅ No results found', 5);
-                await sleep(300);
-                hideProgress();
-                return; 
+                oldResultsList.innerHTML = '<div class="col-12"><p class="text-center text-muted">No published results found.</p></div>'; 
+            } else {
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    const date = d.createdAt ? new Date(d.createdAt.toDate()).toLocaleDateString() : 'Unknown';
+                    const templateLabel = d.template === 'result1' ? '🎫 Admit Card Style' : '📄 Classic';
+                    const mainCount = d.mainSubjects ? d.mainSubjects.length : (d.subjects ? d.subjects.length : 0);
+                    const optCount = d.optionalSubjects ? d.optionalSubjects.length : 0;
+                    const optLabel = optCount > 0 ? ` | Optional: ${optCount}` : '';
+                    const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">${date} | Template: ${templateLabel} | Main: ${mainCount}${optLabel} | Students: ${d.students.length}</p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary view-result" data-id="${doc.id}">View</button><button class="btn btn-sm btn-warning edit-result" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-info change-template" data-id="${doc.id}">🎨 Template</button><button class="btn btn-sm btn-danger delete-result" data-id="${doc.id}">🗑️ Delete</button></div></div></div></div>`;
+                    oldResultsList.insertAdjacentHTML('beforeend', card);
+                });
             }
             
-            snap.forEach(doc => {
-                const d = doc.data();
-                const date = d.createdAt ? new Date(d.createdAt.toDate()).toLocaleDateString() : 'Unknown';
-                const templateLabel = d.template === 'result1' ? '🎫 Admit Card Style' : '📄 Classic';
-                const mainCount = d.mainSubjects ? d.mainSubjects.length : (d.subjects ? d.subjects.length : 0);
-                const optCount = d.optionalSubjects ? d.optionalSubjects.length : 0;
-                const optLabel = optCount > 0 ? ` | Optional: ${optCount}` : '';
-                const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">${date} | Template: ${templateLabel} | Main: ${mainCount}${optLabel} | Students: ${d.students.length}</p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary view-result" data-id="${doc.id}">View</button><button class="btn btn-sm btn-warning edit-result" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-info change-template" data-id="${doc.id}">🎨 Template</button><button class="btn btn-sm btn-danger delete-result" data-id="${doc.id}">Delete</button></div></div></div></div>`;
-                oldResultsList.insertAdjacentHTML('beforeend', card);
+            updateProgress(60, 'Loading Recycle Bin...', 3);
+            await sleep(300);
+            
+            // Load recycle bin
+            const recycleQ = query(collection(db, "recycle_bin"), orderBy("deletedAt", "desc"));
+            const recycleSnap = await getDocs(recycleQ);
+            
+            recycleBin = [];
+            recycleSnap.forEach(doc => {
+                const data = doc.data();
+                recycleBin.push({
+                    id: doc.id,
+                    ...data
+                });
             });
+            
+            updateProgress(80, 'Building display...', 4);
+            await sleep(300);
+            
+            // Show recycle bin
+            if (recycleBin.length > 0) {
+                recycleCount.textContent = recycleBin.length;
+                emptyRecycleBtn.style.display = 'inline-block';
+                
+                let html = '';
+                recycleBin.forEach((item, idx) => {
+                    const resultData = item.data || {};
+                    const examName = resultData.examName || 'Unknown Exam';
+                    const date = item.deletedAt ? new Date(item.deletedAt.toDate()).toLocaleDateString() : 'Unknown';
+                    const studentsCount = resultData.students ? resultData.students.length : 0;
+                    html += `<div class="d-flex justify-content-between align-items-center p-2 border-bottom">
+                        <div>
+                            <strong>${examName}</strong>
+                            <span class="text-muted ms-2" style="font-size:0.75rem;">Deleted: ${date}</span>
+                            <span class="badge bg-secondary ms-2">${studentsCount} students</span>
+                        </div>
+                        <div>
+                            <button class="restore-btn restore-item" data-id="${item.id}">
+                                <i class="fas fa-trash-restore"></i> Restore
+                            </button>
+                        </div>
+                    </div>`;
+                });
+                recycleBinList.innerHTML = html;
+                
+                document.querySelectorAll('.restore-item').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        restoreTargetId = this.dataset.id;
+                        restoreConfirmModal.show();
+                    });
+                });
+            } else {
+                recycleCount.textContent = '0';
+                emptyRecycleBtn.style.display = 'none';
+                recycleBinList.innerHTML = '<p class="text-muted text-center">Recycle bin is empty</p>';
+            }
             
             updateProgress(100, '✅ Loaded successfully!', 5);
             await sleep(400);
@@ -2190,7 +2378,20 @@
             
             document.querySelectorAll('.view-result').forEach(btn => btn.addEventListener('click', e => viewResult(e.target.dataset.id)));
             document.querySelectorAll('.edit-result').forEach(btn => btn.addEventListener('click', e => editResult(e.target.dataset.id)));
-            document.querySelectorAll('.delete-result').forEach(btn => btn.addEventListener('click', e => deleteResult(e.target.dataset.id)));
+            document.querySelectorAll('.delete-result').forEach(btn => btn.addEventListener('click', e => {
+                const id = e.target.dataset.id;
+                if (confirm('🗑️ Move this result to Recycle Bin?')) {
+                    const card = e.target.closest('.card');
+                    const examName = card?.querySelector('.card-title')?.innerText || 'Unknown';
+                    const q = query(collection(db, "results"), where("__name__", "==", id));
+                    getDocs(q).then(snap => {
+                        if (!snap.empty) {
+                            const data = snap.docs[0].data();
+                            moveToRecycleBin(id, data);
+                        }
+                    });
+                }
+            }));
             document.querySelectorAll('.change-template').forEach(btn => btn.addEventListener('click', e => openTemplateEditor(e.target.dataset.id)));
             
         } catch(error) {
@@ -2198,6 +2399,18 @@
             alert('Error loading results: ' + error.message);
         }
     }
+
+    // Restore confirmation
+    confirmRestoreBtn.addEventListener('click', async () => {
+        if (restoreTargetId) {
+            restoreConfirmModal.hide();
+            await restoreFromRecycleBin(restoreTargetId);
+            restoreTargetId = null;
+        }
+    });
+
+    // Empty recycle bin
+    emptyRecycleBtn.addEventListener('click', emptyRecycleBin);
 
     function openTemplateEditor(resultId) {
         document.getElementById('editTemplateResultId').value = resultId;
@@ -2244,7 +2457,7 @@
     });
 
     // ============================================
-    // VIEW RESULT WITH PROGRESS BAR
+    // VIEW RESULT
     // ============================================
     async function viewResult(id) {
         showProgress('📄 Loading Result...', 'Fetching student data...');
@@ -2395,11 +2608,10 @@
             editingDraftId = null;
             isEditingPublishedResult = true;
             editingPublishedResultId = id;
+            validateNextButton();
             showFullScreen(createResultSection);
         }, 100);
     }
-
-    async function deleteResult(id) { if (confirm('Delete published result?')) { await deleteDoc(doc(db, "results", id)); showToast('Result deleted'); loadOldResults(); } }
 
     downloadPdfBtn.addEventListener('click', () => { if (currentResultDataForPdf) generatePDF(currentResultDataForPdf, currentExamNameForPdf); });
 
