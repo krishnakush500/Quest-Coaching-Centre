@@ -246,6 +246,7 @@
       color: #dc2626;
     }
     
+    /* ✅ QR Code - Almost Zero Border */
     .qr-area {
       width: 130px;
       flex-shrink: 0;
@@ -256,36 +257,42 @@
       background: white;
       border-radius: 8px;
       border: 2px solid #c5a059;
-      padding: 8px 8px;
+      padding: 6px 6px 6px 6px;  /* ✅ Minimum padding */
     }
     
     .qr-area #qrcode {
       width: 110px;
       height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .qr-area #qrcode canvas,
     .qr-area #qrcode img {
-      width: 110px !important;
-      height: 110px !important;
+      width: 108px !important;   /* ✅ Almost full width */
+      height: 108px !important;  /* ✅ Almost full height */
+      display: block !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
     
     .qr-area .qr-label {
-      font-size: 0.45rem;
+      font-size: 0.4rem;
       color: #1a3a5c;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-top: 4px;
+      margin-top: 3px;
       text-align: center;
       background: #f0f7ff;
-      padding: 2px 12px;
+      padding: 1px 10px;
       border-radius: 10px;
     }
     
     .qr-area .qr-label i {
       color: #c5a059;
-      font-size: 0.45rem;
+      font-size: 0.4rem;
     }
     
     .marks-section {
@@ -587,10 +594,19 @@
     .pdf-clone .detail-item { padding: 3px 8px; }
     .pdf-clone .detail-item .value { font-size: 0.75rem; }
     .pdf-clone .detail-item .label { font-size: 0.4rem; }
-    .pdf-clone .qr-area { width: 120px; padding: 6px; }
-    .pdf-clone .qr-area #qrcode { width: 100px; height: 100px; }
+    .pdf-clone .qr-area { 
+      width: 110px; 
+      padding: 4px 4px !important; 
+    }
+    .pdf-clone .qr-area #qrcode { 
+      width: 100px; 
+      height: 100px; 
+    }
     .pdf-clone .qr-area #qrcode canvas,
-    .pdf-clone .qr-area #qrcode img { width: 100px !important; height: 100px !important; }
+    .pdf-clone .qr-area #qrcode img { 
+      width: 98px !important; 
+      height: 98px !important; 
+    }
     .pdf-clone .marks-section { padding: 10px 16px 8px 16px; }
     .pdf-clone .marks-table th,
     .pdf-clone .marks-table td { padding: 4px 10px; font-size: 0.75rem; }
@@ -682,10 +698,10 @@
       .student-details { grid-template-columns: 1fr 1fr; min-width: unset; }
       .student-photo-area { width: 110px; }
       .student-photo { width: 100px; height: 120px; }
-      .qr-area { width: 110px; }
-      .qr-area #qrcode { width: 90px; height: 90px; }
+      .qr-area { width: 110px; padding: 4px !important; }
+      .qr-area #qrcode { width: 100px; height: 100px; }
       .qr-area #qrcode canvas,
-      .qr-area #qrcode img { width: 90px !important; height: 90px !important; }
+      .qr-area #qrcode img { width: 98px !important; height: 98px !important; }
     }
     
     @media (max-width: 600px) {
@@ -695,10 +711,10 @@
       .student-details { grid-template-columns: 1fr; width: 100%; }
       .student-photo-area { width: 100px; }
       .student-photo { width: 90px; height: 110px; }
-      .qr-area { width: 100px; padding: 5px; }
-      .qr-area #qrcode { width: 80px; height: 80px; }
+      .qr-area { width: 100px; padding: 3px !important; }
+      .qr-area #qrcode { width: 90px; height: 90px; }
       .qr-area #qrcode canvas,
-      .qr-area #qrcode img { width: 80px !important; height: 80px !important; }
+      .qr-area #qrcode img { width: 88px !important; height: 88px !important; }
       .header-text h1 { font-size: 1.1rem; }
       .header-text .classes-info { font-size: 0.6rem; }
       .logo-box { width: 60px; height: 60px; }
@@ -1035,8 +1051,8 @@
           qrContainer.innerHTML = '';
           new QRCode(qrContainer, {
             text: publicUrl,
-            width: 110,  // ✅ Bada QR Code
-            height: 110, // ✅ Bada QR Code
+            width: 108,  // ✅ Bada QR Code
+            height: 108, // ✅ Bada QR Code
             colorDark: "#0f2b44",
             colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.H
@@ -1228,8 +1244,8 @@
       qrContainer.innerHTML = '';
       new QRCode(qrContainer, {
         text: cloneUrl,
-        width: 100,
-        height: 100,
+        width: 98,
+        height: 98,
         colorDark: "#0f2b44",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.H
@@ -1275,8 +1291,8 @@
         if (canvas) {
           const img = document.createElement('img');
           img.src = canvas.toDataURL('image/png');
-          img.style.width = '100px';
-          img.style.height = '100px';
+          img.style.width = '98px';
+          img.style.height = '98px';
           qrContainer.innerHTML = '';
           qrContainer.appendChild(img);
         }
