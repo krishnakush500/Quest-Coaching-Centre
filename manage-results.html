@@ -449,6 +449,96 @@
             min-width: 70px;
         }
         
+        /* Progress Bar Styles */
+        .progress-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .progress-overlay.active {
+            display: flex;
+        }
+        .progress-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 50px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .progress-card .icon {
+            font-size: 3rem;
+            color: #1a237e;
+            margin-bottom: 15px;
+        }
+        .progress-card .title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1a237e;
+            margin-bottom: 5px;
+        }
+        .progress-card .subtitle {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+        .progress-bar-container {
+            width: 100%;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 50px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #1a237e, #4f6f8f, #1a237e);
+            background-size: 200% 100%;
+            border-radius: 50px;
+            transition: width 0.3s ease;
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .progress-status {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1a237e;
+            margin-top: 10px;
+        }
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        .progress-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            transition: all 0.3s;
+        }
+        .progress-dot.done {
+            background: #16a34a;
+        }
+        .progress-dot.active {
+            background: #1a237e;
+            transform: scale(1.3);
+        }
+        
         @media (max-width: 768px) {
             body { padding: 15px; }
             .header-section { flex-direction: column; text-align: center; }
@@ -468,6 +558,7 @@
             .optional-mark-row .optional-mark { max-width: 100% !important; }
             .dialog-tabs { flex-direction: column; }
             .dialog-tab { text-align: center; }
+            .progress-card { padding: 25px 20px; }
         }
     </style>
 </head>
@@ -532,7 +623,11 @@
                     <button class="btn-show-subjects ms-2" id="showSubjectsBtnStep1"><i class="fas fa-eye"></i> Show Subjects</button>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3"><label class="form-label">Exam Name <span style="color:#dc2626;">*</span></label><input type="text" class="form-control" id="examName" placeholder="e.g., Final Examination 2025"></div>
+                    <div class="mb-3">
+                        <label class="form-label">Exam Name <span style="color:#dc2626;">*</span></label>
+                        <input type="text" class="form-control" id="examName" placeholder="e.g., Final Examination 2025">
+                        <small class="text-muted" id="examNameError" style="color:#dc2626; display:none;">⚠️ Exam name is required to proceed</small>
+                    </div>
                     <div class="mb-3"><label class="form-label">Examination Centre</label><input type="text" class="form-control" id="examCentre" placeholder="e.g., QUEST COACHING CENTRE, GOPALGANJ"></div>
                     <div class="mb-3"><label class="form-label">Roll Code</label><input type="text" class="form-control" id="rollCode" value="55075"></div>
                     
@@ -677,6 +772,26 @@
     </div>
 </div>
 
+<!-- Progress Overlay -->
+<div class="progress-overlay" id="progressOverlay">
+    <div class="progress-card">
+        <div class="icon"><i class="fas fa-spinner fa-spin"></i></div>
+        <div class="title" id="progressTitle">Publishing Result...</div>
+        <div class="subtitle" id="progressSubtitle">Please wait while we process your data</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-status" id="progressStatus">0%</div>
+        <div class="progress-dots">
+            <div class="progress-dot" id="dot1"></div>
+            <div class="progress-dot" id="dot2"></div>
+            <div class="progress-dot" id="dot3"></div>
+            <div class="progress-dot" id="dot4"></div>
+            <div class="progress-dot" id="dot5"></div>
+        </div>
+    </div>
+</div>
+
 <!-- Modals -->
 <div class="modal fade" id="resultModal" tabindex="-1">
     <div class="modal-dialog modal-xl"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="resultModalTitle">Result Details</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
@@ -786,6 +901,11 @@
     const saveDraftConfirmBtn = document.getElementById('saveDraftConfirmBtn');
     const saveChangesConfirmBtn = document.getElementById('saveChangesConfirmBtn');
     const editTemplateModal = new bootstrap.Modal(document.getElementById('editTemplateModal'));
+    const progressOverlay = document.getElementById('progressOverlay');
+    const progressFill = document.getElementById('progressFill');
+    const progressStatus = document.getElementById('progressStatus');
+    const progressTitle = document.getElementById('progressTitle');
+    const progressSubtitle = document.getElementById('progressSubtitle');
 
     // Subject Dialog Elements
     const subjectDialog = document.getElementById('subjectDialog');
@@ -813,12 +933,48 @@
     let tempMainSubjects = [];
     let tempOptionalSubjects = [];
     let currentTab = 'main';
+    let isPublishing = false;
 
     function showFullScreen(section) { actionCardsContainer.style.display = 'none'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; section.style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
     function showActionCards() { actionCardsContainer.style.display = 'grid'; createResultSection.style.display = 'none'; draftResultsSection.style.display = 'none'; oldResultsSection.style.display = 'none'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
     function showToast(msg, isPublished = false) { const toast = isPublished ? document.getElementById('publishedToast') : document.getElementById('successToast'); if (!isPublished) document.getElementById('toastMessage').innerText = msg; toast.style.display = 'flex'; setTimeout(() => toast.style.display = 'none', 2000); }
 
-    // Template Selection
+    // ============================================
+    // PROGRESS BAR FUNCTIONS
+    // ============================================
+    function showProgress(title, subtitle) {
+        progressOverlay.classList.add('active');
+        progressTitle.textContent = title || 'Processing...';
+        progressSubtitle.textContent = subtitle || 'Please wait';
+        progressFill.style.width = '0%';
+        progressStatus.textContent = '0%';
+        document.querySelectorAll('.progress-dot').forEach(d => d.className = 'progress-dot');
+        document.getElementById('dot1').classList.add('active');
+        isPublishing = true;
+    }
+
+    function updateProgress(percent, statusText, dotIndex) {
+        progressFill.style.width = percent + '%';
+        progressStatus.textContent = percent + '%';
+        if (statusText) progressSubtitle.textContent = statusText;
+        
+        document.querySelectorAll('.progress-dot').forEach(d => d.className = 'progress-dot');
+        for (let i = 0; i < dotIndex; i++) {
+            document.getElementById('dot' + (i+1)).classList.add('done');
+        }
+        if (dotIndex < 5) {
+            document.getElementById('dot' + (dotIndex+1)).classList.add('active');
+        }
+    }
+
+    function hideProgress() {
+        progressOverlay.classList.remove('active');
+        isPublishing = false;
+    }
+
+    // ============================================
+    // TEMPLATE SELECTION
+    // ============================================
     document.querySelectorAll('#templateSelector .template-option').forEach(opt => {
         opt.addEventListener('click', function() {
             document.querySelectorAll('#templateSelector .template-option').forEach(o => o.classList.remove('selected'));
@@ -836,7 +992,9 @@
         });
     });
 
-    // Tab Switching
+    // ============================================
+    // SUBJECT DIALOG
+    // ============================================
     function switchTab(tab) {
         currentTab = tab;
         document.querySelectorAll('.dialog-tab').forEach(t => t.classList.remove('active'));
@@ -988,30 +1146,6 @@
         });
     }
 
-    function validateDialogSelection() {
-        let valid = true;
-        const errors = [];
-        
-        tempMainSubjects.forEach(sub => {
-            if (!sub.total || sub.total === '') {
-                valid = false;
-                errors.push(sub.name);
-            }
-        });
-        tempOptionalSubjects.forEach(sub => {
-            if (!sub.total || sub.total === '') {
-                valid = false;
-                errors.push(sub.name);
-            }
-        });
-        
-        if (!valid) {
-            alert(`Please enter total marks for: ${errors.join(', ')}`);
-            return false;
-        }
-        return true;
-    }
-
     function closeDialog() {
         subjectDialog.style.display = 'none';
         tempMainSubjects = [];
@@ -1052,7 +1186,9 @@
         }
     }
 
-    // Show Subjects Buttons
+    // ============================================
+    // SHOW SUBJECTS BUTTON - STEP 2 ONLY SHOW SELECTED SUBJECTS
+    // ============================================
     document.getElementById('showSubjectsBtnStep1').addEventListener('click', function() {
         if (selectedMainSubjects.length === 0 && selectedOptionalSubjects.length === 0) {
             alert('No subjects selected yet. Please add subjects first.');
@@ -1062,11 +1198,24 @@
     });
 
     document.getElementById('showSubjectsBtnStep2').addEventListener('click', function() {
+        // ✅ Step 2 mein sirf wahi subjects dikhao jo Step 1 mein select kiye gaye hain
         if (selectedMainSubjects.length === 0 && selectedOptionalSubjects.length === 0) {
-            alert('No subjects selected yet. Please add subjects first.');
+            alert('No subjects selected in Step 1. Please go back and add subjects.');
             return;
         }
-        openSubjectDialog();
+        
+        // ✅ Show only selected subjects (read-only view)
+        const mainList = selectedMainSubjects.map(s => s.name).join(', ');
+        const optList = selectedOptionalSubjects.map(s => s.name).join(', ');
+        let msg = '📚 <strong>Selected Subjects:</strong><br><br>';
+        msg += '<strong>Main Subjects:</strong> ' + (mainList || 'None') + '<br>';
+        msg += '<strong>Optional Subjects:</strong> ' + (optList || 'None');
+        
+        // ✅ Show in a nice alert/modal
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = msg;
+        tempDiv.style.cssText = 'padding: 15px; font-size: 0.95rem;';
+        alert(tempDiv.textContent);
     });
 
     // Dialog Event Listeners
@@ -1079,6 +1228,9 @@
         if (e.target === this) closeDialog();
     });
 
+    // ============================================
+    // NAVIGATION - STEP 1 TO STEP 2
+    // ============================================
     createResultMainCard.addEventListener('click', () => { resetCreateResultForm(); showFullScreen(createResultSection); });
     draftResultsMainCard.addEventListener('click', () => { loadDraftResults(); showFullScreen(draftResultsSection); });
     oldResultsMainCard.addEventListener('click', () => { loadOldResults(); showFullScreen(oldResultsSection); });
@@ -1086,6 +1238,39 @@
     backFromCreateBtn.addEventListener('click', showActionCards);
     backFromDraftBtn.addEventListener('click', showActionCards);
     backFromOldBtn.addEventListener('click', showActionCards);
+
+    // ✅ Exam Name validation for Next button
+    examNameInput.addEventListener('input', function() {
+        const errorEl = document.getElementById('examNameError');
+        if (this.value.trim().length > 0) {
+            errorEl.style.display = 'none';
+            // Check if subjects are selected too
+            if (selectedMainSubjects.length > 0) {
+                step1NextBtn.classList.remove('d-none');
+            }
+        } else {
+            errorEl.style.display = 'block';
+            step1NextBtn.classList.add('d-none');
+        }
+    });
+
+    // ✅ Next button - validate exam name
+    nextToStudentEntryBtn.addEventListener('click', function() {
+        const examName = examNameInput.value.trim();
+        if (!examName) {
+            document.getElementById('examNameError').style.display = 'block';
+            examNameInput.focus();
+            return;
+        }
+        if (selectedMainSubjects.length === 0) {
+            alert('Please select at least one main subject.');
+            return;
+        }
+        generateMarksFields();
+        renderOptionalMarksFields();
+        examSetupStep.style.display = 'none';
+        studentEntryStep.style.display = 'block';
+    });
 
     generateSubjectFieldsBtn.addEventListener('click', function() {
         if (selectedMainSubjects.length === 0) {
@@ -1130,14 +1315,10 @@
             subjectFields.appendChild(optDiv);
         }
         
-        step1NextBtn.classList.remove('d-none');
-    });
-
-    nextToStudentEntryBtn.addEventListener('click', () => {
-        generateMarksFields();
-        renderOptionalMarksFields();
-        examSetupStep.style.display = 'none';
-        studentEntryStep.style.display = 'block';
+        // ✅ Show next button only if exam name is filled
+        if (examNameInput.value.trim().length > 0) {
+            step1NextBtn.classList.remove('d-none');
+        }
     });
 
     // ============================================
@@ -1356,7 +1537,7 @@
     });
 
     // ============================================
-    // UPDATE STUDENTS TABLE - MAIN & OPTIONAL SEPARATE
+    // UPDATE STUDENTS TABLE
     // ============================================
     function updateStudentsTable() {
         studentsTableBody.innerHTML = '';
@@ -1405,7 +1586,7 @@
     }
 
     // ============================================
-    // ADD STUDENT - MAIN & OPTIONAL SEPARATE
+    // ADD STUDENT
     // ============================================
     addStudentBtn.addEventListener('click', () => {
         const roll = parseInt(rollNoInput.value);
@@ -1495,7 +1676,7 @@
     });
 
     // ============================================
-    // EDIT STUDENT - MAIN & OPTIONAL SEPARATE
+    // EDIT STUDENT
     // ============================================
     function editStudent(idx) {
         const s = students[idx];
@@ -1512,7 +1693,6 @@
             studentPhotoPreview.style.display = 'none';
         }
         
-        // Main subjects load
         document.querySelectorAll('.subject-mark-row').forEach(row => {
             const subject = row.dataset.subject;
             const toggle = row.querySelector('.subject-toggle');
@@ -1535,7 +1715,6 @@
             }
         });
         
-        // Optional subjects load
         document.querySelectorAll('.optional-mark-row').forEach(row => {
             const subject = row.dataset.subject;
             const toggle = row.querySelector('.optional-toggle');
@@ -1565,7 +1744,7 @@
     }
 
     // ============================================
-    // UPDATE STUDENT - MAIN & OPTIONAL SEPARATE
+    // UPDATE STUDENT
     // ============================================
     updateStudentBtn.addEventListener('click', () => {
         if (editingStudentIndex === null) return;
@@ -1666,7 +1845,7 @@
     }
 
     // ============================================
-    // SAVE DRAFT - MAIN & OPTIONAL SEPARATE
+    // SAVE DRAFT
     // ============================================
     saveDraftBtn.addEventListener('click', async () => {
         if (!examNameInput.value.trim() || students.length === 0) { alert('Exam name and at least one student required'); return; }
@@ -1703,28 +1882,38 @@
     });
 
     // ============================================
-    // PUBLISH RESULT - MAIN & OPTIONAL SEPARATE
+    // PUBLISH RESULT WITH PROGRESS BAR
     // ============================================
     publishResultBtn.addEventListener('click', async () => {
         if (!examNameInput.value.trim() || students.length === 0) { alert('Exam name and at least one student required'); return; }
         if (selectedMainSubjects.length === 0) { alert('Please select at least one main subject'); return; }
+        if (isPublishing) return;
+        
         if (isEditingPublishedResult) {
             editPublishedConfirmModal.show();
             return;
         }
         
-        const cleanStudents = students.map(s => ({
-            rollNo: s.rollNo,
-            name: s.name,
-            fatherName: s.fatherName || '',
-            photoUrl: s.photoUrl || null,
-            mainMarks: s.mainMarks || {},
-            optionalMarks: s.optionalMarks || {},
-            activeMainSubjects: s.activeMainSubjects || [],
-            activeOptionalSubjects: s.activeOptionalSubjects || []
-        }));
+        // ✅ Show progress bar
+        showProgress('📤 Publishing Result...', 'Preparing your data...');
+        updateProgress(10, 'Validating data...', 1);
+        await sleep(500);
         
         try {
+            const cleanStudents = students.map(s => ({
+                rollNo: s.rollNo,
+                name: s.name,
+                fatherName: s.fatherName || '',
+                photoUrl: s.photoUrl || null,
+                mainMarks: s.mainMarks || {},
+                optionalMarks: s.optionalMarks || {},
+                activeMainSubjects: s.activeMainSubjects || [],
+                activeOptionalSubjects: s.activeOptionalSubjects || []
+            }));
+            
+            updateProgress(25, 'Building result data...', 2);
+            await sleep(400);
+            
             const data = {
                 examName: examNameInput.value,
                 examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
@@ -1735,16 +1924,40 @@
                 students: cleanStudents,
                 createdAt: serverTimestamp()
             };
+            
+            updateProgress(50, 'Saving to database...', 3);
+            await sleep(400);
+            
             await addDoc(collection(db, "results"), data);
+            
+            updateProgress(75, 'Finalizing...', 4);
+            await sleep(400);
+            
             if (editingDraftId) await deleteDoc(doc(db, "draft_results", editingDraftId));
+            
+            updateProgress(100, '✅ Done!', 5);
+            await sleep(500);
+            
+            hideProgress();
             showToast('', true);
             resetCreateResultForm();
             showActionCards();
-        } catch(e) { alert(e.message); }
+            
+        } catch(e) {
+            hideProgress();
+            alert('Error publishing result: ' + e.message);
+        }
     });
+
+    function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
     saveChangesConfirmBtn.addEventListener('click', async () => {
         if (!editingPublishedResultId) { editPublishedConfirmModal.hide(); return; }
+        
+        if (isPublishing) return;
+        showProgress('📤 Updating Result...', 'Saving changes...');
+        updateProgress(20, 'Preparing data...', 1);
+        await sleep(400);
         
         const cleanStudents = students.map(s => ({
             rollNo: s.rollNo,
@@ -1758,6 +1971,9 @@
         }));
         
         try {
+            updateProgress(50, 'Updating database...', 3);
+            await sleep(400);
+            
             const data = {
                 examName: examNameInput.value,
                 examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
@@ -1768,15 +1984,28 @@
                 students: cleanStudents
             };
             await updateDoc(doc(db, "results", editingPublishedResultId), data);
+            
+            updateProgress(100, '✅ Done!', 5);
+            await sleep(500);
+            
             editPublishedConfirmModal.hide();
+            hideProgress();
             showToast('Result updated successfully!');
             resetCreateResultForm();
             showActionCards();
             loadOldResults();
-        } catch(e) { alert(e.message); }
+        } catch(e) {
+            hideProgress();
+            alert('Error updating result: ' + e.message);
+        }
     });
 
     saveDraftConfirmBtn.addEventListener('click', async () => {
+        if (isPublishing) return;
+        showProgress('📤 Saving as Draft...', 'Please wait...');
+        updateProgress(20, 'Preparing data...', 1);
+        await sleep(400);
+        
         const cleanStudents = students.map(s => ({
             rollNo: s.rollNo,
             name: s.name,
@@ -1789,6 +2018,9 @@
         }));
         
         try {
+            updateProgress(50, 'Saving to database...', 3);
+            await sleep(400);
+            
             const data = {
                 examName: examNameInput.value,
                 examCentre: examCentreInput.value || 'QUEST COACHING CENTRE, GOPALGANJ',
@@ -1800,12 +2032,20 @@
                 createdAt: serverTimestamp()
             };
             await addDoc(collection(db, "draft_results"), data);
+            
+            updateProgress(100, '✅ Done!', 5);
+            await sleep(500);
+            
             editPublishedConfirmModal.hide();
+            hideProgress();
             showToast('Saved as draft!');
             resetCreateResultForm();
             showActionCards();
             loadDraftResults();
-        } catch(e) { alert(e.message); }
+        } catch(e) {
+            hideProgress();
+            alert('Error saving draft: ' + e.message);
+        }
     });
 
     dontSaveConfirmBtn.addEventListener('click', () => {
@@ -1820,6 +2060,7 @@
         rollCodeInput.value = '55075';
         subjectFields.innerHTML = '';
         step1NextBtn.classList.add('d-none');
+        document.getElementById('examNameError').style.display = 'none';
         examSetupStep.style.display = 'block';
         studentEntryStep.style.display = 'none';
         students = []; updateStudentsTable();
@@ -1834,8 +2075,13 @@
         document.getElementById('templateResult').classList.add('selected');
         document.getElementById('templateResult').querySelector('input[type="radio"]').checked = true;
         selectedTemplate = 'result';
+        isPublishing = false;
+        hideProgress();
     }
 
+    // ============================================
+    // LOAD DRAFT RESULTS
+    // ============================================
     async function loadDraftResults() {
         const q = query(collection(db, "draft_results"), orderBy("createdAt", "desc"));
         const snap = await getDocs(q);
@@ -1875,7 +2121,6 @@
             selectedTemplate = 'result';
         }
         
-        // Load subjects - support both old and new format
         if (data.mainSubjects) {
             selectedMainSubjects = data.mainSubjects.map(s => ({ name: s.name, total: s.total }));
         } else if (data.subjects) {
@@ -1904,25 +2149,54 @@
 
     async function deleteDraft(id) { if (confirm('Delete draft?')) { await deleteDoc(doc(db, "draft_results", id)); showToast('Draft deleted'); loadDraftResults(); } }
 
+    // ============================================
+    // LOAD OLD RESULTS WITH PROGRESS BAR
+    // ============================================
     async function loadOldResults() {
-        const q = query(collection(db, "results"), orderBy("createdAt", "desc"));
-        const snap = await getDocs(q);
-        oldResultsList.innerHTML = '';
-        if (snap.empty) { oldResultsList.innerHTML = '<div class="col-12"><p class="text-center text-muted">No published results.</p></div>'; return; }
-        snap.forEach(doc => {
-            const d = doc.data();
-            const date = d.createdAt ? new Date(d.createdAt.toDate()).toLocaleDateString() : 'Unknown';
-            const templateLabel = d.template === 'result1' ? '🎫 Admit Card Style' : '📄 Classic';
-            const mainCount = d.mainSubjects ? d.mainSubjects.length : (d.subjects ? d.subjects.length : 0);
-            const optCount = d.optionalSubjects ? d.optionalSubjects.length : 0;
-            const optLabel = optCount > 0 ? ` | Optional: ${optCount}` : '';
-            const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">${date} | Template: ${templateLabel} | Main: ${mainCount}${optLabel} | Students: ${d.students.length}</p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary view-result" data-id="${doc.id}">View</button><button class="btn btn-sm btn-warning edit-result" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-info change-template" data-id="${doc.id}">🎨 Template</button><button class="btn btn-sm btn-danger delete-result" data-id="${doc.id}">Delete</button></div></div></div></div>`;
-            oldResultsList.insertAdjacentHTML('beforeend', card);
-        });
-        document.querySelectorAll('.view-result').forEach(btn => btn.addEventListener('click', e => viewResult(e.target.dataset.id)));
-        document.querySelectorAll('.edit-result').forEach(btn => btn.addEventListener('click', e => editResult(e.target.dataset.id)));
-        document.querySelectorAll('.delete-result').forEach(btn => btn.addEventListener('click', e => deleteResult(e.target.dataset.id)));
-        document.querySelectorAll('.change-template').forEach(btn => btn.addEventListener('click', e => openTemplateEditor(e.target.dataset.id)));
+        showProgress('📂 Loading Published Results...', 'Fetching data from database...');
+        updateProgress(20, 'Connecting to database...', 1);
+        await sleep(400);
+        
+        try {
+            const q = query(collection(db, "results"), orderBy("createdAt", "desc"));
+            const snap = await getDocs(q);
+            
+            updateProgress(60, 'Processing data...', 3);
+            await sleep(400);
+            
+            oldResultsList.innerHTML = '';
+            if (snap.empty) { 
+                oldResultsList.innerHTML = '<div class="col-12"><p class="text-center text-muted">No published results.</p></div>'; 
+                updateProgress(100, '✅ No results found', 5);
+                await sleep(300);
+                hideProgress();
+                return; 
+            }
+            
+            snap.forEach(doc => {
+                const d = doc.data();
+                const date = d.createdAt ? new Date(d.createdAt.toDate()).toLocaleDateString() : 'Unknown';
+                const templateLabel = d.template === 'result1' ? '🎫 Admit Card Style' : '📄 Classic';
+                const mainCount = d.mainSubjects ? d.mainSubjects.length : (d.subjects ? d.subjects.length : 0);
+                const optCount = d.optionalSubjects ? d.optionalSubjects.length : 0;
+                const optLabel = optCount > 0 ? ` | Optional: ${optCount}` : '';
+                const card = `<div class="col-md-6 col-lg-4"><div class="card h-100 shadow-sm"><div class="card-body"><h5 class="card-title">${d.examName}</h5><p class="card-text text-muted">${date} | Template: ${templateLabel} | Main: ${mainCount}${optLabel} | Students: ${d.students.length}</p><div class="d-flex gap-2 flex-wrap"><button class="btn btn-sm btn-primary view-result" data-id="${doc.id}">View</button><button class="btn btn-sm btn-warning edit-result" data-id="${doc.id}">Edit</button><button class="btn btn-sm btn-info change-template" data-id="${doc.id}">🎨 Template</button><button class="btn btn-sm btn-danger delete-result" data-id="${doc.id}">Delete</button></div></div></div></div>`;
+                oldResultsList.insertAdjacentHTML('beforeend', card);
+            });
+            
+            updateProgress(100, '✅ Loaded successfully!', 5);
+            await sleep(400);
+            hideProgress();
+            
+            document.querySelectorAll('.view-result').forEach(btn => btn.addEventListener('click', e => viewResult(e.target.dataset.id)));
+            document.querySelectorAll('.edit-result').forEach(btn => btn.addEventListener('click', e => editResult(e.target.dataset.id)));
+            document.querySelectorAll('.delete-result').forEach(btn => btn.addEventListener('click', e => deleteResult(e.target.dataset.id)));
+            document.querySelectorAll('.change-template').forEach(btn => btn.addEventListener('click', e => openTemplateEditor(e.target.dataset.id)));
+            
+        } catch(error) {
+            hideProgress();
+            alert('Error loading results: ' + error.message);
+        }
     }
 
     function openTemplateEditor(resultId) {
@@ -1950,80 +2224,114 @@
         const selected = document.querySelector('#editTemplateSelector input[name="editTemplate"]:checked');
         if (!selected) { alert('Please select a template'); return; }
         const newTemplate = selected.value;
+        
+        showProgress('🎨 Updating Template...', 'Applying changes...');
+        updateProgress(30, 'Processing...', 2);
+        await sleep(400);
+        
         try {
             await updateDoc(doc(db, "results", resultId), { template: newTemplate });
+            updateProgress(100, '✅ Done!', 5);
+            await sleep(400);
+            hideProgress();
             showToast('Template updated successfully!');
             editTemplateModal.hide();
             loadOldResults();
         } catch(e) {
+            hideProgress();
             alert('Error updating template: ' + e.message);
         }
     });
 
     // ============================================
-    // VIEW RESULT - MAIN & OPTIONAL SEPARATE
+    // VIEW RESULT WITH PROGRESS BAR
     // ============================================
     async function viewResult(id) {
-        const q = query(collection(db, "results"), where("__name__", "==", id));
-        const snap = await getDocs(q);
-        if (snap.empty) return;
-        const data = snap.docs[0].data();
-        currentResultDataForPdf = data;
-        currentExamNameForPdf = data.examName;
+        showProgress('📄 Loading Result...', 'Fetching student data...');
+        updateProgress(20, 'Connecting to database...', 1);
+        await sleep(400);
         
-        // Use mainSubjects or fallback to subjects
-        const mainSubjects = data.mainSubjects || data.subjects || [];
-        const optionalSubjects = data.optionalSubjects || [];
-        
-        const sorted = sortStudentsByPercentage(data.students, mainSubjects);
-        resultModalTitle.innerText = data.examName + ' (Ranked)';
-        let html = `<p><strong>Total Students:</strong> ${data.students.length}</p>`;
-        html += `<p><strong>Main Subjects:</strong> ${mainSubjects.map(s => s.name).join(', ')}</p>`;
-        if (optionalSubjects && optionalSubjects.length) {
-            html += `<p><strong>Optional Subjects:</strong> ${optionalSubjects.map(o => o.name).join(', ')} - <span class="text-muted">Not added to total</span></p>`;
-        }
-        html += `<p><strong>Template:</strong> ${data.template === 'result1' ? '🎫 Admit Card Style' : '📄 Classic'}</p>`;
-        if (sorted.length) html += `<div class="alert alert-success">🏆 Top Student: ${sorted[0].name} (Roll: ${sorted[0].rollNo})</div>`;
-        html += `<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Photo</th><th>Rank</th><th>Roll</th><th>Name</th><th>Father</th>`;
-        
-        mainSubjects.forEach(s => html += `<th>${s.name}</th>`);
-        if (optionalSubjects && optionalSubjects.length) {
-            optionalSubjects.forEach(o => html += `<th>${o.name}<br><small>(Optional)</small></th>`);
-        }
-        html += `<th>Total</th><th>%</th></tr></thead><tbody>`;
-        
-        sorted.forEach((s, idx) => {
-            let total = 0, maxTotal = 0;
-            const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷</span>';
-            html += `<tr${idx===0?' class="top-student-row"':''}><td>${photoHtml}</td><td><strong>#${idx+1}</strong></td><td>${s.rollNo}</td><td>${s.name}${idx===0?' 🏆':''}</td><td>${s.fatherName||'-'}</td>`;
+        try {
+            const q = query(collection(db, "results"), where("__name__", "==", id));
+            const snap = await getDocs(q);
+            if (snap.empty) {
+                hideProgress();
+                alert('Result not found!');
+                return;
+            }
             
-            mainSubjects.forEach(sub => {
-                if (s.activeMainSubjects && s.activeMainSubjects.includes(sub.name)) {
-                    const mark = s.mainMarks && s.mainMarks[sub.name] !== undefined ? s.mainMarks[sub.name] : 0;
-                    total += mark;
-                    maxTotal += sub.total;
-                    html += `<td>${mark}/${sub.total}</td>`;
-                } else {
-                    html += `<td style="color:#ccc;">-</td>`;
-                }
-            });
+            updateProgress(50, 'Processing data...', 3);
+            await sleep(400);
             
+            const data = snap.docs[0].data();
+            currentResultDataForPdf = data;
+            currentExamNameForPdf = data.examName;
+            
+            const mainSubjects = data.mainSubjects || data.subjects || [];
+            const optionalSubjects = data.optionalSubjects || [];
+            
+            const sorted = sortStudentsByPercentage(data.students, mainSubjects);
+            
+            updateProgress(75, 'Building display...', 4);
+            await sleep(400);
+            
+            resultModalTitle.innerText = data.examName + ' (Ranked)';
+            let html = `<p><strong>Total Students:</strong> ${data.students.length}</p>`;
+            html += `<p><strong>Main Subjects:</strong> ${mainSubjects.map(s => s.name).join(', ')}</p>`;
             if (optionalSubjects && optionalSubjects.length) {
-                optionalSubjects.forEach(o => {
-                    if (s.activeOptionalSubjects && s.activeOptionalSubjects.includes(o.name)) {
-                        const optMark = s.optionalMarks && s.optionalMarks[o.name] !== undefined ? s.optionalMarks[o.name] : '-';
-                        html += `<td style="color:#c5a059;">${optMark}/${o.total}</td>`;
+                html += `<p><strong>Optional Subjects:</strong> ${optionalSubjects.map(o => o.name).join(', ')} - <span class="text-muted">Not added to total</span></p>`;
+            }
+            html += `<p><strong>Template:</strong> ${data.template === 'result1' ? '🎫 Admit Card Style' : '📄 Classic'}</p>`;
+            if (sorted.length) html += `<div class="alert alert-success">🏆 Top Student: ${sorted[0].name} (Roll: ${sorted[0].rollNo})</div>`;
+            html += `<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Photo</th><th>Rank</th><th>Roll</th><th>Name</th><th>Father</th>`;
+            
+            mainSubjects.forEach(s => html += `<th>${s.name}</th>`);
+            if (optionalSubjects && optionalSubjects.length) {
+                optionalSubjects.forEach(o => html += `<th>${o.name}<br><small>(Optional)</small></th>`);
+            }
+            html += `<th>Total</th><th>%</th></tr></thead><tbody>`;
+            
+            sorted.forEach((s, idx) => {
+                let total = 0, maxTotal = 0;
+                const photoHtml = s.photoUrl ? `<img src="${s.photoUrl}" style="width:35px;height:35px;border-radius:50%;object-fit:cover;">` : '<span class="text-muted">📷</span>';
+                html += `<tr${idx===0?' class="top-student-row"':''}><td>${photoHtml}</td><td><strong>#${idx+1}</strong></td><td>${s.rollNo}</td><td>${s.name}${idx===0?' 🏆':''}</td><td>${s.fatherName||'-'}</td>`;
+                
+                mainSubjects.forEach(sub => {
+                    if (s.activeMainSubjects && s.activeMainSubjects.includes(sub.name)) {
+                        const mark = s.mainMarks && s.mainMarks[sub.name] !== undefined ? s.mainMarks[sub.name] : 0;
+                        total += mark;
+                        maxTotal += sub.total;
+                        html += `<td>${mark}/${sub.total}</td>`;
                     } else {
                         html += `<td style="color:#ccc;">-</td>`;
                     }
                 });
-            }
-            const percent = maxTotal ? ((total/maxTotal)*100).toFixed(2) : 0;
-            html += `<td><strong>${total}/${maxTotal}</strong></td><td><strong>${percent}%</strong></td></tr>`;
-        });
-        html += `</tbody></table></div>`;
-        resultDetails.innerHTML = html;
-        resultModal.show();
+                
+                if (optionalSubjects && optionalSubjects.length) {
+                    optionalSubjects.forEach(o => {
+                        if (s.activeOptionalSubjects && s.activeOptionalSubjects.includes(o.name)) {
+                            const optMark = s.optionalMarks && s.optionalMarks[o.name] !== undefined ? s.optionalMarks[o.name] : '-';
+                            html += `<td style="color:#c5a059;">${optMark}/${o.total}</td>`;
+                        } else {
+                            html += `<td style="color:#ccc;">-</td>`;
+                        }
+                    });
+                }
+                const percent = maxTotal ? ((total/maxTotal)*100).toFixed(2) : 0;
+                html += `<td><strong>${total}/${maxTotal}</strong></td><td><strong>${percent}%</strong></td></tr>`;
+            });
+            html += `</tbody></table></div>`;
+            resultDetails.innerHTML = html;
+            
+            updateProgress(100, '✅ Ready!', 5);
+            await sleep(300);
+            hideProgress();
+            resultModal.show();
+            
+        } catch(error) {
+            hideProgress();
+            alert('Error loading result: ' + error.message);
+        }
     }
 
     function sortStudentsByPercentage(arr, mainSubjects) {
@@ -2096,7 +2404,7 @@
     downloadPdfBtn.addEventListener('click', () => { if (currentResultDataForPdf) generatePDF(currentResultDataForPdf, currentExamNameForPdf); });
 
     // ============================================
-    // GENERATE PDF - MAIN & OPTIONAL SEPARATE
+    // GENERATE PDF
     // ============================================
     function generatePDF(data, examName) {
         const { jsPDF } = window.jspdf;
