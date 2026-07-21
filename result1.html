@@ -949,7 +949,7 @@
       
       currentExamData = docSnap.data();
       
-      // ✅ Agar template 'result' hai to redirect to classic result
+      // Agar template 'result' hai to redirect to classic result
       const template = currentExamData.template || 'result';
       if (template === 'result') {
         console.log('🔄 Redirecting to result.html (Classic Style)');
@@ -984,7 +984,7 @@
     }
   }
   
-  // ✅✅✅ FIXED: displayResult function - ONLY ACTIVE SUBJECTS ✅✅✅
+  // ✅✅✅ FIXED: displayResult function - SMART FALLBACK ✅✅✅
   function displayResult(examData, student) {
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('resultCard').style.display = 'block';
@@ -1041,18 +1041,30 @@
       }, 300);
     }
     
-    // ✅✅✅ MARKS TABLE - ONLY ACTIVE SUBJECTS ✅✅✅
+    // ✅✅✅ MARKS TABLE - SMART FALLBACK ✅✅✅
     let marksHtml = '';
     let totalObtained = 0;
     let totalMax = 0;
     
-    // ✅ Get active subjects from student
-    const activeSubjects = student.activeSubjects || [];
+    // ✅ Get active subjects - agar nahi hai toh saare subjects ko active maano
+    let activeSubjects = student.activeSubjects || [];
     
-    // ✅ MAIN SUBJECTS - from mainSubjects OR subjects (backward compatible)
+    // ✅ Agar activeSubjects empty hai, toh saare subjects ko active maano (backward compatibility)
     const mainSubjects = examData.mainSubjects || examData.subjects || [];
+    const optionalSubjects = examData.optionalSubjects || [];
     
-    // ✅ Track if we have any main subjects shown
+    // ✅ Agar activeSubjects empty hai toh saare main subjects ko active maano
+    if (activeSubjects.length === 0 && mainSubjects.length > 0) {
+      activeSubjects = mainSubjects.map(s => s.name);
+      console.log('🔄 No activeSubjects found, using all subjects as active');
+    }
+    
+    // ✅ Agar activeSubjects empty hai aur optional subjects hain toh unhe bhi add karo
+    if (activeSubjects.length === 0 && optionalSubjects.length > 0) {
+      activeSubjects = [...activeSubjects, ...optionalSubjects.map(s => s.name)];
+    }
+    
+    // ✅ MAIN SUBJECTS
     let mainSubjectsShown = 0;
     
     for (const subject of mainSubjects) {
@@ -1087,11 +1099,6 @@
       totalMax += subTotal;
     }
     
-    // ✅ If no main subjects active, show message
-    if (mainSubjectsShown === 0 && mainSubjects.length > 0) {
-      marksHtml += `<tr><td colspan="4" style="text-align:center; color:#999;">No active subjects found for this student</td></tr>`;
-    }
-    
     // ✅ TOTAL ROW
     if (mainSubjectsShown > 0) {
       marksHtml += `<tr class="total-row">
@@ -1100,12 +1107,14 @@
         <td><strong>${totalObtained}</strong></td>
         <td></td>
       </tr>`;
+    } else {
+      // ✅ Agar koi subject active nahi hai toh error dikhao
+      marksHtml = `<tr><td colspan="4" style="text-align:center; color:#dc2626; padding:20px;">
+        <i class="fas fa-exclamation-circle"></i> No subjects found for this student. Please check exam data.
+      </td></tr>`;
     }
     
-    // ✅ OPTIONAL SUBJECTS - Only show if active
-    const optionalSubjects = examData.optionalSubjects || [];
-    let hasActiveOptional = false;
-    
+    // ✅ OPTIONAL SUBJECTS
     for (const opt of optionalSubjects) {
       const optName = opt.name;
       
@@ -1114,7 +1123,6 @@
         continue; // Skip inactive optional subjects
       }
       
-      hasActiveOptional = true;
       const optTotal = opt.total || 100;
       let optObtained = '-';
       let optGrade = '-';
