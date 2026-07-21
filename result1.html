@@ -984,7 +984,7 @@
     }
   }
   
-  // ✅✅✅ FIXED: displayResult function - SMART FALLBACK ✅✅✅
+  // ✅✅✅ FIXED: SIRF ACTIVE SUBJECTS DIKHAYEGA ✅✅✅
   function displayResult(examData, student) {
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('resultCard').style.display = 'block';
@@ -1041,44 +1041,41 @@
       }, 300);
     }
     
-    // ✅✅✅ MARKS TABLE - SMART FALLBACK ✅✅✅
+    // ✅✅✅ SIRF ACTIVE SUBJECTS - MAIN ✅✅✅
     let marksHtml = '';
     let totalObtained = 0;
     let totalMax = 0;
     
-    // ✅ Get active subjects - agar nahi hai toh saare subjects ko active maano
-    let activeSubjects = student.activeSubjects || [];
+    // ✅ Student ke active subjects
+    const activeMainSubjects = student.activeMainSubjects || [];
+    const activeOptionalSubjects = student.activeOptionalSubjects || [];
     
-    // ✅ Agar activeSubjects empty hai, toh saare subjects ko active maano (backward compatibility)
+    // ✅ Exam ke subjects
     const mainSubjects = examData.mainSubjects || examData.subjects || [];
     const optionalSubjects = examData.optionalSubjects || [];
     
-    // ✅ Agar activeSubjects empty hai toh saare main subjects ko active maano
-    if (activeSubjects.length === 0 && mainSubjects.length > 0) {
-      activeSubjects = mainSubjects.map(s => s.name);
-      console.log('🔄 No activeSubjects found, using all subjects as active');
-    }
+    // ✅ Log for debugging
+    console.log('Active Main Subjects:', activeMainSubjects);
+    console.log('Active Optional Subjects:', activeOptionalSubjects);
+    console.log('All Main Subjects:', mainSubjects.map(s => s.name));
+    console.log('All Optional Subjects:', optionalSubjects.map(s => s.name));
     
-    // ✅ Agar activeSubjects empty hai aur optional subjects hain toh unhe bhi add karo
-    if (activeSubjects.length === 0 && optionalSubjects.length > 0) {
-      activeSubjects = [...activeSubjects, ...optionalSubjects.map(s => s.name)];
-    }
-    
-    // ✅ MAIN SUBJECTS
+    // ✅ 1️⃣ MAIN SUBJECTS - Sirf active wale
     let mainSubjectsShown = 0;
     
     for (const subject of mainSubjects) {
       const subName = subject.name;
       
-      // ✅ CHECK: Is this subject active for this student?
-      if (!activeSubjects.includes(subName)) {
-        continue; // Skip inactive subjects
+      // ✅ SIRF ACTIVE MAIN SUBJECTS
+      if (!activeMainSubjects.includes(subName)) {
+        console.log(`⏭️ Skipping ${subName} - Not in activeMainSubjects`);
+        continue;
       }
       
       mainSubjectsShown++;
       const subTotal = subject.total || 100;
       
-      // ✅ Get marks from mainMarks OR marks (backward compatible)
+      // ✅ Marks from mainMarks
       let marksObtained = 0;
       if (student.mainMarks && student.mainMarks[subName] !== undefined) {
         marksObtained = student.mainMarks[subName];
@@ -1107,22 +1104,21 @@
         <td><strong>${totalObtained}</strong></td>
         <td></td>
       </tr>`;
-    } else {
-      // ✅ Agar koi subject active nahi hai toh error dikhao
-      marksHtml = `<tr><td colspan="4" style="text-align:center; color:#dc2626; padding:20px;">
-        <i class="fas fa-exclamation-circle"></i> No subjects found for this student. Please check exam data.
-      </td></tr>`;
     }
     
-    // ✅ OPTIONAL SUBJECTS
+    // ✅ 2️⃣ OPTIONAL SUBJECTS - Sirf active wale
+    let optionalSubjectsShown = 0;
+    
     for (const opt of optionalSubjects) {
       const optName = opt.name;
       
-      // ✅ CHECK: Is this optional subject active for this student?
-      if (!activeSubjects.includes(optName)) {
-        continue; // Skip inactive optional subjects
+      // ✅ SIRF ACTIVE OPTIONAL SUBJECTS
+      if (!activeOptionalSubjects.includes(optName)) {
+        console.log(`⏭️ Skipping optional ${optName} - Not in activeOptionalSubjects`);
+        continue;
       }
       
+      optionalSubjectsShown++;
       const optTotal = opt.total || 100;
       let optObtained = '-';
       let optGrade = '-';
@@ -1154,9 +1150,16 @@
       </tr>`;
     }
     
+    // ✅ Agar koi subject nahi dikha toh message
+    if (mainSubjectsShown === 0 && optionalSubjectsShown === 0) {
+      marksHtml = `<tr><td colspan="4" style="text-align:center; color:#dc2626; padding:20px;">
+        <i class="fas fa-exclamation-circle"></i> No active subjects found for this student.
+      </td></tr>`;
+    }
+    
     document.getElementById('marksTableBody').innerHTML = marksHtml;
     
-    // ✅ PERCENTAGE & DIVISION (only active main subjects)
+    // ✅ PERCENTAGE & DIVISION (sirf active main subjects se)
     const totalPercentage = totalMax > 0 ? ((totalObtained / totalMax) * 100) : 0;
     const roundedPercentage = totalPercentage.toFixed(2);
     const divisionInfo = calculateDivision(totalPercentage);
