@@ -120,9 +120,11 @@
             background: white;
             transition: 0.2s;
             user-select: none;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         .exam-header:hover { background: #f1f5f9; }
-        .exam-header .exam-info { display: flex; flex-direction: column; gap: 5px; }
+        .exam-header .exam-info { display: flex; flex-direction: column; gap: 5px; flex: 1; }
         .exam-header .exam-name { font-size: 1.1rem; font-weight: 700; color: #1e3a5f; }
         .exam-header .exam-meta { font-size: 0.9rem; color: #64748b; }
         .exam-header .exam-meta i { margin-right: 5px; }
@@ -130,6 +132,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            flex-wrap: wrap;
         }
         .exam-header .student-count {
             background: #1b4f9b;
@@ -145,6 +148,23 @@
             transition: transform 0.3s;
         }
         .exam-header .toggle-icon.open { transform: rotate(180deg); }
+        
+        .btn-print-all {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .btn-print-all:hover { background: #047857; transform: scale(1.05); }
+        .btn-print-all i { font-size: 0.9rem; }
         
         .exam-students {
             padding: 0 20px 20px 20px;
@@ -170,7 +190,7 @@
         .student-card-info strong { color: #1e3a5f; }
         .card-date { font-size: 12px; color: #64748b; }
         
-        .student-card-actions { display: flex; gap: 10px; }
+        .student-card-actions { display: flex; gap: 10px; flex-wrap: wrap; }
         .btn-view-card, .btn-delete-card {
             padding: 8px 16px;
             border: none;
@@ -216,22 +236,14 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         
-        .back-to-exams {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #1b4f9b;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 15px;
-            transition: 0.2s;
+        /* Print All specific styles */
+        .print-all-container {
+            display: none;
         }
-        .back-to-exams:hover { background: #0f3f7a; transform: translateY(-2px); }
+        .print-all-container .admit-card {
+            page-break-after: always;
+            margin-bottom: 20px;
+        }
         
         @media (max-width: 700px) {
             .student-card-item { flex-direction: column; text-align: center; gap: 12px; }
@@ -239,6 +251,14 @@
             .header h1 { font-size: 1.4rem; }
             .exam-header { flex-direction: column; gap: 10px; text-align: center; }
             .exam-header .exam-stats { justify-content: center; }
+            .exam-header .exam-info { align-items: center; }
+        }
+        
+        @media print {
+            .no-print { display: none !important; }
+            .print-all-container { display: block !important; }
+            body { background: white; padding: 0; }
+            .admit-card { page-break-after: always; box-shadow: none; margin: 0 auto; }
         }
     </style>
 </head>
@@ -250,16 +270,16 @@
 
     <div id="mainContent" class="main-content">
         <div class="container">
-            <button class="back-btn" onclick="goBack()">
+            <button class="back-btn no-print" onclick="goBack()">
                 <i class="fas fa-arrow-left"></i> Back to Generator
             </button>
             
-            <div class="header">
+            <div class="header no-print">
                 <h1><i class="fas fa-history"></i> Previous Admit Cards</h1>
                 <p>View admit cards grouped by exam</p>
             </div>
             
-            <div class="cards-list">
+            <div class="cards-list no-print">
                 <div class="search-box">
                     <input type="text" id="searchInput" placeholder="🔍 Search by Exam Name, Roll Number or Student Name..." onkeyup="filterCards()">
                 </div>
@@ -269,6 +289,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Hidden container for print all -->
+    <div id="printAllContainer" class="print-all-container"></div>
 
     <script>
     const firebaseConfig = {
@@ -285,8 +308,7 @@
     
     let allCards = [];
     let filteredCards = [];
-    let currentView = 'exams'; // 'exams' or 'students'
-    let currentExamKey = '';
+    let allStudentsData = {};
     
     function goBack() { window.location.href = 'admit-card.html'; }
     
@@ -304,7 +326,7 @@
         
         const logoutBtn = document.createElement('button');
         logoutBtn.innerHTML = '🚪 Logout';
-        logoutBtn.className = 'logout-btn';
+        logoutBtn.className = 'logout-btn no-print';
         logoutBtn.onclick = async () => { await auth.signOut(); window.location.href = 'index.html'; };
         document.body.appendChild(logoutBtn);
         
@@ -326,7 +348,6 @@
     }
     
     function displayExams(cards) {
-        currentView = 'exams';
         const container = document.getElementById('cardsContainer');
         
         // Group cards by exam
@@ -355,7 +376,7 @@
         examKeys.forEach(key => {
             const group = examGroups[key];
             const count = group.students.length;
-            const card = group.students[0]; // For exam date
+            const card = group.students[0];
             const date = card.createdAt ? new Date(card.createdAt.toDate()).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Unknown date';
             
             html += `
@@ -370,6 +391,9 @@
                             </div>
                         </div>
                         <div class="exam-stats">
+                            <button class="btn-print-all" onclick="event.stopPropagation(); printAllCards('${key}')">
+                                <i class="fas fa-print"></i> Print All (${count})
+                            </button>
                             <span class="student-count">${count} Students</span>
                             <i class="fas fa-chevron-down toggle-icon"></i>
                         </div>
@@ -441,7 +465,6 @@
                 await admitCardsCollection.doc(cardId).delete();
                 Swal.fire('Deleted!', 'Admit card has been deleted.', 'success');
                 await loadCards();
-                // Re-apply search filter
                 const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
                 if (searchTerm) {
                     const filtered = allCards.filter(card => 
@@ -455,6 +478,291 @@
             } catch (error) {
                 Swal.fire('Error!', 'Failed to delete admit card.', 'error');
             }
+        }
+    };
+    
+    // Print All Function
+    window.printAllCards = async function(examKey) {
+        try {
+            Swal.fire({
+                title: 'Preparing Admit Cards...',
+                text: 'Please wait while we load all admit cards',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+            
+            // Get all students for this exam
+            const examName = examKey.split('_')[0];
+            const className = examKey.split('_')[1] || '';
+            
+            const snapshot = await admitCardsCollection
+                .where('examName', '==', examName)
+                .where('studentClass', '==', className)
+                .get();
+            
+            const students = [];
+            snapshot.forEach(doc => { students.push({ id: doc.id, ...doc.data() }); });
+            
+            if (students.length === 0) {
+                Swal.fire('No students found!', 'No admit cards available for this exam.', 'warning');
+                return;
+            }
+            
+            // Close the loading
+            Swal.close();
+            
+            // Show confirmation
+            const confirmResult = await Swal.fire({
+                title: `Print ${students.length} Admit Cards?`,
+                text: `This will open a new window with all ${students.length} admit cards for ${examName}`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#059669',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: `Yes, Print All (${students.length})`,
+                cancelButtonText: 'Cancel'
+            });
+            
+            if (!confirmResult.isConfirmed) return;
+            
+            // Generate all admit cards in a new window
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>All Admit Cards - ${examName}</title>
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body { padding: 20px; background: white; }
+                        .admit-card { 
+                            width: 210mm;
+                            min-height: 297mm;
+                            background: white;
+                            margin: 0 auto 30px auto;
+                            page-break-after: always;
+                            position: relative;
+                            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                            font-family: 'Segoe UI', 'Poppins', sans-serif;
+                            overflow: hidden;
+                        }
+                        .card-border {
+                            position: absolute;
+                            top: 8px;
+                            left: 8px;
+                            right: 8px;
+                            bottom: 8px;
+                            border: 2px solid #c5a059;
+                            border-radius: 20px;
+                            pointer-events: none;
+                            z-index: 2;
+                        }
+                        .card-header {
+                            background: linear-gradient(135deg, #1a3a5c, #0f2b44);
+                            padding: 20px 25px;
+                            text-align: center;
+                            position: relative;
+                            z-index: 1;
+                            margin: 8px 8px 0 8px;
+                            border-radius: 16px 16px 0 0;
+                        }
+                        .header-flex { display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap; }
+                        .logo-circle { width: 70px; height: 70px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #c5a059; overflow: hidden; }
+                        .logo-circle img { width: 100%; height: 100%; object-fit: cover; }
+                        .header-text h1 { color: white; font-size: 22px; letter-spacing: 1px; }
+                        .header-text p { color: #c5a059; font-size: 11px; margin: 2px 0; }
+                        .exam-title-bar { background: #c5a059; color: #1a3a5c; text-align: center; padding: 8px; margin: 0 8px; font-size: 16px; font-weight: 700; letter-spacing: 1px; }
+                        .admit-title { text-align: center; margin: 8px 8px 5px 8px; padding: 5px; }
+                        .admit-title h2 { font-size: 16px; font-weight: 700; color: #1a3a5c; letter-spacing: 1px; }
+                        .card-body { padding: 15px 20px; display: flex; flex-direction: column; gap: 12px; margin: 0 8px; }
+                        .top-info-row { display: flex; gap: 15px; flex-wrap: wrap; }
+                        .photo-section { width: 110px; text-align: center; }
+                        .student-photo { width: 100px; height: 120px; border: 3px solid #c5a059; border-radius: 12px; overflow: hidden; background: #f5f5f5; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+                        .student-photo img { width: 100%; height: 100%; object-fit: cover; }
+                        .basic-info { flex: 2; display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+                        .info-item { border-bottom: 1px solid #e2e8f0; padding: 3px 0; }
+                        .info-label { font-size: 9px; font-weight: 600; color: #64748b; text-transform: uppercase; }
+                        .info-value { font-size: 12px; font-weight: 700; color: #1e3a5f; margin-top: 1px; }
+                        .qr-section { width: 100px; text-align: center; }
+                        .qr-box { background: white; padding: 6px; border: 2px solid #c5a059; border-radius: 12px; display: flex; justify-content: center; align-items: center; margin: 0 auto; width: 85px; height: 85px; }
+                        .qr-box canvas { width: 75px !important; height: 75px !important; }
+                        .qr-label { font-size: 7px; font-weight: bold; color: #c5a059; margin-top: 4px; }
+                        .subjects-schedule { background: #fef9e6; border-radius: 14px; padding: 12px; border-left: 4px solid #c5a059; }
+                        .section-title { font-size: 13px; font-weight: 800; color: #1a3a5c; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+                        .schedule-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+                        .schedule-table th { background: #1a3a5c; color: white; padding: 8px; text-align: left; font-size: 10px; font-weight: 600; }
+                        .schedule-table td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; font-size: 10px; }
+                        .rules-section { background: #f8fafc; border-radius: 14px; padding: 12px; border: 1px solid #e2e8f0; }
+                        .rules-title { font-size: 12px; font-weight: 800; color: #1a3a5c; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+                        .rules-list { font-size: 11px; line-height: 1.4; color: #1e293b; }
+                        .rules-list li { list-style: none; position: relative; padding-left: 16px; margin-bottom: 6px; }
+                        .rules-list li:before { content: "●"; color: #c5a059; position: absolute; left: 0; font-size: 8px; }
+                        .quote-section { text-align: center; padding: 8px; background: #eef2ff; border-radius: 30px; }
+                        .quote-text { font-size: 10px; font-style: italic; color: #1e3a5f; }
+                        .quote-author { font-size: 9px; font-weight: 700; color: #c5a059; margin-top: 3px; }
+                        .signatures { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 8px 0; }
+                        .sign-box { text-align: center; width: 130px; }
+                        .sign-line { border-top: 1px solid #333; width: 100%; margin-top: 18px; padding-top: 5px; }
+                        .sign-label { font-size: 8px; font-weight: 600; }
+                        .stamp-box { text-align: center; }
+                        .stamp { width: 65px; height: 65px; border: 2px solid #c5a059; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; background: #fef9e6; }
+                        .stamp span { font-size: 6px; font-weight: bold; color: #c5a059; text-align: center; }
+                        .footer { background: #0f2b44; padding: 8px; text-align: center; margin: 0 8px 8px 8px; border-radius: 0 0 16px 16px; position: relative; z-index: 1; }
+                        .footer p { color: white; font-size: 7px; }
+                        .page-number { text-align: center; font-size: 10px; color: #64748b; margin-top: 5px; }
+                        
+                        @media print {
+                            .admit-card { box-shadow: none; margin: 0 auto; }
+                            body { padding: 0; }
+                        }
+                    </style>
+                </head>
+                <body>
+            `);
+            
+            const LOGO_URL = 'https://i.ibb.co/hF9tmnpB/20250903-202922.jpg';
+            const RULES_LIST = [
+                "परीक्षा केंद्र पर परीक्षार्थी परीक्षा प्रारम्भ होने से आधा घंटा पूर्व पहुँच जाए।",
+                "परीक्षा प्रारम्भ होने के बाद परीक्षार्थियों को परीक्षा हॉल में प्रवेश की अनुमति नहीं दी जाएगी।",
+                "परीक्षार्थी अपने निर्धारित स्थान/सीट पर ही बैठेंगे।",
+                "प्रवेश-पत्र (Admit Card) के अतिरिक्त कोई अन्य कागजात परीक्षा हॉल में लाना वर्जित है।",
+                "उत्तरपुस्तिका के आवरण पृष्ठ पर अपना रोलकोड, क्रमांक, पंजीयन संख्या, परीक्षा का विषय, लिपि, परीक्षा की तिथि एवं प्रश्नपत्र सेट नंबर, अपने हस्ताक्षर आदि अवश्य अंकित करें।",
+                "परीक्षार्थी को प्रत्येक विषय की परीक्षा के लिए केवल एक ही उत्तरपुस्तिका मिलेगी। अतिरिक्त उत्तरपुस्तिका नहीं दी जाएगी।",
+                "परीक्षा हॉल में एक दूसरे से मदद लेना या देना अथवा किसी प्रकार का कदाचार अपनाने के प्रयास में पकड़े गए परीक्षार्थी को परीक्षा से निष्कासित कर दिया जाएगा।",
+                "परीक्षा हॉल में किसी भी प्रकार का इलेक्ट्रॉनिक उपकरण जैसे: मोबाइल, घड़ी, कैलकुलेटर, ब्लूटूथ, इत्यादि लाना वर्जित है।"
+            ];
+            
+            students.forEach((student, index) => {
+                const rulesHtml = RULES_LIST.map(r => `<li>${r}</li>`).join('');
+                const photoHtml = student.photoUrl ? 
+                    `<img src="${student.photoUrl}" style="width:100%;height:100%;object-fit:cover;">` : 
+                    '<i class="fas fa-user" style="font-size:35px;color:#999;"></i>';
+                
+                let scheduleHtml = '';
+                if (student.subjects && student.subjects.length > 0) {
+                    student.subjects.forEach(sub => {
+                        const timeDisplay = sub.startTime && sub.endTime ? 
+                            `${sub.startTime} ${sub.ampm || 'AM'} – ${sub.endTime} ${sub.ampm || 'AM'}` : '-';
+                        scheduleHtml += `
+                            <tr>
+                                <td style="padding:6px 8px;">${sub.code || '-'}</td>
+                                <td style="padding:6px 8px;">${sub.name}</td>
+                                <td style="padding:6px 8px;">${sub.date || '-'}</td>
+                                <td style="padding:6px 8px;">${timeDisplay}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    scheduleHtml = '<tr><td colspan="4" style="text-align:center;">No subjects added</td></tr>';
+                }
+                
+                const rollCode = student.rollCode || '55075';
+                const dob = student.dob ? new Date(student.dob).toLocaleDateString('en-GB') : 'N/A';
+                const motherName = student.motherName || 'N/A';
+                const publicShareUrl = `${window.location.origin}${window.location.pathname.replace('previous-cards.html', 'view-card.html')}?id=${student.id}`;
+                
+                printWindow.document.write(`
+                    <div class="admit-card">
+                        <div class="card-border"></div>
+                        <div class="card-header">
+                            <div class="header-flex">
+                                <div class="logo-circle"><img src="${LOGO_URL}" alt="Logo"></div>
+                                <div class="header-text">
+                                    <h1>QUEST COACHING CENTRE</h1>
+                                    <p>Block More, Gopalganj - 841428 | Ph: +91 9708442525</p>
+                                    <p>Under the guidance of MR. RAVI SIR</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="exam-title-bar">${student.examName || 'Exam'}</div>
+                        <div class="admit-title"><h2>प्रवेश पत्र (ADMIT CARD)</h2></div>
+                        <div class="card-body">
+                            <div class="top-info-row">
+                                <div class="photo-section"><div class="student-photo">${photoHtml}</div></div>
+                                <div class="basic-info">
+                                    <div class="info-item"><div class="info-label">STUDENT NAME</div><div class="info-value">${student.studentName || 'N/A'}</div></div>
+                                    <div class="info-item"><div class="info-label">CLASS</div><div class="info-value">${student.studentClass || 'N/A'}</div></div>
+                                    <div class="info-item"><div class="info-label">ROLL NUMBER</div><div class="info-value">${student.rollNumber || 'N/A'}</div></div>
+                                    <div class="info-item"><div class="info-label">ROLL CODE</div><div class="info-value">${rollCode}</div></div>
+                                    <div class="info-item"><div class="info-label">FATHER'S NAME</div><div class="info-value">${student.fatherName || 'N/A'}</div></div>
+                                    <div class="info-item"><div class="info-label">MOTHER'S NAME</div><div class="info-value">${motherName}</div></div>
+                                    <div class="info-item"><div class="info-label">DATE OF BIRTH</div><div class="info-value">${dob}</div></div>
+                                    <div class="info-item"><div class="info-label">GENDER</div><div class="info-value">${student.gender || 'N/A'}</div></div>
+                                    <div class="info-item"><div class="info-label">REGISTRATION NO.</div><div class="info-value">${student.registrationNo || student.admissionNo || 'N/A'}</div></div>
+                                    <div class="info-item"><div class="info-label">EXAM CENTRE</div><div class="info-value">${student.examCentre || 'N/A'}</div></div>
+                                </div>
+                                <div class="qr-section">
+                                    <div class="qr-box"><div id="qrcode_${student.id}" style="width:75px;height:75px;"></div></div>
+                                    <div class="qr-label">SCAN TO VERIFY</div>
+                                </div>
+                            </div>
+                            <div class="subjects-schedule">
+                                <div class="section-title"><i class="fas fa-calendar-alt"></i> परीक्षा कार्यक्रम (Exam Schedule)</div>
+                                <table class="schedule-table">
+                                    <thead>
+                                        <tr>
+                                            <th>विषय कोड</th>
+                                            <th>विषय का नाम</th>
+                                            <th>परीक्षा की तिथि</th>
+                                            <th>परीक्षा का समय</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${scheduleHtml}</tbody>
+                                </table>
+                            </div>
+                            <div class="rules-section">
+                                <div class="rules-title"><i class="fas fa-file-alt"></i> परीक्षार्थियों के लिए निर्देश</div>
+                                <div class="rules-list"><ul style="margin:0; padding-left:0;">${rulesHtml}</ul></div>
+                            </div>
+                            <div class="quote-section">
+                                <div class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</div>
+                                <div class="quote-author">- MR. RAVI SIR (Director, Quest Coaching Centre)</div>
+                            </div>
+                            <div class="signatures">
+                                <div class="sign-box"><div class="sign-line"></div><div class="sign-label">Director Signature</div></div>
+                                <div class="stamp-box"><div class="stamp"><span>QUEST</span><span>COACHING</span><span>CENTRE</span><span style="font-size:5px;">AUTHORISED</span></div></div>
+                                <div class="sign-box"><div class="sign-line"></div><div class="sign-label">Student Signature</div></div>
+                            </div>
+                        </div>
+                        <div class="footer"><p>★ THIS IS A SYSTEM GENERATED ADMIT CARD | VALID FOR EXAMINATION PURPOSE ONLY ★</p></div>
+                    </div>
+                    <div class="page-number">Page ${index + 1} of ${students.length}</div>
+                `);
+            });
+            
+            printWindow.document.write(`
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+                <script>
+                    // Generate QR codes after page loads
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const students = ${JSON.stringify(students)};
+                        students.forEach(function(student) {
+                            const qrDiv = document.getElementById('qrcode_' + student.id);
+                            if (qrDiv) {
+                                const url = window.location.origin + window.location.pathname.replace('previous-cards.html', 'view-card.html') + '?id=' + student.id;
+                                try {
+                                    new QRCode(qrDiv, { text: url, width: 75, height: 75 });
+                                } catch(e) {
+                                    console.error('QR Error:', e);
+                                }
+                            }
+                        });
+                    });
+                    
+                    // Auto print after all content loads
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.print();
+                        }, 1500);
+                    };
+                <\/script>
+            `);
+            
+            printWindow.document.write(`</body></html>`);
+            printWindow.document.close();
+            
+        } catch (error) {
+            console.error("Error printing all cards:", error);
+            Swal.fire('Error!', 'Failed to print all admit cards. Please try again.', 'error');
         }
     };
     </script>
