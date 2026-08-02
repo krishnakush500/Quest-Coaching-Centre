@@ -100,11 +100,63 @@
         }
         .search-box input:focus { border-color: #1b4f9b; outline: none; }
         
-        .admit-card-item {
+        /* Exam Group Styles */
+        .exam-group {
             background: #f8fafc;
             border-radius: 20px;
-            padding: 20px;
             margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .exam-group:hover { border-color: #c5a059; }
+        
+        .exam-header {
+            padding: 20px 25px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            transition: 0.2s;
+            user-select: none;
+        }
+        .exam-header:hover { background: #f1f5f9; }
+        .exam-header .exam-info { display: flex; flex-direction: column; gap: 5px; }
+        .exam-header .exam-name { font-size: 1.1rem; font-weight: 700; color: #1e3a5f; }
+        .exam-header .exam-meta { font-size: 0.9rem; color: #64748b; }
+        .exam-header .exam-meta i { margin-right: 5px; }
+        .exam-header .exam-stats {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .exam-header .student-count {
+            background: #1b4f9b;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .exam-header .toggle-icon {
+            color: #64748b;
+            font-size: 1.2rem;
+            transition: transform 0.3s;
+        }
+        .exam-header .toggle-icon.open { transform: rotate(180deg); }
+        
+        .exam-students {
+            padding: 0 20px 20px 20px;
+            display: none;
+        }
+        .exam-students.open { display: block; }
+        
+        .student-card-item {
+            background: white;
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin-top: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -112,23 +164,23 @@
             border: 1px solid #e2e8f0;
             transition: all 0.2s;
         }
-        .admit-card-item:hover { border-color: #c5a059; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .student-card-item:hover { border-color: #c5a059; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         
-        .admit-card-info p { margin: 5px 0; color: #334155; }
-        .admit-card-info strong { color: #1e3a5f; }
+        .student-card-info p { margin: 3px 0; color: #334155; }
+        .student-card-info strong { color: #1e3a5f; }
         .card-date { font-size: 12px; color: #64748b; }
         
-        .admit-card-actions { display: flex; gap: 10px; }
+        .student-card-actions { display: flex; gap: 10px; }
         .btn-view-card, .btn-delete-card {
-            padding: 10px 20px;
+            padding: 8px 16px;
             border: none;
             border-radius: 40px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12px;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             transition: 0.2s;
         }
         .btn-view-card { background: #1b4f9b; color: white; }
@@ -164,10 +216,29 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         
+        .back-to-exams {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #1b4f9b;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: 0.2s;
+        }
+        .back-to-exams:hover { background: #0f3f7a; transform: translateY(-2px); }
+        
         @media (max-width: 700px) {
-            .admit-card-item { flex-direction: column; text-align: center; gap: 15px; }
-            .admit-card-actions { justify-content: center; }
+            .student-card-item { flex-direction: column; text-align: center; gap: 12px; }
+            .student-card-actions { justify-content: center; }
             .header h1 { font-size: 1.4rem; }
+            .exam-header { flex-direction: column; gap: 10px; text-align: center; }
+            .exam-header .exam-stats { justify-content: center; }
         }
     </style>
 </head>
@@ -185,12 +256,12 @@
             
             <div class="header">
                 <h1><i class="fas fa-history"></i> Previous Admit Cards</h1>
-                <p>View and manage all generated admit cards</p>
+                <p>View admit cards grouped by exam</p>
             </div>
             
             <div class="cards-list">
                 <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="🔍 Search by Roll Number or Student Name..." onkeyup="filterCards()">
+                    <input type="text" id="searchInput" placeholder="🔍 Search by Exam Name, Roll Number or Student Name..." onkeyup="filterCards()">
                 </div>
                 <div id="cardsContainer">
                     <div class="loading-spinner"><div class="spinner"></div><p>Loading admit cards...</p></div>
@@ -213,6 +284,9 @@
     const admitCardsCollection = db.collection('admit_cards');
     
     let allCards = [];
+    let filteredCards = [];
+    let currentView = 'exams'; // 'exams' or 'students'
+    let currentExamKey = '';
     
     function goBack() { window.location.href = 'admit-card.html'; }
     
@@ -243,33 +317,76 @@
             const cards = [];
             snapshot.forEach(doc => { cards.push({ id: doc.id, ...doc.data() }); });
             allCards = cards;
-            displayCards(allCards);
+            filteredCards = cards;
+            displayExams(cards);
         } catch (error) {
             console.error("Error loading cards:", error);
             document.getElementById('cardsContainer').innerHTML = `<div class="no-data"><i class="fas fa-exclamation-circle"></i><p>Error loading admit cards. Please try again.</p></div>`;
         }
     }
     
-    function displayCards(cards) {
+    function displayExams(cards) {
+        currentView = 'exams';
         const container = document.getElementById('cardsContainer');
-        if (cards.length === 0) {
+        
+        // Group cards by exam
+        const examGroups = {};
+        cards.forEach(card => {
+            const examKey = card.examName || 'Unknown Exam';
+            const classKey = card.studentClass || 'Unknown Class';
+            const uniqueKey = `${examKey}_${classKey}`;
+            if (!examGroups[uniqueKey]) {
+                examGroups[uniqueKey] = {
+                    examName: examKey,
+                    studentClass: classKey,
+                    students: []
+                };
+            }
+            examGroups[uniqueKey].students.push(card);
+        });
+        
+        const examKeys = Object.keys(examGroups);
+        if (examKeys.length === 0) {
             container.innerHTML = `<div class="no-data"><i class="fas fa-id-card"></i><p>No admit cards found. Generate your first admit card!</p></div>`;
             return;
         }
         
         let html = '';
-        cards.forEach(card => {
+        examKeys.forEach(key => {
+            const group = examGroups[key];
+            const count = group.students.length;
+            const card = group.students[0]; // For exam date
             const date = card.createdAt ? new Date(card.createdAt.toDate()).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Unknown date';
+            
             html += `
-                <div class="admit-card-item">
-                    <div class="admit-card-info">
-                        <p><strong>${card.studentName || 'N/A'}</strong> | Roll No: ${card.rollNumber || 'N/A'}</p>
-                        <p><i class="fas fa-graduation-cap"></i> Exam: ${card.examName || 'N/A'} | Class: ${card.studentClass || 'N/A'}</p>
-                        <p class="card-date"><i class="far fa-calendar-alt"></i> Generated on: ${date}</p>
+                <div class="exam-group" data-exam-key="${key}">
+                    <div class="exam-header" onclick="toggleExam('${key}')">
+                        <div class="exam-info">
+                            <div class="exam-name"><i class="fas fa-file-alt" style="color:#c5a059;margin-right:8px;"></i>${group.examName}</div>
+                            <div class="exam-meta">
+                                <i class="fas fa-users"></i> ${count} students &nbsp;|&nbsp; 
+                                <i class="fas fa-graduation-cap"></i> Class: ${group.studentClass} &nbsp;|&nbsp;
+                                <i class="far fa-calendar-alt"></i> ${date}
+                            </div>
+                        </div>
+                        <div class="exam-stats">
+                            <span class="student-count">${count} Students</span>
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </div>
                     </div>
-                    <div class="admit-card-actions">
-                        <button class="btn-view-card" onclick="viewCard('${card.id}')"><i class="fas fa-eye"></i> View</button>
-                        <button class="btn-delete-card" onclick="deleteCard('${card.id}')"><i class="fas fa-trash"></i> Delete</button>
+                    <div class="exam-students" id="examStudents_${key}">
+                        ${group.students.map(student => `
+                            <div class="student-card-item" data-roll="${student.rollNumber || ''}" data-name="${student.studentName || ''}">
+                                <div class="student-card-info">
+                                    <p><strong>${student.studentName || 'N/A'}</strong> | Roll No: ${student.rollNumber || 'N/A'}</p>
+                                    <p class="card-date"><i class="far fa-calendar-alt"></i> Generated: ${student.createdAt ? new Date(student.createdAt.toDate()).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Unknown'}</p>
+                                </div>
+                                <div class="student-card-actions">
+                                    <button class="btn-view-card" onclick="viewCard('${student.id}')"><i class="fas fa-eye"></i> View</button>
+                                    <button class="btn-delete-card" onclick="deleteCard('${student.id}')"><i class="fas fa-trash"></i> Delete</button>
+                                </div>
+                            </div>
+                        `).join('')}
                     </div>
                 </div>
             `;
@@ -277,14 +394,33 @@
         container.innerHTML = html;
     }
     
+    function toggleExam(examKey) {
+        const studentsDiv = document.getElementById(`examStudents_${examKey}`);
+        const icon = studentsDiv.previousElementSibling.querySelector('.toggle-icon');
+        if (studentsDiv.classList.contains('open')) {
+            studentsDiv.classList.remove('open');
+            icon.classList.remove('open');
+        } else {
+            studentsDiv.classList.add('open');
+            icon.classList.add('open');
+        }
+    }
+    
     function filterCards() {
         const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
-        if (!searchTerm) { displayCards(allCards); return; }
+        if (!searchTerm) {
+            filteredCards = allCards;
+            displayExams(allCards);
+            return;
+        }
+        
         const filtered = allCards.filter(card => 
+            (card.examName && card.examName.toLowerCase().includes(searchTerm)) ||
             (card.rollNumber && card.rollNumber.toString().toLowerCase().includes(searchTerm)) ||
             (card.studentName && card.studentName.toLowerCase().includes(searchTerm))
         );
-        displayCards(filtered);
+        filteredCards = filtered;
+        displayExams(filtered);
     }
     
     window.viewCard = function(cardId) { window.open(`view-card.html?id=${cardId}`, '_blank'); };
@@ -305,6 +441,17 @@
                 await admitCardsCollection.doc(cardId).delete();
                 Swal.fire('Deleted!', 'Admit card has been deleted.', 'success');
                 await loadCards();
+                // Re-apply search filter
+                const searchTerm = document.getElementById('searchInput').value.trim().toLowerCase();
+                if (searchTerm) {
+                    const filtered = allCards.filter(card => 
+                        (card.examName && card.examName.toLowerCase().includes(searchTerm)) ||
+                        (card.rollNumber && card.rollNumber.toString().toLowerCase().includes(searchTerm)) ||
+                        (card.studentName && card.studentName.toLowerCase().includes(searchTerm))
+                    );
+                    filteredCards = filtered;
+                    displayExams(filtered);
+                }
             } catch (error) {
                 Swal.fire('Error!', 'Failed to delete admit card.', 'error');
             }
