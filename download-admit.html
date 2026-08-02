@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body {
@@ -74,56 +75,7 @@
     .exam-item .exam-info { display:flex; flex-direction:column; gap:3px; }
     .exam-item .exam-name { font-weight:700; color:#1a237e; font-size:1rem; }
     .exam-item .exam-meta { font-size:0.8rem; color:#64748b; }
-    .exam-item .exam-count { 
-      background:#10b981; 
-      color:white; 
-      padding:4px 12px; 
-      border-radius:20px; 
-      font-size:0.8rem;
-      font-weight:600;
-    }
     .exam-item .arrow { color:#10b981; font-size:1.2rem; }
-    
-    .roll-input-area {
-      display:none;
-      background:#f0fdf4;
-      padding:20px;
-      border-radius:12px;
-      margin-top:20px;
-      border:2px solid #10b981;
-    }
-    .roll-input-area.active { display:block; }
-    .roll-input-area h3 { color:#1a237e; margin-bottom:12px; }
-    .roll-input-group {
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      justify-content:center;
-    }
-    .roll-input-group input {
-      padding:10px 15px;
-      border:2px solid #d1d5db;
-      border-radius:8px;
-      font-size:1rem;
-      width:100%;
-      max-width:250px;
-    }
-    .roll-input-group input:focus { border-color:#10b981; outline:none; }
-    .roll-input-group button {
-      padding:10px 25px;
-      background:#10b981;
-      color:white;
-      border:none;
-      border-radius:8px;
-      font-weight:600;
-      cursor:pointer;
-      transition:0.2s;
-    }
-    .roll-input-group button:hover { background:#059669; transform:scale(1.02); }
-    .roll-input-group .back-exam-btn {
-      background:#64748b;
-    }
-    .roll-input-group .back-exam-btn:hover { background:#475569; }
     
     .loading { text-align:center; padding:40px; }
     .loading .spinner {
@@ -138,17 +90,52 @@
     
     .no-data { text-align:center; padding:40px; color:#64748b; }
     .no-data i { font-size:40px; color:#cbd5e1; margin-bottom:15px; display:block; }
-    
-    .error-msg {
-      background:#fee2e2;
-      color:#dc2626;
-      padding:10px 15px;
-      border-radius:8px;
-      margin-top:10px;
-      display:none;
-      text-align:center;
+
+    /* SweetAlert Custom Override */
+    .swal2-popup {
+      border-radius: 20px !important;
+      padding: 25px !important;
     }
-    .error-msg.show { display:block; }
+    .swal2-input {
+      border: 2px solid #d1d5db !important;
+      border-radius: 10px !important;
+      padding: 12px 15px !important;
+      font-size: 1rem !important;
+      width: 100% !important;
+      max-width: 280px !important;
+      margin: 10px auto !important;
+    }
+    .swal2-input:focus {
+      border-color: #10b981 !important;
+      outline: none !important;
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.2) !important;
+    }
+    .swal2-confirm {
+      background: #10b981 !important;
+      border-radius: 10px !important;
+      padding: 10px 30px !important;
+      font-weight: 600 !important;
+    }
+    .swal2-confirm:hover {
+      background: #059669 !important;
+    }
+    .swal2-cancel {
+      background: #64748b !important;
+      border-radius: 10px !important;
+      padding: 10px 30px !important;
+      font-weight: 600 !important;
+    }
+    .swal2-cancel:hover {
+      background: #475569 !important;
+    }
+    .swal2-title {
+      color: #1a237e !important;
+      font-size: 1.3rem !important;
+    }
+    .swal2-html-container {
+      color: #64748b !important;
+      font-size: 0.95rem !important;
+    }
   </style>
 </head>
 <body>
@@ -167,16 +154,6 @@
     <div id="examList">
       <div class="loading"><div class="spinner"></div><p>Loading exams...</p></div>
     </div>
-    
-    <div class="roll-input-area" id="rollInputArea">
-      <h3 id="selectedExamTitle">Enter Roll Number</h3>
-      <div class="roll-input-group">
-        <input type="text" id="rollNumberInput" placeholder="Enter Roll Number">
-        <button onclick="fetchAdmitCard()"><i class="fas fa-search"></i> Get Admit Card</button>
-        <button class="back-exam-btn" onclick="backToExams()"><i class="fas fa-arrow-left"></i> Back</button>
-      </div>
-      <div class="error-msg" id="errorMsg">❌ Student not found in this exam!</div>
-    </div>
   </div>
 </div>
 
@@ -191,8 +168,6 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 let allExams = [];
-let selectedExamData = null;
-let selectedExamId = null;
 
 async function loadExams() {
   try {
@@ -242,12 +217,11 @@ function displayExams(exams) {
   let html = '';
   exams.forEach(exam => {
     html += `
-      <div class="exam-item" onclick="selectExam('${exam.examName}', '${exam.studentClass}')">
+      <div class="exam-item" onclick="showRollNumberDialog('${exam.examName}', '${exam.studentClass}')">
         <div class="exam-info">
-          <div class="exam-name">${exam.examName}</div>
-          <div class="exam-meta"><i class="fas fa-graduation-cap"></i> Class: ${exam.studentClass} | <i class="fas fa-users"></i> ${exam.students.length} students</div>
+          <div class="exam-name"><i class="fas fa-file-alt" style="color:#10b981;margin-right:8px;"></i>${exam.examName}</div>
+          <div class="exam-meta"><i class="fas fa-graduation-cap"></i> Class: ${exam.studentClass}</div>
         </div>
-        <span class="exam-count">${exam.students.length}</span>
         <i class="fas fa-chevron-right arrow"></i>
       </div>
     `;
@@ -255,58 +229,64 @@ function displayExams(exams) {
   container.innerHTML = html;
 }
 
-function selectExam(examName, studentClass) {
-  selectedExamData = allExams.find(e => e.examName === examName && e.studentClass === studentClass);
-  if (!selectedExamData) {
-    alert('Exam data not found!');
+function showRollNumberDialog(examName, studentClass) {
+  // Find the exam data
+  const examData = allExams.find(e => e.examName === examName && e.studentClass === studentClass);
+  if (!examData) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error!',
+      text: 'Exam data not found!',
+      confirmButtonColor: '#dc2626'
+    });
     return;
   }
-  
-  document.getElementById('selectedExamTitle').textContent = `Enter Roll Number for: ${examName}`;
-  document.getElementById('rollInputArea').classList.add('active');
-  document.getElementById('rollNumberInput').value = '';
-  document.getElementById('errorMsg').classList.remove('show');
-  document.getElementById('rollNumberInput').focus();
-}
 
-function backToExams() {
-  document.getElementById('rollInputArea').classList.remove('active');
-  document.getElementById('errorMsg').classList.remove('show');
-  selectedExamData = null;
-}
+  // Show SweetAlert dialog with roll number input
+  Swal.fire({
+    title: `<i class="fas fa-id-card" style="color:#10b981;margin-right:10px;"></i> ${examName}`,
+    html: `
+      <p style="margin-bottom:12px;color:#64748b;">Enter your roll number to download admit card</p>
+      <input type="text" id="rollNumberInput" class="swal2-input" placeholder="Enter Roll Number" autofocus>
+    `,
+    showCancelButton: true,
+    confirmButtonText: '<i class="fas fa-search"></i> Get Admit Card',
+    cancelButtonText: '<i class="fas fa-times"></i> Cancel',
+    confirmButtonColor: '#10b981',
+    cancelButtonColor: '#64748b',
+    preConfirm: () => {
+      const rollNo = document.getElementById('rollNumberInput').value.trim();
+      if (!rollNo) {
+        Swal.showValidationMessage('Please enter your roll number!');
+        return false;
+      }
+      return rollNo;
+    }
+  }).then((result) => {
+    if (result.isConfirmed && result.value) {
+      const rollNo = result.value;
+      // Find student in selected exam
+      const student = examData.students.find(s => String(s.rollNumber) === String(rollNo));
+      if (!student) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Student Not Found!',
+          text: `Roll number "${rollNo}" not found in ${examName}`,
+          confirmButtonColor: '#dc2626'
+        });
+        return;
+      }
+      // Open admit card view
+      window.open(`view-card.html?id=${student.id}`, '_blank');
+    }
+  });
 
-function fetchAdmitCard() {
-  const rollNo = document.getElementById('rollNumberInput').value.trim();
-  if (!rollNo) {
-    alert('Please enter your roll number');
-    return;
-  }
-  
-  if (!selectedExamData) {
-    alert('Please select an exam first');
-    return;
-  }
-  
-  // Find student in selected exam
-  const student = selectedExamData.students.find(s => String(s.rollNumber) === String(rollNo));
-  if (!student) {
-    document.getElementById('errorMsg').textContent = '❌ Student with roll number ' + rollNo + ' not found in this exam!';
-    document.getElementById('errorMsg').classList.add('show');
-    return;
-  }
-  
-  // Open admit card view
-  window.open(`view-card.html?id=${student.id}`, '_blank');
-  
-  // Reset
-  document.getElementById('rollNumberInput').value = '';
-  document.getElementById('errorMsg').classList.remove('show');
+  // Focus on input when dialog opens
+  setTimeout(() => {
+    const input = document.getElementById('rollNumberInput');
+    if (input) input.focus();
+  }, 300);
 }
-
-// Enter key support
-document.getElementById('rollNumberInput').addEventListener('keypress', function(e) {
-  if (e.key === 'Enter') fetchAdmitCard();
-});
 
 // Load exams on page load
 document.addEventListener('DOMContentLoaded', loadExams);
