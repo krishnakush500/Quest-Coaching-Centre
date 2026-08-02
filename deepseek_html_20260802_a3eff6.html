@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download Admit Card - Quest Coaching</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body {
+      background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+      min-height:100vh;
+      padding:30px 20px;
+    }
+    .container { max-width:800px; margin:0 auto; }
+    .header {
+      background: white;
+      border-radius:20px;
+      padding:25px;
+      text-align:center;
+      box-shadow:0 10px 30px rgba(0,0,0,0.1);
+      margin-bottom:25px;
+    }
+    .header h1 { color:#1a237e; font-size:1.8rem; }
+    .header h1 i { color:#10b981; }
+    .header p { color:#64748b; margin-top:8px; }
+    
+    .back-btn {
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:#64748b;
+      color:white;
+      padding:10px 20px;
+      border:none;
+      border-radius:50px;
+      font-size:14px;
+      font-weight:600;
+      cursor:pointer;
+      margin-bottom:20px;
+      transition:0.2s;
+    }
+    .back-btn:hover { background:#475569; transform:translateY(-2px); }
+    
+    .exam-list-card {
+      background:white;
+      border-radius:20px;
+      padding:25px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.1);
+    }
+    .exam-list-card h2 {
+      color:#1a237e;
+      margin-bottom:15px;
+      font-size:1.2rem;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .exam-item {
+      background:#f8fafc;
+      padding:15px 20px;
+      border-radius:12px;
+      margin-bottom:10px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      border:1px solid #e2e8f0;
+      transition:0.2s;
+      cursor:pointer;
+    }
+    .exam-item:hover { border-color:#10b981; background:#f0fdf4; }
+    .exam-item .exam-info { display:flex; flex-direction:column; gap:3px; }
+    .exam-item .exam-name { font-weight:700; color:#1a237e; font-size:1rem; }
+    .exam-item .exam-meta { font-size:0.8rem; color:#64748b; }
+    .exam-item .exam-count { 
+      background:#10b981; 
+      color:white; 
+      padding:4px 12px; 
+      border-radius:20px; 
+      font-size:0.8rem;
+      font-weight:600;
+    }
+    .exam-item .arrow { color:#10b981; font-size:1.2rem; }
+    
+    .roll-input-area {
+      display:none;
+      background:#f0fdf4;
+      padding:20px;
+      border-radius:12px;
+      margin-top:20px;
+      border:2px solid #10b981;
+    }
+    .roll-input-area.active { display:block; }
+    .roll-input-area h3 { color:#1a237e; margin-bottom:12px; }
+    .roll-input-group {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    .roll-input-group input {
+      padding:10px 15px;
+      border:2px solid #d1d5db;
+      border-radius:8px;
+      font-size:1rem;
+      width:100%;
+      max-width:250px;
+    }
+    .roll-input-group input:focus { border-color:#10b981; outline:none; }
+    .roll-input-group button {
+      padding:10px 25px;
+      background:#10b981;
+      color:white;
+      border:none;
+      border-radius:8px;
+      font-weight:600;
+      cursor:pointer;
+      transition:0.2s;
+    }
+    .roll-input-group button:hover { background:#059669; transform:scale(1.02); }
+    .roll-input-group .back-exam-btn {
+      background:#64748b;
+    }
+    .roll-input-group .back-exam-btn:hover { background:#475569; }
+    
+    .loading { text-align:center; padding:40px; }
+    .loading .spinner {
+      width:40px; height:40px;
+      border:4px solid #f3f3f3;
+      border-top:4px solid #1a237e;
+      border-radius:50%;
+      animation:spin 1s linear infinite;
+      margin:0 auto 15px;
+    }
+    @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+    
+    .no-data { text-align:center; padding:40px; color:#64748b; }
+    .no-data i { font-size:40px; color:#cbd5e1; margin-bottom:15px; display:block; }
+    
+    .error-msg {
+      background:#fee2e2;
+      color:#dc2626;
+      padding:10px 15px;
+      border-radius:8px;
+      margin-top:10px;
+      display:none;
+      text-align:center;
+    }
+    .error-msg.show { display:block; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <button class="back-btn" onclick="window.location.href='index.html'">
+    <i class="fas fa-arrow-left"></i> Back to Home
+  </button>
+  
+  <div class="header">
+    <h1><i class="fas fa-download"></i> Download Admit Card</h1>
+    <p>Select your exam and enter your roll number</p>
+  </div>
+  
+  <div class="exam-list-card">
+    <h2><i class="fas fa-list"></i> Available Exams</h2>
+    <div id="examList">
+      <div class="loading"><div class="spinner"></div><p>Loading exams...</p></div>
+    </div>
+    
+    <div class="roll-input-area" id="rollInputArea">
+      <h3 id="selectedExamTitle">Enter Roll Number</h3>
+      <div class="roll-input-group">
+        <input type="text" id="rollNumberInput" placeholder="Enter Roll Number">
+        <button onclick="fetchAdmitCard()"><i class="fas fa-search"></i> Get Admit Card</button>
+        <button class="back-exam-btn" onclick="backToExams()"><i class="fas fa-arrow-left"></i> Back</button>
+      </div>
+      <div class="error-msg" id="errorMsg">❌ Student not found in this exam!</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
+  authDomain: "quest-coaching.firebaseapp.com",
+  projectId: "quest-coaching",
+  storageBucket: "quest-coaching.firebasestorage.app"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+let allExams = [];
+let selectedExamData = null;
+let selectedExamId = null;
+
+async function loadExams() {
+  try {
+    const snapshot = await db.collection('admit_cards').get();
+    const cards = [];
+    snapshot.forEach(doc => { cards.push({ id: doc.id, ...doc.data() }); });
+    
+    // Group by exam
+    const examGroups = {};
+    cards.forEach(card => {
+      const key = card.examName || 'Unknown Exam';
+      if (!examGroups[key]) {
+        examGroups[key] = {
+          examName: key,
+          studentClass: card.studentClass || 'N/A',
+          students: []
+        };
+      }
+      examGroups[key].students.push(card);
+    });
+    
+    allExams = Object.keys(examGroups).map(key => examGroups[key]);
+    displayExams(allExams);
+  } catch (error) {
+    console.error('Error loading exams:', error);
+    document.getElementById('examList').innerHTML = `
+      <div class="no-data">
+        <i class="fas fa-exclamation-circle"></i>
+        <p>Error loading exams. Please try again.</p>
+      </div>
+    `;
+  }
+}
+
+function displayExams(exams) {
+  const container = document.getElementById('examList');
+  if (exams.length === 0) {
+    container.innerHTML = `
+      <div class="no-data">
+        <i class="fas fa-id-card"></i>
+        <p>No admit cards available yet.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  let html = '';
+  exams.forEach(exam => {
+    html += `
+      <div class="exam-item" onclick="selectExam('${exam.examName}', '${exam.studentClass}')">
+        <div class="exam-info">
+          <div class="exam-name">${exam.examName}</div>
+          <div class="exam-meta"><i class="fas fa-graduation-cap"></i> Class: ${exam.studentClass} | <i class="fas fa-users"></i> ${exam.students.length} students</div>
+        </div>
+        <span class="exam-count">${exam.students.length}</span>
+        <i class="fas fa-chevron-right arrow"></i>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+function selectExam(examName, studentClass) {
+  selectedExamData = allExams.find(e => e.examName === examName && e.studentClass === studentClass);
+  if (!selectedExamData) {
+    alert('Exam data not found!');
+    return;
+  }
+  
+  document.getElementById('selectedExamTitle').textContent = `Enter Roll Number for: ${examName}`;
+  document.getElementById('rollInputArea').classList.add('active');
+  document.getElementById('rollNumberInput').value = '';
+  document.getElementById('errorMsg').classList.remove('show');
+  document.getElementById('rollNumberInput').focus();
+}
+
+function backToExams() {
+  document.getElementById('rollInputArea').classList.remove('active');
+  document.getElementById('errorMsg').classList.remove('show');
+  selectedExamData = null;
+}
+
+function fetchAdmitCard() {
+  const rollNo = document.getElementById('rollNumberInput').value.trim();
+  if (!rollNo) {
+    alert('Please enter your roll number');
+    return;
+  }
+  
+  if (!selectedExamData) {
+    alert('Please select an exam first');
+    return;
+  }
+  
+  // Find student in selected exam
+  const student = selectedExamData.students.find(s => String(s.rollNumber) === String(rollNo));
+  if (!student) {
+    document.getElementById('errorMsg').textContent = '❌ Student with roll number ' + rollNo + ' not found in this exam!';
+    document.getElementById('errorMsg').classList.add('show');
+    return;
+  }
+  
+  // Open admit card view
+  window.open(`view-card.html?id=${student.id}`, '_blank');
+  
+  // Reset
+  document.getElementById('rollNumberInput').value = '';
+  document.getElementById('errorMsg').classList.remove('show');
+}
+
+// Enter key support
+document.getElementById('rollNumberInput').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') fetchAdmitCard();
+});
+
+// Load exams on page load
+document.addEventListener('DOMContentLoaded', loadExams);
+</script>
+</body>
+</html>
