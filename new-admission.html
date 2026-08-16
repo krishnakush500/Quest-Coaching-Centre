@@ -2,492 +2,179 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>📝 Quest Coaching · Registration Form</title>
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>➕ Add/Edit Student</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
-        body { background: #f0f4fa; padding: 16px 12px 32px; }
-        .container { max-width: 1000px; margin: 0 auto; }
-        
-        .header-bar {
-            background: white;
-            border-radius: 40px;
-            padding: 14px 24px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 18px rgba(0,20,40,0.08);
+        *{ margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Roboto,sans-serif; }
+        body{ background:#f0f5fa; padding:16px; display:flex; flex-direction:column; align-items:center; min-height:100vh; }
+        .form-card{ background:white; max-width:1000px; width:100%; border-radius:32px; padding:24px 28px; box-shadow:0 15px 30px -10px rgba(0,0,0,0.1); }
+        .header{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+        .header h2{ font-size:1.3rem; color:#174873; display:flex; align-items:center; gap:8px; }
+        .btn-new{ background:#f59e0b; border:none; color:white; padding:6px 18px; border-radius:40px; font-weight:600; cursor:pointer; font-size:0.85rem; }
+        .btn-new:hover{ background:#d97706; }
+        .fetch-row{ display:flex; gap:10px; align-items:center; background:#f8faff; padding:12px 16px; border-radius:16px; border:1px solid #e2e8f0; margin-bottom:14px; flex-wrap:wrap; }
+        .fetch-row label{ font-weight:600; color:#1b4a77; font-size:0.9rem; white-space:nowrap; }
+        .fetch-row input{ flex:1; min-width:120px; padding:10px 16px; border:1px solid #b8ceec; border-radius:40px; font-size:0.9rem; background:white; outline:none; }
+        .fetch-row input:focus{ border-color:#1b5e9e; box-shadow:0 0 0 3px rgba(27,94,158,0.1); }
+        .btn-fetch{ background:#0d6efd; border:none; color:white; padding:10px 24px; border-radius:40px; font-weight:600; cursor:pointer; font-size:0.9rem; white-space:nowrap; }
+        .btn-fetch:hover{ background:#0a58ca; }
+        .btn-fetch:disabled{ opacity:0.6; cursor:not-allowed; }
+        #fetchStatus{ font-size:0.8rem; font-weight:600; padding:4px 12px; border-radius:40px; display:none; }
+        #fetchStatus.success{ background:#d1e7dd; color:#0f5132; display:inline-block; }
+        #fetchStatus.error{ background:#f8d7da; color:#842029; display:inline-block; }
+        #fetchStatus.loading{ background:#e2e3e5; color:#41464b; display:inline-block; }
+        .form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px 20px; }
+        .field{ display:flex; flex-direction:column; gap:4px; }
+        .field label{ font-weight:600; color:#1b4a77; font-size:0.8rem; display:flex; align-items:center; gap:4px; }
+        .field label .badge{ background:#0d6efd; color:white; font-size:0.55rem; padding:1px 8px; border-radius:40px; font-weight:400; }
+        .field input, .field select{ padding:8px 14px; border:1px solid #b8ceec; border-radius:40px; font-size:0.85rem; background:#fafcff; outline:none; transition:0.2s; }
+        .field input:focus, .field select:focus{ border-color:#1b5e9e; background:white; box-shadow:0 0 0 3px rgba(27,94,158,0.08); }
+        .field input:disabled{ background:#eef2f6; color:#6c757d; }
+        .field-full{ grid-column:span 2; }
+        .fee-section{ background:#f8fbfe; border-radius:16px; padding:14px 18px; margin-top:12px; border:1px solid #e2e8f0; }
+        .fee-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
+        .fee-header h4{ font-size:0.95rem; color:#f59e0b; display:flex; align-items:center; gap:6px; }
+        .fee-header span{ font-size:0.7rem; color:#6c757d; font-weight:400; }
+        .fee-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:6px 16px; }
+        .fee-item{ display:flex; align-items:center; gap:8px; background:white; padding:4px 12px 4px 8px; border-radius:40px; border:1px solid #e2e8f0; }
+        .fee-item input{ width:16px; height:16px; accent-color:#1b4f9b; cursor:pointer; flex-shrink:0; }
+        .fee-item label{ font-size:0.78rem; font-weight:500; color:#1e3a5f; cursor:pointer; flex:1; }
+        .fee-item .price{ font-weight:700; color:#0f5c3e; font-size:0.7rem; background:#e2f0e8; padding:0 10px; border-radius:40px; }
+        .fee-bottom{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:10px; }
+        .fee-bottom .field{ gap:2px; }
+        .fee-bottom .field label{ font-size:0.7rem; color:#555; }
+        .fee-bottom .field input{ padding:6px 12px; font-size:0.8rem; }
+        .fee-bottom .field input:read-only{ background:#eef2f5; color:#b44; font-weight:700; }
+        .total-display{ background:#e6f0fa; border-radius:40px; padding:8px 18px; display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
+        .total-display .label{ font-weight:700; font-size:0.9rem; color:#0a3a60; }
+        .total-display .amount{ font-size:1.3rem; font-weight:800; color:#1b4f9b; }
+        .subj-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:4px; }
+        .subj-item{ display:flex; align-items:center; gap:6px; background:white; padding:2px 10px 2px 6px; border-radius:40px; border:1px solid #e2e8f0; }
+        .subj-item input{ width:15px; height:15px; accent-color:#1b4f9b; }
+        .subj-item label{ font-size:0.75rem; font-weight:500; cursor:pointer; }
+        .subj-item .sp{ font-size:0.65rem; color:#0f5c3e; font-weight:700; }
+        .extra-row{ display:flex; flex-wrap:wrap; gap:6px; margin:6px 0; }
+        .extra-item{ display:flex; align-items:center; gap:5px; background:#fef7e0; padding:2px 12px 2px 6px; border-radius:40px; border:1px solid #ffe2a4; }
+        .extra-item input{ width:15px; height:15px; accent-color:#f59e0b; }
+        .extra-item label{ font-size:0.7rem; font-weight:600; color:#7a5c00; cursor:pointer; }
+        .class-warning{ background:#fff3cd; border-left:3px solid #ffc107; padding:6px 14px; border-radius:8px; font-size:0.75rem; color:#856404; display:none; margin-bottom:8px; }
+        .btn-submit{ background:#1b4f9b; border:none; color:white; font-size:1rem; font-weight:700; padding:12px; width:100%; border-radius:50px; display:flex; align-items:center; justify-content:center; gap:10px; margin-top:16px; cursor:pointer; transition:0.2s; }
+        .btn-submit:hover{ background:#0f3d73; transform:translateY(-1px); }
+        .btn-submit:disabled{ opacity:0.6; cursor:not-allowed; transform:none; }
+        .btn-submit.btn-update{ background:linear-gradient(135deg, #f59e0b, #d97706); }
+        .btn-submit.btn-update:hover{ background:linear-gradient(135deg, #d97706, #b45309); }
+        .info-note{ text-align:center; margin-top:12px; font-size:0.8rem; color:#2c577c; }
+        .info-note a{ color:#1b4f9b; font-weight:600; text-decoration:none; border-bottom:1px dotted #1b4f9b; }
+        .loading{ text-align:center; padding:10px; background:#eef2f8; border-radius:40px; margin-top:10px; font-weight:500; display:none; font-size:0.9rem; }
+        .error-msg{ color:#c0392b; background:#fdecea; border-radius:40px; padding:8px 16px; margin-top:10px; text-align:center; display:none; font-size:0.85rem; }
+        .success-toast{ position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#1e6f3f; color:white; padding:10px 28px; border-radius:60px; font-weight:600; z-index:1000; opacity:0; transition:opacity 0.2s; pointer-events:none; font-size:0.9rem; }
+        .auth-loading{ position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; justify-content:center; align-items:center; flex-direction:column; z-index:10000; }
+        .auth-loading .spinner{ width:40px; height:40px; border:4px solid #f3f3f3; border-top:4px solid #1b4f9b; border-radius:50%; animation:spin 1s linear infinite; }
+        @keyframes spin{ 0%{ transform:rotate(0deg); } 100%{ transform:rotate(360deg); } }
+        .main-content{ display:none; width:100%; max-width:1000px; }
+        .logout-btn{ position:fixed; bottom:15px; right:15px; padding:8px 18px; background:#dc3545; color:white; border:none; border-radius:40px; cursor:pointer; z-index:9999; font-weight:600; font-size:0.8rem; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
+        .logout-btn:hover{ background:#c82333; }
+        .debug-box{ background:#f8f9fa; border:1px dashed #6c757d; border-radius:12px; padding:10px 14px; margin-top:10px; font-size:0.75rem; color:#495057; display:none; max-height:150px; overflow:auto; }
+        .debug-box strong{ color:#0d6efd; }
+        @media (max-width:700px){
+            .form-grid{ grid-template-columns:1fr; }
+            .field-full{ grid-column:span 1; }
+            .fee-bottom{ grid-template-columns:1fr 1fr; }
+            .form-card{ padding:16px; }
+            .fee-grid{ grid-template-columns:1fr; }
+            .subj-grid{ grid-template-columns:1fr 1fr; }
+            .fetch-row{ flex-direction:column; align-items:stretch; }
+            .fetch-row input{ min-width:auto; }
         }
-        .back-btn {
-            background: #e8f0fe;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: 600;
-            color: #1b4f9b;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .form-card {
-            background: white;
-            border-radius: 32px;
-            padding: 30px;
-            box-shadow: 0 15px 30px -12px rgba(0,0,0,0.1);
-        }
-        
-        .section-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #1e3a5f;
-            margin: 20px 0 15px 0;
-            padding-bottom: 8px;
-            border-bottom: 3px solid #c5a059;
-            display: inline-block;
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-        
-        .full-width { grid-column: span 2; }
-        .form-group { margin-bottom: 5px; }
-        label { display: block; font-weight: 600; color: #334155; margin-bottom: 6px; font-size: 0.8rem; }
-        .required { color: #dc2626; }
-        
-        input, select, textarea {
-            width: 100%;
-            padding: 12px 14px;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            background: #fafbfc;
-        }
-        input:focus, select:focus, textarea:focus { border-color: #1b4f9b; outline: none; background: white; }
-        .name-boxes { display: flex; gap: 12px; }
-        .name-box { flex: 1; }
-        
-        .radio-group, .checkbox-group { display: flex; gap: 20px; flex-wrap: wrap; padding: 8px 0; }
-        .radio-group label, .checkbox-group label { display: inline-flex; align-items: center; gap: 6px; font-weight: normal; cursor: pointer; }
-        .radio-group input, .checkbox-group input { width: 16px; height: 16px; }
-        
-        .photo-section { display: flex; justify-content: flex-end; margin-bottom: 20px; }
-        .photo-box {
-            width: 140px;
-            height: 160px;
-            border: 2px dashed #1b4f9b;
-            border-radius: 16px;
-            background: #f8fafc;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            overflow: hidden;
-        }
-        .photo-box:hover { border-color: #c5a059; background: #f1f5f9; }
-        .photo-placeholder { text-align: center; padding: 15px; }
-        .photo-placeholder i { font-size: 2rem; color: #1b4f9b; }
-        .photo-preview { width: 100%; height: 100%; object-fit: cover; display: none; }
-        #studentPhoto { display: none; }
-        
-        .declaration-box {
-            background: #f8fafc;
-            padding: 20px;
-            border-radius: 20px;
-            margin: 20px 0;
-            border: 1px solid #e2e8f0;
-        }
-        .declaration-text { font-style: italic; color: #334155; margin-bottom: 15px; font-size: 0.85rem; }
-        .signature-row { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px; }
-        .signature-item { flex: 1; }
-        
-        .btn-submit {
-            background: linear-gradient(135deg, #1b4f9b, #0f3f7a);
-            color: white;
-            padding: 16px 28px;
-            border: none;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s;
-        }
-        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(27, 79, 155, 0.3); }
-        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
-        
-        .btn-update {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-        }
-        .btn-update:hover { background: linear-gradient(135deg, #d97706, #b45309); }
-        
-        .progress-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 9999;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-        .progress-card {
-            background: white;
-            padding: 35px;
-            border-radius: 30px;
-            text-align: center;
-            min-width: 280px;
-        }
-        .progress-bar-container { width: 100%; height: 12px; background: #e2e8f0; border-radius: 20px; overflow: hidden; margin: 20px 0; }
-        .progress-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #1b4f9b, #c5a059); border-radius: 20px; transition: width 0.3s ease; }
-        
-        .auth-loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 10000;
-        }
-        .auth-loading .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #1b4f9b; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .main-content { display: none; }
-        
-        .mode-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-left: 15px;
-        }
-        .mode-view { background: #16a34a; color: white; }
-        .mode-edit { background: #f59e0b; color: white; }
-        .mode-new { background: #1b4f9b; color: white; }
-        
-        .readonly-field {
-            background: #f1f5f9;
-            color: #334155;
-            cursor: not-allowed;
-        }
-        
-        .action-buttons-card {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            padding: 20px;
-            background: #f1f5f9;
-            flex-wrap: wrap;
-            border-radius: 16px;
-            margin-top: 20px;
-        }
-        .action-btn {
-            padding: 10px 24px;
-            border: none;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.2s;
-            font-size: 13px;
-        }
-        .action-btn.print { background: #1b4f9b; color: white; }
-        .action-btn.share { background: #16a34a; color: white; }
-        .action-btn.pdf { background: #dc2626; color: white; }
-        .action-btn.new-admission-btn { background: #f59e0b; color: white; }
-        .action-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        
-        :root {
-            --primary: #1a3a5c;
-            --primary-dark: #0f2b44;
-            --accent: #c5a059;
-            --light-bg: #f8f9fc;
-            --border: #e2e8f0;
-            --text-dark: #2c3e50;
-        }
-        
-        /* REGISTRATION CARD STYLES - FIXED LAYOUT */
-        .registration-card {
-            background: white;
-            width: 100%;
-            max-width: 1100px;
-            margin: 0 auto;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-        }
-        .card-header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 25px 35px; text-align: center; }
-        .logo-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .logo-img-card { width: 100px; height: 100px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid var(--accent); overflow: hidden; margin-bottom: 15px; }
-        .logo-img-card img { width: 100%; height: 100%; object-fit: cover; }
-        .institution-name h1 { color: white; font-size: 32px; letter-spacing: 2px; margin-bottom: 5px; }
-        .institution-name .tagline { color: var(--accent); font-size: 13px; letter-spacing: 2px; margin-bottom: 5px; }
-        .institution-name .under { color: rgba(255,255,255,0.8); font-size: 13px; }
-        .contact-strip-card { display: flex; justify-content: center; flex-wrap: wrap; gap: 25px; margin-top: 15px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.2); }
-        .contact-item-card { color: rgba(255,255,255,0.85); font-size: 12px; display: flex; align-items: center; gap: 6px; }
-        .contact-item-card i { color: var(--accent); }
-        
-        .title-banner { text-align: center; padding: 20px 0 10px 0; background: white; }
-        .title-banner h2 { font-size: 28px; color: var(--primary); letter-spacing: 3px; display: inline-block; position: relative; }
-        .title-banner h2:before, .title-banner h2:after { content: "✦"; color: var(--accent); font-size: 20px; position: absolute; top: 50%; transform: translateY(-50%); }
-        .title-banner h2:before { left: -35px; }
-        .title-banner h2:after { right: -35px; }
-        
-        .top-row { display: flex; gap: 25px; padding: 0 30px 20px 30px; flex-wrap: wrap; }
-        .photo-card { width: 130px; height: 150px; border: 3px solid var(--accent); border-radius: 12px; overflow: hidden; background: #f5f5f5; display: flex; align-items: center; justify-content: center; }
-        .photo-card img { width: 100%; height: 100%; object-fit: cover; }
-        .info-group { flex: 1; background: var(--light-bg); border-radius: 12px; padding: 15px 20px; border: 1px solid var(--border); }
-        .info-row { display: grid; grid-template-columns: 140px 1fr; padding: 10px 0; border-bottom: 1px dashed var(--border); }
-        .info-row:last-child { border-bottom: none; }
-        .info-label { font-weight: 700; color: var(--text-dark); font-size: 12px; }
-        .info-value { font-weight: 600; color: var(--primary); font-size: 13px; }
-        .reg-no { color: #d9534f; font-size: 14px; }
-        
-        .qr-card { text-align: center; width: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .qr-box { background: white; padding: 10px; border: 2px solid var(--accent); border-radius: 16px; margin-bottom: 8px; display: flex; justify-content: center; align-items: center; }
-        .qr-label-card { background: var(--accent); color: white; font-size: 10px; padding: 5px 10px; border-radius: 20px; font-weight: bold; }
-        
-        /* FIXED LAYOUT - Details Section */
-        .details-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 25px;
-            padding: 0 30px;
-            margin-bottom: 25px;
-        }
-        .detail-box {
-            background: var(--light-bg);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-        }
-        .detail-title {
-            background: var(--primary);
-            color: white;
-            padding: 12px 18px;
-            font-size: 14px;
-            font-weight: 700;
-        }
-        .detail-content {
-            padding: 18px;
-        }
-        .detail-table {
-            width: 100%;
-        }
-        .detail-table td {
-            padding: 10px 8px;
-            font-size: 12px;
-            border-bottom: 1px dotted var(--border);
-        }
-        .detail-table td:first-child {
-            font-weight: 700;
-            color: var(--text-dark);
-            width: 38%;
-        }
-        .detail-table td:last-child {
-            color: var(--primary);
-        }
-        .detail-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .terms-section { padding: 0 30px; margin: 20px 0; }
-        .terms-box { background: #fef9e6; border-left: 4px solid var(--accent); border-radius: 12px; padding: 18px 22px; }
-        .terms-title { font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-        .terms-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 30px; }
-        .terms-col { list-style: none; padding: 0; margin: 0; }
-        .terms-col li { margin-bottom: 8px; font-size: 10.5px; line-height: 1.4; color: #333; text-align: left; }
-        
-        .quote-card { background: linear-gradient(135deg, var(--light-bg), white); padding: 12px 25px; text-align: center; border-radius: 40px; margin: 0 30px 20px 30px; border: 1px solid var(--border); }
-        .quote-text { font-size: 12px; font-style: italic; color: var(--text-dark); }
-        .quote-author { font-size: 11px; font-weight: 700; color: var(--accent); margin-top: 5px; display: block; }
-        
-        .signatures-section { display: flex; justify-content: space-between; align-items: center; padding: 0 30px 25px 30px; flex-wrap: wrap; gap: 20px; }
-        .sig-card { text-align: center; width: 200px; }
-        .sig-line { border-top: 1.5px solid var(--text-dark); width: 100%; margin-top: 30px; padding-top: 8px; font-size: 11px; font-weight: 600; }
-        .seal-card { width: 100px; height: 100px; border: 2px solid var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-direction: column; background: #fef9e6; }
-        .seal-card span { font-size: 9px; font-weight: bold; color: var(--accent); text-align: center; line-height: 1.3; }
-        .seal-card .seal-text { font-size: 8px; margin-top: 5px; }
-        
-        .card-footer { background: var(--primary-dark); padding: 12px; text-align: center; }
-        .card-footer p { color: white; font-size: 11px; letter-spacing: 1px; }
-        
-        @media (max-width: 700px) {
-            .form-grid { grid-template-columns: 1fr; }
-            .full-width { grid-column: span 1; }
-            .name-boxes { flex-direction: column; gap: 8px; }
-            .form-card { padding: 20px; }
-            .photo-section { justify-content: center; }
-            .details-grid { grid-template-columns: 1fr; padding: 0 15px; }
-            .top-row { flex-direction: column; align-items: center; padding: 0 15px; }
-            .signatures-section { justify-content: center; flex-direction: column; align-items: center; }
-            .terms-list { grid-template-columns: 1fr; gap: 15px; }
-            .title-banner h2 { font-size: 22px; }
-            .title-banner h2:before, .title-banner h2:after { display: none; }
-            .institution-name h1 { font-size: 24px; }
-        }
-        
-        @media print {
-            .no-print, .action-buttons-card, .header-bar, .back-btn { display: none !important; }
-            .registration-card { box-shadow: none; margin: 0; max-width: 100%; }
-            body { background: white; padding: 0; }
-            .terms-list { grid-template-columns: 1fr 1fr; }
+        @media (max-width:450px){
+            .fee-bottom{ grid-template-columns:1fr; }
+            .subj-grid{ grid-template-columns:1fr; }
+            .header h2{ font-size:1rem; }
         }
     </style>
 </head>
 <body>
     <div id="authLoading" class="auth-loading">
         <div class="spinner"></div>
-        <p style="margin-top: 15px; color: #1b4f9b; font-weight: 600;">Verifying access...</p>
+        <p style="margin-top:12px; color:#1b4f9b; font-weight:600; font-size:0.9rem;">Verifying access...</p>
     </div>
 
     <div id="mainContent" class="main-content">
-    <div class="container">
-        <div class="header-bar">
-            <div class="logo-area">
-                <h1>🏫 Quest कोचिंग सेंटर</h1>
-                <p>search for knowledge | Under MR. RAVI SIR</p>
+        <div class="form-card">
+            <div class="header">
+                <h2>📋 Student <span style="font-weight:400;font-size:0.8rem;color:#6c757d;">Add / Edit</span></h2>
+                <button class="btn-new" id="clearFormBtn">➕ New Entry</button>
             </div>
-            <button class="back-btn" id="backButton" onclick="goBack()">
-                <i class="fas fa-arrow-left"></i> Back
-            </button>
-        </div>
-        
-        <div id="formSection" class="form-card" style="display: none;">
-            <h2 style="color: #1e3a5f; margin-bottom: 20px;">
-                <i class="fas fa-user-plus"></i> Student Registration Form
-                <span id="modeBadge" class="mode-badge"></span>
-            </h2>
-            <div id="formAlert"></div>
-            
-            <div class="photo-section">
-                <div class="photo-box" id="photoUploadBox">
-                    <div class="photo-placeholder" id="photoPlaceholder">
-                        <i class="fas fa-camera"></i>
-                        <p>Passport Size Photo</p>
-                        <p style="font-size: 10px;">Click to upload</p>
-                    </div>
-                    <img id="photoPreview" class="photo-preview" alt="Preview">
-                </div>
-                <input type="file" id="studentPhoto" accept="image/*">
-            </div>
-            
-            <form id="admissionForm">
-                <div class="form-group">
-                    <label>1. Full Name of the Applicant <span class="required">*</span></label>
-                    <div class="name-boxes">
-                        <div class="name-box"><input type="text" id="firstName" placeholder="First Name" required></div>
-                        <div class="name-box"><input type="text" id="middleName" placeholder="Middle Name"></div>
-                        <div class="name-box"><input type="text" id="lastName" placeholder="Last Name" required></div>
-                    </div>
-                </div>
-                
-                <div class="form-grid">
-                    <div class="form-group"><label>2. Nationality <span class="required">*</span></label><input type="text" id="nationality" value="Indian" required></div>
-                    <div class="form-group"><label>3. Date of Birth <span class="required">*</span></label><input type="date" id="dob" required></div>
-                    <div class="form-group">
-                        <label>4. Sex <span class="required">*</span></label>
-                        <div class="radio-group"><label><input type="radio" name="gender" value="Male" required> Male</label><label><input type="radio" name="gender" value="Female"> Female</label></div>
-                    </div>
-                    <div class="form-group"><label>5. Class <span class="required">*</span></label>
-                        <select id="class" required>
-                            <option value="">Select Class</option>
-                            <option>6th</option><option>7th</option><option>8th</option>
-                            <option>9th</option><option>10th</option>
-                            <option>11th (Science)</option><option>11th (Commerce)</option>
-                            <option>11th (Arts)</option>
-                            <option>12th (Science)</option><option>12th (Commerce)</option>
-                            <option>12th (Arts)</option>
-                        </select>
-                    </div>
-                    <div class="form-group"><label>6. Roll Number <span class="required">*</span></label><input type="text" id="rollNumber" placeholder="e.g., 101" required></div>
-                    <div class="form-group"><label>7. Father's Name <span class="required">*</span></label><input type="text" id="fatherName" required></div>
-                    <div class="form-group"><label>8. Mother's Name</label><input type="text" id="motherName"></div>
-                    <div class="form-group"><label>9. Contact No. (Student's) <span class="required">*</span></label><input type="tel" id="studentMobile" maxlength="10" required></div>
-                    <div class="form-group full-width"><label>10. Complete Address <span class="required">*</span></label><textarea id="address" rows="2" required></textarea></div>
-                    <div class="form-group"><label>11. Aadhar No.</label><input type="text" id="aadhar" maxlength="12"></div>
-                    <div class="form-group"><label>12. Current School/College <span class="required">*</span></label><input type="text" id="presentSchool" required></div>
-                    <div class="form-group"><label>13. Session <span class="required">*</span></label>
-                        <select id="sessionSelect" required>
-                            <option value="2026-27" selected>2026-27</option>
-                            <option value="2027-28">2027-28</option>
-                            <option value="2028-29">2028-29</option>
-                            <option value="2029-30">2029-30</option>
-                        </select>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>14. How did you come to know about QCC</label>
-                        <div class="checkbox-group">
-                            <label><input type="checkbox" name="knowAbout" value="Google"> Google</label>
-                            <label><input type="checkbox" name="knowAbout" value="Teacher"> Teacher</label>
-                            <label><input type="checkbox" name="knowAbout" value="Friend/Relatives"> Friend / Relatives</label>
-                        </div>
-                    </div>
-                    <div class="form-group full-width"><label>15. Mention Information (Psychological/Physical) If Any</label><textarea id="medicalInfo" rows="2"></textarea></div>
-                </div>
-                
-                <div class="declaration-box">
-                    <div class="declaration-text"><i class="fas fa-file-signature"></i> <strong>DECLARATION</strong><br>I hereby declare that the information furnished in this form is true to the best of my/our knowledge and belief.</div>
-                    <div class="checkbox-group"><label><input type="checkbox" id="declaration" required> I Agree to the above declaration <span class="required">*</span></label></div>
-                    <div class="signature-row">
-                        <div class="signature-item"><label>Date:</label><input type="text" id="declarationDate" readonly></div>
-                        <div class="signature-item"><label>Place:</label><input type="text" id="declarationPlace" placeholder="e.g., Gopalganj"></div>
-                    </div>
-                </div>
-                
-                <div id="submitButtonContainer"></div>
-            </form>
-        </div>
-        
-        <div id="cardSection" style="display: none;"></div>
-    </div>
-    </div>
 
-    <div class="progress-overlay" id="progressOverlay">
-        <div class="progress-card">
-            <h3><i class="fas fa-spinner fa-spin"></i> Processing...</h3>
-            <div class="progress-bar-container"><div class="progress-bar-fill" id="progressFill"></div></div>
-            <div class="progress-status" id="progressStatus">Initializing...</div>
-            <div class="progress-percent" id="progressPercent">0%</div>
+            <div class="fetch-row">
+                <label>🔢 Roll No.</label>
+                <input type="text" id="rollNumber" placeholder="Enter roll number">
+                <button class="btn-fetch" id="fetchBtn">🔍 Fetch</button>
+                <span id="fetchStatus"></span>
+            </div>
+
+            <div class="form-grid">
+                <div class="field">
+                    <label>🧑 Student Name <span style="color:red;">*</span></label>
+                    <input type="text" id="studentName" placeholder="Full name">
+                </div>
+                <div class="field">
+                    <label>👨 Father Name <span style="color:red;">*</span></label>
+                    <input type="text" id="fatherName" placeholder="Father's name">
+                </div>
+                <div class="field">
+                    <label>📞 Phone</label>
+                    <input type="tel" id="phoneNumber" placeholder="9876543210" maxlength="10">
+                </div>
+                <div class="field">
+                    <label>📅 Session <span style="color:red;">*</span></label>
+                    <select id="sessionSelect">
+                        <option value="2024-25">2024-25</option>
+                        <option value="2025-26">2025-26</option>
+                        <option value="2026-27" selected>2026-27</option>
+                        <option value="2027-28">2027-28</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>🏫 Class <span style="color:red;">*</span></label>
+                    <select id="classSelect">
+                        <option value="Class 6">Class 6</option>
+                        <option value="Class 7">Class 7</option>
+                        <option value="Class 8">Class 8</option>
+                        <option value="Class 9">Class 9</option>
+                        <option value="Class 10">Class 10</option>
+                        <option value="Class 11">Class 11</option>
+                        <option value="Class 12">Class 12</option>
+                    </select>
+                </div>
+                <div class="field" style="justify-content:flex-end;">
+                    <span style="font-size:0.7rem;color:#0d6efd;background:#e8f4fd;padding:4px 14px;border-radius:40px;display:inline-block;">⚡ Auto-fill on fetch</span>
+                </div>
+            </div>
+
+            <div class="fee-section">
+                <div class="fee-header">
+                    <h4>💰 Fee Details <span>(Teacher will fill)</span></h4>
+                </div>
+                
+                <div id="classWarning" class="class-warning">⚠️ For Class 11 & 12, select subjects below</div>
+                <div id="dynamicFeeSection"></div>
+            </div>
+
+            <!-- DEBUG BOX - Helpful for troubleshooting -->
+            <div id="debugBox" class="debug-box">
+                <strong>🔍 Debug Info:</strong> <span id="debugText">Waiting for fetch...</span>
+            </div>
+
+            <button class="btn-submit" id="addStudentBtn">💾 Save Student</button>
+            <div class="info-note">↩ <a href="dashboard.html">Back to dashboard</a></div>
+            <div id="loadingMessage" class="loading">⏳ Saving...</div>
+            <div id="errorMessage" class="error-msg"></div>
         </div>
+        <div id="successToast" class="success-toast">✅ Saved successfully!</div>
     </div>
 
     <script>
@@ -501,764 +188,503 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
-    const admissionsCollection = db.collection('admissions');
-    
-    const SUPABASE_URL = 'https://zjwvxqjmccqhyxsaeggw.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_6a_9nxKSSLUZMmSGleyycg_kQ4a4BtI';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const STORAGE_BUCKET = 'student_photos';
-    const LOGO_URL = 'https://i.ibb.co/hF9tmnpB/20250903-202922.jpg';
-    
-    const TERMS_LEFT = [
-        "नामांकन फॉर्म के साथ हाल ही की दो पासपोर्ट साइज फोटो और आधार कार्ड लगाना अनिवार्य है।",
-        "संस्थान द्वारा टेस्ट का परिणाम या कोई अन्य जानकारी SMS के माध्यम से भेजी जाएगी।",
-        "क्लास में मोबाइल फोन या आई-पॉड ले जाने की अनुमति नहीं है। यदि छात्र मोबाइल साथ लाता है, तो उसे बंद रखना होगा।",
-        "छात्रों को विनम्र, समय का पाबंद और नियमित होना चाहिए।",
-        "छात्रों को दिया गया सारा होमवर्क समय पर पूरा करना चाहिए और सभी टेस्ट में शामिल होना चाहिए।",
-        "यदि आप अनुपस्थित रहते हैं, तो क्लास के समय से पहले शिक्षक को सूचित करें, अन्यथा ₹10 प्रतिदिन अनुपस्थिति जुर्माना लिया जाएगा।",
-        "यदि आप कोई टेस्ट छोड़ते हैं, तो आपको ₹50 टेस्ट छोड़ने का जुर्माना देना होगा।",
-        "सत्र के बीच में प्रवेश रद्द नहीं किया जा सकता। प्रवेश रद्द करने से एक महीने पहले नोटिस देना अनिवार्य है।",
-        "एक बार जमा की गई फीस किसी भी परिस्थिति में वापस या समायोजित नहीं की जाएगी।",
-        "यदि अभिभावक अपने बच्चे का नाम वापस लेना चाहते हैं, तो उन्हें 4 सप्ताह पहले निदेशक से बात करनी होगी।",
-        "गंभीर अनुशासनहीनता के परिणामस्वरूप बिना किसी रिफंड के प्रवेश रद्द कर दिया जाएगा।"
-    ];
-    
-    const TERMS_RIGHT = [
-        "यदि कोई छात्र समय पर फीस नहीं भरता है, तो उसे क्लास में आने से रोक दिया जाएगा।",
-        "यदि कोई छात्र बिना किसी सूचना के 3 सप्ताह से अधिक अनुपस्थित रहता है, तो उसका नाम काट दिया जाएगा; पुनः प्रवेश के लिए ₹500 अतिरिक्त देने होंगे।",
-        "यदि शिक्षकों को लगता है कि छात्र मेहनत नहीं कर रहा, अनुशासनहीनता कर रहा है या पढ़ाई में ध्यान नहीं दे रहा, तो उसे निकाला जा सकता है। इस संबंध में निदेशक का निर्णय अंतिम होगा।",
-        "पंजीकरण राशि जमा करने के बाद, यदि छात्र नाम वापस लेना चाहता है, तो संस्थान कोई पैसा वापस नहीं करेगा।",
-        "यदि कोई अभिभावक संस्थान के स्टाफ के साथ दुर्व्यवहार करता है, तो छात्र को निकाला जा सकता है और कोई फीस वापस नहीं होगी।",
-        "यदि छात्र को निकाला जाता है या वह सत्र के अंत से पहले कोचिंग छोड़ देता है, तो शेष फीस जब्त कर ली जाएगी।",
-        "यदि छात्र केंद्र की संपत्ति को कोई नुकसान पहुंचाता है, तो अभिभावक मरम्मत के पूर्ण खर्च के लिए जिम्मेदार होंगे।",
-        "QUEST COACHING CENTRE के पास बिना किसी पूर्व सूचना के कार्यक्रमों, स्थान या समय में बदलाव करने का अधिकार सुरक्षित है। प्रबंध निदेशक का निर्णय अंतिम होगा।",
-        "किसी भी प्रकार के कानूनी विवाद या मतभेद की स्थिति में, न्यायिक क्षेत्राधिकार केवल जिला न्यायालय, गोपालगंज (बिहार) के अधीन होगा।"
-    ];
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const mode = urlParams.get('mode') || 'new';
-    const studentId = urlParams.get('id');
-    let currentStudentData = null;
-    let existingPhotoUrl = null;
-    
+    const feesCollection = db.collection('fees');
+    const transactionsCollection = db.collection('transactions');
+
+    // Enable offline persistence for better performance
+    db.enablePersistence().catch(err => console.warn("Persistence error:", err));
+
     const authLoading = document.getElementById('authLoading');
     const mainContent = document.getElementById('mainContent');
-    const formSection = document.getElementById('formSection');
-    const cardSection = document.getElementById('cardSection');
-    const backButton = document.getElementById('backButton');
-    const modeBadge = document.getElementById('modeBadge');
-    
-    function goBack() {
-        window.location.href = 'manage-students.html';
-    }
-    
-    function resetForm() {
-        document.getElementById('firstName').value = '';
-        document.getElementById('middleName').value = '';
-        document.getElementById('lastName').value = '';
-        document.getElementById('nationality').value = 'Indian';
-        document.getElementById('dob').value = '';
-        document.getElementById('rollNumber').value = '';
-        document.querySelectorAll('input[name="gender"]').forEach(cb => cb.checked = false);
-        document.getElementById('class').value = '';
-        document.getElementById('fatherName').value = '';
-        document.getElementById('motherName').value = '';
-        document.getElementById('studentMobile').value = '';
-        document.getElementById('address').value = '';
-        document.getElementById('aadhar').value = '';
-        document.getElementById('presentSchool').value = '';
-        document.getElementById('sessionSelect').value = '2026-27';
-        document.querySelectorAll('input[name="knowAbout"]').forEach(cb => cb.checked = false);
-        document.getElementById('medicalInfo').value = '';
-        document.getElementById('declaration').checked = false;
-        document.getElementById('declarationPlace').value = '';
-        document.getElementById('declarationDate').value = new Date().toLocaleDateString('en-IN');
-        
-        const photoPreview = document.getElementById('photoPreview');
-        const photoPlaceholder = document.getElementById('photoPlaceholder');
-        photoPreview.style.display = 'none';
-        photoPreview.src = '';
-        photoPlaceholder.style.display = 'flex';
-        document.getElementById('studentPhoto').value = '';
-    }
-    
-    function openNewAdmissionForm() {
-        resetForm();
-        formSection.style.display = 'block';
-        cardSection.style.display = 'none';
-        document.getElementById('modeBadge').textContent = '📝 NEW REGISTRATION';
-        document.getElementById('modeBadge').className = 'mode-badge mode-new';
-    }
-    
-    const isPublicView = (mode === 'view' && studentId);
-    
+
     auth.onAuthStateChanged((user) => {
-        if (isPublicView) {
-            authLoading.style.display = 'none';
-            mainContent.style.display = 'block';
-            const headerBar = document.querySelector('.header-bar');
-            if (headerBar) {
-                const backBtn = headerBar.querySelector('.back-btn');
-                if (backBtn) backBtn.style.display = 'none';
-            }
-            loadAndDisplayCard(studentId);
-            return;
-        }
-        
         if (!user) {
-            Swal.fire({
-                title: 'Access Denied!',
-                text: 'Please login from main page first!',
-                icon: 'error',
-                confirmButtonColor: '#1b4f9b',
-                confirmButtonText: 'Go to Login'
-            }).then(() => { window.location.href = 'index.html'; });
+            alert('Please login first!');
+            window.location.href = 'index.html';
             return;
         }
-        
         authLoading.style.display = 'none';
         mainContent.style.display = 'block';
         
         const logoutBtn = document.createElement('button');
-        logoutBtn.innerHTML = '🚪 Logout';
-        logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px;';
+        logoutBtn.className = 'logout-btn';
+        logoutBtn.textContent = '🚪 Logout';
         logoutBtn.onclick = async () => { await auth.signOut(); window.location.href = 'index.html'; };
         document.body.appendChild(logoutBtn);
-        
-        if (mode === 'edit' && studentId) {
-            modeBadge.textContent = '✏️ EDIT MODE';
-            modeBadge.className = 'mode-badge mode-edit';
-            formSection.style.display = 'block';
-            cardSection.style.display = 'none';
-            loadStudentForEdit(studentId);
-        } else if (mode === 'new') {
-            modeBadge.textContent = '📝 NEW REGISTRATION';
-            modeBadge.className = 'mode-badge mode-new';
-            formSection.style.display = 'block';
-            cardSection.style.display = 'none';
-            setupNewMode();
-        }
     });
-    
-    async function loadAndDisplayCard(id) {
+
+    const SUBJECTS = [
+        { name: "PHYSICS", price: 3000 }, { name: "CHEMISTRY", price: 3000 },
+        { name: "BIOLOGY", price: 3000 }, { name: "MATHS", price: 3000 },
+        { name: "HINDI", price: 3000 }, { name: "ENGLISH", price: 3000 }
+    ];
+    const EXTRA_FEES = [
+        { name: "ADMISSION", price: 500 },
+        { name: "EXAM (HY+ANNUAL)", price: 500 },
+        { name: "ASSIGNMENT", price: 500 }
+    ];
+
+    const getTuitionFee = (cls) => cls === 'Class 10' ? 7200 : 6000;
+
+    const dom = {
+        roll: document.getElementById('rollNumber'),
+        name: document.getElementById('studentName'),
+        father: document.getElementById('fatherName'),
+        phone: document.getElementById('phoneNumber'),
+        session: document.getElementById('sessionSelect'),
+        class: document.getElementById('classSelect'),
+        fetchBtn: document.getElementById('fetchBtn'),
+        fetchStatus: document.getElementById('fetchStatus'),
+        clearBtn: document.getElementById('clearFormBtn'),
+        addBtn: document.getElementById('addStudentBtn'),
+        dynamic: document.getElementById('dynamicFeeSection'),
+        warning: document.getElementById('classWarning'),
+        loading: document.getElementById('loadingMessage'),
+        error: document.getElementById('errorMessage'),
+        toast: document.getElementById('successToast'),
+        debugBox: document.getElementById('debugBox'),
+        debugText: document.getElementById('debugText')
+    };
+
+    let currentMode = 'simple';
+    let currentStudentId = null;
+    let isFetching = false;
+    let subjectCbs = [], extraCbs = [];
+    let discInput, recvInput, dueInput;
+    let feeCbs = {};
+
+    function showToast(msg) {
+        dom.toast.textContent = msg;
+        dom.toast.style.opacity = '1';
+        clearTimeout(window.toastTimer);
+        window.toastTimer = setTimeout(() => dom.toast.style.opacity = '0', 2000);
+    }
+
+    function showError(msg) {
+        dom.error.textContent = msg;
+        dom.error.style.display = 'block';
+        setTimeout(() => dom.error.style.display = 'none', 3000);
+    }
+
+    function setStatus(msg, type) {
+        dom.fetchStatus.textContent = msg;
+        dom.fetchStatus.className = type;
+        dom.fetchStatus.style.display = 'inline-block';
+    }
+
+    function clearStatus() {
+        dom.fetchStatus.style.display = 'none';
+        dom.fetchStatus.className = '';
+    }
+
+    function setDebug(msg) {
+        dom.debugBox.style.display = 'block';
+        dom.debugText.textContent = msg;
+        console.log("Debug:", msg);
+    }
+
+    function updateDue() {
+        let total = 0, recv = 0;
+        if (currentMode === 'advanced') {
+            subjectCbs.forEach(cb => { if(cb.checked) total += parseInt(cb.dataset.price) || 0; });
+            extraCbs.forEach(cb => { if(cb.checked) total += parseInt(cb.dataset.price) || 0; });
+            if (discInput) total = Math.max(0, total - (parseFloat(discInput.value) || 0));
+            const span = document.getElementById('advTotal');
+            if (span) span.textContent = total;
+            recv = recvInput ? parseFloat(recvInput.value) || 0 : 0;
+            if (dueInput) dueInput.value = Math.max(0, total - recv);
+        } else {
+            total = (feeCbs.tuition?.checked ? getTuitionFee(dom.class.value) : 0) +
+                    (feeCbs.admission?.checked ? 500 : 0) +
+                    (feeCbs.exam?.checked ? 500 : 0) +
+                    (feeCbs.assignment?.checked ? 500 : 0);
+            if (discInput) total = Math.max(0, total - (parseFloat(discInput.value) || 0));
+            const span = document.getElementById('chkTotal');
+            if (span) span.textContent = total;
+            recv = recvInput ? parseFloat(recvInput.value) || 0 : 0;
+            if (dueInput) dueInput.value = Math.max(0, total - recv);
+        }
+    }
+
+    function renderFeeSection() {
+        const cls = dom.class.value;
+        const isHigher = cls === 'Class 11' || cls === 'Class 12';
+        dom.warning.style.display = isHigher ? 'block' : 'none';
+        currentMode = isHigher ? 'advanced' : 'simple';
+
+        if (isHigher) {
+            dom.dynamic.innerHTML = `
+                <div style="margin-bottom:6px;"><strong style="font-size:0.8rem;">📖 Subjects (₹3000 each)</strong></div>
+                <div class="subj-grid" id="subjGrid"></div>
+                <div style="margin:6px 0;"><strong style="font-size:0.8rem;">📌 Extra Charges</strong></div>
+                <div class="extra-row" id="extraRow"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+                    <div class="field"><label>🎁 Discount (₹)</label><input type="number" id="advDisc" value="0" min="0"></div>
+                    <div class="field"><label>💵 Received (₹)</label><input type="number" id="advRecv" value="0" min="0"></div>
+                </div>
+                <div class="total-display"><span class="label">💰 Total</span><span class="amount" id="advTotal">0</span></div>
+                <div class="field" style="margin-top:4px;"><label>⏳ Due (Auto)</label><input type="number" id="advDue" readonly style="background:#eef2f5;color:#b44;font-weight:700;"></div>
+            `;
+
+            const grid = document.getElementById('subjGrid');
+            subjectCbs = [];
+            SUBJECTS.forEach(s => {
+                const d = document.createElement('div');
+                d.className = 'subj-item';
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.id = 's_' + s.name;
+                cb.dataset.price = s.price;
+                cb.addEventListener('change', updateDue);
+                const lbl = document.createElement('label');
+                lbl.htmlFor = 's_' + s.name;
+                lbl.textContent = s.name;
+                const sp = document.createElement('span');
+                sp.className = 'sp';
+                sp.textContent = '₹' + s.price;
+                d.append(cb, lbl, sp);
+                grid.appendChild(d);
+                subjectCbs.push(cb);
+            });
+
+            const row = document.getElementById('extraRow');
+            extraCbs = [];
+            EXTRA_FEES.forEach(e => {
+                const d = document.createElement('div');
+                d.className = 'extra-item';
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.id = 'e_' + e.name.replace(/\s/g,'_');
+                cb.dataset.price = e.price;
+                cb.addEventListener('change', updateDue);
+                const lbl = document.createElement('label');
+                lbl.htmlFor = 'e_' + e.name.replace(/\s/g,'_');
+                lbl.textContent = e.name;
+                d.append(cb, lbl);
+                row.appendChild(d);
+                extraCbs.push(cb);
+            });
+
+            discInput = document.getElementById('advDisc');
+            recvInput = document.getElementById('advRecv');
+            dueInput = document.getElementById('advDue');
+            if (discInput) discInput.addEventListener('input', updateDue);
+            if (recvInput) recvInput.addEventListener('input', updateDue);
+            updateDue();
+        } else {
+            const fee = getTuitionFee(cls);
+            dom.dynamic.innerHTML = `
+                <div class="fee-grid">
+                    <div class="fee-item"><input type="checkbox" id="f_tuition"><label for="f_tuition">Tuition Fee</label><span class="price">₹${fee}</span></div>
+                    <div class="fee-item"><input type="checkbox" id="f_admission"><label for="f_admission">Admission Fee</label><span class="price">₹500</span></div>
+                    <div class="fee-item"><input type="checkbox" id="f_exam"><label for="f_exam">Exam Fee</label><span class="price">₹500</span></div>
+                    <div class="fee-item"><input type="checkbox" id="f_assignment"><label for="f_assignment">Assignment Fee</label><span class="price">₹500</span></div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+                    <div class="field"><label>🎁 Discount (₹)</label><input type="number" id="sDisc" value="0" min="0"></div>
+                    <div class="field"><label>💵 Received (₹)</label><input type="number" id="sRecv" value="0" min="0"></div>
+                </div>
+                <div class="total-display"><span class="label">💰 Total</span><span class="amount" id="chkTotal">0</span></div>
+                <div class="field" style="margin-top:4px;"><label>⏳ Due (Auto)</label><input type="number" id="sDue" readonly style="background:#eef2f5;color:#b44;font-weight:700;"></div>
+            `;
+
+            feeCbs = {
+                tuition: document.getElementById('f_tuition'),
+                admission: document.getElementById('f_admission'),
+                exam: document.getElementById('f_exam'),
+                assignment: document.getElementById('f_assignment')
+            };
+            discInput = document.getElementById('sDisc');
+            recvInput = document.getElementById('sRecv');
+            dueInput = document.getElementById('sDue');
+
+            Object.values(feeCbs).forEach(cb => cb?.addEventListener('change', updateDue));
+            if (discInput) discInput.addEventListener('input', updateDue);
+            if (recvInput) recvInput.addEventListener('input', updateDue);
+            updateDue();
+        }
+    }
+
+    // ============ FETCH STUDENT - MULTIPLE QUERY METHODS ============
+    async function fetchStudent() {
+        const roll = dom.roll.value.trim();
+        const session = dom.session.value;
+        
+        if (!roll) { 
+            setStatus('⚠️ Enter roll number', 'error'); 
+            return; 
+        }
+        
+        if (isFetching) return;
+        isFetching = true;
+        dom.fetchBtn.disabled = true;
+        setStatus('⏳ Searching...', 'loading');
+        setDebug('Searching for roll: "' + roll + '" in session: "' + session + '"');
+
         try {
-            const doc = await admissionsCollection.doc(id).get();
-            if (!doc.exists) {
-                Swal.fire('Error', 'Student not found!', 'error').then(() => { 
-                    if (!isPublicView) window.location.href = 'manage-students.html';
-                    else window.location.href = 'index.html';
-                });
-                return;
+            let studentDoc = null;
+            let studentData = null;
+            let foundMethod = '';
+
+            // METHOD 1: Try with roll_number field
+            setDebug('Method 1: Querying where roll_number == "' + roll + '"');
+            const query1 = await feesCollection
+                .where('roll_number', '==', roll)
+                .where('session', '==', session)
+                .limit(1)
+                .get();
+
+            if (!query1.empty) {
+                studentDoc = query1.docs[0];
+                studentData = studentDoc.data();
+                foundMethod = 'roll_number';
+                setDebug('✅ Found using roll_number field');
             }
-            currentStudentData = { id: doc.id, ...doc.data() };
-            displayRegistrationCard(currentStudentData, currentStudentData.photoUrl);
-        } catch (error) {
-            console.error('Error loading student:', error);
-            Swal.fire('Error', 'Failed to load student data', 'error');
-        }
-    }
-    
-    async function loadStudentForEdit(id) {
-        try {
-            const doc = await admissionsCollection.doc(id).get();
-            if (!doc.exists) {
-                Swal.fire('Error', 'Student not found!', 'error').then(() => { goBack(); });
-                return;
-            }
-            currentStudentData = { id: doc.id, ...doc.data() };
-            existingPhotoUrl = currentStudentData.photoUrl;
-            fillFormWithData(currentStudentData);
-            setupEditMode();
-        } catch (error) {
-            console.error('Error loading student:', error);
-            Swal.fire('Error', 'Failed to load student data', 'error');
-        }
-    }
-    
-    function fillFormWithData(data) {
-        const nameParts = (data.studentName || '').split(' ');
-        document.getElementById('firstName').value = nameParts[0] || '';
-        document.getElementById('middleName').value = nameParts.slice(1, -1).join(' ') || '';
-        document.getElementById('lastName').value = nameParts[nameParts.length - 1] || '';
-        
-        document.getElementById('nationality').value = data.nationality || 'Indian';
-        document.getElementById('dob').value = data.dob || '';
-        document.getElementById('rollNumber').value = data.rollNumber || '';
-        
-        if (data.gender === 'Male') {
-            document.querySelector('input[name="gender"][value="Male"]').checked = true;
-        } else if (data.gender === 'Female') {
-            document.querySelector('input[name="gender"][value="Female"]').checked = true;
-        }
-        
-        document.getElementById('class').value = data.classApplying || '';
-        document.getElementById('fatherName').value = data.fatherName || '';
-        document.getElementById('motherName').value = data.motherName || '';
-        document.getElementById('studentMobile').value = data.parentMobile || '';
-        document.getElementById('address').value = data.address || '';
-        document.getElementById('aadhar').value = data.aadhar || '';
-        document.getElementById('presentSchool').value = data.schoolName || '';
-        document.getElementById('sessionSelect').value = data.session || '2026-27';
-        document.getElementById('declarationPlace').value = 'Gopalganj';
-        document.getElementById('declarationDate').value = new Date().toLocaleDateString('en-IN');
-        
-        if (data.photoUrl) {
-            const photoPreview = document.getElementById('photoPreview');
-            const photoPlaceholder = document.getElementById('photoPlaceholder');
-            photoPreview.src = data.photoUrl;
-            photoPreview.style.display = 'block';
-            photoPlaceholder.style.display = 'none';
-        }
-    }
-    
-    function setupEditMode() {
-        const container = document.getElementById('submitButtonContainer');
-        container.innerHTML = `<button type="submit" class="btn-submit btn-update" id="updateStudentBtn"><i class="fas fa-save"></i> Update Student</button>`;
-        
-        const form = document.getElementById('admissionForm');
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            await updateStudent();
-        };
-    }
-    
-    function setupNewMode() {
-        const container = document.getElementById('submitButtonContainer');
-        container.innerHTML = `<button type="submit" class="btn-submit" id="submitBtn"><i class="fas fa-save"></i> Submit Registration</button>`;
-        document.getElementById('declarationDate').value = new Date().toLocaleDateString('en-IN');
-        
-        const form = document.getElementById('admissionForm');
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            await submitNewAdmission(e);
-        };
-    }
-    
-    function getFormData() {
-        const firstName = document.getElementById('firstName').value.trim();
-        const middleName = document.getElementById('middleName').value.trim();
-        const lastName = document.getElementById('lastName').value.trim();
-        const fullName = [firstName, middleName, lastName].filter(n => n).join(' ');
-        
-        const knowAbout = Array.from(document.querySelectorAll('input[name="knowAbout"]:checked')).map(cb => cb.value).join(', ');
-        
-        return {
-            fullName, firstName, middleName, lastName,
-            nationality: document.getElementById('nationality').value.trim(),
-            dob: document.getElementById('dob').value,
-            rollNumber: document.getElementById('rollNumber').value.trim(),
-            gender: document.querySelector('input[name="gender"]:checked')?.value,
-            classVal: document.getElementById('class').value,
-            fatherName: document.getElementById('fatherName').value.trim(),
-            motherName: document.getElementById('motherName').value.trim(),
-            studentMobile: document.getElementById('studentMobile').value.trim(),
-            address: document.getElementById('address').value.trim(),
-            aadhar: document.getElementById('aadhar').value.trim(),
-            presentSchool: document.getElementById('presentSchool').value.trim(),
-            session: document.getElementById('sessionSelect').value,
-            knowAbout: knowAbout,
-            medicalInfo: document.getElementById('medicalInfo').value.trim(),
-            declaration: document.getElementById('declaration').checked,
-            declarationPlace: document.getElementById('declarationPlace').value.trim()
-        };
-    }
-    
-    function validateFormData(data) {
-        if (!data.firstName || !data.lastName || !data.nationality || !data.dob || !data.rollNumber || !data.gender || !data.classVal || !data.fatherName || !data.studentMobile || !data.address || !data.presentSchool) {
-            showAlert('Please fill all required fields (*)', 'error');
-            return false;
-        }
-        if (data.studentMobile.length !== 10 || !/^\d+$/.test(data.studentMobile)) {
-            showAlert('Enter valid 10-digit mobile number', 'error');
-            return false;
-        }
-        if (!data.declaration) {
-            showAlert('Please accept the declaration', 'error');
-            return false;
-        }
-        return true;
-    }
-    
-    function showAlert(msg, type) {
-        const div = document.getElementById('formAlert');
-        div.innerHTML = `<div style="background:${type==='error'?'#fee2e2':'#d1fae5'}; color:${type==='error'?'#991b1b':'#065f46'}; padding:12px; border-radius:16px; margin-bottom:20px;">${msg}</div>`;
-        setTimeout(() => div.innerHTML = '', 4000);
-    }
-    
-    document.getElementById('declarationDate').value = new Date().toLocaleDateString('en-IN');
-    
-    const photoBox = document.getElementById('photoUploadBox');
-    const photoInput = document.getElementById('studentPhoto');
-    const photoPreview = document.getElementById('photoPreview');
-    const photoPlaceholder = document.getElementById('photoPlaceholder');
-    
-    photoBox.addEventListener('click', () => { photoInput.click(); });
-    photoInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                photoPreview.src = event.target.result;
-                photoPreview.style.display = 'block';
-                photoPlaceholder.style.display = 'none';
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-    
-    const progressOverlay = document.getElementById('progressOverlay');
-    const progressFill = document.getElementById('progressFill');
-    const progressStatus = document.getElementById('progressStatus');
-    const progressPercent = document.getElementById('progressPercent');
-    
-    function updateProgress(percent, status) {
-        progressFill.style.width = percent + '%';
-        progressPercent.textContent = percent + '%';
-        if (status) progressStatus.textContent = status;
-    }
-    
-    async function compressPhoto(file, maxWidth = 400, maxHeight = 400, quality = 0.75) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (e) => {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width, height = img.height;
-                    if (width > height) {
-                        if (width > maxWidth) { height = (height * maxWidth) / width; width = maxWidth; }
-                    } else {
-                        if (height > maxHeight) { width = (width * maxHeight) / height; height = maxHeight; }
-                    }
-                    canvas.width = width; canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    canvas.toBlob((blob) => resolve(blob), 'image/jpeg', quality);
-                };
-            };
-            reader.onerror = reject;
-        });
-    }
-    
-    async function uploadPhotoToSupabase(file, admissionNo) {
-        const compressedBlob = await compressPhoto(file, 400, 400, 0.75);
-        const fileName = `${admissionNo}_${Date.now()}.jpg`;
-        const { error } = await supabaseClient.storage.from(STORAGE_BUCKET).upload(fileName, compressedBlob, { contentType: 'image/jpeg' });
-        if (error) throw error;
-        const { data: urlData } = supabaseClient.storage.from(STORAGE_BUCKET).getPublicUrl(fileName);
-        return urlData.publicUrl;
-    }
-    
-    function generateRegNo() {
-        const year = new Date().getFullYear();
-        const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-        return `QCC/${year}/${random}`;
-    }
-    
-    async function updateStudent() {
-        const data = getFormData();
-        if (!validateFormData(data)) return;
-        
-        let photoUrl = existingPhotoUrl;
-        const photoFile = document.getElementById('studentPhoto').files[0];
-        
-        progressOverlay.style.display = 'flex';
-        updateProgress(0, 'Starting...');
-        
-        try {
-            if (photoFile) {
-                updateProgress(30, 'Uploading new photo...');
-                photoUrl = await uploadPhotoToSupabase(photoFile, currentStudentData.admissionNo);
-            }
-            
-            updateProgress(70, 'Updating student data...');
-            
-            const updateData = {
-                studentName: data.fullName,
-                rollNumber: data.rollNumber,
-                fatherName: data.fatherName,
-                motherName: data.motherName,
-                dob: data.dob,
-                gender: data.gender,
-                classApplying: data.classVal,
-                schoolName: data.presentSchool,
-                address: data.address,
-                parentMobile: data.studentMobile,
-                aadhar: data.aadhar,
-                nationality: data.nationality,
-                knowAbout: data.knowAbout,
-                medicalInfo: data.medicalInfo,
-                session: data.session,
-                photoUrl: photoUrl
-            };
-            
-            await admissionsCollection.doc(studentId).update(updateData);
-            updateProgress(100, 'Complete!');
-            
-            setTimeout(() => {
-                progressOverlay.style.display = 'none';
-                Swal.fire('Success!', 'Student data updated successfully!', 'success').then(() => {
-                    window.location.href = 'manage-students.html';
-                });
-            }, 500);
-        } catch (error) {
-            progressOverlay.style.display = 'none';
-            showAlert('Error: ' + error.message, 'error');
-        }
-    }
-    
-    async function submitNewAdmission(e) {
-        e.preventDefault();
-        
-        const data = getFormData();
-        if (!validateFormData(data)) return;
-        
-        const photoFile = document.getElementById('studentPhoto').files[0];
-        if (!photoFile) { showAlert('Please upload passport size photo', 'error'); return; }
-        
-        progressOverlay.style.display = 'flex';
-        updateProgress(0, 'Starting...');
-        
-        try {
-            updateProgress(20, 'Generating registration number...');
-            const regNo = generateRegNo();
-            
-            updateProgress(40, 'Compressing and uploading photo...');
-            let photoUrl = await uploadPhotoToSupabase(photoFile, regNo);
-            updateProgress(60, 'Photo uploaded successfully!');
-            
-            updateProgress(80, 'Saving student data...');
-            const admissionData = {
-                admissionNo: regNo,
-                studentName: data.fullName,
-                rollNumber: data.rollNumber,
-                fatherName: data.fatherName,
-                motherName: data.motherName || '',
-                dob: data.dob,
-                gender: data.gender,
-                classApplying: data.classVal,
-                schoolName: data.presentSchool,
-                address: data.address,
-                parentMobile: data.studentMobile,
-                aadhar: data.aadhar || '',
-                nationality: data.nationality,
-                knowAbout: data.knowAbout || '',
-                medicalInfo: data.medicalInfo || '',
-                photoUrl: photoUrl,
-                admissionDate: new Date().toISOString(),
-                session: data.session,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                status: 'active'
-            };
-            await admissionsCollection.add(admissionData);
-            updateProgress(100, 'Complete!');
-            
-            resetForm();
-            
-            setTimeout(() => {
-                progressOverlay.style.display = 'none';
-                displayRegistrationCard(admissionData, photoUrl);
-            }, 500);
-            
-        } catch (error) {
-            progressOverlay.style.display = 'none';
-            showAlert('Error: ' + error.message, 'error');
-        }
-    }
-    
-    async function generateQRCodeImageUrl(text, size = 85) {
-        return new Promise((resolve) => {
-            const tempDiv = document.createElement('div');
-            tempDiv.style.position = 'absolute';
-            tempDiv.style.left = '-9999px';
-            tempDiv.style.top = '-9999px';
-            document.body.appendChild(tempDiv);
-            
-            const qrDiv = document.createElement('div');
-            tempDiv.appendChild(qrDiv);
-            
-            new QRCode(qrDiv, { text: text, width: size, height: size });
-            
-            setTimeout(() => {
-                const canvas = qrDiv.querySelector('canvas');
-                if (canvas) {
-                    const imgUrl = canvas.toDataURL('image/png');
-                    document.body.removeChild(tempDiv);
-                    resolve(imgUrl);
-                } else {
-                    document.body.removeChild(tempDiv);
-                    resolve(null);
+
+            // METHOD 2: If not found, try with rollNumber (camelCase)
+            if (!studentData) {
+                setDebug('Method 2: Querying where rollNumber == "' + roll + '"');
+                const query2 = await feesCollection
+                    .where('rollNumber', '==', roll)
+                    .where('session', '==', session)
+                    .limit(1)
+                    .get();
+
+                if (!query2.empty) {
+                    studentDoc = query2.docs[0];
+                    studentData = studentDoc.data();
+                    foundMethod = 'rollNumber';
+                    setDebug('✅ Found using rollNumber field');
                 }
-            }, 200);
-        });
-    }
-    
-    async function generatePdfBlobUrl(studentData, photoUrl) {
-        const tempDiv = document.createElement('div');
-        tempDiv.style.position = 'absolute';
-        tempDiv.style.left = '-9999px';
-        tempDiv.style.top = '-9999px';
-        tempDiv.style.width = '1100px';
-        document.body.appendChild(tempDiv);
-        
-        const admDate = new Date(studentData.admissionDate);
-        const dobDate = new Date(studentData.dob);
-        
-        const publicUrl = `${window.location.origin}${window.location.pathname}?mode=view&id=${studentData.id}`;
-        const qrImageUrl = await generateQRCodeImageUrl(publicUrl, 85);
-        
-        let termsHtml = `
-            <ul class="terms-col">
-                ${TERMS_LEFT.map((term, i) => `<li><strong>${i+1}.</strong> ${term}</li>`).join('')}
-            </ul>
-            <ul class="terms-col">
-                ${TERMS_RIGHT.map((term, i) => `<li><strong>${i+12}.</strong> ${term}</li>`).join('')}
-            </ul>
-        `;
-        
-        tempDiv.innerHTML = `
-            <div id="pdfCard" class="registration-card">
-                <div class="card-header">
-                    <div class="logo-center">
-                        <div class="logo-img-card"><img src="${LOGO_URL}" alt="Logo"></div>
-                        <div class="institution-name">
-                            <h1>QUEST COACHING CENTRE</h1>
-                            <div class="tagline">|| SEARCH FOR KNOWLEDGE ||</div>
-                            <div class="under">Under the guidance of MR. RAVI SIR</div>
-                        </div>
-                        <div class="contact-strip-card">
-                            <div class="contact-item-card"><i class="fas fa-map-marker-alt"></i> Block More, Gopalganj - 841428</div>
-                            <div class="contact-item-card"><i class="fas fa-phone-alt"></i> +91 9708442525</div>
-                            <div class="contact-item-card"><i class="fas fa-envelope"></i> questcoachingcentre@gmail.com</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="title-banner"><h2>🎓 REGISTRATION FORM 🎓</h2></div>
-                <div class="top-row">
-                    <div class="photo-card"><img src="${photoUrl}" alt="Photo"></div>
-                    <div class="info-group">
-                        <div class="info-row"><span class="info-label">REGISTRATION NO.</span><span class="info-value reg-no">${studentData.admissionNo}</span></div>
-                        <div class="info-row"><span class="info-label">ROLL NO.</span><span class="info-value">${studentData.rollNumber || '-'}</span></div>
-                        <div class="info-row"><span class="info-label">REGISTRATION DATE</span><span class="info-value">${admDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
-                        <div class="info-row"><span class="info-label">ACADEMIC SESSION</span><span class="info-value">${studentData.session}</span></div>
-                        <div class="info-row"><span class="info-label">CLASS APPLYING</span><span class="info-value">${studentData.classApplying}</span></div>
-                    </div>
-                    <div class="qr-card">
-                        <div class="qr-box">
-                            <img src="${qrImageUrl}" style="width:85px; height:85px;" alt="QR Code">
-                        </div>
-                        <div class="qr-label-card">SCAN TO VERIFY</div>
-                    </div>
-                </div>
-                <div class="details-grid">
-                    <div class="detail-box">
-                        <div class="detail-title">PERSONAL DETAILS</div>
-                        <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td></tr>
-                            <tr><td style="width:38%;">Roll Number</td><td>${studentData.rollNumber || '-'}</td></tr>
-                            <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
-                            <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td></tr>
-                            <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td></tr>
-                            <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td></tr>
-                        </table></div>
-                    </div>
-                    <div class="detail-box">
-                        <div class="detail-title">PARENT INFORMATION</div>
-                        <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td></tr>
-                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td></tr>
-                            <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td></tr>
-                            <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td></tr>
-                        </table></div>
-                    </div>
-                </div>
-                <div class="details-grid">
-                    <div class="detail-box">
-                        <div class="detail-title">ADDRESS DETAILS</div>
-                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td></tr></table></div>
-                    </div>
-                    <div class="detail-box">
-                        <div class="detail-title">EDUCATION DETAILS</div>
-                        <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Current School</td><td>${studentData.schoolName}</td></tr>
-                            <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td></tr>
-                        </table></div>
-                    </div>
-                </div>
-                <div class="terms-section"><div class="terms-box"><div class="terms-title">📜 नियम और शर्तें (Terms & Conditions)</div><div class="terms-list">${termsHtml}</div></div></div>
-                <div class="quote-card"><span class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</span><span class="quote-author">- Albert Einstein</span></div>
-                <div class="signatures-section">
-                    <div class="sig-card"><div class="sig-line">Parent / Guardian Signature</div></div>
-                    <div class="seal-card"><span>QUEST<br>COACHING<br>CENTRE</span><span class="seal-text">SEAL & SIGNATURE<br>OF DIRECTOR</span></div>
-                    <div class="sig-card"><div class="sig-line">Student Signature</div></div>
-                </div>
-                <div class="card-footer"><p>★ THANK YOU FOR CHOOSING QUEST COACHING CENTRE ★</p></div>
-            </div>
-        `;
-        
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        const element = tempDiv.querySelector('#pdfCard');
-        const canvas = await html2canvas(element, { scale: 2, useCORS: true, allowTaint: false, backgroundColor: '#ffffff' });
-        const imgData = canvas.toDataURL('image/png');
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgWidth = 190;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-        const pdfBlob = pdf.output('blob');
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-        
-        document.body.removeChild(tempDiv);
-        
-        return pdfUrl;
-    }
-    
-    async function generateAndSavePdf(studentData, photoUrl) {
-        const pdfUrl = await generatePdfBlobUrl(studentData, photoUrl);
-        const link = document.createElement('a');
-        link.href = pdfUrl;
-        link.download = `Registration_Form_${studentData.admissionNo}_${studentData.studentName}.pdf`;
-        link.click();
-        URL.revokeObjectURL(pdfUrl);
-        Swal.fire('Downloaded!', 'PDF downloaded successfully', 'success');
-    }
-    
-    function displayRegistrationCard(studentData, photoUrl) {
-        const admDate = new Date(studentData.admissionDate);
-        const dobDate = new Date(studentData.dob);
-        
-        let termsHtml = `
-            <ul class="terms-col">
-                ${TERMS_LEFT.map((term, i) => `<li><strong>${i+1}.</strong> ${term}</li>`).join('')}
-            </ul>
-            <ul class="terms-col">
-                ${TERMS_RIGHT.map((term, i) => `<li><strong>${i+12}.</strong> ${term}</li>`).join('')}
-            </ul>
-        `;
-        
-        const cardHtml = `
-            <div class="registration-card" id="registrationCard">
-                <div class="card-header">
-                    <div class="logo-center">
-                        <div class="logo-img-card"><img src="${LOGO_URL}" alt="Logo"></div>
-                        <div class="institution-name">
-                            <h1>QUEST COACHING CENTRE</h1>
-                            <div class="tagline">|| SEARCH FOR KNOWLEDGE ||</div>
-                            <div class="under">Under the guidance of MR. RAVI SIR</div>
-                        </div>
-                        <div class="contact-strip-card">
-                            <div class="contact-item-card"><i class="fas fa-map-marker-alt"></i> Block More, Gopalganj - 841428</div>
-                            <div class="contact-item-card"><i class="fas fa-phone-alt"></i> +91 9708442525</div>
-                            <div class="contact-item-card"><i class="fas fa-envelope"></i> questcoachingcentre@gmail.com</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="title-banner"><h2>🎓 REGISTRATION FORM 🎓</h2></div>
-                <div class="top-row">
-                    <div class="photo-card"><img src="${photoUrl}" alt="Photo"></div>
-                    <div class="info-group">
-                        <div class="info-row"><span class="info-label">REGISTRATION NO.</span><span class="info-value reg-no">${studentData.admissionNo}</span></div>
-                        <div class="info-row"><span class="info-label">ROLL NO.</span><span class="info-value">${studentData.rollNumber || '-'}</span></div>
-                        <div class="info-row"><span class="info-label">REGISTRATION DATE</span><span class="info-value">${admDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</span></div>
-                        <div class="info-row"><span class="info-label">ACADEMIC SESSION</span><span class="info-value">${studentData.session}</span></div>
-                        <div class="info-row"><span class="info-label">CLASS APPLYING</span><span class="info-value">${studentData.classApplying}</span></div>
-                    </div>
-                    <div class="qr-card"><div class="qr-box"><div id="qrcode-view" style="width:85px;height:85px;"></div></div><div class="qr-label-card">SCAN TO VERIFY</div></div>
-                </div>
-                <div class="details-grid">
-                    <div class="detail-box">
-                        <div class="detail-title">PERSONAL DETAILS</div>
-                        <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Student Name</td><td>${studentData.studentName}</td></tr>
-                            <tr><td style="width:38%;">Roll Number</td><td>${studentData.rollNumber || '-'}</td></tr>
-                            <tr><td style="width:38%;">Date of Birth</td><td>${dobDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</td></tr>
-                            <tr><td style="width:38%;">Gender</td><td>${studentData.gender}</td></tr>
-                            <tr><td style="width:38%;">Nationality</td><td>${studentData.nationality}</td></tr>
-                            <tr><td style="width:38%;">Aadhar Number</td><td>${studentData.aadhar || '-'}</td></tr>
-                        </table></div>
-                    </div>
-                    <div class="detail-box">
-                        <div class="detail-title">PARENT INFORMATION</div>
-                        <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Father's Name</td><td>${studentData.fatherName}</td></tr>
-                            <tr><td style="width:38%;">Mother's Name</td><td>${studentData.motherName || '-'}</td></tr>
-                            <tr><td style="width:38%;">Contact Number</td><td>${studentData.parentMobile}</td></tr>
-                            <tr><td style="width:38%;">Know About QCC</td><td>${studentData.knowAbout || '-'}</td></tr>
-                        </table></div>
-                    </div>
-                </div>
-                <div class="details-grid">
-                    <div class="detail-box">
-                        <div class="detail-title">ADDRESS DETAILS</div>
-                        <div class="detail-content"><table class="detail-table"><tr><td style="width:38%;">Complete Address</td><td>${studentData.address}</td></tr></table></div>
-                    </div>
-                    <div class="detail-box">
-                        <div class="detail-title">EDUCATION DETAILS</div>
-                        <div class="detail-content"><table class="detail-table">
-                            <tr><td style="width:38%;">Current School</td><td>${studentData.schoolName}</td></tr>
-                            <tr><td style="width:38%;">Medical Information</td><td>${studentData.medicalInfo || 'None'}</td></tr>
-                        </table></div>
-                    </div>
-                </div>
-                <div class="terms-section"><div class="terms-box"><div class="terms-title">📜 नियम और शर्तें (Terms & Conditions)</div><div class="terms-list">${termsHtml}</div></div></div>
-                <div class="quote-card"><span class="quote-text">"Education is not the learning of facts, but the training of the mind to think."</span><span class="quote-author">- Albert Einstein</span></div>
-                <div class="signatures-section">
-                    <div class="sig-card"><div class="sig-line">Parent / Guardian Signature</div></div>
-                    <div class="seal-card"><span>QUEST<br>COACHING<br>CENTRE</span><span class="seal-text">SEAL & SIGNATURE<br>OF DIRECTOR</span></div>
-                    <div class="sig-card"><div class="sig-line">Student Signature</div></div>
-                </div>
-                <div class="card-footer"><p>★ THANK YOU FOR CHOOSING QUEST COACHING CENTRE ★</p></div>
-            </div>
-            <div class="action-buttons-card">
-                <button class="action-btn print" onclick="printRegistrationCard()"><i class="fas fa-print"></i> Print Form</button>
-                <button class="action-btn share" onclick="shareRegistrationCard()"><i class="fas fa-share-alt"></i> Share</button>
-                <button class="action-btn pdf" onclick="downloadRegistrationPDF()"><i class="fas fa-file-pdf"></i> Download PDF</button>
-                ${!isPublicView ? `<button class="action-btn new-admission-btn" onclick="openNewAdmissionForm()"><i class="fas fa-plus"></i> New Registration</button>` : ''}
-            </div>
-        `;
-        
-        cardSection.innerHTML = cardHtml;
-        cardSection.style.display = 'block';
-        formSection.style.display = 'none';
-        
-        const publicUrl = `${window.location.origin}${window.location.pathname}?mode=view&id=${studentData.id}`;
-        setTimeout(() => {
-            new QRCode(document.getElementById("qrcode-view"), { text: publicUrl, width: 85, height: 85 });
-        }, 100);
-        
-        window.printRegistrationCard = () => {
-            const printContent = document.getElementById('registrationCard').cloneNode(true);
-            const win = window.open('', '_blank');
-            win.document.write(`<html><head><title>Registration Form - ${studentData.studentName}</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><style>body{padding:20px;} .action-buttons-card { display: none; } .registration-card{max-width:1100px;margin:0 auto;box-shadow:none;}</style></head><body>${printContent.outerHTML}</body></html>`);
-            win.document.close();
-            win.print();
-        };
-        
-        window.shareRegistrationCard = () => {
-            const shareText = `🎓 Quest Coaching Centre - Registration Form\n\nStudent: ${studentData.studentName}\nRegistration No: ${studentData.admissionNo}\nRoll No: ${studentData.rollNumber || '-'}\nClass: ${studentData.classApplying}\nFather: ${studentData.fatherName}\nMobile: ${studentData.parentMobile}\n\nThank you for choosing Quest Coaching Centre! 📚`;
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Registration Form',
-                    text: shareText,
-                    url: publicUrl
-                }).catch(() => {
-                    navigator.clipboard.writeText(shareText + '\n\nLink: ' + publicUrl);
-                    Swal.fire('Copied!', 'Registration details copied to clipboard', 'success');
-                });
-            } else {
-                navigator.clipboard.writeText(shareText + '\n\nLink: ' + publicUrl);
-                Swal.fire('Copied!', 'Registration details copied to clipboard', 'success');
             }
-        };
-        
-        window.downloadRegistrationPDF = async () => {
-            await generateAndSavePdf(studentData, photoUrl);
-        };
+
+            // METHOD 3: Try with roll (simple)
+            if (!studentData) {
+                setDebug('Method 3: Querying where roll == "' + roll + '"');
+                const query3 = await feesCollection
+                    .where('roll', '==', roll)
+                    .where('session', '==', session)
+                    .limit(1)
+                    .get();
+
+                if (!query3.empty) {
+                    studentDoc = query3.docs[0];
+                    studentData = studentDoc.data();
+                    foundMethod = 'roll';
+                    setDebug('✅ Found using roll field');
+                }
+            }
+
+            // METHOD 4: If still not found, get all students and search manually (fallback)
+            if (!studentData) {
+                setDebug('Method 4: Fallback - scanning all students');
+                const allDocs = await feesCollection.where('session', '==', session).get();
+                setDebug('Total students in session: ' + allDocs.size);
+                
+                let found = null;
+                allDocs.forEach(doc => {
+                    const data = doc.data();
+                    // Check all possible roll number fields
+                    if (data.roll_number == roll || data.rollNumber == roll || data.roll == roll) {
+                        found = { doc, data };
+                    }
+                });
+
+                if (found) {
+                    studentDoc = found.doc;
+                    studentData = found.data;
+                    foundMethod = 'fallback (manual scan)';
+                    setDebug('✅ Found using fallback scan');
+                }
+            }
+
+            // If still not found
+            if (!studentData) {
+                setDebug('❌ No student found with Roll #' + roll + ' in session ' + session);
+                setStatus(`❌ No student found with Roll #${roll} in session ${session}`, 'error');
+                currentStudentId = null;
+                dom.name.value = '';
+                dom.father.value = '';
+                dom.phone.value = '';
+                dom.class.value = 'Class 6';
+                dom.addBtn.innerHTML = '💾 Save Student';
+                dom.addBtn.className = 'btn-submit';
+                renderFeeSection();
+                return;
+            }
+
+            // === STUDENT FOUND! ===
+            currentStudentId = studentDoc.id;
+            
+            setDebug('✅ Student found! Method: ' + foundMethod + ' | ID: ' + currentStudentId);
+            console.log("Student Data:", studentData);
+
+            // Fill student details
+            dom.name.value = studentData.student_name || studentData.name || '';
+            dom.father.value = studentData.father_name || studentData.father || '';
+            dom.phone.value = studentData.phone_number || studentData.phone || studentData.mobile || '';
+            dom.class.value = studentData.class || studentData.classApplying || 'Class 6';
+            dom.session.value = studentData.session || '2026-27';
+            
+            // Render fee section
+            renderFeeSection();
+            
+            // Fill fee data (if exists)
+            setTimeout(() => {
+                const bd = studentData.fee_breakdown || {};
+                
+                if (currentMode === 'advanced') {
+                    const subs = studentData.subjects || [];
+                    subjectCbs.forEach((cb, i) => cb.checked = subs.includes(SUBJECTS[i].name));
+                    const extras = studentData.extra_fees || [];
+                    extraCbs.forEach((cb, i) => cb.checked = extras.includes(EXTRA_FEES[i].name));
+                    if (discInput) discInput.value = studentData.discount_applied || studentData.discount || 0;
+                    if (recvInput) recvInput.value = studentData.received_amount || studentData.received || 0;
+                } else {
+                    if (feeCbs.tuition) feeCbs.tuition.checked = (bd.tuition || studentData.tuition_fee || 0) > 0;
+                    if (feeCbs.admission) feeCbs.admission.checked = (bd.admission || studentData.admission_fee || 0) > 0;
+                    if (feeCbs.exam) feeCbs.exam.checked = (bd.exam || studentData.exam_fee || 0) > 0;
+                    if (feeCbs.assignment) feeCbs.assignment.checked = (bd.assignment || studentData.assignment_fee || 0) > 0;
+                    if (discInput) discInput.value = studentData.discount_applied || studentData.discount || 0;
+                    if (recvInput) recvInput.value = studentData.received_amount || studentData.received || 0;
+                }
+                updateDue();
+            }, 150);
+
+            dom.addBtn.innerHTML = '✏️ Update Student';
+            dom.addBtn.className = 'btn-submit btn-update';
+            setStatus(`✅ ${studentData.student_name || studentData.name || 'Student'} found!`, 'success');
+            showToast(`✅ ${studentData.student_name || studentData.name || 'Student'} loaded!`);
+
+        } catch(error) {
+            console.error("Fetch error:", error);
+            setDebug('❌ Error: ' + error.message);
+            setStatus('❌ ' + error.message, 'error');
+        } finally {
+            isFetching = false;
+            dom.fetchBtn.disabled = false;
+        }
     }
+
+    function clearForm() {
+        dom.roll.value = '';
+        dom.name.value = '';
+        dom.father.value = '';
+        dom.phone.value = '';
+        dom.class.value = 'Class 6';
+        currentStudentId = null;
+        renderFeeSection();
+        clearStatus();
+        dom.addBtn.innerHTML = '💾 Save Student';
+        dom.addBtn.className = 'btn-submit';
+        dom.debugBox.style.display = 'none';
+        dom.roll.focus();
+        showToast('🔄 Form cleared');
+    }
+
+    function getFeeData() {
+        if (currentMode === 'advanced') {
+            const subs = subjectCbs.filter(cb => cb.checked).map((cb,i) => SUBJECTS[i].name);
+            const extras = extraCbs.filter(cb => cb.checked).map((cb,i) => EXTRA_FEES[i].name);
+            const total = subjectCbs.reduce((s,cb) => s + (cb.checked ? parseInt(cb.dataset.price) : 0), 0) +
+                         extraCbs.reduce((s,cb) => s + (cb.checked ? parseInt(cb.dataset.price) : 0), 0);
+            const disc = parseFloat(discInput?.value) || 0;
+            return { type:'advanced', subjects:subs, extra_fees:extras, subtotal:total, discount:disc, total:Math.max(0,total-disc) };
+        } else {
+            const tuition = feeCbs.tuition?.checked ? getTuitionFee(dom.class.value) : 0;
+            const admission = feeCbs.admission?.checked ? 500 : 0;
+            const exam = feeCbs.exam?.checked ? 500 : 0;
+            const assignment = feeCbs.assignment?.checked ? 500 : 0;
+            const disc = parseFloat(discInput?.value) || 0;
+            const subtotal = tuition + admission + exam + assignment;
+            return { type:'simple', tuition, admission, exam, assignment, discount:disc, subtotal, total:Math.max(0,subtotal-disc) };
+        }
+    }
+
+    dom.addBtn.addEventListener('click', async function() {
+        dom.error.style.display = 'none';
+        const roll = dom.roll.value.trim();
+        const name = dom.name.value.trim();
+        const father = dom.father.value.trim();
+        if (!roll || !name || !father) {
+            showError('❌ Roll Number, Name & Father Name required');
+            return;
+        }
+
+        const fee = getFeeData();
+        const recv = parseFloat(recvInput?.value) || 0;
+        const total = fee.total;
+        const due = Math.max(0, total - recv);
+
+        const data = {
+            roll_number: roll,
+            student_name: name,
+            father_name: father,
+            phone_number: dom.phone.value.trim() || '',
+            class: dom.class.value,
+            session: dom.session.value,
+            total_amount: total,
+            received_amount: recv,
+            due_amount: due,
+            discount_applied: fee.discount || 0,
+            fee_breakdown: fee,
+            updated_at: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        if (currentMode === 'advanced') {
+            data.subjects = fee.subjects || [];
+            data.extra_fees = fee.extra_fees || [];
+        }
+
+        dom.loading.style.display = 'block';
+        dom.addBtn.disabled = true;
+
+        try {
+            let id;
+            if (currentStudentId) {
+                await feesCollection.doc(currentStudentId).update(data);
+                id = currentStudentId;
+                showToast(`✅ ${name} updated!`);
+            } else {
+                data.created_at = firebase.firestore.FieldValue.serverTimestamp();
+                const ref = await feesCollection.add(data);
+                id = ref.id;
+                showToast(`✅ ${name} added!`);
+            }
+
+            if (recv > 0) {
+                await transactionsCollection.add({
+                    studentId: id,
+                    studentName: name,
+                    rollNumber: roll,
+                    studentClass: dom.class.value,
+                    session: dom.session.value,
+                    amount: recv,
+                    previousReceived: 0,
+                    newReceived: recv,
+                    previousDue: total,
+                    newDue: due,
+                    transactionId: 'TXN' + Date.now() + Math.floor(Math.random()*10000),
+                    date: new Date().toISOString(),
+                    created_at: firebase.firestore.FieldValue.serverTimestamp(),
+                    note: currentStudentId ? `Updated payment ₹${recv}` : `Initial payment ₹${recv}`
+                });
+            }
+            clearForm();
+        } catch(e) {
+            showError('❌ ' + e.message);
+        } finally {
+            dom.loading.style.display = 'none';
+            dom.addBtn.disabled = false;
+        }
+    });
+
+    dom.class.addEventListener('change', renderFeeSection);
+    dom.fetchBtn.addEventListener('click', fetchStudent);
+    dom.clearBtn.addEventListener('click', clearForm);
+    dom.roll.addEventListener('keypress', e => { if(e.key === 'Enter') { e.preventDefault(); fetchStudent(); } });
+
+    renderFeeSection();
+    dom.roll.focus();
     </script>
 </body>
 </html>
