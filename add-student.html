@@ -3,151 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>➕ Add/Edit Student · Fee Manager</title>
-    <!-- Firebase SDKs -->
+    <title>➕ Add/Edit Student</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <style>
         *{ margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Roboto,sans-serif; }
-        body{ background:#f0f5fa; padding:24px 16px; display:flex; flex-direction:column; align-items:center; }
-        .form-card{ background:white; max-width:950px; width:100%; margin:20px auto; border-radius:48px; padding:36px 30px; box-shadow:0 25px 40px -15px #1e3b5b; }
-        h2{ display:flex; align-items:center; gap:12px; color:#174873; margin-bottom:28px; font-size:1.9rem; flex-wrap:wrap; }
-        .field{ margin-bottom:22px; }
-        label{ font-weight:600; display:flex; align-items:center; gap:6px; margin-bottom:10px; color:#1b4a77; font-size:1.05rem; }
-        input, select{ width:100%; padding:14px 20px; font-size:1rem; background:#f3f8ff; border:1px solid #b8ceec; border-radius:60px; outline:none; transition: all 0.2s ease; }
-        input:focus, select:focus{ border-color:#1b5e9e; background:white; box-shadow:0 0 0 3px rgba(27,94,158,0.1); }
-        input:disabled{ background:#e9ecef; color:#6c757d; cursor:not-allowed; }
-        .row2{ display:flex; gap:15px; flex-wrap:wrap; }
-        .row2 .field{ flex:1 1 200px; }
+        body{ background:#f0f5fa; padding:16px; display:flex; flex-direction:column; align-items:center; min-height:100vh; }
         
-        .fetch-section{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-        .fetch-section .field{ flex:1; margin-bottom:0; }
-        .btn-fetch{ background:#0d6efd; border:none; color:white; padding:14px 30px; border-radius:60px; font-weight:700; cursor:pointer; font-size:1rem; transition:0.2s; white-space:nowrap; }
-        .btn-fetch:hover{ background:#0a58ca; transform:scale(1.02); }
-        .btn-fetch:disabled{ opacity:0.6; cursor:not-allowed; transform:none; }
+        .form-card{ background:white; max-width:1000px; width:100%; border-radius:32px; padding:24px 28px; box-shadow:0 15px 30px -10px rgba(0,0,0,0.1); }
         
-        .fees-section{ background:#f8fbfe; border-radius:32px; padding:18px 20px; margin:20px 0 12px 0; border:1px solid #d9e6f5; }
-        .section-title{ font-size:1.25rem; font-weight:800; color:#174873; margin-bottom:16px; display:flex; align-items:center; gap:8px; border-left:4px solid #1b4f9b; padding-left:14px; }
-        .subjects-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(210px,1fr)); gap:12px 20px; margin-bottom:20px; }
-        .subject-item{ display:flex; align-items:center; gap:12px; background:white; padding:8px 16px; border-radius:50px; border:1px solid #cde1f0; transition:0.1s; cursor:pointer; }
-        .subject-item:hover{ background:#eef4fc; border-color:#9bb7d4; }
-        .subject-item input{ width:20px; height:20px; margin:0; cursor:pointer; accent-color:#1b4f9b; }
-        .subject-item label{ margin:0; font-weight:500; font-size:0.95rem; color:#1e3a5f; cursor:pointer; flex:1; }
-        .subject-price{ font-weight:700; color:#0f5c3e; background:#e2f0e8; padding:2px 10px; border-radius:40px; font-size:0.8rem; }
-        .extra-charges{ display:flex; flex-wrap:wrap; gap:15px; margin-top:8px; border-top:1px dashed #c2d6ea; padding-top:18px; }
-        .extra-item{ background:#fef7e0; border-radius:40px; padding:6px 20px 6px 16px; display:flex; align-items:center; gap:10px; border:1px solid #ffe2a4; }
-        .extra-item input{ width:18px; height:18px; margin:0; cursor:pointer; }
-        .extra-item label{ margin:0; font-weight:600; font-size:0.9rem; color:#7a5c00; }
-        .total-box{ background:#e6f0fa; border-radius:50px; padding:16px 24px; margin:20px 0 10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
-        .total-label{ font-weight:800; font-size:1.3rem; color:#0a3a60; }
-        .total-amount{ font-size:2rem; font-weight:800; color:#1b4f9b; background:white; padding:5px 20px; border-radius:60px; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
-        .checkbox-fees-box{ background:#eef3fc; border-radius:28px; padding:20px; margin:15px 0; }
-        .fee-checkbox-item{ display:flex; align-items:center; gap:15px; background:white; padding:12px 20px; border-radius:50px; margin-bottom:10px; border:1px solid #cde1f0; }
-        .fee-checkbox-item input{ width:20px; height:20px; cursor:pointer; accent-color:#1b4f9b; }
-        .fee-checkbox-item label{ margin:0; font-weight:500; font-size:1rem; cursor:pointer; flex:1; }
-        .fee-price{ font-weight:700; color:#0f5c3e; background:#e2f0e8; padding:2px 12px; border-radius:40px; font-size:0.85rem; }
-        .discount-box{ background:#fff3cd; border-radius:50px; padding:12px 20px; margin-top:15px; border:1px solid #ffe2a4; }
-        .due-highlight{ background:#eef2f5; color:#b44; font-weight:700; cursor:default; border-color:#d4e0ec; }
-        .btn-submit{ background:#1b4f9b; border:none; color:white; font-size:1.3rem; font-weight:700; padding:18px; width:100%; border-radius:60px; display:flex; align-items:center; justify-content:center; gap:12px; margin-top:18px; cursor:pointer; box-shadow:0 15px 20px -8px #123a60; transition:0.2s; }
-        .btn-submit:hover{ background:#0f3d73; transform:translateY(-2px); }
+        /* HEADER */
+        .header{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+        .header h2{ font-size:1.3rem; color:#174873; display:flex; align-items:center; gap:8px; }
+        .btn-new{ background:#f59e0b; border:none; color:white; padding:6px 18px; border-radius:40px; font-weight:600; cursor:pointer; font-size:0.85rem; }
+        .btn-new:hover{ background:#d97706; }
+        
+        /* FETCH ROW */
+        .fetch-row{ display:flex; gap:10px; align-items:center; background:#f8faff; padding:12px 16px; border-radius:16px; border:1px solid #e2e8f0; margin-bottom:14px; flex-wrap:wrap; }
+        .fetch-row label{ font-weight:600; color:#1b4a77; font-size:0.9rem; white-space:nowrap; }
+        .fetch-row input{ flex:1; min-width:120px; padding:10px 16px; border:1px solid #b8ceec; border-radius:40px; font-size:0.9rem; background:white; outline:none; }
+        .fetch-row input:focus{ border-color:#1b5e9e; box-shadow:0 0 0 3px rgba(27,94,158,0.1); }
+        .btn-fetch{ background:#0d6efd; border:none; color:white; padding:10px 24px; border-radius:40px; font-weight:600; cursor:pointer; font-size:0.9rem; white-space:nowrap; }
+        .btn-fetch:hover{ background:#0a58ca; }
+        .btn-fetch:disabled{ opacity:0.6; cursor:not-allowed; }
+        #fetchStatus{ font-size:0.8rem; font-weight:600; padding:4px 12px; border-radius:40px; display:none; }
+        #fetchStatus.success{ background:#d1e7dd; color:#0f5132; display:inline-block; }
+        #fetchStatus.error{ background:#f8d7da; color:#842029; display:inline-block; }
+        #fetchStatus.loading{ background:#e2e3e5; color:#41464b; display:inline-block; }
+        
+        /* FORM - COMPACT GRID */
+        .form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px 20px; }
+        .field{ display:flex; flex-direction:column; gap:4px; }
+        .field label{ font-weight:600; color:#1b4a77; font-size:0.8rem; display:flex; align-items:center; gap:4px; }
+        .field label .badge{ background:#0d6efd; color:white; font-size:0.55rem; padding:1px 8px; border-radius:40px; font-weight:400; }
+        .field input, .field select{ padding:8px 14px; border:1px solid #b8ceec; border-radius:40px; font-size:0.85rem; background:#fafcff; outline:none; transition:0.2s; }
+        .field input:focus, .field select:focus{ border-color:#1b5e9e; background:white; box-shadow:0 0 0 3px rgba(27,94,158,0.08); }
+        .field input:disabled{ background:#eef2f6; color:#6c757d; }
+        .field-full{ grid-column:span 2; }
+        
+        /* FEE SECTION - COMPACT */
+        .fee-section{ background:#f8fbfe; border-radius:16px; padding:14px 18px; margin-top:12px; border:1px solid #e2e8f0; }
+        .fee-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
+        .fee-header h4{ font-size:0.95rem; color:#f59e0b; display:flex; align-items:center; gap:6px; }
+        .fee-header span{ font-size:0.7rem; color:#6c757d; font-weight:400; }
+        
+        .fee-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:6px 16px; }
+        .fee-item{ display:flex; align-items:center; gap:8px; background:white; padding:4px 12px 4px 8px; border-radius:40px; border:1px solid #e2e8f0; }
+        .fee-item input{ width:16px; height:16px; accent-color:#1b4f9b; cursor:pointer; flex-shrink:0; }
+        .fee-item label{ font-size:0.78rem; font-weight:500; color:#1e3a5f; cursor:pointer; flex:1; }
+        .fee-item .price{ font-weight:700; color:#0f5c3e; font-size:0.7rem; background:#e2f0e8; padding:0 10px; border-radius:40px; }
+        
+        .fee-bottom{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:10px; }
+        .fee-bottom .field{ gap:2px; }
+        .fee-bottom .field label{ font-size:0.7rem; color:#555; }
+        .fee-bottom .field input{ padding:6px 12px; font-size:0.8rem; }
+        .fee-bottom .field input:read-only{ background:#eef2f5; color:#b44; font-weight:700; }
+        
+        .total-display{ background:#e6f0fa; border-radius:40px; padding:8px 18px; display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
+        .total-display .label{ font-weight:700; font-size:0.9rem; color:#0a3a60; }
+        .total-display .amount{ font-size:1.3rem; font-weight:800; color:#1b4f9b; }
+        
+        /* SUBJECTS FOR CLASS 11/12 */
+        .subj-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:4px; }
+        .subj-item{ display:flex; align-items:center; gap:6px; background:white; padding:2px 10px 2px 6px; border-radius:40px; border:1px solid #e2e8f0; }
+        .subj-item input{ width:15px; height:15px; accent-color:#1b4f9b; }
+        .subj-item label{ font-size:0.75rem; font-weight:500; cursor:pointer; }
+        .subj-item .sp{ font-size:0.65rem; color:#0f5c3e; font-weight:700; }
+        
+        .extra-row{ display:flex; flex-wrap:wrap; gap:6px; margin:6px 0; }
+        .extra-item{ display:flex; align-items:center; gap:5px; background:#fef7e0; padding:2px 12px 2px 6px; border-radius:40px; border:1px solid #ffe2a4; }
+        .extra-item input{ width:15px; height:15px; accent-color:#f59e0b; }
+        .extra-item label{ font-size:0.7rem; font-weight:600; color:#7a5c00; cursor:pointer; }
+        
+        .class-warning{ background:#fff3cd; border-left:3px solid #ffc107; padding:6px 14px; border-radius:8px; font-size:0.75rem; color:#856404; display:none; margin-bottom:8px; }
+        
+        /* BUTTONS */
+        .btn-submit{ background:#1b4f9b; border:none; color:white; font-size:1rem; font-weight:700; padding:12px; width:100%; border-radius:50px; display:flex; align-items:center; justify-content:center; gap:10px; margin-top:16px; cursor:pointer; transition:0.2s; }
+        .btn-submit:hover{ background:#0f3d73; transform:translateY(-1px); }
         .btn-submit:disabled{ opacity:0.6; cursor:not-allowed; transform:none; }
-        .info-note{ text-align:center; margin-top:20px; color:#2c577c; }
-        a{ color:#1b4f9b; font-weight:600; text-decoration:none; border-bottom:1px dotted #1b4f9b; }
-        .loading{ text-align:center; padding:14px; background:#eef2f8; border-radius:50px; margin-top:12px; font-weight:500; display:none; }
-        .error-msg{ color:#c0392b; background:#fdecea; border-radius:40px; padding:10px 16px; margin-top:12px; text-align:center; display:none; }
-        .success-toast{ position:fixed; bottom:25px; left:50%; transform:translateX(-50%); background:#1e6f3f; color:white; padding:12px 28px; border-radius:60px; font-weight:600; z-index:1000; opacity:0; transition:opacity 0.2s; pointer-events:none; }
-        .class-warning{ background:#fff3cd; border-left:4px solid #ffc107; padding:10px 15px; border-radius:12px; margin-bottom:15px; font-size:0.85rem; color:#856404; display:none; }
-        .fetch-status{ padding:8px 16px; border-radius:40px; font-weight:600; font-size:0.9rem; margin-top:6px; display:none; }
-        .fetch-status.success{ background:#d1e7dd; color:#0f5132; display:block; }
-        .fetch-status.error{ background:#f8d7da; color:#842029; display:block; }
-        .fetch-status.loading{ background:#e2e3e5; color:#41464b; display:block; }
-        .found-badge{ background:#0f7b3a; color:white; padding:4px 16px; border-radius:40px; font-size:0.85rem; margin-left:12px; }
-        .auto-fill-badge{ background:#0d6efd; color:white; padding:2px 12px; border-radius:40px; font-size:0.7rem; margin-left:8px; }
-        hr{ margin:10px 0; }
-        .field-disabled{ opacity:0.7; }
+        .btn-submit.btn-update{ background:linear-gradient(135deg, #f59e0b, #d97706); }
+        .btn-submit.btn-update:hover{ background:linear-gradient(135deg, #d97706, #b45309); }
         
-        .auth-loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 10000;
-        }
-        .auth-loading .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #1b4f9b;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .main-content { display: none; }
-        .flex-between{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
-        .btn-edit-mode{ background:#f59e0b; border:none; color:white; padding:8px 20px; border-radius:60px; font-weight:600; cursor:pointer; font-size:0.9rem; }
-        .btn-edit-mode:hover{ background:#d97706; }
+        .info-note{ text-align:center; margin-top:12px; font-size:0.8rem; color:#2c577c; }
+        .info-note a{ color:#1b4f9b; font-weight:600; text-decoration:none; border-bottom:1px dotted #1b4f9b; }
         
-        @media (max-width:650px){ .form-card{ padding:24px 18px; } .subjects-grid{ grid-template-columns:1fr; } }
+        .loading{ text-align:center; padding:10px; background:#eef2f8; border-radius:40px; margin-top:10px; font-weight:500; display:none; font-size:0.9rem; }
+        .error-msg{ color:#c0392b; background:#fdecea; border-radius:40px; padding:8px 16px; margin-top:10px; text-align:center; display:none; font-size:0.85rem; }
+        .success-toast{ position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#1e6f3f; color:white; padding:10px 28px; border-radius:60px; font-weight:600; z-index:1000; opacity:0; transition:opacity 0.2s; pointer-events:none; font-size:0.9rem; }
+        
+        .auth-loading{ position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; justify-content:center; align-items:center; flex-direction:column; z-index:10000; }
+        .auth-loading .spinner{ width:40px; height:40px; border:4px solid #f3f3f3; border-top:4px solid #1b4f9b; border-radius:50%; animation:spin 1s linear infinite; }
+        @keyframes spin{ 0%{ transform:rotate(0deg); } 100%{ transform:rotate(360deg); } }
+        .main-content{ display:none; width:100%; max-width:1000px; }
+        
+        .logout-btn{ position:fixed; bottom:15px; right:15px; padding:8px 18px; background:#dc3545; color:white; border:none; border-radius:40px; cursor:pointer; z-index:9999; font-weight:600; font-size:0.8rem; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
+        .logout-btn:hover{ background:#c82333; }
+        
+        @media (max-width:700px){
+            .form-grid{ grid-template-columns:1fr; }
+            .field-full{ grid-column:span 1; }
+            .fee-bottom{ grid-template-columns:1fr 1fr; }
+            .form-card{ padding:16px; }
+            .fee-grid{ grid-template-columns:1fr; }
+            .subj-grid{ grid-template-columns:1fr 1fr; }
+            .fetch-row{ flex-direction:column; align-items:stretch; }
+            .fetch-row input{ min-width:auto; }
+        }
+        @media (max-width:450px){
+            .fee-bottom{ grid-template-columns:1fr; }
+            .subj-grid{ grid-template-columns:1fr; }
+            .header h2{ font-size:1rem; }
+        }
     </style>
 </head>
 <body>
-    <!-- Auth Loading Screen -->
     <div id="authLoading" class="auth-loading">
         <div class="spinner"></div>
-        <p style="margin-top: 15px; color: #1b4f9b; font-weight: 600;">Verifying access...</p>
+        <p style="margin-top:12px; color:#1b4f9b; font-weight:600; font-size:0.9rem;">Verifying access...</p>
     </div>
 
-    <!-- Main Content -->
     <div id="mainContent" class="main-content">
-    <div class="form-card">
-        <div class="flex-between">
-            <h2>📋 Add / Edit Student</h2>
-            <button class="btn-edit-mode" id="clearFormBtn" title="Clear form for new entry">➕ New Entry</button>
-        </div>
-        
-        <!-- Roll Number Fetch Section -->
-        <div class="fetch-section">
-            <div class="field" style="flex:1;">
-                <label>🔢 Roll Number <span style="font-weight:400;font-size:0.8rem;color:#6c757d;">(Enter & press Fetch)</span></label>
-                <div style="display:flex; gap:10px; align-items:center;">
-                    <input type="text" id="rollNumber" placeholder="e.g. 24" style="flex:1;" required>
-                    <button class="btn-fetch" id="fetchBtn">🔍 Fetch</button>
-                </div>
-                <div id="fetchStatus" class="fetch-status"></div>
+        <div class="form-card">
+            <!-- HEADER -->
+            <div class="header">
+                <h2>📋 Student <span style="font-weight:400;font-size:0.8rem;color:#6c757d;">Add / Edit</span></h2>
+                <button class="btn-new" id="clearFormBtn">➕ New Entry</button>
             </div>
-        </div>
 
-        <hr style="margin:20px 0;">
+            <!-- FETCH ROW -->
+            <div class="fetch-row">
+                <label>🔢 Roll No.</label>
+                <input type="text" id="rollNumber" placeholder="Enter roll number">
+                <button class="btn-fetch" id="fetchBtn">🔍 Fetch</button>
+                <span id="fetchStatus"></span>
+            </div>
 
-        <!-- ===== STUDENT DETAILS (AUTO-FILL HONGE) ===== -->
-        <div style="background:#e8f4fd; border-radius:20px; padding:20px; margin-bottom:20px; border-left:4px solid #0d6efd;">
-            <h4 style="color:#0d6efd; margin-bottom:15px;">📌 Student Details <span class="auto-fill-badge">Auto-Fill</span></h4>
-            
-            <div class="field">
-                <label>🧑 Student Name <span class="required" style="color:red;">*</span></label>
-                <input type="text" id="studentName" placeholder="Full name" required>
-            </div>
-            <div class="field">
-                <label>👨 Father Name <span class="required" style="color:red;">*</span></label>
-                <input type="text" id="fatherName" placeholder="Father's name" required>
-            </div>
-            <div class="field">
-                <label>📞 Phone Number</label>
-                <input type="tel" id="phoneNumber" placeholder="e.g. 9876543210" pattern="[0-9]{10}" title="Please enter 10 digit mobile number">
-            </div>
-            <div class="row2">
+            <!-- STUDENT DETAILS - COMPACT GRID -->
+            <div class="form-grid">
                 <div class="field">
-                    <label>📅 Session <span class="required" style="color:red;">*</span></label>
+                    <label>🧑 Student Name <span style="color:red;">*</span></label>
+                    <input type="text" id="studentName" placeholder="Full name">
+                </div>
+                <div class="field">
+                    <label>👨 Father Name <span style="color:red;">*</span></label>
+                    <input type="text" id="fatherName" placeholder="Father's name">
+                </div>
+                <div class="field">
+                    <label>📞 Phone</label>
+                    <input type="tel" id="phoneNumber" placeholder="9876543210" maxlength="10">
+                </div>
+                <div class="field">
+                    <label>📅 Session <span style="color:red;">*</span></label>
                     <select id="sessionSelect">
                         <option value="2024-25">2024-25</option>
                         <option value="2025-26">2025-26</option>
@@ -156,7 +163,7 @@
                     </select>
                 </div>
                 <div class="field">
-                    <label>🏫 Class <span class="required" style="color:red;">*</span></label>
+                    <label>🏫 Class <span style="color:red;">*</span></label>
                     <select id="classSelect">
                         <option value="Class 6">Class 6</option>
                         <option value="Class 7">Class 7</option>
@@ -167,35 +174,35 @@
                         <option value="Class 12">Class 12</option>
                     </select>
                 </div>
+                <div class="field" style="justify-content:flex-end;">
+                    <span style="font-size:0.7rem;color:#0d6efd;background:#e8f4fd;padding:4px 14px;border-radius:40px;display:inline-block;">⚡ Auto-fill on fetch</span>
+                </div>
             </div>
+
+            <!-- FEE SECTION -->
+            <div class="fee-section">
+                <div class="fee-header">
+                    <h4>💰 Fee Details <span>(Teacher will fill)</span></h4>
+                </div>
+                
+                <div id="classWarning" class="class-warning">⚠️ For Class 11 & 12, select subjects below</div>
+                <div id="dynamicFeeSection"></div>
+            </div>
+
+            <button class="btn-submit" id="addStudentBtn">💾 Save Student</button>
+            <div class="info-note">↩ <a href="dashboard.html">Back to dashboard</a></div>
+            <div id="loadingMessage" class="loading">⏳ Saving...</div>
+            <div id="errorMessage" class="error-msg"></div>
         </div>
-
-        <!-- ===== FEE DETAILS (TEACHER MANUALLY DALEGA) ===== -->
-        <div style="background:#fff8e7; border-radius:20px; padding:20px; border-left:4px solid #f59e0b;">
-            <h4 style="color:#f59e0b; margin-bottom:15px;">💰 Fee Details <span style="font-weight:400;font-size:0.8rem;color:#6c757d;">(Teacher will fill manually)</span></h4>
-            
-            <div id="classWarning" class="class-warning">⚠️ For Class 11 & 12, fee will be calculated based on selected subjects & charges below.</div>
-
-            <div id="dynamicFeeSection"></div>
-        </div>
-
-        <button class="btn-submit" id="addStudentBtn">➕ Save Student to Firebase</button>
-        <div class="info-note">↩ <a href="dashboard.html">Back to dashboard</a></div>
-        <div id="loadingMessage" class="loading">⏳ Saving to Firebase...</div>
-        <div id="errorMessage" class="error-msg"></div>
-    </div>
-    <div id="successToast" class="success-toast">✅ Student saved successfully!</div>
+        <div id="successToast" class="success-toast">✅ Saved successfully!</div>
     </div>
 
     <script>
     const firebaseConfig = {
         apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
         authDomain: "quest-coaching.firebaseapp.com",
-        databaseURL: "https://quest-coaching-default-rtdb.asia-southeast1.firebasedatabase.app",
         projectId: "quest-coaching",
-        storageBucket: "quest-coaching.firebasestorage.app",
-        messagingSenderId: "131948734089",
-        appId: "1:131948734089:web:f4ba25110c8b1298360858"
+        storageBucket: "quest-coaching.firebasestorage.app"
     };
     
     firebase.initializeApp(firebaseConfig);
@@ -204,615 +211,390 @@
     const feesCollection = db.collection('fees');
     const transactionsCollection = db.collection('transactions');
 
-    // Auth Elements
     const authLoading = document.getElementById('authLoading');
     const mainContent = document.getElementById('mainContent');
 
-    // ============ AUTHENTICATION CHECK ============
     auth.onAuthStateChanged((user) => {
         if (!user) {
-            alert('Please login from main page first!');
+            alert('Please login first!');
             window.location.href = 'index.html';
             return;
         }
-        
         authLoading.style.display = 'none';
         mainContent.style.display = 'block';
         
         const logoutBtn = document.createElement('button');
-        logoutBtn.innerHTML = '🚪 Logout';
-        logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.2);';
-        logoutBtn.onclick = async () => {
-            await auth.signOut();
-            window.location.href = 'index.html';
-        };
+        logoutBtn.className = 'logout-btn';
+        logoutBtn.textContent = '🚪 Logout';
+        logoutBtn.onclick = async () => { await auth.signOut(); window.location.href = 'index.html'; };
         document.body.appendChild(logoutBtn);
     });
 
     const SUBJECTS = [
-        { name: "PHYSICS", price: 3000 },
-        { name: "CHEMISTRY", price: 3000 },
-        { name: "BIOLOGY", price: 3000 },
-        { name: "MATHS", price: 3000 },
-        { name: "HINDI", price: 3000 },
-        { name: "ENGLISH", price: 3000 }
+        { name: "PHYSICS", price: 3000 }, { name: "CHEMISTRY", price: 3000 },
+        { name: "BIOLOGY", price: 3000 }, { name: "MATHS", price: 3000 },
+        { name: "HINDI", price: 3000 }, { name: "ENGLISH", price: 3000 }
     ];
     const EXTRA_FEES = [
-        { name: "ADMISSION FEE", price: 500 },
-        { name: "EXAM FEE (Half Yearly + Annual)", price: 500 },
-        { name: "ASSIGNMENT FEE", price: 500 }
+        { name: "ADMISSION", price: 500 },
+        { name: "EXAM (HY+ANNUAL)", price: 500 },
+        { name: "ASSIGNMENT", price: 500 }
     ];
 
-    const getTuitionFee = (className) => {
-        if (className === 'Class 10') return 7200;
-        return 6000;
+    const getTuitionFee = (cls) => cls === 'Class 10' ? 7200 : 6000;
+
+    const dom = {
+        roll: document.getElementById('rollNumber'),
+        name: document.getElementById('studentName'),
+        father: document.getElementById('fatherName'),
+        phone: document.getElementById('phoneNumber'),
+        session: document.getElementById('sessionSelect'),
+        class: document.getElementById('classSelect'),
+        fetchBtn: document.getElementById('fetchBtn'),
+        fetchStatus: document.getElementById('fetchStatus'),
+        clearBtn: document.getElementById('clearFormBtn'),
+        addBtn: document.getElementById('addStudentBtn'),
+        dynamic: document.getElementById('dynamicFeeSection'),
+        warning: document.getElementById('classWarning'),
+        loading: document.getElementById('loadingMessage'),
+        error: document.getElementById('errorMessage'),
+        toast: document.getElementById('successToast')
     };
 
-    const BASE_FEES = {
-        tuition: { price: 0, label: "📚 Tuition Fee" },
-        admission: { price: 500, label: "📋 Admission Fee" },
-        exam: { price: 500, label: "📝 Exam Fee (Half Yearly + Annual)" },
-        assignment: { price: 500, label: "📖 Assignment Fee" }
-    };
-
-    // DOM Elements
-    const dynamicSection = document.getElementById('dynamicFeeSection');
-    const classSelect = document.getElementById('classSelect');
-    const classWarning = document.getElementById('classWarning');
-    const addBtn = document.getElementById('addStudentBtn');
-    const loadingMsg = document.getElementById('loadingMessage');
-    const errorDiv = document.getElementById('errorMessage');
-    const successToast = document.getElementById('successToast');
-    const rollInput = document.getElementById('rollNumber');
-    const nameInput = document.getElementById('studentName');
-    const fatherInput = document.getElementById('fatherName');
-    const phoneInput = document.getElementById('phoneNumber');
-    const sessionSelect = document.getElementById('sessionSelect');
-    const fetchBtn = document.getElementById('fetchBtn');
-    const fetchStatus = document.getElementById('fetchStatus');
-    const clearFormBtn = document.getElementById('clearFormBtn');
-
-    let subjectCheckboxes = [];
-    let extraCheckboxes = [];
-    let advancedDiscountInput = null;
-    let advancedReceivedInput = null;
-    let advancedDueInput = null;
-    
-    let feeCheckboxes = {};
-    let discountInput = null;
-    let receivedInput = null;
-    let dueInput = null;
-    let currentTuitionFee = 6000;
     let currentMode = 'simple';
     let currentStudentId = null;
     let isFetching = false;
+    let subjectCbs = [], extraCbs = [];
+    let discInput, recvInput, dueInput;
+    let feeCbs = {};
 
-    let toastTimeout;
-    function showToast(message) {
-        successToast.textContent = message;
-        successToast.style.opacity = '1';
-        if (toastTimeout) clearTimeout(toastTimeout);
-        toastTimeout = setTimeout(() => { successToast.style.opacity = '0'; }, 2500);
+    function showToast(msg) {
+        dom.toast.textContent = msg;
+        dom.toast.style.opacity = '1';
+        clearTimeout(window.toastTimer);
+        window.toastTimer = setTimeout(() => dom.toast.style.opacity = '0', 2000);
     }
 
-    function showError(message) {
-        errorDiv.textContent = message;
-        errorDiv.style.display = 'block';
-        setTimeout(() => { errorDiv.style.display = 'none'; }, 4000);
+    function showError(msg) {
+        dom.error.textContent = msg;
+        dom.error.style.display = 'block';
+        setTimeout(() => dom.error.style.display = 'none', 3000);
     }
 
-    function setFetchStatus(message, type) {
-        fetchStatus.textContent = message;
-        fetchStatus.className = 'fetch-status ' + type;
-        fetchStatus.style.display = 'block';
+    function setStatus(msg, type) {
+        dom.fetchStatus.textContent = msg;
+        dom.fetchStatus.className = type;
+        dom.fetchStatus.style.display = 'inline-block';
     }
 
-    function clearFetchStatus() {
-        fetchStatus.style.display = 'none';
-        fetchStatus.className = 'fetch-status';
-    }
-
-    function calculateAdvancedTotal() {
-        let total = 0;
-        subjectCheckboxes.forEach(checkbox => {
-            if (checkbox.checked) total += parseInt(checkbox.getAttribute('data-price')) || 0;
-        });
-        extraCheckboxes.forEach(checkbox => {
-            if (checkbox.checked) total += parseInt(checkbox.getAttribute('data-price')) || 0;
-        });
-        let discount = 0;
-        if (advancedDiscountInput) discount = parseFloat(advancedDiscountInput.value) || 0;
-        total = Math.max(0, total - discount);
-        return total;
-    }
-
-    function calculateCheckboxTotal() {
-        let total = 0;
-        if (feeCheckboxes.tuition && feeCheckboxes.tuition.checked) total += currentTuitionFee;
-        if (feeCheckboxes.admission && feeCheckboxes.admission.checked) total += BASE_FEES.admission.price;
-        if (feeCheckboxes.exam && feeCheckboxes.exam.checked) total += BASE_FEES.exam.price;
-        if (feeCheckboxes.assignment && feeCheckboxes.assignment.checked) total += BASE_FEES.assignment.price;
-        let discount = 0;
-        if (discountInput) discount = parseFloat(discountInput.value) || 0;
-        total = Math.max(0, total - discount);
-        return total;
+    function clearStatus() {
+        dom.fetchStatus.style.display = 'none';
+        dom.fetchStatus.className = '';
     }
 
     function updateDue() {
-        let total = 0;
-        let received = 0;
-        
+        let total = 0, recv = 0;
         if (currentMode === 'advanced') {
-            total = calculateAdvancedTotal();
-            const totalSpan = document.getElementById('advancedTotalAmount');
-            if (totalSpan) totalSpan.innerText = total;
-            received = advancedReceivedInput ? (parseFloat(advancedReceivedInput.value) || 0) : 0;
-            if (advancedDueInput) advancedDueInput.value = Math.max(0, total - received);
-        } else if (currentMode === 'checkbox') {
-            total = calculateCheckboxTotal();
-            const totalSpan = document.getElementById('checkboxTotalAmount');
-            if (totalSpan) totalSpan.innerText = total;
-            received = receivedInput ? (parseFloat(receivedInput.value) || 0) : 0;
-            if (dueInput) dueInput.value = Math.max(0, total - received);
+            subjectCbs.forEach(cb => { if(cb.checked) total += parseInt(cb.dataset.price) || 0; });
+            extraCbs.forEach(cb => { if(cb.checked) total += parseInt(cb.dataset.price) || 0; });
+            if (discInput) total = Math.max(0, total - (parseFloat(discInput.value) || 0));
+            const span = document.getElementById('advTotal');
+            if (span) span.textContent = total;
+            recv = recvInput ? parseFloat(recvInput.value) || 0 : 0;
+            if (dueInput) dueInput.value = Math.max(0, total - recv);
+        } else {
+            total = (feeCbs.tuition?.checked ? getTuitionFee(dom.class.value) : 0) +
+                    (feeCbs.admission?.checked ? 500 : 0) +
+                    (feeCbs.exam?.checked ? 500 : 0) +
+                    (feeCbs.assignment?.checked ? 500 : 0);
+            if (discInput) total = Math.max(0, total - (parseFloat(discInput.value) || 0));
+            const span = document.getElementById('chkTotal');
+            if (span) span.textContent = total;
+            recv = recvInput ? parseFloat(recvInput.value) || 0 : 0;
+            if (dueInput) dueInput.value = Math.max(0, total - recv);
         }
     }
 
-    // ============ FETCH STUDENT BY ROLL NUMBER (SIRF STUDENT DETAILS) ============
-    async function fetchStudentByRoll() {
-        const roll = rollInput.value.trim();
-        const session = sessionSelect.value;
-        
-        if (!roll) {
-            setFetchStatus('⚠️ Please enter a Roll Number', 'error');
-            return;
-        }
+    function renderFeeSection() {
+        const cls = dom.class.value;
+        const isHigher = cls === 'Class 11' || cls === 'Class 12';
+        dom.warning.style.display = isHigher ? 'block' : 'none';
+        currentMode = isHigher ? 'advanced' : 'simple';
 
+        if (isHigher) {
+            dom.dynamic.innerHTML = `
+                <div style="margin-bottom:6px;"><strong style="font-size:0.8rem;">📖 Subjects (₹3000 each)</strong></div>
+                <div class="subj-grid" id="subjGrid"></div>
+                <div style="margin:6px 0;"><strong style="font-size:0.8rem;">📌 Extra Charges</strong></div>
+                <div class="extra-row" id="extraRow"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+                    <div class="field"><label>🎁 Discount (₹)</label><input type="number" id="advDisc" value="0" min="0"></div>
+                    <div class="field"><label>💵 Received (₹)</label><input type="number" id="advRecv" value="0" min="0"></div>
+                </div>
+                <div class="total-display"><span class="label">💰 Total</span><span class="amount" id="advTotal">0</span></div>
+                <div class="field" style="margin-top:4px;"><label>⏳ Due (Auto)</label><input type="number" id="advDue" readonly style="background:#eef2f5;color:#b44;font-weight:700;"></div>
+            `;
+
+            const grid = document.getElementById('subjGrid');
+            subjectCbs = [];
+            SUBJECTS.forEach(s => {
+                const d = document.createElement('div');
+                d.className = 'subj-item';
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.id = 's_' + s.name;
+                cb.dataset.price = s.price;
+                cb.addEventListener('change', updateDue);
+                const lbl = document.createElement('label');
+                lbl.htmlFor = 's_' + s.name;
+                lbl.textContent = s.name;
+                const sp = document.createElement('span');
+                sp.className = 'sp';
+                sp.textContent = '₹' + s.price;
+                d.append(cb, lbl, sp);
+                grid.appendChild(d);
+                subjectCbs.push(cb);
+            });
+
+            const row = document.getElementById('extraRow');
+            extraCbs = [];
+            EXTRA_FEES.forEach(e => {
+                const d = document.createElement('div');
+                d.className = 'extra-item';
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.id = 'e_' + e.name.replace(/\s/g,'_');
+                cb.dataset.price = e.price;
+                cb.addEventListener('change', updateDue);
+                const lbl = document.createElement('label');
+                lbl.htmlFor = 'e_' + e.name.replace(/\s/g,'_');
+                lbl.textContent = e.name;
+                d.append(cb, lbl);
+                row.appendChild(d);
+                extraCbs.push(cb);
+            });
+
+            discInput = document.getElementById('advDisc');
+            recvInput = document.getElementById('advRecv');
+            dueInput = document.getElementById('advDue');
+            if (discInput) discInput.addEventListener('input', updateDue);
+            if (recvInput) recvInput.addEventListener('input', updateDue);
+            updateDue();
+        } else {
+            const fee = getTuitionFee(cls);
+            dom.dynamic.innerHTML = `
+                <div class="fee-grid">
+                    <div class="fee-item"><input type="checkbox" id="f_tuition"><label for="f_tuition">Tuition Fee</label><span class="price">₹${fee}</span></div>
+                    <div class="fee-item"><input type="checkbox" id="f_admission"><label for="f_admission">Admission Fee</label><span class="price">₹500</span></div>
+                    <div class="fee-item"><input type="checkbox" id="f_exam"><label for="f_exam">Exam Fee</label><span class="price">₹500</span></div>
+                    <div class="fee-item"><input type="checkbox" id="f_assignment"><label for="f_assignment">Assignment Fee</label><span class="price">₹500</span></div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+                    <div class="field"><label>🎁 Discount (₹)</label><input type="number" id="sDisc" value="0" min="0"></div>
+                    <div class="field"><label>💵 Received (₹)</label><input type="number" id="sRecv" value="0" min="0"></div>
+                </div>
+                <div class="total-display"><span class="label">💰 Total</span><span class="amount" id="chkTotal">0</span></div>
+                <div class="field" style="margin-top:4px;"><label>⏳ Due (Auto)</label><input type="number" id="sDue" readonly style="background:#eef2f5;color:#b44;font-weight:700;"></div>
+            `;
+
+            feeCbs = {
+                tuition: document.getElementById('f_tuition'),
+                admission: document.getElementById('f_admission'),
+                exam: document.getElementById('f_exam'),
+                assignment: document.getElementById('f_assignment')
+            };
+            discInput = document.getElementById('sDisc');
+            recvInput = document.getElementById('sRecv');
+            dueInput = document.getElementById('sDue');
+
+            Object.values(feeCbs).forEach(cb => cb?.addEventListener('change', updateDue));
+            if (discInput) discInput.addEventListener('input', updateDue);
+            if (recvInput) recvInput.addEventListener('input', updateDue);
+            updateDue();
+        }
+    }
+
+    async function fetchStudent() {
+        const roll = dom.roll.value.trim();
+        const session = dom.session.value;
+        if (!roll) { setStatus('⚠️ Enter roll number', 'error'); return; }
         if (isFetching) return;
         isFetching = true;
-        fetchBtn.disabled = true;
-        setFetchStatus('⏳ Searching for student...', 'loading');
+        dom.fetchBtn.disabled = true;
+        setStatus('⏳ Searching...', 'loading');
 
         try {
-            const querySnapshot = await feesCollection
-                .where('roll_number', '==', roll)
-                .where('session', '==', session)
-                .limit(1)
-                .get();
-
-            if (querySnapshot.empty) {
-                setFetchStatus(`❌ No student found with Roll #${roll} in session ${session}`, 'error');
+            const snap = await feesCollection.where('roll_number','==',roll).where('session','==',session).limit(1).get();
+            if (snap.empty) {
+                setStatus(`❌ No student with Roll #${roll} in ${session}`, 'error');
                 currentStudentId = null;
-                // Clear student details but keep fee section as is
-                nameInput.value = '';
-                fatherInput.value = '';
-                phoneInput.value = '';
+                dom.name.value = '';
+                dom.father.value = '';
+                dom.phone.value = '';
+                dom.addBtn.innerHTML = '💾 Save Student';
+                dom.addBtn.className = 'btn-submit';
                 return;
             }
-
-            const doc = querySnapshot.docs[0];
-            const studentData = doc.data();
-            currentStudentId = doc.id;
-
-            // === ONLY FILL STUDENT DETAILS ===
-            nameInput.value = studentData.student_name || '';
-            fatherInput.value = studentData.father_name || '';
-            phoneInput.value = studentData.phone_number || '';
-            classSelect.value = studentData.class || 'Class 6';
-            sessionSelect.value = studentData.session || '2026-27';
+            const data = snap.docs[0].data();
+            currentStudentId = snap.docs[0].id;
+            dom.name.value = data.student_name || '';
+            dom.father.value = data.father_name || '';
+            dom.phone.value = data.phone_number || '';
+            dom.class.value = data.class || 'Class 6';
+            dom.session.value = data.session || '2026-27';
             
-            // === FEE SECTION RENDER HOGA BUT EMPTY RAHEGA (Teacher manually fill karega) ===
-            // Class change trigger karo taaki fee section render ho
-            onClassChange();
-
-            setFetchStatus(`✅ Student found! Name: ${studentData.student_name || 'N/A'} (Roll: ${roll})`, 'success');
+            renderFeeSection();
             
-            addBtn.innerHTML = '✏️ Update Student';
-            addBtn.classList.add('btn-update');
-            addBtn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
-            
-            showToast(`✅ ${studentData.student_name || 'Student'} loaded! Now fill fee details manually.`);
+            // Fill fee data if exists
+            setTimeout(() => {
+                const bd = data.fee_breakdown || {};
+                if (currentMode === 'advanced') {
+                    const subs = data.subjects || [];
+                    subjectCbs.forEach((cb, i) => cb.checked = subs.includes(SUBJECTS[i].name));
+                    const extras = data.extra_fees || [];
+                    extraCbs.forEach((cb, i) => cb.checked = extras.includes(EXTRA_FEES[i].name));
+                    if (discInput) discInput.value = data.discount_applied || 0;
+                    if (recvInput) recvInput.value = data.received_amount || 0;
+                } else {
+                    if (feeCbs.tuition) feeCbs.tuition.checked = (bd.tuition || 0) > 0;
+                    if (feeCbs.admission) feeCbs.admission.checked = (bd.admission || 0) > 0;
+                    if (feeCbs.exam) feeCbs.exam.checked = (bd.exam || 0) > 0;
+                    if (feeCbs.assignment) feeCbs.assignment.checked = (bd.assignment || 0) > 0;
+                    if (discInput) discInput.value = data.discount_applied || 0;
+                    if (recvInput) recvInput.value = data.received_amount || 0;
+                }
+                updateDue();
+            }, 50);
 
-        } catch (error) {
-            console.error('Fetch error:', error);
-            setFetchStatus(`❌ Error: ${error.message}`, 'error');
+            dom.addBtn.innerHTML = '✏️ Update Student';
+            dom.addBtn.className = 'btn-submit btn-update';
+            setStatus(`✅ ${data.student_name} found!`, 'success');
+            showToast(`✅ ${data.student_name} loaded!`);
+        } catch(e) {
+            setStatus('❌ ' + e.message, 'error');
         } finally {
             isFetching = false;
-            fetchBtn.disabled = false;
+            dom.fetchBtn.disabled = false;
         }
     }
 
-    // ============ CLEAR FORM ============
     function clearForm() {
-        rollInput.value = '';
-        nameInput.value = '';
-        fatherInput.value = '';
-        phoneInput.value = '';
+        dom.roll.value = '';
+        dom.name.value = '';
+        dom.father.value = '';
+        dom.phone.value = '';
         currentStudentId = null;
-        
-        // Reset fee section
+        renderFeeSection();
+        clearStatus();
+        dom.addBtn.innerHTML = '💾 Save Student';
+        dom.addBtn.className = 'btn-submit';
+        dom.roll.focus();
+        showToast('🔄 Form cleared');
+    }
+
+    function getFeeData() {
         if (currentMode === 'advanced') {
-            subjectCheckboxes.forEach(cb => cb.checked = false);
-            extraCheckboxes.forEach(cb => cb.checked = false);
-            if (advancedDiscountInput) advancedDiscountInput.value = '0';
-            if (advancedReceivedInput) advancedReceivedInput.value = '0';
-        } else if (currentMode === 'checkbox') {
-            if (feeCheckboxes.tuition) feeCheckboxes.tuition.checked = false;
-            if (feeCheckboxes.admission) feeCheckboxes.admission.checked = false;
-            if (feeCheckboxes.exam) feeCheckboxes.exam.checked = false;
-            if (feeCheckboxes.assignment) feeCheckboxes.assignment.checked = false;
-            if (discountInput) discountInput.value = '0';
-            if (receivedInput) receivedInput.value = '0';
-        }
-        
-        updateDue();
-        clearFetchStatus();
-        
-        addBtn.innerHTML = '➕ Save Student to Firebase';
-        addBtn.classList.remove('btn-update');
-        addBtn.style.background = '';
-        
-        rollInput.focus();
-        showToast('🔄 Form cleared for new entry');
-    }
-
-    // ============ RENDER FUNCTIONS ============
-    function renderCheckboxMode(className) {
-        currentMode = 'checkbox';
-        currentTuitionFee = getTuitionFee(className);
-        
-        dynamicSection.innerHTML = `
-            <div class="checkbox-fees-box">
-                <div class="section-title" style="margin-bottom:15px;">💰 Select Fees Components <span style="font-weight:400;font-size:0.8rem;color:#6c757d;">(Check to add)</span></div>
-                
-                <div class="fee-checkbox-item">
-                    <input type="checkbox" id="fee_tuition">
-                    <label for="fee_tuition">${BASE_FEES.tuition.label}</label>
-                    <span class="fee-price">₹${currentTuitionFee}/-</span>
-                </div>
-                
-                <div class="fee-checkbox-item">
-                    <input type="checkbox" id="fee_admission">
-                    <label for="fee_admission">${BASE_FEES.admission.label}</label>
-                    <span class="fee-price">₹${BASE_FEES.admission.price}/-</span>
-                </div>
-                
-                <div class="fee-checkbox-item">
-                    <input type="checkbox" id="fee_exam">
-                    <label for="fee_exam">${BASE_FEES.exam.label}</label>
-                    <span class="fee-price">₹${BASE_FEES.exam.price}/-</span>
-                </div>
-                
-                <div class="fee-checkbox-item">
-                    <input type="checkbox" id="fee_assignment">
-                    <label for="fee_assignment">${BASE_FEES.assignment.label}</label>
-                    <span class="fee-price">₹${BASE_FEES.assignment.price}/-</span>
-                </div>
-                
-                <div class="discount-box">
-                    <label style="font-weight:600; margin-bottom:8px; display:block;">🎁 Discount (₹)</label>
-                    <input type="number" id="discountAmount" value="0" min="0" step="1" placeholder="Enter discount amount" style="width:100%; padding:10px 15px; border-radius:40px; border:1px solid #ffe2a4; background:white;">
-                </div>
-                
-                <div class="total-box" style="margin-top:20px;">
-                    <span class="total-label">💰 Total Fees:</span>
-                    <span class="total-amount" id="checkboxTotalAmount">0</span>
-                </div>
-                
-                <div class="field" style="margin-top:15px;">
-                    <label>💵 Received Amount (₹)</label>
-                    <input type="number" id="receivedAmountCheckbox" value="0" min="0" step="1">
-                </div>
-                <div class="field">
-                    <label>⏳ Due Amount (Auto)</label>
-                    <input type="number" id="dueAmountCheckbox" class="due-highlight" readonly value="0">
-                </div>
-            </div>
-        `;
-        
-        feeCheckboxes = {
-            tuition: document.getElementById('fee_tuition'),
-            admission: document.getElementById('fee_admission'),
-            exam: document.getElementById('fee_exam'),
-            assignment: document.getElementById('fee_assignment')
-        };
-        
-        discountInput = document.getElementById('discountAmount');
-        receivedInput = document.getElementById('receivedAmountCheckbox');
-        dueInput = document.getElementById('dueAmountCheckbox');
-        
-        Object.values(feeCheckboxes).forEach(cb => {
-            if (cb) cb.addEventListener('change', updateDue);
-        });
-        if (discountInput) discountInput.addEventListener('input', updateDue);
-        if (receivedInput) receivedInput.addEventListener('input', updateDue);
-        
-        updateDue();
-    }
-
-    function renderAdvancedMode() {
-        currentMode = 'advanced';
-        dynamicSection.innerHTML = `
-            <div class="fees-section">
-                <div class="section-title">📖 Select Subjects <span style="font-weight:400;font-size:0.8rem;color:#6c757d;">(₹3000 each)</span></div>
-                <div class="subjects-grid" id="subjectsGrid"></div>
-                <div class="section-title" style="margin-top:6px;">📌 Additional Charges</div>
-                <div class="extra-charges" id="extraChargesContainer"></div>
-                
-                <div class="discount-box" style="margin-top:15px;">
-                    <label style="font-weight:600; margin-bottom:8px; display:block;">🎁 Discount (₹)</label>
-                    <input type="number" id="advancedDiscountAmount" value="0" min="0" step="1" placeholder="Enter discount amount" style="width:100%; padding:10px 15px; border-radius:40px; border:1px solid #ffe2a4; background:white;">
-                </div>
-                
-                <div class="total-box">
-                    <span class="total-label">💰 Total Fees (Auto-Calculated):</span>
-                    <span class="total-amount" id="advancedTotalAmount">0</span>
-                </div>
-                <div class="field" style="margin-top:5px;">
-                    <label>💵 Received Amount (₹)</label>
-                    <input type="number" id="receivedAmountAdvanced" value="0" min="0" step="1">
-                </div>
-                <div class="field">
-                    <label>⏳ Due Amount (Auto)</label>
-                    <input type="number" id="dueAmountAdvanced" class="due-highlight" readonly value="0">
-                </div>
-            </div>
-        `;
-        
-        const subjectsGrid = document.getElementById('subjectsGrid');
-        subjectCheckboxes = [];
-        SUBJECTS.forEach(sub => {
-            const div = document.createElement('div');
-            div.className = 'subject-item';
-            const cb = document.createElement('input');
-            cb.type = 'checkbox';
-            cb.id = `sub_${sub.name}`;
-            cb.setAttribute('data-price', sub.price);
-            cb.addEventListener('change', updateDue);
-            const label = document.createElement('label');
-            label.htmlFor = `sub_${sub.name}`;
-            label.innerText = sub.name;
-            const priceSpan = document.createElement('span');
-            priceSpan.className = 'subject-price';
-            priceSpan.innerText = `₹${sub.price}`;
-            div.appendChild(cb);
-            div.appendChild(label);
-            div.appendChild(priceSpan);
-            subjectsGrid.appendChild(div);
-            subjectCheckboxes.push(cb);
-        });
-        
-        const extraContainer = document.getElementById('extraChargesContainer');
-        extraCheckboxes = [];
-        EXTRA_FEES.forEach(extra => {
-            const div = document.createElement('div');
-            div.className = 'extra-item';
-            const cb = document.createElement('input');
-            cb.type = 'checkbox';
-            cb.id = `extra_${extra.name.replace(/\s/g, '_')}`;
-            cb.setAttribute('data-price', extra.price);
-            cb.addEventListener('change', updateDue);
-            const label = document.createElement('label');
-            label.htmlFor = cb.id;
-            label.innerText = extra.name;
-            const priceSpan = document.createElement('span');
-            priceSpan.style.fontWeight = 'bold';
-            priceSpan.style.marginLeft = '6px';
-            priceSpan.innerText = `(+₹${extra.price})`;
-            div.appendChild(cb);
-            div.appendChild(label);
-            div.appendChild(priceSpan);
-            extraContainer.appendChild(div);
-            extraCheckboxes.push(cb);
-        });
-        
-        advancedDiscountInput = document.getElementById('advancedDiscountAmount');
-        advancedReceivedInput = document.getElementById('receivedAmountAdvanced');
-        advancedDueInput = document.getElementById('dueAmountAdvanced');
-        
-        if (advancedDiscountInput) advancedDiscountInput.addEventListener('input', updateDue);
-        if (advancedReceivedInput) advancedReceivedInput.addEventListener('input', updateDue);
-        
-        updateDue();
-    }
-
-    function getSelectedSubjects() {
-        if (currentMode !== 'advanced') return [];
-        const selected = [];
-        subjectCheckboxes.forEach((cb, idx) => {
-            if (cb.checked) selected.push(SUBJECTS[idx].name);
-        });
-        return selected;
-    }
-
-    function getSelectedExtraFees() {
-        if (currentMode !== 'advanced') return [];
-        const selected = [];
-        extraCheckboxes.forEach((cb, idx) => {
-            if (cb.checked) selected.push(EXTRA_FEES[idx].name);
-        });
-        return selected;
-    }
-
-    function getTotalAmount() {
-        if (currentMode === 'advanced') {
-            return calculateAdvancedTotal();
-        } else if (currentMode === 'checkbox') {
-            return calculateCheckboxTotal();
-        }
-        return 0;
-    }
-
-    function getReceivedAmount() {
-        if (currentMode === 'advanced') {
-            return advancedReceivedInput ? (parseFloat(advancedReceivedInput.value) || 0) : 0;
-        } else if (currentMode === 'checkbox') {
-            return receivedInput ? (parseFloat(receivedInput.value) || 0) : 0;
-        }
-        return 0;
-    }
-
-    function getDiscountAmount() {
-        if (currentMode === 'advanced') {
-            return advancedDiscountInput ? (parseFloat(advancedDiscountInput.value) || 0) : 0;
-        } else if (currentMode === 'checkbox') {
-            return discountInput ? (parseFloat(discountInput.value) || 0) : 0;
-        }
-        return 0;
-    }
-
-    function getFeeBreakdown() {
-        if (currentMode === 'advanced') {
-            const subjectsTotal = getSelectedSubjects().length * 3000;
-            const extraTotal = (extraCheckboxes[0]?.checked ? 500 : 0) + 
-                              (extraCheckboxes[1]?.checked ? 500 : 0) + 
-                              (extraCheckboxes[2]?.checked ? 500 : 0);
-            const subtotal = subjectsTotal + extraTotal;
-            const discount = getDiscountAmount();
-            
-            return {
-                type: 'subject_based',
-                subjects: getSelectedSubjects(),
-                subjects_total: subjectsTotal,
-                admission_fee: extraCheckboxes[0]?.checked ? 500 : 0,
-                exam_fee: extraCheckboxes[1]?.checked ? 500 : 0,
-                assignment_fee: extraCheckboxes[2]?.checked ? 500 : 0,
-                subtotal: subtotal,
-                discount: discount,
-                total: Math.max(0, subtotal - discount)
-            };
-        } else if (currentMode === 'checkbox') {
-            let breakdown = {
-                type: 'checkbox_based',
-                tuition: feeCheckboxes.tuition?.checked ? currentTuitionFee : 0,
-                admission: feeCheckboxes.admission?.checked ? BASE_FEES.admission.price : 0,
-                exam: feeCheckboxes.exam?.checked ? BASE_FEES.exam.price : 0,
-                assignment: feeCheckboxes.assignment?.checked ? BASE_FEES.assignment.price : 0,
-                discount: getDiscountAmount()
-            };
-            breakdown.subtotal = breakdown.tuition + breakdown.admission + breakdown.exam + breakdown.assignment;
-            breakdown.total = Math.max(0, breakdown.subtotal - breakdown.discount);
-            return breakdown;
-        }
-        return {};
-    }
-
-    function onClassChange() {
-        const selectedClass = classSelect.value;
-        
-        if (selectedClass === 'Class 11' || selectedClass === 'Class 12') {
-            classWarning.style.display = 'block';
-            renderAdvancedMode();
+            const subs = subjectCbs.filter(cb => cb.checked).map((cb,i) => SUBJECTS[i].name);
+            const extras = extraCbs.filter(cb => cb.checked).map((cb,i) => EXTRA_FEES[i].name);
+            const total = subjectCbs.reduce((s,cb) => s + (cb.checked ? parseInt(cb.dataset.price) : 0), 0) +
+                         extraCbs.reduce((s,cb) => s + (cb.checked ? parseInt(cb.dataset.price) : 0), 0);
+            const disc = parseFloat(discInput?.value) || 0;
+            return { type:'advanced', subjects:subs, extra_fees:extras, subtotal:total, discount:disc, total:Math.max(0,total-disc) };
         } else {
-            classWarning.style.display = 'none';
-            renderCheckboxMode(selectedClass);
+            const tuition = feeCbs.tuition?.checked ? getTuitionFee(dom.class.value) : 0;
+            const admission = feeCbs.admission?.checked ? 500 : 0;
+            const exam = feeCbs.exam?.checked ? 500 : 0;
+            const assignment = feeCbs.assignment?.checked ? 500 : 0;
+            const disc = parseFloat(discInput?.value) || 0;
+            const subtotal = tuition + admission + exam + assignment;
+            return { type:'simple', tuition, admission, exam, assignment, discount:disc, subtotal, total:Math.max(0,subtotal-disc) };
         }
     }
 
-    // ============ SAVE STUDENT ============
-    addBtn.addEventListener('click', async function() {
-        errorDiv.style.display = 'none';
-        
-        const roll = rollInput.value.trim();
-        const name = nameInput.value.trim();
-        const father = fatherInput.value.trim();
-        const phone = phoneInput.value.trim();
-        const session = sessionSelect.value;
-        const classVal = classSelect.value;
-        
+    dom.addBtn.addEventListener('click', async function() {
+        dom.error.style.display = 'none';
+        const roll = dom.roll.value.trim();
+        const name = dom.name.value.trim();
+        const father = dom.father.value.trim();
         if (!roll || !name || !father) {
-            showError('❌ Please fill Roll Number, Student Name and Father Name');
+            showError('❌ Roll Number, Name & Father Name required');
             return;
         }
-        
-        const totalAmount = getTotalAmount();
-        const receivedAmount = getReceivedAmount();
-        const dueAmount = Math.max(0, totalAmount - receivedAmount);
-        
-        let studentData = {
+
+        const fee = getFeeData();
+        const recv = parseFloat(recvInput?.value) || 0;
+        const total = fee.total;
+        const due = Math.max(0, total - recv);
+
+        const data = {
             roll_number: roll,
             student_name: name,
             father_name: father,
-            phone_number: phone || '',
-            class: classVal,
-            session: session,
-            total_amount: totalAmount,
-            received_amount: receivedAmount,
-            due_amount: dueAmount,
-            discount_applied: getDiscountAmount(),
-            fee_breakdown: getFeeBreakdown(),
+            phone_number: dom.phone.value.trim() || '',
+            class: dom.class.value,
+            session: dom.session.value,
+            total_amount: total,
+            received_amount: recv,
+            due_amount: due,
+            discount_applied: fee.discount || 0,
+            fee_breakdown: fee,
             updated_at: firebase.firestore.FieldValue.serverTimestamp()
         };
-        
         if (currentMode === 'advanced') {
-            studentData.subjects = getSelectedSubjects();
-            studentData.extra_fees = getSelectedExtraFees();
+            data.subjects = fee.subjects || [];
+            data.extra_fees = fee.extra_fees || [];
         }
-        
-        loadingMsg.style.display = 'block';
-        addBtn.disabled = true;
-        
+
+        dom.loading.style.display = 'block';
+        dom.addBtn.disabled = true;
+
         try {
-            let docRef;
-            let isUpdate = false;
-            
+            let id;
             if (currentStudentId) {
-                await feesCollection.doc(currentStudentId).update(studentData);
-                docRef = { id: currentStudentId };
-                isUpdate = true;
-                showToast(`✅ ${name} updated successfully!`);
+                await feesCollection.doc(currentStudentId).update(data);
+                id = currentStudentId;
+                showToast(`✅ ${name} updated!`);
             } else {
-                studentData.created_at = firebase.firestore.FieldValue.serverTimestamp();
-                docRef = await feesCollection.add(studentData);
-                showToast(`✅ ${name} added successfully!`);
+                data.created_at = firebase.firestore.FieldValue.serverTimestamp();
+                const ref = await feesCollection.add(data);
+                id = ref.id;
+                showToast(`✅ ${name} added!`);
             }
-            
-            const studentId = docRef.id;
-            
-            if (receivedAmount > 0) {
-                const transactionId = 'TXN' + Date.now() + Math.floor(Math.random() * 10000);
-                const transactionData = {
-                    studentId: studentId,
+
+            if (recv > 0) {
+                await transactionsCollection.add({
+                    studentId: id,
                     studentName: name,
                     rollNumber: roll,
-                    studentClass: classVal,
-                    session: session,
-                    amount: receivedAmount,
+                    studentClass: dom.class.value,
+                    session: dom.session.value,
+                    amount: recv,
                     previousReceived: 0,
-                    newReceived: receivedAmount,
-                    previousDue: totalAmount,
-                    newDue: dueAmount,
-                    transactionId: transactionId,
+                    newReceived: recv,
+                    previousDue: total,
+                    newDue: due,
+                    transactionId: 'TXN' + Date.now() + Math.floor(Math.random()*10000),
                     date: new Date().toISOString(),
                     created_at: firebase.firestore.FieldValue.serverTimestamp(),
-                    note: isUpdate ? `Updated payment of ₹${receivedAmount}` : `Initial admission payment of ₹${receivedAmount}`
-                };
-                await transactionsCollection.add(transactionData);
+                    note: currentStudentId ? `Updated payment ₹${recv}` : `Initial payment ₹${recv}`
+                });
             }
-            
             clearForm();
-        } catch (error) {
-            console.error("Firestore error:", error);
-            showError(`❌ Save failed: ${error.message}`);
+        } catch(e) {
+            showError('❌ ' + e.message);
         } finally {
-            loadingMsg.style.display = 'none';
-            addBtn.disabled = false;
+            dom.loading.style.display = 'none';
+            dom.addBtn.disabled = false;
         }
     });
 
-    // ============ EVENT LISTENERS ============
-    classSelect.addEventListener('change', onClassChange);
-    fetchBtn.addEventListener('click', fetchStudentByRoll);
-    clearFormBtn.addEventListener('click', clearForm);
-    
-    rollInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            fetchStudentByRoll();
-        }
-    });
-    
-    onClassChange();
-    rollInput.focus();
+    dom.class.addEventListener('change', renderFeeSection);
+    dom.fetchBtn.addEventListener('click', fetchStudent);
+    dom.clearBtn.addEventListener('click', clearForm);
+    dom.roll.addEventListener('keypress', e => { if(e.key === 'Enter') { e.preventDefault(); fetchStudent(); } });
+
+    renderFeeSection();
+    dom.roll.focus();
     </script>
 </body>
 </html>
