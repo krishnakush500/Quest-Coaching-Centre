@@ -29,11 +29,9 @@
         .form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px 20px; }
         .field{ display:flex; flex-direction:column; gap:4px; }
         .field label{ font-weight:600; color:#1b4a77; font-size:0.8rem; display:flex; align-items:center; gap:4px; }
-        .field label .badge{ background:#0d6efd; color:white; font-size:0.55rem; padding:1px 8px; border-radius:40px; font-weight:400; }
         .field input, .field select{ padding:8px 14px; border:1px solid #b8ceec; border-radius:40px; font-size:0.85rem; background:#fafcff; outline:none; transition:0.2s; }
         .field input:focus, .field select:focus{ border-color:#1b5e9e; background:white; box-shadow:0 0 0 3px rgba(27,94,158,0.08); }
         .field input:disabled{ background:#eef2f6; color:#6c757d; }
-        .field-full{ grid-column:span 2; }
         .fee-section{ background:#f8fbfe; border-radius:16px; padding:14px 18px; margin-top:12px; border:1px solid #e2e8f0; }
         .fee-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
         .fee-header h4{ font-size:0.95rem; color:#f59e0b; display:flex; align-items:center; gap:6px; }
@@ -43,11 +41,6 @@
         .fee-item input{ width:16px; height:16px; accent-color:#1b4f9b; cursor:pointer; flex-shrink:0; }
         .fee-item label{ font-size:0.78rem; font-weight:500; color:#1e3a5f; cursor:pointer; flex:1; }
         .fee-item .price{ font-weight:700; color:#0f5c3e; font-size:0.7rem; background:#e2f0e8; padding:0 10px; border-radius:40px; }
-        .fee-bottom{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:10px; }
-        .fee-bottom .field{ gap:2px; }
-        .fee-bottom .field label{ font-size:0.7rem; color:#555; }
-        .fee-bottom .field input{ padding:6px 12px; font-size:0.8rem; }
-        .fee-bottom .field input:read-only{ background:#eef2f5; color:#b44; font-weight:700; }
         .total-display{ background:#e6f0fa; border-radius:40px; padding:8px 18px; display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
         .total-display .label{ font-weight:700; font-size:0.9rem; color:#0a3a60; }
         .total-display .amount{ font-size:1.3rem; font-weight:800; color:#1b4f9b; }
@@ -77,20 +70,15 @@
         .main-content{ display:none; width:100%; max-width:1000px; }
         .logout-btn{ position:fixed; bottom:15px; right:15px; padding:8px 18px; background:#dc3545; color:white; border:none; border-radius:40px; cursor:pointer; z-index:9999; font-weight:600; font-size:0.8rem; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
         .logout-btn:hover{ background:#c82333; }
-        .debug-box{ background:#f8f9fa; border:1px dashed #6c757d; border-radius:12px; padding:10px 14px; margin-top:10px; font-size:0.75rem; color:#495057; display:none; max-height:150px; overflow:auto; }
-        .debug-box strong{ color:#0d6efd; }
         @media (max-width:700px){
             .form-grid{ grid-template-columns:1fr; }
-            .field-full{ grid-column:span 1; }
-            .fee-bottom{ grid-template-columns:1fr 1fr; }
-            .form-card{ padding:16px; }
             .fee-grid{ grid-template-columns:1fr; }
             .subj-grid{ grid-template-columns:1fr 1fr; }
             .fetch-row{ flex-direction:column; align-items:stretch; }
             .fetch-row input{ min-width:auto; }
+            .form-card{ padding:16px; }
         }
         @media (max-width:450px){
-            .fee-bottom{ grid-template-columns:1fr; }
             .subj-grid{ grid-template-columns:1fr; }
             .header h2{ font-size:1rem; }
         }
@@ -164,11 +152,6 @@
                 <div id="dynamicFeeSection"></div>
             </div>
 
-            <!-- DEBUG BOX - Helpful for troubleshooting -->
-            <div id="debugBox" class="debug-box">
-                <strong>🔍 Debug Info:</strong> <span id="debugText">Waiting for fetch...</span>
-            </div>
-
             <button class="btn-submit" id="addStudentBtn">💾 Save Student</button>
             <div class="info-note">↩ <a href="dashboard.html">Back to dashboard</a></div>
             <div id="loadingMessage" class="loading">⏳ Saving...</div>
@@ -190,9 +173,6 @@
     const auth = firebase.auth();
     const feesCollection = db.collection('fees');
     const transactionsCollection = db.collection('transactions');
-
-    // Enable offline persistence for better performance
-    db.enablePersistence().catch(err => console.warn("Persistence error:", err));
 
     const authLoading = document.getElementById('authLoading');
     const mainContent = document.getElementById('mainContent');
@@ -241,9 +221,7 @@
         warning: document.getElementById('classWarning'),
         loading: document.getElementById('loadingMessage'),
         error: document.getElementById('errorMessage'),
-        toast: document.getElementById('successToast'),
-        debugBox: document.getElementById('debugBox'),
-        debugText: document.getElementById('debugText')
+        toast: document.getElementById('successToast')
     };
 
     let currentMode = 'simple';
@@ -275,12 +253,6 @@
     function clearStatus() {
         dom.fetchStatus.style.display = 'none';
         dom.fetchStatus.className = '';
-    }
-
-    function setDebug(msg) {
-        dom.debugBox.style.display = 'block';
-        dom.debugText.textContent = msg;
-        console.log("Debug:", msg);
     }
 
     function updateDue() {
@@ -405,7 +377,7 @@
         }
     }
 
-    // ============ FETCH STUDENT - MULTIPLE QUERY METHODS ============
+    // ============ FETCH STUDENT - FIXED FOR rollNumber FIELD ============
     async function fetchStudent() {
         const roll = dom.roll.value.trim();
         const session = dom.session.value;
@@ -419,88 +391,85 @@
         isFetching = true;
         dom.fetchBtn.disabled = true;
         setStatus('⏳ Searching...', 'loading');
-        setDebug('Searching for roll: "' + roll + '" in session: "' + session + '"');
 
         try {
-            let studentDoc = null;
-            let studentData = null;
-            let foundMethod = '';
+            console.log("🔍 Searching for Roll:", roll, "Session:", session);
 
-            // METHOD 1: Try with roll_number field
-            setDebug('Method 1: Querying where roll_number == "' + roll + '"');
-            const query1 = await feesCollection
-                .where('roll_number', '==', roll)
+            // ✅ QUERY 1: rollNumber (camelCase) - YAHI TUMHARE DATA MEIN HAI!
+            let querySnapshot = await feesCollection
+                .where('rollNumber', '==', roll)
                 .where('session', '==', session)
                 .limit(1)
                 .get();
 
-            if (!query1.empty) {
-                studentDoc = query1.docs[0];
-                studentData = studentDoc.data();
-                foundMethod = 'roll_number';
-                setDebug('✅ Found using roll_number field');
-            }
+            console.log("Query 1 (rollNumber) result:", querySnapshot.empty ? "EMPTY" : "FOUND");
 
-            // METHOD 2: If not found, try with rollNumber (camelCase)
-            if (!studentData) {
-                setDebug('Method 2: Querying where rollNumber == "' + roll + '"');
-                const query2 = await feesCollection
-                    .where('rollNumber', '==', roll)
+            // ✅ QUERY 2: roll_number (underscore) - fallback
+            if (querySnapshot.empty) {
+                querySnapshot = await feesCollection
+                    .where('roll_number', '==', roll)
                     .where('session', '==', session)
                     .limit(1)
                     .get();
-
-                if (!query2.empty) {
-                    studentDoc = query2.docs[0];
-                    studentData = studentDoc.data();
-                    foundMethod = 'rollNumber';
-                    setDebug('✅ Found using rollNumber field');
-                }
+                console.log("Query 2 (roll_number) result:", querySnapshot.empty ? "EMPTY" : "FOUND");
             }
 
-            // METHOD 3: Try with roll (simple)
-            if (!studentData) {
-                setDebug('Method 3: Querying where roll == "' + roll + '"');
-                const query3 = await feesCollection
-                    .where('roll', '==', roll)
-                    .where('session', '==', session)
-                    .limit(1)
-                    .get();
-
-                if (!query3.empty) {
-                    studentDoc = query3.docs[0];
-                    studentData = studentDoc.data();
-                    foundMethod = 'roll';
-                    setDebug('✅ Found using roll field');
-                }
-            }
-
-            // METHOD 4: If still not found, get all students and search manually (fallback)
-            if (!studentData) {
-                setDebug('Method 4: Fallback - scanning all students');
+            // ✅ QUERY 3: fallback - manual scan
+            if (querySnapshot.empty) {
+                console.log("🔍 Fallback: Scanning all students in session");
                 const allDocs = await feesCollection.where('session', '==', session).get();
-                setDebug('Total students in session: ' + allDocs.size);
-                
                 let found = null;
                 allDocs.forEach(doc => {
                     const data = doc.data();
                     // Check all possible roll number fields
-                    if (data.roll_number == roll || data.rollNumber == roll || data.roll == roll) {
+                    if (data.rollNumber == roll || data.roll_number == roll || data.roll == roll) {
                         found = { doc, data };
                     }
                 });
-
                 if (found) {
-                    studentDoc = found.doc;
-                    studentData = found.data;
-                    foundMethod = 'fallback (manual scan)';
-                    setDebug('✅ Found using fallback scan');
+                    querySnapshot = {
+                        empty: false,
+                        docs: [found.doc],
+                        forEach: (cb) => cb(found.doc)
+                    };
+                    // Manually set the data
+                    const tempData = found.data;
+                    console.log("✅ Found via fallback:", tempData);
+                    currentStudentId = found.doc.id;
+                    
+                    // Fill form
+                    dom.name.value = tempData.studentName || tempData.student_name || '';
+                    dom.father.value = tempData.fatherName || tempData.father_name || '';
+                    dom.phone.value = tempData.parentMobile || tempData.phone_number || tempData.phone || '';
+                    dom.class.value = tempData.class || tempData.classApplying || 'Class 6';
+                    dom.session.value = tempData.session || '2026-27';
+                    
+                    renderFeeSection();
+                    
+                    setTimeout(() => {
+                        if (feeCbs.tuition) feeCbs.tuition.checked = false;
+                        if (feeCbs.admission) feeCbs.admission.checked = false;
+                        if (feeCbs.exam) feeCbs.exam.checked = false;
+                        if (feeCbs.assignment) feeCbs.assignment.checked = false;
+                        if (discInput) discInput.value = 0;
+                        if (recvInput) recvInput.value = 0;
+                        updateDue();
+                    }, 100);
+
+                    dom.addBtn.innerHTML = '✏️ Update Student';
+                    dom.addBtn.className = 'btn-submit btn-update';
+                    setStatus(`✅ ${tempData.studentName || tempData.student_name || 'Student'} found!`, 'success');
+                    showToast(`✅ ${tempData.studentName || tempData.student_name || 'Student'} loaded!`);
+                    
+                    isFetching = false;
+                    dom.fetchBtn.disabled = false;
+                    return;
                 }
             }
 
-            // If still not found
-            if (!studentData) {
-                setDebug('❌ No student found with Roll #' + roll + ' in session ' + session);
+            // Agar kuch nahi mila
+            if (querySnapshot.empty) {
+                console.log("❌ No student found");
                 setStatus(`❌ No student found with Roll #${roll} in session ${session}`, 'error');
                 currentStudentId = null;
                 dom.name.value = '';
@@ -513,52 +482,40 @@
                 return;
             }
 
-            // === STUDENT FOUND! ===
-            currentStudentId = studentDoc.id;
-            
-            setDebug('✅ Student found! Method: ' + foundMethod + ' | ID: ' + currentStudentId);
-            console.log("Student Data:", studentData);
+            // ✅ Student Mil Gaya!
+            const doc = querySnapshot.docs[0];
+            const data = doc.data();
+            currentStudentId = doc.id;
 
-            // Fill student details
-            dom.name.value = studentData.student_name || studentData.name || '';
-            dom.father.value = studentData.father_name || studentData.father || '';
-            dom.phone.value = studentData.phone_number || studentData.phone || studentData.mobile || '';
-            dom.class.value = studentData.class || studentData.classApplying || 'Class 6';
-            dom.session.value = studentData.session || '2026-27';
+            console.log("✅ Student found:", data);
+
+            // Fill student details - SUPPORT BOTH FIELD NAMES
+            dom.name.value = data.studentName || data.student_name || '';
+            dom.father.value = data.fatherName || data.father_name || '';
+            dom.phone.value = data.parentMobile || data.phone_number || data.phone || '';
+            dom.class.value = data.class || data.classApplying || 'Class 6';
+            dom.session.value = data.session || '2026-27';
             
-            // Render fee section
             renderFeeSection();
             
-            // Fill fee data (if exists)
             setTimeout(() => {
-                const bd = studentData.fee_breakdown || {};
-                
-                if (currentMode === 'advanced') {
-                    const subs = studentData.subjects || [];
-                    subjectCbs.forEach((cb, i) => cb.checked = subs.includes(SUBJECTS[i].name));
-                    const extras = studentData.extra_fees || [];
-                    extraCbs.forEach((cb, i) => cb.checked = extras.includes(EXTRA_FEES[i].name));
-                    if (discInput) discInput.value = studentData.discount_applied || studentData.discount || 0;
-                    if (recvInput) recvInput.value = studentData.received_amount || studentData.received || 0;
-                } else {
-                    if (feeCbs.tuition) feeCbs.tuition.checked = (bd.tuition || studentData.tuition_fee || 0) > 0;
-                    if (feeCbs.admission) feeCbs.admission.checked = (bd.admission || studentData.admission_fee || 0) > 0;
-                    if (feeCbs.exam) feeCbs.exam.checked = (bd.exam || studentData.exam_fee || 0) > 0;
-                    if (feeCbs.assignment) feeCbs.assignment.checked = (bd.assignment || studentData.assignment_fee || 0) > 0;
-                    if (discInput) discInput.value = studentData.discount_applied || studentData.discount || 0;
-                    if (recvInput) recvInput.value = studentData.received_amount || studentData.received || 0;
-                }
+                // Fee details - teacher manually fill karega, isliye sab unchecked
+                if (feeCbs.tuition) feeCbs.tuition.checked = false;
+                if (feeCbs.admission) feeCbs.admission.checked = false;
+                if (feeCbs.exam) feeCbs.exam.checked = false;
+                if (feeCbs.assignment) feeCbs.assignment.checked = false;
+                if (discInput) discInput.value = 0;
+                if (recvInput) recvInput.value = 0;
                 updateDue();
-            }, 150);
+            }, 100);
 
             dom.addBtn.innerHTML = '✏️ Update Student';
             dom.addBtn.className = 'btn-submit btn-update';
-            setStatus(`✅ ${studentData.student_name || studentData.name || 'Student'} found!`, 'success');
-            showToast(`✅ ${studentData.student_name || studentData.name || 'Student'} loaded!`);
+            setStatus(`✅ ${data.studentName || data.student_name || 'Student'} found!`, 'success');
+            showToast(`✅ ${data.studentName || data.student_name || 'Student'} loaded!`);
 
         } catch(error) {
-            console.error("Fetch error:", error);
-            setDebug('❌ Error: ' + error.message);
+            console.error("❌ Fetch error:", error);
             setStatus('❌ ' + error.message, 'error');
         } finally {
             isFetching = false;
@@ -577,7 +534,6 @@
         clearStatus();
         dom.addBtn.innerHTML = '💾 Save Student';
         dom.addBtn.className = 'btn-submit';
-        dom.debugBox.style.display = 'none';
         dom.roll.focus();
         showToast('🔄 Form cleared');
     }
@@ -617,10 +573,10 @@
         const due = Math.max(0, total - recv);
 
         const data = {
-            roll_number: roll,
-            student_name: name,
-            father_name: father,
-            phone_number: dom.phone.value.trim() || '',
+            rollNumber: roll,  // ✅ Save with camelCase to match existing data
+            studentName: name,
+            fatherName: father,
+            parentMobile: dom.phone.value.trim() || '',
             class: dom.class.value,
             session: dom.session.value,
             total_amount: total,
@@ -630,6 +586,7 @@
             fee_breakdown: fee,
             updated_at: firebase.firestore.FieldValue.serverTimestamp()
         };
+        
         if (currentMode === 'advanced') {
             data.subjects = fee.subjects || [];
             data.extra_fees = fee.extra_fees || [];
