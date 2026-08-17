@@ -31,6 +31,7 @@
         .field label{ font-weight:600; color:#1b4a77; font-size:0.8rem; display:flex; align-items:center; gap:4px; }
         .field input, .field select{ padding:8px 14px; border:1px solid #b8ceec; border-radius:40px; font-size:0.85rem; background:#fafcff; outline:none; transition:0.2s; }
         .field input:focus, .field select:focus{ border-color:#1b5e9e; background:white; box-shadow:0 0 0 3px rgba(27,94,158,0.08); }
+        .field input[readonly]{ background:#eef2f6; color:#1b4a77; cursor:default; }
         .fee-section{ background:#f8fbfe; border-radius:16px; padding:14px 18px; margin-top:12px; border:1px solid #e2e8f0; }
         .fee-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
         .fee-header h4{ font-size:0.95rem; color:#f59e0b; display:flex; align-items:center; gap:6px; }
@@ -69,6 +70,7 @@
         .main-content{ display:none; width:100%; max-width:1000px; }
         .logout-btn{ position:fixed; bottom:15px; right:15px; padding:8px 18px; background:#dc3545; color:white; border:none; border-radius:40px; cursor:pointer; z-index:9999; font-weight:600; font-size:0.8rem; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
         .logout-btn:hover{ background:#c82333; }
+        .auto-badge{ background:#0d6efd; color:white; font-size:0.55rem; padding:2px 10px; border-radius:40px; font-weight:400; margin-left:6px; }
         @media (max-width:700px){
             .form-grid{ grid-template-columns:1fr; }
             .fee-grid{ grid-template-columns:1fr; }
@@ -96,6 +98,7 @@
                 <button class="btn-new" id="clearFormBtn">➕ New Entry</button>
             </div>
 
+            <!-- FETCH ROW -->
             <div class="fetch-row">
                 <label>🔢 Roll No.</label>
                 <input type="text" id="rollNumber" placeholder="Enter roll number">
@@ -103,21 +106,22 @@
                 <span id="fetchStatus"></span>
             </div>
 
+            <!-- STUDENT DETAILS - SAB AUTO-FILL HOGA -->
             <div class="form-grid">
                 <div class="field">
-                    <label>🧑 Student Name <span style="color:red;">*</span></label>
-                    <input type="text" id="studentName" placeholder="Full name">
+                    <label>🧑 Student Name <span class="auto-badge">Auto</span></label>
+                    <input type="text" id="studentName" placeholder="Auto-fill on fetch" readonly>
                 </div>
                 <div class="field">
-                    <label>👨 Father Name <span style="color:red;">*</span></label>
-                    <input type="text" id="fatherName" placeholder="Father's name">
+                    <label>👨 Father Name <span class="auto-badge">Auto</span></label>
+                    <input type="text" id="fatherName" placeholder="Auto-fill on fetch" readonly>
                 </div>
                 <div class="field">
-                    <label>📞 Phone</label>
-                    <input type="tel" id="phoneNumber" placeholder="9876543210" maxlength="10">
+                    <label>📞 Phone <span class="auto-badge">Auto</span></label>
+                    <input type="tel" id="phoneNumber" placeholder="Auto-fill on fetch" readonly>
                 </div>
                 <div class="field">
-                    <label>📅 Session <span style="color:red;">*</span></label>
+                    <label>📅 Session <span class="auto-badge">Auto</span></label>
                     <select id="sessionSelect">
                         <option value="2024-25">2024-25</option>
                         <option value="2025-26">2025-26</option>
@@ -126,7 +130,7 @@
                     </select>
                 </div>
                 <div class="field">
-                    <label>🏫 Class <span style="color:red;">*</span></label>
+                    <label>🏫 Class <span class="auto-badge">Auto</span></label>
                     <select id="classSelect">
                         <option value="Class 6">Class 6</option>
                         <option value="Class 7">Class 7</option>
@@ -138,10 +142,11 @@
                     </select>
                 </div>
                 <div class="field" style="justify-content:flex-end;">
-                    <span style="font-size:0.7rem;color:#0d6efd;background:#e8f4fd;padding:4px 14px;border-radius:40px;display:inline-block;">⚡ Auto-fill on fetch</span>
+                    <span style="font-size:0.7rem;color:#0d6efd;background:#e8f4fd;padding:4px 14px;border-radius:40px;display:inline-block;">⚡ Enter roll & fetch</span>
                 </div>
             </div>
 
+            <!-- FEE SECTION -->
             <div class="fee-section">
                 <div class="fee-header">
                     <h4>💰 Fee Details <span>(Teacher will fill)</span></h4>
@@ -376,7 +381,7 @@
         }
     }
 
-    // ============ FETCH STUDENT - SIRF CAMELCASE FIELDS ============
+    // ============ FETCH STUDENT - DIRECT DOCUMENT SCAN ============
     async function fetchStudent() {
         const roll = dom.roll.value.trim();
         const session = dom.session.value;
@@ -394,23 +399,26 @@
         try {
             console.log("🔍 Searching for Roll:", roll, "Session:", session);
 
-            // ✅ Query using rollNumber (camelCase) - YAHI TUMHARE DATA MEIN HAI!
-            const querySnapshot = await feesCollection
+            // METHOD 1: Query with rollNumber (camelCase)
+            let querySnapshot = await feesCollection
                 .where('rollNumber', '==', roll)
                 .where('session', '==', session)
                 .limit(1)
                 .get();
 
-            console.log("Query result:", querySnapshot.empty ? "EMPTY" : "FOUND");
+            console.log("Query 1 (rollNumber):", querySnapshot.empty ? "EMPTY" : "FOUND");
 
-            // Agar nahi mila toh fallback - manual scan
+            // METHOD 2: If not found, try manual scan
             if (querySnapshot.empty) {
                 console.log("🔍 Fallback: Scanning all students in session");
                 const allDocs = await feesCollection.where('session', '==', session).get();
+                console.log("Total students in session:", allDocs.size);
+                
                 let found = null;
                 allDocs.forEach(doc => {
                     const data = doc.data();
-                    if (data.rollNumber == roll) {
+                    // Check both possible field names
+                    if (data.rollNumber == roll || data.roll_number == roll || data.roll == roll) {
                         found = { doc, data };
                     }
                 });
@@ -429,13 +437,9 @@
                 } else {
                     setStatus(`❌ No student found with Roll #${roll} in session ${session}`, 'error');
                     currentStudentId = null;
-                    dom.name.value = '';
-                    dom.father.value = '';
-                    dom.phone.value = '';
-                    dom.class.value = 'Class 6';
+                    clearStudentFields();
                     dom.addBtn.innerHTML = '💾 Save Student';
                     dom.addBtn.className = 'btn-submit';
-                    renderFeeSection();
                     isFetching = false;
                     dom.fetchBtn.disabled = false;
                     return;
@@ -464,13 +468,18 @@
         }
     }
 
-    // ============ FILL STUDENT DATA - SIRF CAMELCASE ============
+    // ============ FILL STUDENT DATA - SAB KUCH AUTO FILL ============
     function fillStudentData(data) {
-        // Student details
-        dom.name.value = data.studentName || '';
-        dom.father.value = data.fatherName || '';
-        dom.phone.value = data.parentMobile || data.phoneNumber || '';
-        dom.class.value = data.classApplying || data.class || 'Class 6';
+        // Student details - sab auto-fill
+        dom.name.value = data.studentName || data.student_name || '';
+        dom.father.value = data.fatherName || data.father_name || '';
+        dom.phone.value = data.parentMobile || data.phone_number || data.phone || '';
+        
+        // Class auto-fill
+        const classVal = data.classApplying || data.class || 'Class 6';
+        dom.class.value = classVal;
+        
+        // Session auto-fill
         dom.session.value = data.session || '2026-27';
         
         // Fee section render karo
@@ -488,13 +497,21 @@
         }, 100);
     }
 
+    function clearStudentFields() {
+        dom.name.value = '';
+        dom.father.value = '';
+        dom.phone.value = '';
+        dom.class.value = 'Class 6';
+        // Session change nahi karenge
+    }
+
     function clearForm() {
         dom.roll.value = '';
         dom.name.value = '';
         dom.father.value = '';
         dom.phone.value = '';
         dom.class.value = 'Class 6';
-        // Session already selected rahega
+        // Session already selected rahega - change nahi karenge
         currentStudentId = null;
         renderFeeSection();
         clearStatus();
