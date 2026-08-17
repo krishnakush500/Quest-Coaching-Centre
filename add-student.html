@@ -31,7 +31,6 @@
         .field label{ font-weight:600; color:#1b4a77; font-size:0.8rem; display:flex; align-items:center; gap:4px; }
         .field input, .field select{ padding:8px 14px; border:1px solid #b8ceec; border-radius:40px; font-size:0.85rem; background:#fafcff; outline:none; transition:0.2s; }
         .field input:focus, .field select:focus{ border-color:#1b5e9e; background:white; box-shadow:0 0 0 3px rgba(27,94,158,0.08); }
-        .field input:disabled{ background:#eef2f6; color:#6c757d; }
         .fee-section{ background:#f8fbfe; border-radius:16px; padding:14px 18px; margin-top:12px; border:1px solid #e2e8f0; }
         .fee-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
         .fee-header h4{ font-size:0.95rem; color:#f59e0b; display:flex; align-items:center; gap:6px; }
@@ -377,7 +376,7 @@
         }
     }
 
-    // ============ FETCH STUDENT - FIXED FOR rollNumber FIELD ============
+    // ============ FETCH STUDENT - SIRF CAMELCASE FIELDS ============
     async function fetchStudent() {
         const roll = dom.roll.value.trim();
         const session = dom.session.value;
@@ -395,91 +394,52 @@
         try {
             console.log("🔍 Searching for Roll:", roll, "Session:", session);
 
-            // ✅ QUERY 1: rollNumber (camelCase) - YAHI TUMHARE DATA MEIN HAI!
-            let querySnapshot = await feesCollection
+            // ✅ Query using rollNumber (camelCase) - YAHI TUMHARE DATA MEIN HAI!
+            const querySnapshot = await feesCollection
                 .where('rollNumber', '==', roll)
                 .where('session', '==', session)
                 .limit(1)
                 .get();
 
-            console.log("Query 1 (rollNumber) result:", querySnapshot.empty ? "EMPTY" : "FOUND");
+            console.log("Query result:", querySnapshot.empty ? "EMPTY" : "FOUND");
 
-            // ✅ QUERY 2: roll_number (underscore) - fallback
-            if (querySnapshot.empty) {
-                querySnapshot = await feesCollection
-                    .where('roll_number', '==', roll)
-                    .where('session', '==', session)
-                    .limit(1)
-                    .get();
-                console.log("Query 2 (roll_number) result:", querySnapshot.empty ? "EMPTY" : "FOUND");
-            }
-
-            // ✅ QUERY 3: fallback - manual scan
+            // Agar nahi mila toh fallback - manual scan
             if (querySnapshot.empty) {
                 console.log("🔍 Fallback: Scanning all students in session");
                 const allDocs = await feesCollection.where('session', '==', session).get();
                 let found = null;
                 allDocs.forEach(doc => {
                     const data = doc.data();
-                    // Check all possible roll number fields
-                    if (data.rollNumber == roll || data.roll_number == roll || data.roll == roll) {
+                    if (data.rollNumber == roll) {
                         found = { doc, data };
                     }
                 });
+                
                 if (found) {
-                    querySnapshot = {
-                        empty: false,
-                        docs: [found.doc],
-                        forEach: (cb) => cb(found.doc)
-                    };
-                    // Manually set the data
-                    const tempData = found.data;
-                    console.log("✅ Found via fallback:", tempData);
+                    console.log("✅ Found via fallback:", found.data);
                     currentStudentId = found.doc.id;
-                    
-                    // Fill form
-                    dom.name.value = tempData.studentName || tempData.student_name || '';
-                    dom.father.value = tempData.fatherName || tempData.father_name || '';
-                    dom.phone.value = tempData.parentMobile || tempData.phone_number || tempData.phone || '';
-                    dom.class.value = tempData.class || tempData.classApplying || 'Class 6';
-                    dom.session.value = tempData.session || '2026-27';
-                    
-                    renderFeeSection();
-                    
-                    setTimeout(() => {
-                        if (feeCbs.tuition) feeCbs.tuition.checked = false;
-                        if (feeCbs.admission) feeCbs.admission.checked = false;
-                        if (feeCbs.exam) feeCbs.exam.checked = false;
-                        if (feeCbs.assignment) feeCbs.assignment.checked = false;
-                        if (discInput) discInput.value = 0;
-                        if (recvInput) recvInput.value = 0;
-                        updateDue();
-                    }, 100);
-
+                    fillStudentData(found.data);
                     dom.addBtn.innerHTML = '✏️ Update Student';
                     dom.addBtn.className = 'btn-submit btn-update';
-                    setStatus(`✅ ${tempData.studentName || tempData.student_name || 'Student'} found!`, 'success');
-                    showToast(`✅ ${tempData.studentName || tempData.student_name || 'Student'} loaded!`);
-                    
+                    setStatus(`✅ ${found.data.studentName || 'Student'} found!`, 'success');
+                    showToast(`✅ ${found.data.studentName || 'Student'} loaded!`);
+                    isFetching = false;
+                    dom.fetchBtn.disabled = false;
+                    return;
+                } else {
+                    setStatus(`❌ No student found with Roll #${roll} in session ${session}`, 'error');
+                    currentStudentId = null;
+                    dom.name.value = '';
+                    dom.father.value = '';
+                    dom.phone.value = '';
+                    dom.class.value = 'Class 6';
+                    dom.addBtn.innerHTML = '💾 Save Student';
+                    dom.addBtn.className = 'btn-submit';
+                    renderFeeSection();
                     isFetching = false;
                     dom.fetchBtn.disabled = false;
                     return;
                 }
-            }
-
-            // Agar kuch nahi mila
-            if (querySnapshot.empty) {
-                console.log("❌ No student found");
-                setStatus(`❌ No student found with Roll #${roll} in session ${session}`, 'error');
-                currentStudentId = null;
-                dom.name.value = '';
-                dom.father.value = '';
-                dom.phone.value = '';
-                dom.class.value = 'Class 6';
-                dom.addBtn.innerHTML = '💾 Save Student';
-                dom.addBtn.className = 'btn-submit';
-                renderFeeSection();
-                return;
             }
 
             // ✅ Student Mil Gaya!
@@ -488,31 +448,12 @@
             currentStudentId = doc.id;
 
             console.log("✅ Student found:", data);
-
-            // Fill student details - SUPPORT BOTH FIELD NAMES
-            dom.name.value = data.studentName || data.student_name || '';
-            dom.father.value = data.fatherName || data.father_name || '';
-            dom.phone.value = data.parentMobile || data.phone_number || data.phone || '';
-            dom.class.value = data.class || data.classApplying || 'Class 6';
-            dom.session.value = data.session || '2026-27';
-            
-            renderFeeSection();
-            
-            setTimeout(() => {
-                // Fee details - teacher manually fill karega, isliye sab unchecked
-                if (feeCbs.tuition) feeCbs.tuition.checked = false;
-                if (feeCbs.admission) feeCbs.admission.checked = false;
-                if (feeCbs.exam) feeCbs.exam.checked = false;
-                if (feeCbs.assignment) feeCbs.assignment.checked = false;
-                if (discInput) discInput.value = 0;
-                if (recvInput) recvInput.value = 0;
-                updateDue();
-            }, 100);
+            fillStudentData(data);
 
             dom.addBtn.innerHTML = '✏️ Update Student';
             dom.addBtn.className = 'btn-submit btn-update';
-            setStatus(`✅ ${data.studentName || data.student_name || 'Student'} found!`, 'success');
-            showToast(`✅ ${data.studentName || data.student_name || 'Student'} loaded!`);
+            setStatus(`✅ ${data.studentName || 'Student'} found!`, 'success');
+            showToast(`✅ ${data.studentName || 'Student'} loaded!`);
 
         } catch(error) {
             console.error("❌ Fetch error:", error);
@@ -523,12 +464,37 @@
         }
     }
 
+    // ============ FILL STUDENT DATA - SIRF CAMELCASE ============
+    function fillStudentData(data) {
+        // Student details
+        dom.name.value = data.studentName || '';
+        dom.father.value = data.fatherName || '';
+        dom.phone.value = data.parentMobile || data.phoneNumber || '';
+        dom.class.value = data.classApplying || data.class || 'Class 6';
+        dom.session.value = data.session || '2026-27';
+        
+        // Fee section render karo
+        renderFeeSection();
+        
+        // Fee details - teacher manually fill karega, isliye sab unchecked
+        setTimeout(() => {
+            if (feeCbs.tuition) feeCbs.tuition.checked = false;
+            if (feeCbs.admission) feeCbs.admission.checked = false;
+            if (feeCbs.exam) feeCbs.exam.checked = false;
+            if (feeCbs.assignment) feeCbs.assignment.checked = false;
+            if (discInput) discInput.value = 0;
+            if (recvInput) recvInput.value = 0;
+            updateDue();
+        }, 100);
+    }
+
     function clearForm() {
         dom.roll.value = '';
         dom.name.value = '';
         dom.father.value = '';
         dom.phone.value = '';
         dom.class.value = 'Class 6';
+        // Session already selected rahega
         currentStudentId = null;
         renderFeeSection();
         clearStatus();
@@ -573,11 +539,11 @@
         const due = Math.max(0, total - recv);
 
         const data = {
-            rollNumber: roll,  // ✅ Save with camelCase to match existing data
+            rollNumber: roll,
             studentName: name,
             fatherName: father,
             parentMobile: dom.phone.value.trim() || '',
-            class: dom.class.value,
+            classApplying: dom.class.value,
             session: dom.session.value,
             total_amount: total,
             received_amount: recv,
