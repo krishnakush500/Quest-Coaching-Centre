@@ -20,6 +20,37 @@
         .row2{ display:flex; gap:15px; flex-wrap:wrap; }
         .row2 .field{ flex:1 1 200px; }
         
+        /* Student Preview Styles */
+        .student-preview {
+            background: #f0f7ff;
+            border-radius: 16px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border: 1px solid #c1d6f0;
+            display: none;
+        }
+        .student-preview.show {
+            display: block;
+        }
+        .preview-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px dashed #c1d6f0;
+        }
+        .preview-row:last-child {
+            border-bottom: none;
+        }
+        .preview-row strong {
+            color: #1b4a77;
+        }
+        .preview-loading {
+            text-align: center;
+            padding: 10px;
+            color: #1b4f9b;
+            font-weight: 600;
+        }
+        
         .fees-section{ background:#f8fbfe; border-radius:32px; padding:18px 20px; margin:20px 0 12px 0; border:1px solid #d9e6f5; }
         .section-title{ font-size:1.25rem; font-weight:800; color:#174873; margin-bottom:16px; display:flex; align-items:center; gap:8px; border-left:4px solid #1b4f9b; padding-left:14px; }
         .subjects-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(210px,1fr)); gap:12px 20px; margin-bottom:20px; }
@@ -98,10 +129,20 @@
     <div class="form-card">
         <h2>📋 Add New Student</h2>
         
+        <!-- Roll Number Field -->
         <div class="field">
             <label>🔢 Roll Number</label>
             <input type="text" id="rollNumber" placeholder="e.g. 24" required>
         </div>
+
+        <!-- Student Preview - Automatically shows when roll number is entered -->
+        <div id="studentPreview" class="student-preview">
+            <div id="studentPreviewContent">
+                <div class="preview-loading">⏳ Searching student...</div>
+            </div>
+        </div>
+
+        <!-- Other Fields (Auto-filled or Manually filled) -->
         <div class="field">
             <label>🧑 Student Name</label>
             <input type="text" id="studentName" placeholder="Full name" required>
@@ -165,6 +206,7 @@
     const auth = firebase.auth();
     const feesCollection = db.collection('fees');
     const transactionsCollection = db.collection('transactions');
+    const admissionsCollection = db.collection('admissions');
 
     // Auth Elements
     const authLoading = document.getElementById('authLoading');
@@ -257,6 +299,94 @@
         errorDiv.style.display = 'block';
         setTimeout(() => { errorDiv.style.display = 'none'; }, 4000);
     }
+
+    // ============================================================
+    // 🔥 MAIN FEATURE: Auto-fetch student details on roll number input
+    // ============================================================
+    document.getElementById('rollNumber')?.addEventListener('input', async function() {
+        const roll = this.value.trim();
+        const previewDiv = document.getElementById('studentPreview');
+        const contentDiv = document.getElementById('studentPreviewContent');
+
+        if (roll.length < 2) {
+            previewDiv.classList.remove('show');
+            // Clear the fields if roll is empty
+            if (roll.length === 0) {
+                document.getElementById('studentName').value = '';
+                document.getElementById('fatherName').value = '';
+                document.getElementById('phoneNumber').value = '';
+            }
+            return;
+        }
+
+        // Show loading
+        previewDiv.classList.add('show');
+        contentDiv.innerHTML = `<div class="preview-loading">⏳ Searching student...</div>`;
+
+        try {
+            // Search in fees collection first
+            let student = null;
+            let snap = await feesCollection.where('roll_number', '==', roll).get();
+            
+            if (!snap.empty) {
+                snap.forEach(doc => {
+                    student = { id: doc.id, ...doc.data() };
+                });
+            } else {
+                // If not found in fees, search in admissions collection
+                let snap2 = await admissionsCollection.where('rollNumber', '==', roll).get();
+                if (!snap2.empty) {
+                    snap2.forEach(doc => {
+                        student = { id: doc.id, ...doc.data() };
+                    });
+                }
+            }
+
+            if (student) {
+                // Auto-fill the form fields
+                document.getElementById('studentName').value = student.student_name || student.studentName || '';
+                document.getElementById('fatherName').value = student.father_name || student.fatherName || '';
+                document.getElementById('phoneNumber').value = student.phone_number || student.phoneNumber || '';
+                
+                // Auto-select class if available
+                if (student.class) {
+                    const classSelect = document.getElementById('classSelect');
+                    const options = classSelect.options;
+                    for (let i = 0; i < options.length; i++) {
+                        if (options[i].value === student.class) {
+                            classSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                    // Trigger class change to update fee section
+                    classSelect.dispatchEvent(new Event('change'));
+                }
+
+                // Show student preview
+                contentDiv.innerHTML = `
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                        <div style="flex:1;">
+                            <div class="preview-row"><strong>👤 Name:</strong> ${student.student_name || student.studentName || 'N/A'}</div>
+                            <div class="preview-row"><strong>👨 Father:</strong> ${student.father_name || student.fatherName || 'N/A'}</div>
+                            <div class="preview-row"><strong>🏫 Class:</strong> ${student.class || 'N/A'}</div>
+                            <div class="preview-row"><strong>📞 Phone:</strong> ${student.phone_number || student.phoneNumber || 'N/A'}</div>
+                            <div class="preview-row"><strong>📅 Session:</strong> ${student.session || 'N/A'}</div>
+                        </div>
+                    </div>
+                `;
+                previewDiv.classList.add('show');
+            } else {
+                contentDiv.innerHTML = `<div style="color:#dc2626; padding:10px;">❌ No student found with Roll Number: <strong>${roll}</strong></div>`;
+                previewDiv.classList.add('show');
+                
+                // Don't clear fields if not found, user might want to add new student
+            }
+        } catch (error) {
+            console.error("Error fetching student:", error);
+            contentDiv.innerHTML = `<div style="color:#dc2626; padding:10px;">❌ Error fetching student details: ${error.message}</div>`;
+            previewDiv.classList.add('show');
+        }
+    });
 
     function calculateAdvancedTotal() {
         let total = 0;
@@ -548,6 +678,9 @@
         nameInput.value = '';
         fatherInput.value = '';
         phoneInput.value = '';
+        
+        // Hide preview
+        document.getElementById('studentPreview').classList.remove('show');
         
         if (currentMode === 'advanced') {
             subjectCheckboxes.forEach(cb => cb.checked = false);
