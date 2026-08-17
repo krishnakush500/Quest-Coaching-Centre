@@ -10,14 +10,11 @@
     <style>
         *{ margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Roboto,sans-serif; }
         body{ background:#f0f5fa; padding:16px; display:flex; flex-direction:column; align-items:center; min-height:100vh; }
-        
         .form-card{ background:white; max-width:1000px; width:100%; border-radius:32px; padding:24px 28px; box-shadow:0 15px 30px -10px rgba(0,0,0,0.1); }
-        
         .header{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
         .header h2{ font-size:1.3rem; color:#174873; display:flex; align-items:center; gap:8px; }
         .btn-new{ background:#f59e0b; border:none; color:white; padding:6px 18px; border-radius:40px; font-weight:600; cursor:pointer; font-size:0.85rem; }
         .btn-new:hover{ background:#d97706; }
-        
         .fetch-row{ display:flex; gap:10px; align-items:center; background:#f8faff; padding:12px 16px; border-radius:16px; border:1px solid #e2e8f0; margin-bottom:14px; flex-wrap:wrap; }
         .fetch-row label{ font-weight:600; color:#1b4a77; font-size:0.9rem; white-space:nowrap; }
         .fetch-row input{ flex:1; min-width:120px; padding:10px 16px; border:1px solid #b8ceec; border-radius:40px; font-size:0.9rem; background:white; outline:none; }
@@ -29,83 +26,59 @@
         #fetchStatus.success{ background:#d1e7dd; color:#0f5132; display:inline-block; }
         #fetchStatus.error{ background:#f8d7da; color:#842029; display:inline-block; }
         #fetchStatus.loading{ background:#e2e3e5; color:#41464b; display:inline-block; }
-        
         .form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px 20px; }
         .field{ display:flex; flex-direction:column; gap:4px; }
         .field label{ font-weight:600; color:#1b4a77; font-size:0.8rem; display:flex; align-items:center; gap:4px; }
-        .field label .badge{ background:#0d6efd; color:white; font-size:0.55rem; padding:1px 8px; border-radius:40px; font-weight:400; }
         .field input, .field select{ padding:8px 14px; border:1px solid #b8ceec; border-radius:40px; font-size:0.85rem; background:#fafcff; outline:none; transition:0.2s; }
         .field input:focus, .field select:focus{ border-color:#1b5e9e; background:white; box-shadow:0 0 0 3px rgba(27,94,158,0.08); }
         .field input:disabled{ background:#eef2f6; color:#6c757d; }
-        .field-full{ grid-column:span 2; }
-        
         .fee-section{ background:#f8fbfe; border-radius:16px; padding:14px 18px; margin-top:12px; border:1px solid #e2e8f0; }
         .fee-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
         .fee-header h4{ font-size:0.95rem; color:#f59e0b; display:flex; align-items:center; gap:6px; }
         .fee-header span{ font-size:0.7rem; color:#6c757d; font-weight:400; }
-        
         .fee-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:6px 16px; }
         .fee-item{ display:flex; align-items:center; gap:8px; background:white; padding:4px 12px 4px 8px; border-radius:40px; border:1px solid #e2e8f0; }
         .fee-item input{ width:16px; height:16px; accent-color:#1b4f9b; cursor:pointer; flex-shrink:0; }
         .fee-item label{ font-size:0.78rem; font-weight:500; color:#1e3a5f; cursor:pointer; flex:1; }
         .fee-item .price{ font-weight:700; color:#0f5c3e; font-size:0.7rem; background:#e2f0e8; padding:0 10px; border-radius:40px; }
-        
-        .fee-bottom{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:10px; }
-        .fee-bottom .field{ gap:2px; }
-        .fee-bottom .field label{ font-size:0.7rem; color:#555; }
-        .fee-bottom .field input{ padding:6px 12px; font-size:0.8rem; }
-        .fee-bottom .field input:read-only{ background:#eef2f5; color:#b44; font-weight:700; }
-        
         .total-display{ background:#e6f0fa; border-radius:40px; padding:8px 18px; display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
         .total-display .label{ font-weight:700; font-size:0.9rem; color:#0a3a60; }
         .total-display .amount{ font-size:1.3rem; font-weight:800; color:#1b4f9b; }
-        
         .subj-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:4px; }
         .subj-item{ display:flex; align-items:center; gap:6px; background:white; padding:2px 10px 2px 6px; border-radius:40px; border:1px solid #e2e8f0; }
         .subj-item input{ width:15px; height:15px; accent-color:#1b4f9b; }
         .subj-item label{ font-size:0.75rem; font-weight:500; cursor:pointer; }
         .subj-item .sp{ font-size:0.65rem; color:#0f5c3e; font-weight:700; }
-        
         .extra-row{ display:flex; flex-wrap:wrap; gap:6px; margin:6px 0; }
         .extra-item{ display:flex; align-items:center; gap:5px; background:#fef7e0; padding:2px 12px 2px 6px; border-radius:40px; border:1px solid #ffe2a4; }
         .extra-item input{ width:15px; height:15px; accent-color:#f59e0b; }
         .extra-item label{ font-size:0.7rem; font-weight:600; color:#7a5c00; cursor:pointer; }
-        
         .class-warning{ background:#fff3cd; border-left:3px solid #ffc107; padding:6px 14px; border-radius:8px; font-size:0.75rem; color:#856404; display:none; margin-bottom:8px; }
-        
         .btn-submit{ background:#1b4f9b; border:none; color:white; font-size:1rem; font-weight:700; padding:12px; width:100%; border-radius:50px; display:flex; align-items:center; justify-content:center; gap:10px; margin-top:16px; cursor:pointer; transition:0.2s; }
         .btn-submit:hover{ background:#0f3d73; transform:translateY(-1px); }
         .btn-submit:disabled{ opacity:0.6; cursor:not-allowed; transform:none; }
         .btn-submit.btn-update{ background:linear-gradient(135deg, #f59e0b, #d97706); }
         .btn-submit.btn-update:hover{ background:linear-gradient(135deg, #d97706, #b45309); }
-        
         .info-note{ text-align:center; margin-top:12px; font-size:0.8rem; color:#2c577c; }
         .info-note a{ color:#1b4f9b; font-weight:600; text-decoration:none; border-bottom:1px dotted #1b4f9b; }
-        
         .loading{ text-align:center; padding:10px; background:#eef2f8; border-radius:40px; margin-top:10px; font-weight:500; display:none; font-size:0.9rem; }
         .error-msg{ color:#c0392b; background:#fdecea; border-radius:40px; padding:8px 16px; margin-top:10px; text-align:center; display:none; font-size:0.85rem; }
         .success-toast{ position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#1e6f3f; color:white; padding:10px 28px; border-radius:60px; font-weight:600; z-index:1000; opacity:0; transition:opacity 0.2s; pointer-events:none; font-size:0.9rem; }
-        
         .auth-loading{ position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:flex; justify-content:center; align-items:center; flex-direction:column; z-index:10000; }
         .auth-loading .spinner{ width:40px; height:40px; border:4px solid #f3f3f3; border-top:4px solid #1b4f9b; border-radius:50%; animation:spin 1s linear infinite; }
         @keyframes spin{ 0%{ transform:rotate(0deg); } 100%{ transform:rotate(360deg); } }
         .main-content{ display:none; width:100%; max-width:1000px; }
-        
         .logout-btn{ position:fixed; bottom:15px; right:15px; padding:8px 18px; background:#dc3545; color:white; border:none; border-radius:40px; cursor:pointer; z-index:9999; font-weight:600; font-size:0.8rem; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
         .logout-btn:hover{ background:#c82333; }
-        
         @media (max-width:700px){
             .form-grid{ grid-template-columns:1fr; }
-            .field-full{ grid-column:span 1; }
-            .fee-bottom{ grid-template-columns:1fr 1fr; }
-            .form-card{ padding:16px; }
             .fee-grid{ grid-template-columns:1fr; }
             .subj-grid{ grid-template-columns:1fr 1fr; }
             .fetch-row{ flex-direction:column; align-items:stretch; }
             .fetch-row input{ min-width:auto; }
+            .form-card{ padding:16px; }
         }
         @media (max-width:450px){
-            .fee-bottom{ grid-template-columns:1fr; }
             .subj-grid{ grid-template-columns:1fr; }
             .header h2{ font-size:1rem; }
         }
@@ -124,7 +97,6 @@
                 <button class="btn-new" id="clearFormBtn">➕ New Entry</button>
             </div>
 
-            <!-- FETCH ROW -->
             <div class="fetch-row">
                 <label>🔢 Roll No.</label>
                 <input type="text" id="rollNumber" placeholder="Enter roll number">
@@ -132,7 +104,6 @@
                 <span id="fetchStatus"></span>
             </div>
 
-            <!-- STUDENT DETAILS -->
             <div class="form-grid">
                 <div class="field">
                     <label>🧑 Student Name <span style="color:red;">*</span></label>
@@ -172,7 +143,6 @@
                 </div>
             </div>
 
-            <!-- FEE SECTION -->
             <div class="fee-section">
                 <div class="fee-header">
                     <h4>💰 Fee Details <span>(Teacher will fill)</span></h4>
@@ -407,7 +377,7 @@
         }
     }
 
-    // ============ FETCH STUDENT - FIXED ============
+    // ============ FETCH STUDENT - FIXED FOR rollNumber FIELD ============
     async function fetchStudent() {
         const roll = dom.roll.value.trim();
         const session = dom.session.value;
@@ -423,18 +393,83 @@
         setStatus('⏳ Searching...', 'loading');
 
         try {
-            console.log("Searching for roll:", roll, "session:", session);
-            
-            // Query using roll_number field
-            const querySnapshot = await feesCollection
-                .where('roll_number', '==', roll)
+            console.log("🔍 Searching for Roll:", roll, "Session:", session);
+
+            // ✅ QUERY 1: rollNumber (camelCase) - YAHI TUMHARE DATA MEIN HAI!
+            let querySnapshot = await feesCollection
+                .where('rollNumber', '==', roll)
                 .where('session', '==', session)
                 .limit(1)
                 .get();
 
-            console.log("Query result empty?", querySnapshot.empty);
+            console.log("Query 1 (rollNumber) result:", querySnapshot.empty ? "EMPTY" : "FOUND");
 
+            // ✅ QUERY 2: roll_number (underscore) - fallback
             if (querySnapshot.empty) {
+                querySnapshot = await feesCollection
+                    .where('roll_number', '==', roll)
+                    .where('session', '==', session)
+                    .limit(1)
+                    .get();
+                console.log("Query 2 (roll_number) result:", querySnapshot.empty ? "EMPTY" : "FOUND");
+            }
+
+            // ✅ QUERY 3: fallback - manual scan
+            if (querySnapshot.empty) {
+                console.log("🔍 Fallback: Scanning all students in session");
+                const allDocs = await feesCollection.where('session', '==', session).get();
+                let found = null;
+                allDocs.forEach(doc => {
+                    const data = doc.data();
+                    // Check all possible roll number fields
+                    if (data.rollNumber == roll || data.roll_number == roll || data.roll == roll) {
+                        found = { doc, data };
+                    }
+                });
+                if (found) {
+                    querySnapshot = {
+                        empty: false,
+                        docs: [found.doc],
+                        forEach: (cb) => cb(found.doc)
+                    };
+                    // Manually set the data
+                    const tempData = found.data;
+                    console.log("✅ Found via fallback:", tempData);
+                    currentStudentId = found.doc.id;
+                    
+                    // Fill form
+                    dom.name.value = tempData.studentName || tempData.student_name || '';
+                    dom.father.value = tempData.fatherName || tempData.father_name || '';
+                    dom.phone.value = tempData.parentMobile || tempData.phone_number || tempData.phone || '';
+                    dom.class.value = tempData.class || tempData.classApplying || 'Class 6';
+                    dom.session.value = tempData.session || '2026-27';
+                    
+                    renderFeeSection();
+                    
+                    setTimeout(() => {
+                        if (feeCbs.tuition) feeCbs.tuition.checked = false;
+                        if (feeCbs.admission) feeCbs.admission.checked = false;
+                        if (feeCbs.exam) feeCbs.exam.checked = false;
+                        if (feeCbs.assignment) feeCbs.assignment.checked = false;
+                        if (discInput) discInput.value = 0;
+                        if (recvInput) recvInput.value = 0;
+                        updateDue();
+                    }, 100);
+
+                    dom.addBtn.innerHTML = '✏️ Update Student';
+                    dom.addBtn.className = 'btn-submit btn-update';
+                    setStatus(`✅ ${tempData.studentName || tempData.student_name || 'Student'} found!`, 'success');
+                    showToast(`✅ ${tempData.studentName || tempData.student_name || 'Student'} loaded!`);
+                    
+                    isFetching = false;
+                    dom.fetchBtn.disabled = false;
+                    return;
+                }
+            }
+
+            // Agar kuch nahi mila
+            if (querySnapshot.empty) {
+                console.log("❌ No student found");
                 setStatus(`❌ No student found with Roll #${roll} in session ${session}`, 'error');
                 currentStudentId = null;
                 dom.name.value = '';
@@ -447,51 +482,40 @@
                 return;
             }
 
-            // Student found
+            // ✅ Student Mil Gaya!
             const doc = querySnapshot.docs[0];
             const data = doc.data();
             currentStudentId = doc.id;
 
-            console.log("Student found:", data);
+            console.log("✅ Student found:", data);
 
-            // === FILL STUDENT DETAILS (Class bhi auto-fill ho jayega) ===
-            dom.name.value = data.student_name || '';
-            dom.father.value = data.father_name || '';
-            dom.phone.value = data.phone_number || '';
-            dom.class.value = data.class || 'Class 6';
+            // Fill student details - SUPPORT BOTH FIELD NAMES
+            dom.name.value = data.studentName || data.student_name || '';
+            dom.father.value = data.fatherName || data.father_name || '';
+            dom.phone.value = data.parentMobile || data.phone_number || data.phone || '';
+            dom.class.value = data.class || data.classApplying || 'Class 6';
             dom.session.value = data.session || '2026-27';
             
-            // Fee section render karo
             renderFeeSection();
             
-            // Fee data fill karo (agar hai toh)
             setTimeout(() => {
-                const bd = data.fee_breakdown || {};
-                if (currentMode === 'advanced') {
-                    const subs = data.subjects || [];
-                    subjectCbs.forEach((cb, i) => cb.checked = subs.includes(SUBJECTS[i].name));
-                    const extras = data.extra_fees || [];
-                    extraCbs.forEach((cb, i) => cb.checked = extras.includes(EXTRA_FEES[i].name));
-                    if (discInput) discInput.value = data.discount_applied || 0;
-                    if (recvInput) recvInput.value = data.received_amount || 0;
-                } else {
-                    if (feeCbs.tuition) feeCbs.tuition.checked = (bd.tuition || 0) > 0;
-                    if (feeCbs.admission) feeCbs.admission.checked = (bd.admission || 0) > 0;
-                    if (feeCbs.exam) feeCbs.exam.checked = (bd.exam || 0) > 0;
-                    if (feeCbs.assignment) feeCbs.assignment.checked = (bd.assignment || 0) > 0;
-                    if (discInput) discInput.value = data.discount_applied || 0;
-                    if (recvInput) recvInput.value = data.received_amount || 0;
-                }
+                // Fee details - teacher manually fill karega, isliye sab unchecked
+                if (feeCbs.tuition) feeCbs.tuition.checked = false;
+                if (feeCbs.admission) feeCbs.admission.checked = false;
+                if (feeCbs.exam) feeCbs.exam.checked = false;
+                if (feeCbs.assignment) feeCbs.assignment.checked = false;
+                if (discInput) discInput.value = 0;
+                if (recvInput) recvInput.value = 0;
                 updateDue();
             }, 100);
 
             dom.addBtn.innerHTML = '✏️ Update Student';
             dom.addBtn.className = 'btn-submit btn-update';
-            setStatus(`✅ ${data.student_name || 'Student'} found!`, 'success');
-            showToast(`✅ ${data.student_name || 'Student'} loaded!`);
+            setStatus(`✅ ${data.studentName || data.student_name || 'Student'} found!`, 'success');
+            showToast(`✅ ${data.studentName || data.student_name || 'Student'} loaded!`);
 
         } catch(error) {
-            console.error("Fetch error:", error);
+            console.error("❌ Fetch error:", error);
             setStatus('❌ ' + error.message, 'error');
         } finally {
             isFetching = false;
@@ -505,7 +529,6 @@
         dom.father.value = '';
         dom.phone.value = '';
         dom.class.value = 'Class 6';
-        // Session already selected rahega - change nahi karenge
         currentStudentId = null;
         renderFeeSection();
         clearStatus();
@@ -550,10 +573,10 @@
         const due = Math.max(0, total - recv);
 
         const data = {
-            roll_number: roll,
-            student_name: name,
-            father_name: father,
-            phone_number: dom.phone.value.trim() || '',
+            rollNumber: roll,  // ✅ Save with camelCase to match existing data
+            studentName: name,
+            fatherName: father,
+            parentMobile: dom.phone.value.trim() || '',
             class: dom.class.value,
             session: dom.session.value,
             total_amount: total,
@@ -563,6 +586,7 @@
             fee_breakdown: fee,
             updated_at: firebase.firestore.FieldValue.serverTimestamp()
         };
+        
         if (currentMode === 'advanced') {
             data.subjects = fee.subjects || [];
             data.extra_fees = fee.extra_fees || [];
