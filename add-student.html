@@ -2,87 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>➕ Add Student · Fee Manager</title>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        *{ margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Roboto,sans-serif; }
-        body{ background:#f0f5fa; padding:24px 16px; display:flex; flex-direction:column; align-items:center; }
-        .form-card{ background:white; max-width:950px; width:100%; margin:20px auto; border-radius:48px; padding:36px 30px; box-shadow:0 25px 40px -15px #1e3b5b; }
-        h2{ display:flex; align-items:center; gap:12px; color:#174873; margin-bottom:28px; font-size:1.9rem; }
-        .field{ margin-bottom:22px; }
-        label{ font-weight:600; display:flex; align-items:center; gap:6px; margin-bottom:10px; color:#1b4a77; font-size:1.05rem; }
-        input, select{ width:100%; padding:14px 20px; font-size:1rem; background:#f3f8ff; border:1px solid #b8ceec; border-radius:60px; outline:none; transition: all 0.2s ease; }
-        input:focus, select:focus{ border-color:#1b5e9e; background:white; box-shadow:0 0 0 3px rgba(27,94,158,0.1); }
-        .row2{ display:flex; gap:15px; flex-wrap:wrap; }
-        .row2 .field{ flex:1 1 200px; }
-        
-        /* Student Preview Styles */
-        .student-preview {
-            background: #f0f7ff;
-            border-radius: 16px;
-            padding: 15px 20px;
-            margin-bottom: 20px;
-            border: 1px solid #c1d6f0;
-            display: none;
-        }
-        .student-preview.show {
-            display: block;
-        }
-        .preview-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 0;
-            border-bottom: 1px dashed #c1d6f0;
-        }
-        .preview-row:last-child {
-            border-bottom: none;
-        }
-        .preview-row strong {
-            color: #1b4a77;
-        }
-        .preview-loading {
-            text-align: center;
-            padding: 10px;
-            color: #1b4f9b;
-            font-weight: 600;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Poppins', Roboto, sans-serif;
         }
         
-        .fees-section{ background:#f8fbfe; border-radius:32px; padding:18px 20px; margin:20px 0 12px 0; border:1px solid #d9e6f5; }
-        .section-title{ font-size:1.25rem; font-weight:800; color:#174873; margin-bottom:16px; display:flex; align-items:center; gap:8px; border-left:4px solid #1b4f9b; padding-left:14px; }
-        .subjects-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(210px,1fr)); gap:12px 20px; margin-bottom:20px; }
-        .subject-item{ display:flex; align-items:center; gap:12px; background:white; padding:8px 16px; border-radius:50px; border:1px solid #cde1f0; transition:0.1s; cursor:pointer; }
-        .subject-item:hover{ background:#eef4fc; border-color:#9bb7d4; }
-        .subject-item input{ width:20px; height:20px; margin:0; cursor:pointer; accent-color:#1b4f9b; }
-        .subject-item label{ margin:0; font-weight:500; font-size:0.95rem; color:#1e3a5f; cursor:pointer; flex:1; }
-        .subject-price{ font-weight:700; color:#0f5c3e; background:#e2f0e8; padding:2px 10px; border-radius:40px; font-size:0.8rem; }
-        .extra-charges{ display:flex; flex-wrap:wrap; gap:15px; margin-top:8px; border-top:1px dashed #c2d6ea; padding-top:18px; }
-        .extra-item{ background:#fef7e0; border-radius:40px; padding:6px 20px 6px 16px; display:flex; align-items:center; gap:10px; border:1px solid #ffe2a4; }
-        .extra-item input{ width:18px; height:18px; margin:0; cursor:pointer; }
-        .extra-item label{ margin:0; font-weight:600; font-size:0.9rem; color:#7a5c00; }
-        .total-box{ background:#e6f0fa; border-radius:50px; padding:16px 24px; margin:20px 0 10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
-        .total-label{ font-weight:800; font-size:1.3rem; color:#0a3a60; }
-        .total-amount{ font-size:2rem; font-weight:800; color:#1b4f9b; background:white; padding:5px 20px; border-radius:60px; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
-        .checkbox-fees-box{ background:#eef3fc; border-radius:28px; padding:20px; margin:15px 0; }
-        .fee-checkbox-item{ display:flex; align-items:center; gap:15px; background:white; padding:12px 20px; border-radius:50px; margin-bottom:10px; border:1px solid #cde1f0; }
-        .fee-checkbox-item input{ width:20px; height:20px; cursor:pointer; accent-color:#1b4f9b; }
-        .fee-checkbox-item label{ margin:0; font-weight:500; font-size:1rem; cursor:pointer; flex:1; }
-        .fee-price{ font-weight:700; color:#0f5c3e; background:#e2f0e8; padding:2px 12px; border-radius:40px; font-size:0.85rem; }
-        .discount-box{ background:#fff3cd; border-radius:50px; padding:12px 20px; margin-top:15px; border:1px solid #ffe2a4; }
-        .due-highlight{ background:#eef2f5; color:#b44; font-weight:700; cursor:default; border-color:#d4e0ec; }
-        .btn-submit{ background:#1b4f9b; border:none; color:white; font-size:1.3rem; font-weight:700; padding:18px; width:100%; border-radius:60px; display:flex; align-items:center; justify-content:center; gap:12px; margin-top:18px; cursor:pointer; box-shadow:0 15px 20px -8px #123a60; transition:0.2s; }
-        .btn-submit:hover{ background:#0f3d73; transform:translateY(-2px); }
-        .btn-submit:disabled{ opacity:0.6; cursor:not-allowed; transform:none; }
-        .info-note{ text-align:center; margin-top:20px; color:#2c577c; }
-        a{ color:#1b4f9b; font-weight:600; text-decoration:none; border-bottom:1px dotted #1b4f9b; }
-        .loading{ text-align:center; padding:14px; background:#eef2f8; border-radius:50px; margin-top:12px; font-weight:500; display:none; }
-        .error-msg{ color:#c0392b; background:#fdecea; border-radius:40px; padding:10px 16px; margin-top:12px; text-align:center; display:none; }
-        .success-toast{ position:fixed; bottom:25px; left:50%; transform:translateX(-50%); background:#1e6f3f; color:white; padding:12px 28px; border-radius:60px; font-weight:600; z-index:1000; opacity:0; transition:opacity 0.2s; pointer-events:none; }
-        .class-warning{ background:#fff3cd; border-left:4px solid #ffc107; padding:10px 15px; border-radius:12px; margin-bottom:15px; font-size:0.85rem; color:#856404; display:none; }
-        hr{ margin:10px 0; }
+        body {
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
         
         /* Auth Loading Screen */
         .auth-loading {
@@ -110,11 +49,507 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
         .main-content {
+            display: none;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        /* Form Card */
+        .form-card {
+            background: white;
+            border-radius: 32px;
+            padding: 36px 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+            margin-bottom: 30px;
+        }
+        
+        .form-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e3a5f;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+            border-bottom: 3px solid #c5a059;
+            padding-bottom: 16px;
+        }
+        .form-title i {
+            color: #c5a059;
+        }
+        
+        /* Roll Number Search Section */
+        .search-section {
+            background: #f0f7ff;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 2px dashed #b8ceec;
+        }
+        .search-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .search-row .field {
+            flex: 1;
+            min-width: 200px;
+            margin-bottom: 0;
+        }
+        .btn-search {
+            background: linear-gradient(135deg, #1b4f9b, #0f3f7a);
+            color: white;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            white-space: nowrap;
+            font-size: 0.95rem;
+        }
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(27, 79, 155, 0.3);
+        }
+        .btn-search i {
+            font-size: 1rem;
+        }
+        
+        /* Student Preview Card */
+        .student-preview {
+            background: linear-gradient(135deg, #f8fbff, #eef4fc);
+            border-radius: 18px;
+            padding: 18px 22px;
+            margin: 15px 0 20px 0;
+            border: 1px solid #c5d9f0;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        .student-preview.show {
+            display: block;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .preview-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+        .preview-header i {
+            font-size: 1.8rem;
+            color: #1b4f9b;
+        }
+        .preview-header h4 {
+            font-size: 1.1rem;
+            color: #1e3a5f;
+            font-weight: 700;
+        }
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px 20px;
+        }
+        .preview-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px dashed #d4e2f5;
+        }
+        .preview-item label {
+            font-weight: 600;
+            color: #2c577c;
+            font-size: 0.85rem;
+        }
+        .preview-item span {
+            color: #1e3a5f;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .preview-not-found {
+            color: #dc2626;
+            text-align: center;
+            padding: 10px;
+            font-weight: 600;
+        }
+        .preview-found {
+            color: #16a34a;
+            text-align: center;
+            padding: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        /* Form Fields */
+        .field {
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: 600;
+            color: #1e3a5f;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        input, select {
+            width: 100%;
+            padding: 13px 18px;
+            font-size: 0.95rem;
+            background: #fafbfc;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        input:focus, select:focus {
+            border-color: #1b4f9b;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(27, 79, 155, 0.08);
+        }
+        input:disabled {
+            background: #f1f5f9;
+            cursor: not-allowed;
+        }
+        
+        .row2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        /* Fees Section */
+        .fees-section {
+            background: #f8fbfe;
+            border-radius: 24px;
+            padding: 20px;
+            margin: 20px 0 12px 0;
+            border: 1px solid #d9e6f5;
+        }
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #174873;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid #1b4f9b;
+            padding-left: 14px;
+        }
+        
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .subject-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            padding: 10px 16px;
+            border-radius: 50px;
+            border: 1px solid #cde1f0;
+            transition: 0.15s;
+            cursor: pointer;
+        }
+        .subject-item:hover {
+            background: #eef4fc;
+            border-color: #9bb7d4;
+        }
+        .subject-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            cursor: pointer;
+            accent-color: #1b4f9b;
+        }
+        .subject-item label {
+            margin: 0;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #1e3a5f;
+            cursor: pointer;
+            flex: 1;
+        }
+        .subject-price {
+            font-weight: 700;
+            color: #0f5c3e;
+            background: #e2f0e8;
+            padding: 2px 12px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+        
+        .extra-charges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 10px 0;
+        }
+        .extra-item {
+            background: #fef7e0;
+            border-radius: 40px;
+            padding: 8px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #ffe2a4;
+        }
+        .extra-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #1b4f9b;
+        }
+        .extra-item label {
+            margin: 0;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #7a5c00;
+            cursor: pointer;
+        }
+        
+        .checkbox-fees-box {
+            background: #eef3fc;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .fee-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            margin-bottom: 10px;
+            border: 1px solid #cde1f0;
+        }
+        .fee-checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            cursor: pointer;
+            accent-color: #1b4f9b;
+        }
+        .fee-checkbox-item label {
+            margin: 0;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            flex: 1;
+        }
+        .fee-price {
+            font-weight: 700;
+            color: #0f5c3e;
+            background: #e2f0e8;
+            padding: 2px 14px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+        
+        .discount-box {
+            background: #fff3cd;
+            border-radius: 50px;
+            padding: 14px 20px;
+            margin: 12px 0;
+            border: 1px solid #ffe2a4;
+        }
+        .discount-box label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: block;
+            color: #7a5c00;
+        }
+        .discount-box input {
+            background: white;
+            border: 1px solid #ffe2a4;
+            border-radius: 40px;
+            padding: 10px 16px;
+            width: 100%;
+        }
+        
+        .total-box {
+            background: #e6f0fa;
+            border-radius: 50px;
+            padding: 16px 24px;
+            margin: 16px 0 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .total-label {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #0a3a60;
+        }
+        .total-amount {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1b4f9b;
+            background: white;
+            padding: 5px 24px;
+            border-radius: 60px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        
+        .due-highlight {
+            background: #eef2f5;
+            color: #b44;
+            font-weight: 700;
+            cursor: default;
+        }
+        
+        /* Buttons */
+        .btn-submit {
+            background: linear-gradient(135deg, #1b4f9b, #0f3f7a);
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 700;
+            padding: 16px;
+            width: 100%;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 12px 24px -8px rgba(27, 79, 155, 0.3);
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 32px -8px rgba(27, 79, 155, 0.4);
+        }
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .class-warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 18px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #856404;
             display: none;
         }
         
-        @media (max-width:650px){ .form-card{ padding:24px 18px; } .subjects-grid{ grid-template-columns:1fr; } }
+        .loading {
+            text-align: center;
+            padding: 14px;
+            background: #eef2f8;
+            border-radius: 50px;
+            margin-top: 12px;
+            font-weight: 500;
+            display: none;
+        }
+        .error-msg {
+            color: #c0392b;
+            background: #fdecea;
+            border-radius: 40px;
+            padding: 12px 18px;
+            margin-top: 12px;
+            text-align: center;
+            display: none;
+        }
+        .success-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e6f3f;
+            color: white;
+            padding: 14px 32px;
+            border-radius: 60px;
+            font-weight: 600;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+        }
+        .success-toast.show {
+            opacity: 1;
+        }
+        
+        .info-note {
+            text-align: center;
+            margin-top: 18px;
+            color: #2c577c;
+            font-size: 0.9rem;
+        }
+        .info-note a {
+            color: #1b4f9b;
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 1px dotted #1b4f9b;
+        }
+        
+        .logout-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 22px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            z-index: 9999;
+            font-weight: bold;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s;
+        }
+        .logout-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            body { padding: 16px 12px; }
+            .form-card { padding: 20px 16px; }
+            .form-title { font-size: 1.4rem; }
+            .search-row { flex-direction: column; }
+            .search-row .field { width: 100%; min-width: unset; }
+            .btn-search { width: 100%; justify-content: center; }
+            .preview-grid { grid-template-columns: 1fr; }
+            .subjects-grid { grid-template-columns: 1fr; }
+            .fee-checkbox-item { flex-wrap: wrap; }
+            .total-box { flex-direction: column; text-align: center; }
+            .total-amount { font-size: 1.4rem; }
+            .row2 { grid-template-columns: 1fr; }
+            .logout-btn { bottom: 12px; right: 12px; padding: 8px 16px; font-size: 0.8rem; }
+        }
+        
+        @media (min-width: 1024px) {
+            .form-card { padding: 44px 40px; }
+            .search-section { padding: 24px 28px; }
+        }
     </style>
 </head>
 <body>
@@ -126,71 +561,104 @@
 
     <!-- Main Content -->
     <div id="mainContent" class="main-content">
-    <div class="form-card">
-        <h2>📋 Add New Student</h2>
+        <div class="form-card">
+            <div class="form-title">
+                <i class="fas fa-user-plus"></i>
+                <span>Add New Student</span>
+            </div>
+
+            <!-- 🔍 Search Section -->
+            <div class="search-section">
+                <div class="search-row">
+                    <div class="field" style="flex:2;">
+                        <label><i class="fas fa-search"></i> Roll Number</label>
+                        <input type="text" id="rollNumber" placeholder="Type roll number to search..." autocomplete="off">
+                    </div>
+                    <div class="field" style="flex:0 0 auto;">
+                        <button class="btn-search" id="searchBtn">
+                            <i class="fas fa-search"></i> Search Student
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Student Preview -->
+                <div id="studentPreview" class="student-preview">
+                    <div class="preview-header">
+                        <i class="fas fa-user-circle"></i>
+                        <h4>Student Details</h4>
+                    </div>
+                    <div id="studentPreviewContent">
+                        <div class="preview-grid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 📝 Student Form Fields -->
+            <div class="field">
+                <label><i class="fas fa-user"></i> Student Name</label>
+                <input type="text" id="studentName" placeholder="Full name">
+            </div>
+            
+            <div class="field">
+                <label><i class="fas fa-user-tie"></i> Father Name</label>
+                <input type="text" id="fatherName" placeholder="Father's name">
+            </div>
+            
+            <div class="field">
+                <label><i class="fas fa-phone"></i> Phone Number</label>
+                <input type="tel" id="phoneNumber" placeholder="e.g. 9876543210">
+            </div>
+            
+            <div class="row2">
+                <div class="field">
+                    <label><i class="fas fa-calendar-alt"></i> Session</label>
+                    <select id="sessionSelect">
+                        <option value="2024-25">2024-25</option>
+                        <option value="2025-26">2025-26</option>
+                        <option value="2026-27" selected>2026-27</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label><i class="fas fa-school"></i> Class</label>
+                    <select id="classSelect">
+                        <option value="Class 6">Class 6</option>
+                        <option value="Class 7">Class 7</option>
+                        <option value="Class 8">Class 8</option>
+                        <option value="Class 9">Class 9</option>
+                        <option value="Class 10">Class 10</option>
+                        <option value="Class 11">Class 11</option>
+                        <option value="Class 12">Class 12</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="classWarning" class="class-warning">
+                <i class="fas fa-exclamation-triangle"></i> For Class 11 & 12, fee will be calculated based on selected subjects & charges below.
+            </div>
+
+            <div id="dynamicFeeSection"></div>
+
+            <button class="btn-submit" id="addStudentBtn">
+                <i class="fas fa-save"></i> Add Student & Save
+            </button>
+            
+            <div id="loadingMessage" class="loading">
+                <i class="fas fa-spinner fa-spin"></i> Saving to Firebase...
+            </div>
+            <div id="errorMessage" class="error-msg"></div>
+            
+            <div class="info-note">
+                <i class="fas fa-arrow-left"></i> <a href="dashboard.html">Back to dashboard</a>
+            </div>
+        </div>
         
-        <!-- Roll Number Field -->
-        <div class="field">
-            <label>🔢 Roll Number</label>
-            <input type="text" id="rollNumber" placeholder="e.g. 24" required>
+        <div id="successToast" class="success-toast">
+            <i class="fas fa-check-circle"></i> Student added successfully!
         </div>
-
-        <!-- Student Preview - Automatically shows when roll number is entered -->
-        <div id="studentPreview" class="student-preview">
-            <div id="studentPreviewContent">
-                <div class="preview-loading">⏳ Searching student...</div>
-            </div>
-        </div>
-
-        <!-- Other Fields (Auto-filled or Manually filled) -->
-        <div class="field">
-            <label>🧑 Student Name</label>
-            <input type="text" id="studentName" placeholder="Full name" required>
-        </div>
-        <div class="field">
-            <label>👨 Father Name</label>
-            <input type="text" id="fatherName" placeholder="Father's name" required>
-        </div>
-        <div class="field">
-            <label>📞 Phone Number</label>
-            <input type="tel" id="phoneNumber" placeholder="e.g. 9876543210" pattern="[0-9]{10}" title="Please enter 10 digit mobile number">
-        </div>
-        <div class="row2">
-            <div class="field">
-                <label>📅 Session</label>
-                <select id="sessionSelect">
-                    <option value="2024-25">2024-25</option>
-                    <option value="2025-26">2025-26</option>
-                    <option value="2026-27" selected>2026-27</option>
-                </select>
-            </div>
-            <div class="field">
-                <label>🏫 Class</label>
-                <select id="classSelect">
-                    <option value="Class 6">Class 6</option>
-                    <option value="Class 7">Class 7</option>
-                    <option value="Class 8">Class 8</option>
-                    <option value="Class 9">Class 9</option>
-                    <option value="Class 10">Class 10</option>
-                    <option value="Class 11">Class 11</option>
-                    <option value="Class 12">Class 12</option>
-                </select>
-            </div>
-        </div>
-
-        <div id="classWarning" class="class-warning">⚠️ For Class 11 & 12, fee will be calculated based on selected subjects & charges below.</div>
-
-        <div id="dynamicFeeSection"></div>
-
-        <button class="btn-submit" id="addStudentBtn">➕ Add Student & Save to Firebase</button>
-        <div class="info-note">↩ <a href="dashboard.html">Back to dashboard</a></div>
-        <div id="loadingMessage" class="loading">⏳ Saving to Firebase...</div>
-        <div id="errorMessage" class="error-msg"></div>
-    </div>
-    <div id="successToast" class="success-toast">✅ Student added successfully!</div>
     </div>
 
     <script>
+    // ============ FIREBASE CONFIG ============
     const firebaseConfig = {
         apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
         authDomain: "quest-coaching.firebaseapp.com",
@@ -206,27 +674,32 @@
     const auth = firebase.auth();
     const feesCollection = db.collection('fees');
     const transactionsCollection = db.collection('transactions');
-    const admissionsCollection = db.collection('admissions');
 
-    // Auth Elements
+    // ============ AUTH CHECK ============
     const authLoading = document.getElementById('authLoading');
     const mainContent = document.getElementById('mainContent');
 
-    // ============ AUTHENTICATION CHECK ============
     auth.onAuthStateChanged((user) => {
         if (!user) {
-            alert('Please login from main page first!');
-            window.location.href = 'index.html';
+            Swal.fire({
+                title: 'Access Denied!',
+                text: 'Please login from main page first!',
+                icon: 'error',
+                confirmButtonColor: '#1b4f9b',
+                confirmButtonText: 'Go to Login'
+            }).then(() => {
+                window.location.href = 'index.html';
+            });
             return;
         }
         
         authLoading.style.display = 'none';
         mainContent.style.display = 'block';
         
-        // Add logout button
+        // Logout Button
         const logoutBtn = document.createElement('button');
-        logoutBtn.innerHTML = '🚪 Logout';
-        logoutBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; font-weight:bold; font-size:14px; box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+        logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+        logoutBtn.className = 'logout-btn';
         logoutBtn.onclick = async () => {
             await auth.signOut();
             window.location.href = 'index.html';
@@ -234,6 +707,7 @@
         document.body.appendChild(logoutBtn);
     });
 
+    // ============ CONSTANTS ============
     const SUBJECTS = [
         { name: "PHYSICS", price: 3000 },
         { name: "CHEMISTRY", price: 3000 },
@@ -260,6 +734,7 @@
         assignment: { price: 500, label: "📖 Assignment Fee" }
     };
 
+    // ============ DOM REFERENCES ============
     const dynamicSection = document.getElementById('dynamicFeeSection');
     const classSelect = document.getElementById('classSelect');
     const classWarning = document.getElementById('classWarning');
@@ -272,7 +747,11 @@
     const fatherInput = document.getElementById('fatherName');
     const phoneInput = document.getElementById('phoneNumber');
     const sessionSelect = document.getElementById('sessionSelect');
+    const searchBtn = document.getElementById('searchBtn');
+    const studentPreview = document.getElementById('studentPreview');
+    const previewContent = document.getElementById('studentPreviewContent');
 
+    // ============ STATE ============
     let subjectCheckboxes = [];
     let extraCheckboxes = [];
     let advancedDiscountInput = null;
@@ -285,116 +764,35 @@
     let dueInput = null;
     let currentTuitionFee = 6000;
     let currentMode = 'simple';
+    let foundStudentData = null;
 
     let toastTimeout;
+
+    // ============ UTILITY FUNCTIONS ============
     function showToast(message) {
         successToast.textContent = message;
-        successToast.style.opacity = '1';
+        successToast.classList.add('show');
         if (toastTimeout) clearTimeout(toastTimeout);
-        toastTimeout = setTimeout(() => { successToast.style.opacity = '0'; }, 2500);
+        toastTimeout = setTimeout(() => {
+            successToast.classList.remove('show');
+        }, 3000);
     }
 
     function showError(message) {
-        errorDiv.textContent = message;
+        errorDiv.textContent = '❌ ' + message;
         errorDiv.style.display = 'block';
-        setTimeout(() => { errorDiv.style.display = 'none'; }, 4000);
+        setTimeout(() => {
+            errorDiv.style.display = 'none';
+        }, 5000);
     }
-
-    // ============================================================
-    // 🔥 MAIN FEATURE: Auto-fetch student details on roll number input
-    // ============================================================
-    document.getElementById('rollNumber')?.addEventListener('input', async function() {
-        const roll = this.value.trim();
-        const previewDiv = document.getElementById('studentPreview');
-        const contentDiv = document.getElementById('studentPreviewContent');
-
-        if (roll.length < 2) {
-            previewDiv.classList.remove('show');
-            // Clear the fields if roll is empty
-            if (roll.length === 0) {
-                document.getElementById('studentName').value = '';
-                document.getElementById('fatherName').value = '';
-                document.getElementById('phoneNumber').value = '';
-            }
-            return;
-        }
-
-        // Show loading
-        previewDiv.classList.add('show');
-        contentDiv.innerHTML = `<div class="preview-loading">⏳ Searching student...</div>`;
-
-        try {
-            // Search in fees collection first
-            let student = null;
-            let snap = await feesCollection.where('roll_number', '==', roll).get();
-            
-            if (!snap.empty) {
-                snap.forEach(doc => {
-                    student = { id: doc.id, ...doc.data() };
-                });
-            } else {
-                // If not found in fees, search in admissions collection
-                let snap2 = await admissionsCollection.where('rollNumber', '==', roll).get();
-                if (!snap2.empty) {
-                    snap2.forEach(doc => {
-                        student = { id: doc.id, ...doc.data() };
-                    });
-                }
-            }
-
-            if (student) {
-                // Auto-fill the form fields
-                document.getElementById('studentName').value = student.student_name || student.studentName || '';
-                document.getElementById('fatherName').value = student.father_name || student.fatherName || '';
-                document.getElementById('phoneNumber').value = student.phone_number || student.phoneNumber || '';
-                
-                // Auto-select class if available
-                if (student.class) {
-                    const classSelect = document.getElementById('classSelect');
-                    const options = classSelect.options;
-                    for (let i = 0; i < options.length; i++) {
-                        if (options[i].value === student.class) {
-                            classSelect.selectedIndex = i;
-                            break;
-                        }
-                    }
-                    // Trigger class change to update fee section
-                    classSelect.dispatchEvent(new Event('change'));
-                }
-
-                // Show student preview
-                contentDiv.innerHTML = `
-                    <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
-                        <div style="flex:1;">
-                            <div class="preview-row"><strong>👤 Name:</strong> ${student.student_name || student.studentName || 'N/A'}</div>
-                            <div class="preview-row"><strong>👨 Father:</strong> ${student.father_name || student.fatherName || 'N/A'}</div>
-                            <div class="preview-row"><strong>🏫 Class:</strong> ${student.class || 'N/A'}</div>
-                            <div class="preview-row"><strong>📞 Phone:</strong> ${student.phone_number || student.phoneNumber || 'N/A'}</div>
-                            <div class="preview-row"><strong>📅 Session:</strong> ${student.session || 'N/A'}</div>
-                        </div>
-                    </div>
-                `;
-                previewDiv.classList.add('show');
-            } else {
-                contentDiv.innerHTML = `<div style="color:#dc2626; padding:10px;">❌ No student found with Roll Number: <strong>${roll}</strong></div>`;
-                previewDiv.classList.add('show');
-                
-                // Don't clear fields if not found, user might want to add new student
-            }
-        } catch (error) {
-            console.error("Error fetching student:", error);
-            contentDiv.innerHTML = `<div style="color:#dc2626; padding:10px;">❌ Error fetching student details: ${error.message}</div>`;
-            previewDiv.classList.add('show');
-        }
-    });
 
     function calculateAdvancedTotal() {
         let total = 0;
-        subjectCheckboxes.forEach(checkbox => {
-            if (checkbox.checked) total += parseInt(checkbox.getAttribute('data-price')) || 0;
+        subjectCheckboxes.forEach(cb => {
+            if (cb.checked) total += parseInt(cb.getAttribute('data-price')) || 0;
         });
-        extraCheckboxes.forEach(checkbox => {
-            if (checkbox.checked) total += parseInt(checkbox.getAttribute('data-price')) || 0;
+        extraCheckboxes.forEach(cb => {
+            if (cb.checked) total += parseInt(cb.getAttribute('data-price')) || 0;
         });
         let discount = 0;
         if (advancedDiscountInput) discount = parseFloat(advancedDiscountInput.value) || 0;
@@ -433,13 +831,93 @@
         }
     }
 
+    // ============ SEARCH STUDENT FUNCTION ============
+    async function searchStudent(roll) {
+        roll = roll.trim();
+        
+        if (roll.length < 2) {
+            studentPreview.classList.remove('show');
+            foundStudentData = null;
+            return;
+        }
+
+        try {
+            // Search in fees collection
+            const snap = await feesCollection.where('roll_number', '==', roll).get();
+            
+            if (!snap.empty) {
+                let student = null;
+                snap.forEach(doc => {
+                    student = { id: doc.id, ...doc.data() };
+                });
+                
+                if (student) {
+                    foundStudentData = student;
+                    
+                    // Auto-fill form fields
+                    nameInput.value = student.student_name || '';
+                    fatherInput.value = student.father_name || '';
+                    phoneInput.value = student.phone_number || '';
+                    if (student.class) classSelect.value = student.class;
+                    if (student.session) sessionSelect.value = student.session;
+                    
+                    // Show preview
+                    previewContent.innerHTML = `
+                        <div class="preview-grid">
+                            <div class="preview-item"><label>👤 Name</label><span>${student.student_name || 'N/A'}</span></div>
+                            <div class="preview-item"><label>👨 Father</label><span>${student.father_name || 'N/A'}</span></div>
+                            <div class="preview-item"><label>🏫 Class</label><span>${student.class || 'N/A'}</span></div>
+                            <div class="preview-item"><label>📞 Phone</label><span>${student.phone_number || 'N/A'}</span></div>
+                            <div class="preview-item"><label>📅 Session</label><span>${student.session || 'N/A'}</span></div>
+                            <div class="preview-item"><label>💰 Total Fee</label><span>₹${student.total_amount || 0}</span></div>
+                            <div class="preview-item"><label>💵 Paid</label><span>₹${student.received_amount || 0}</span></div>
+                            <div class="preview-item"><label>⏳ Due</label><span>₹${student.due_amount || 0}</span></div>
+                        </div>
+                        <div style="margin-top:10px; padding:8px; background:#d4edda; border-radius:10px; text-align:center; color:#155724; font-weight:600;">
+                            <i class="fas fa-check-circle"></i> Student found! Form auto-filled.
+                        </div>
+                    `;
+                    studentPreview.classList.add('show');
+                    
+                    // Trigger class change to update fee section
+                    onClassChange();
+                    return;
+                }
+            }
+            
+            // Student not found
+            foundStudentData = null;
+            previewContent.innerHTML = `
+                <div class="preview-not-found">
+                    <i class="fas fa-exclamation-circle"></i> No student found with Roll Number: ${roll}
+                </div>
+            `;
+            studentPreview.classList.add('show');
+            
+            // Clear form fields (except roll number)
+            nameInput.value = '';
+            fatherInput.value = '';
+            phoneInput.value = '';
+            
+        } catch (error) {
+            console.error("Error searching student:", error);
+            previewContent.innerHTML = `
+                <div class="preview-not-found">
+                    <i class="fas fa-exclamation-triangle"></i> Error fetching student details
+                </div>
+            `;
+            studentPreview.classList.add('show');
+        }
+    }
+
+    // ============ RENDER FUNCTIONS ============
     function renderCheckboxMode(className) {
         currentMode = 'checkbox';
         currentTuitionFee = getTuitionFee(className);
         
         dynamicSection.innerHTML = `
             <div class="checkbox-fees-box">
-                <div class="section-title" style="margin-bottom:15px;">💰 Select Fees Components</div>
+                <div class="section-title"><i class="fas fa-check-square"></i> Select Fees Components</div>
                 
                 <div class="fee-checkbox-item">
                     <input type="checkbox" id="fee_tuition" checked>
@@ -466,21 +944,21 @@
                 </div>
                 
                 <div class="discount-box">
-                    <label style="font-weight:600; margin-bottom:8px; display:block;">🎁 Discount (₹)</label>
-                    <input type="number" id="discountAmount" value="0" min="0" step="1" placeholder="Enter discount amount" style="width:100%; padding:10px 15px; border-radius:40px; border:1px solid #ffe2a4; background:white;">
+                    <label><i class="fas fa-gift"></i> Discount (₹)</label>
+                    <input type="number" id="discountAmount" value="0" min="0" step="1" placeholder="Enter discount amount">
                 </div>
                 
-                <div class="total-box" style="margin-top:20px;">
+                <div class="total-box">
                     <span class="total-label">💰 Total Fees:</span>
                     <span class="total-amount" id="checkboxTotalAmount">0</span>
                 </div>
                 
                 <div class="field" style="margin-top:15px;">
-                    <label>💵 Received Amount (₹)</label>
+                    <label><i class="fas fa-hand-holding-usd"></i> Received Amount (₹)</label>
                     <input type="number" id="receivedAmountCheckbox" value="0" min="0" step="1">
                 </div>
                 <div class="field">
-                    <label>⏳ Due Amount (Auto)</label>
+                    <label><i class="fas fa-clock"></i> Due Amount (Auto)</label>
                     <input type="number" id="dueAmountCheckbox" class="due-highlight" readonly value="0">
                 </div>
             </div>
@@ -510,26 +988,28 @@
         currentMode = 'advanced';
         dynamicSection.innerHTML = `
             <div class="fees-section">
-                <div class="section-title">📖 Subjects (₹3000 each)</div>
+                <div class="section-title"><i class="fas fa-book"></i> Subjects (₹3000 each)</div>
                 <div class="subjects-grid" id="subjectsGrid"></div>
-                <div class="section-title" style="margin-top:6px;">📌 Additional Charges</div>
+                
+                <div class="section-title" style="margin-top:6px;"><i class="fas fa-plus-circle"></i> Additional Charges</div>
                 <div class="extra-charges" id="extraChargesContainer"></div>
                 
-                <div class="discount-box" style="margin-top:15px;">
-                    <label style="font-weight:600; margin-bottom:8px; display:block;">🎁 Discount (₹)</label>
-                    <input type="number" id="advancedDiscountAmount" value="0" min="0" step="1" placeholder="Enter discount amount" style="width:100%; padding:10px 15px; border-radius:40px; border:1px solid #ffe2a4; background:white;">
+                <div class="discount-box">
+                    <label><i class="fas fa-gift"></i> Discount (₹)</label>
+                    <input type="number" id="advancedDiscountAmount" value="0" min="0" step="1" placeholder="Enter discount amount">
                 </div>
                 
                 <div class="total-box">
-                    <span class="total-label">💰 Total Fees (Auto-Calculated):</span>
+                    <span class="total-label">💰 Total Fees:</span>
                     <span class="total-amount" id="advancedTotalAmount">0</span>
                 </div>
+                
                 <div class="field" style="margin-top:5px;">
-                    <label>💵 Received Amount (₹)</label>
+                    <label><i class="fas fa-hand-holding-usd"></i> Received Amount (₹)</label>
                     <input type="number" id="receivedAmountAdvanced" value="0" min="0" step="1">
                 </div>
                 <div class="field">
-                    <label>⏳ Due Amount (Auto)</label>
+                    <label><i class="fas fa-clock"></i> Due Amount (Auto)</label>
                     <input type="number" id="dueAmountAdvanced" class="due-highlight" readonly value="0">
                 </div>
             </div>
@@ -542,11 +1022,11 @@
             div.className = 'subject-item';
             const cb = document.createElement('input');
             cb.type = 'checkbox';
-            cb.id = `sub_${sub.name}`;
+            cb.id = `sub_${sub.name.replace(/\s/g, '_')}`;
             cb.setAttribute('data-price', sub.price);
             cb.addEventListener('change', updateDue);
             const label = document.createElement('label');
-            label.htmlFor = `sub_${sub.name}`;
+            label.htmlFor = cb.id;
             label.innerText = sub.name;
             const priceSpan = document.createElement('span');
             priceSpan.className = 'subject-price';
@@ -592,6 +1072,19 @@
         updateDue();
     }
 
+    function onClassChange() {
+        const selectedClass = classSelect.value;
+        
+        if (selectedClass === 'Class 11' || selectedClass === 'Class 12') {
+            classWarning.style.display = 'block';
+            renderAdvancedMode();
+        } else {
+            classWarning.style.display = 'none';
+            renderCheckboxMode(selectedClass);
+        }
+    }
+
+    // ============ GET FUNCTIONS ============
     function getSelectedSubjects() {
         if (currentMode !== 'advanced') return [];
         const selected = [];
@@ -673,14 +1166,14 @@
         return {};
     }
 
+    // ============ RESET FORM ============
     function resetForm() {
-        rollInput.value = '';
+        // Don't clear roll number, keep it
         nameInput.value = '';
         fatherInput.value = '';
         phoneInput.value = '';
-        
-        // Hide preview
-        document.getElementById('studentPreview').classList.remove('show');
+        foundStudentData = null;
+        studentPreview.classList.remove('show');
         
         if (currentMode === 'advanced') {
             subjectCheckboxes.forEach(cb => cb.checked = false);
@@ -700,18 +1193,45 @@
         rollInput.focus();
     }
 
-    function onClassChange() {
-        const selectedClass = classSelect.value;
-        
-        if (selectedClass === 'Class 11' || selectedClass === 'Class 12') {
-            classWarning.style.display = 'block';
-            renderAdvancedMode();
+    // ============ EVENT LISTENERS ============
+    
+    // Auto-search on roll number input (like admit card)
+    rollInput.addEventListener('input', function() {
+        const roll = this.value.trim();
+        if (roll.length >= 2) {
+            searchStudent(roll);
         } else {
-            classWarning.style.display = 'none';
-            renderCheckboxMode(selectedClass);
+            studentPreview.classList.remove('show');
+            foundStudentData = null;
+            // Clear form fields except roll
+            nameInput.value = '';
+            fatherInput.value = '';
+            phoneInput.value = '';
         }
-    }
+    });
 
+    // Search button click
+    searchBtn.addEventListener('click', function() {
+        const roll = rollInput.value.trim();
+        if (roll.length >= 2) {
+            searchStudent(roll);
+        } else {
+            showError('Please enter at least 2 characters of Roll Number');
+        }
+    });
+
+    // Enter key on roll number
+    rollInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            searchBtn.click();
+        }
+    });
+
+    // Class change
+    classSelect.addEventListener('change', onClassChange);
+
+    // ============ ADD STUDENT ============
     addBtn.addEventListener('click', async function() {
         errorDiv.style.display = 'none';
         
@@ -723,7 +1243,7 @@
         const classVal = classSelect.value;
         
         if (!roll || !name || !father) {
-            showError('❌ Please fill Roll Number, Student Name and Father Name');
+            showError('Please fill Roll Number, Student Name and Father Name');
             return;
         }
         
@@ -755,6 +1275,15 @@
         addBtn.disabled = true;
         
         try {
+            // Check if roll number already exists
+            const existingSnap = await feesCollection.where('roll_number', '==', roll).get();
+            if (!existingSnap.empty) {
+                showError('Roll Number already exists! Please use a unique roll number.');
+                loadingMsg.style.display = 'none';
+                addBtn.disabled = false;
+                return;
+            }
+            
             const docRef = await feesCollection.add(studentData);
             const studentId = docRef.id;
             
@@ -784,21 +1313,30 @@
             resetForm();
         } catch (error) {
             console.error("Firestore error:", error);
-            showError(`❌ Save failed: ${error.message}`);
+            showError(`Save failed: ${error.message}`);
         } finally {
             loadingMsg.style.display = 'none';
             addBtn.disabled = false;
         }
     });
-    
-    classSelect.addEventListener('change', onClassChange);
-    onClassChange();
-    
-    const fields = ['rollNumber', 'studentName', 'fatherName', 'phoneNumber'];
+
+    // Enter key on other fields
+    const fields = ['studentName', 'fatherName', 'phoneNumber'];
     fields.forEach(id => {
         const el = document.getElementById(id);
-        if(el) el.addEventListener('keypress', (e) => { if(e.key === 'Enter') addBtn.click(); });
+        if(el) el.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') addBtn.click();
+        });
     });
+
+    // ============ INIT ============
+    // Trigger initial render
+    setTimeout(() => {
+        onClassChange();
+    }, 100);
+
+    console.log('📚 Fee Manager loaded successfully!');
+    console.log('🔍 Type Roll Number to auto-fetch student details');
     </script>
 </body>
 </html>
