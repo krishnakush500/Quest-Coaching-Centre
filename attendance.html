@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-  <title>Attendance · Quest Coaching</title>
+  <title>📋 Attendance · Quest Coaching</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -31,6 +32,7 @@
       padding: 24px 22px 32px;
       border: 1px solid rgba(255, 255, 255, 0.6);
     }
+    /* Header */
     .header {
       display: flex;
       flex-wrap: wrap;
@@ -79,6 +81,7 @@
       outline: none;
       cursor: pointer;
     }
+    /* Class Filter */
     .class-filter {
       display: flex;
       flex-wrap: wrap;
@@ -87,7 +90,7 @@
       background: #f4f9ff;
       padding: 12px 20px;
       border-radius: 60px;
-      margin-bottom: 28px;
+      margin-bottom: 16px;
       border: 1px solid #d7e5fc;
     }
     .class-filter label {
@@ -107,6 +110,7 @@
       font-size: 0.95rem;
       outline: none;
       cursor: pointer;
+      min-width: 160px;
     }
     .class-filter .view-parent-btn {
       margin-left: auto;
@@ -128,10 +132,13 @@
       background: #13458b;
       transform: scale(1.01);
     }
+    /* Save Button */
     .save-btn-container {
       display: flex;
       justify-content: flex-end;
       margin-bottom: 16px;
+      gap: 12px;
+      flex-wrap: wrap;
     }
     .save-btn {
       background: #10b981;
@@ -148,14 +155,22 @@
       cursor: pointer;
       transition: 0.15s;
     }
-    .save-btn:hover {
-      background: #059669;
-      transform: scale(1.01);
+    .save-btn:hover { background: #059669; transform: scale(1.01); }
+    .save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .refresh-btn {
+      background: #e2e8f0;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 60px;
+      color: #1a237e;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
     }
-    .save-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+    .refresh-btn:hover { background: #cbd5e1; }
+    /* Table */
     .table-wrap {
       overflow-x: auto;
       border-radius: 28px;
@@ -192,10 +207,7 @@
       gap: 8px;
       cursor: pointer;
     }
-    .student-name:hover {
-      color: #0033aa;
-      text-decoration: underline;
-    }
+    .student-name:hover { color: #0033aa; text-decoration: underline; }
     .roll-badge {
       background: #e3edfe;
       padding: 4px 12px;
@@ -249,6 +261,7 @@
       outline: none;
       box-shadow: 0 0 0 3px rgba(10, 42, 102, 0.12);
     }
+    /* Report Actions */
     .report-actions {
       display: flex;
       flex-wrap: wrap;
@@ -286,6 +299,7 @@
     .report-actions .right {
       display: flex;
       gap: 12px;
+      flex-wrap: wrap;
     }
     .download-btn {
       background: #0a2a66;
@@ -302,19 +316,16 @@
       border: 1px solid #3c6fc0;
       font-size: 0.9rem;
     }
-    .download-btn:hover {
-      background: #13458b;
-      transform: scale(1.01);
-    }
+    .download-btn:hover { background: #13458b; transform: scale(1.01); }
     .download-btn.outline {
       background: white;
       color: #0a2a66;
       border: 1px solid #b8cef0;
       box-shadow: none;
     }
-    .download-btn.outline:hover {
-      background: #e8f0fe;
-    }
+    .download-btn.outline:hover { background: #e8f0fe; }
+    .download-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    /* Parent View */
     .parent-view-box {
       background: #e3efff;
       border-radius: 60px;
@@ -361,6 +372,17 @@
       z-index: 9999;
       display: none;
     }
+    .no-students-msg {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+    }
+    .no-students-msg i {
+      font-size: 3rem;
+      color: #cbd5e1;
+      display: block;
+      margin-bottom: 15px;
+    }
     @media (max-width: 720px) {
       .container { padding: 18px 14px; }
       .header h1 { font-size: 1.6rem; }
@@ -380,6 +402,7 @@
 <body>
 
 <div class="container">
+  <!-- HEADER -->
   <div class="header">
     <h1><i class="fas fa-clipboard-check"></i> Attendance</h1>
     <div class="month-picker">
@@ -396,33 +419,33 @@
     </div>
   </div>
 
+  <!-- CLASS FILTER + PARENT VIEW -->
   <div class="class-filter">
     <label><i class="fas fa-users"></i> Class</label>
     <select id="classSelect">
-      <option value="10A">10-A (Science)</option>
-      <option value="10B">10-B (Commerce)</option>
-      <option value="9A">9-A (Maths)</option>
-      <option value="8A">8-A</option>
-      <option value="7A">7-A</option>
-      <option value="6A">6-A</option>
+      <option value="">-- Loaded from database --</option>
     </select>
     <button class="view-parent-btn" id="parentViewBtn">
       <i class="fas fa-eye"></i> Parent View (Roll No.)
     </button>
   </div>
 
+  <!-- Parent View Box -->
   <div id="parentViewBox" class="parent-view-box">
     <span><i class="fas fa-id-badge"></i> Parent access · Roll No.</span>
     <input type="text" placeholder="e.g. 101" id="rollInput">
     <button id="parentViewSubmit"><i class="fas fa-search"></i> Show</button>
   </div>
 
+  <!-- SAVE BUTTON -->
   <div class="save-btn-container">
+    <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync"></i> Refresh</button>
     <button class="save-btn" id="saveAttendanceBtn">
       <i class="fas fa-save"></i> Save Attendance
     </button>
   </div>
 
+  <!-- ATTENDANCE TABLE -->
   <div class="table-wrap">
     <table id="attendanceTable">
       <thead>
@@ -434,13 +457,15 @@
         </tr>
       </thead>
       <tbody id="tableBody">
-        <tr><td colspan="4" style="text-align:center;padding:30px;color:#1f4b9e;">
-          <i class="fas fa-spinner fa-spin"></i> Loading students...
+        <tr><td colspan="4" style="text-align:center;padding:40px;color:#1f4b9e;">
+          <i class="fas fa-spinner fa-spin" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
+          Loading students...
         </td></tr>
       </tbody>
     </table>
   </div>
 
+  <!-- REPORT & DOWNLOAD -->
   <div class="report-actions">
     <div class="left">
       <button class="monthly-btn" id="monthlyReportBtn">
@@ -461,6 +486,7 @@
   </div>
 </div>
 
+<!-- Toast Message -->
 <div id="toastMsg" class="toast-msg"></div>
 
 <script>
@@ -492,31 +518,16 @@
   const rollInput = document.getElementById('rollInput');
   const parentViewSubmit = document.getElementById('parentViewSubmit');
   const saveBtn = document.getElementById('saveAttendanceBtn');
+  const refreshBtn = document.getElementById('refreshBtn');
   const toast = document.getElementById('toastMsg');
 
   // ============================================================
   // STATE
   // ============================================================
-  let currentClass = '10A';
   let students = [];
-  let attendanceData = {};
+  let attendanceData = {}; // { roll: { status, remark } }
   let isSaving = false;
-
-  // ============================================================
-  // CLASS MAPPING - Admission Form se match karega
-  // ============================================================
-  const classMap = {
-    '6A': '6th',
-    '7A': '7th',
-    '8A': '8th',
-    '9A': '9th',
-    '10A': '10th',
-    '10B': '10th',
-    '11A': '11th (Science)',
-    '11B': '11th (Commerce)',
-    '12A': '12th (Science)',
-    '12B': '12th (Commerce)'
-  };
+  let allClasses = [];
 
   // ============================================================
   // HELPER: Show Toast
@@ -530,53 +541,118 @@
   }
 
   // ============================================================
-  // FETCH STUDENTS FROM FIREBASE - FIXED for Admission Form
+  // FETCH ALL CLASSES FROM FIREBASE (admissions collection)
   // ============================================================
-  async function fetchStudents() {
+  async function fetchAllClasses() {
     try {
-      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:#1f4b9e;">
-        <i class="fas fa-spinner fa-spin"></i> Loading students...
-      </td></tr>`;
-
-      const classValue = classSelect.value;
-      // Map to admission form classApplying format
-      const className = classMap[classValue] || classValue;
-
-      console.log('🔍 Searching for class:', className);
-
-      // Query admissions collection using classApplying field
-      const snapshot = await db.collection('admissions')
-        .where('classApplying', '==', className)
-        .get();
-
-      console.log('📊 Found:', snapshot.size, 'students');
-
-      if (snapshot.empty) {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:#666;">
-          <i class="fas fa-users" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
-          No students found in ${className}.<br>
-          <small style="color:#999;">Please add students via Admission Form first.</small>
-        </td></tr>`;
-        students = [];
-        attendanceData = {};
-        return;
-      }
-
-      students = [];
+      const snapshot = await db.collection('admissions').get();
+      const classSet = new Set();
       snapshot.forEach(doc => {
         const data = doc.data();
-        // Try multiple possible field names for roll number
-        let roll = data.rollNumber || data.rollNo || data.roll || parseInt(doc.id.slice(-3)) || 0;
-        if (typeof roll === 'string') roll = parseInt(roll) || 0;
-        
-        students.push({
-          id: doc.id,
-          roll: roll,
-          name: data.studentName || data.name || 'Unknown',
-          class: data.classApplying || className,
-          admissionNo: data.admissionNo || ''
-        });
+        if (data.classApplying) {
+          classSet.add(data.classApplying);
+        }
+        // Also check if 'class' field exists (for backward compatibility)
+        if (data.class) {
+          classSet.add(data.class);
+        }
       });
+      allClasses = Array.from(classSet).sort();
+      return allClasses;
+    } catch (error) {
+      console.error('Error fetching classes:', error);
+      return [];
+    }
+  }
+
+  // ============================================================
+  // POPULATE CLASS DROPDOWN
+  // ============================================================
+  function populateClassDropdown(classes) {
+    classSelect.innerHTML = '';
+    if (classes.length === 0) {
+      classSelect.innerHTML = `<option value="">-- No classes found --</option>`;
+      return;
+    }
+    classes.forEach(cls => {
+      const option = document.createElement('option');
+      option.value = cls;
+      option.textContent = cls;
+      classSelect.appendChild(option);
+    });
+    // Select first class by default
+    if (classes.length > 0) {
+      classSelect.value = classes[0];
+    }
+  }
+
+  // ============================================================
+  // FETCH STUDENTS FROM FIREBASE (based on selected class)
+  // ============================================================
+  async function fetchStudents() {
+    const selectedClass = classSelect.value;
+    if (!selectedClass) {
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:#666;">
+        <i class="fas fa-info-circle" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
+        Please select a class from dropdown.
+      </td></tr>`;
+      students = [];
+      attendanceData = {};
+      return;
+    }
+
+    try {
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:40px;color:#1f4b9e;">
+        <i class="fas fa-spinner fa-spin" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
+        Loading students for ${selectedClass}...
+      </td></tr>`;
+
+      // Query admissions where classApplying = selectedClass
+      const snapshot = await db.collection('admissions')
+        .where('classApplying', '==', selectedClass)
+        .get();
+
+      // If no results with classApplying, try 'class' field
+      if (snapshot.empty) {
+        const snapshot2 = await db.collection('admissions')
+          .where('class', '==', selectedClass)
+          .get();
+        
+        if (snapshot2.empty) {
+          tbody.innerHTML = `<tr><td colspan="4" class="no-students-msg">
+            <i class="fas fa-users"></i>
+            No students found in <strong>${selectedClass}</strong>.<br>
+            Please add admissions first.
+          </td></tr>`;
+          students = [];
+          attendanceData = {};
+          return;
+        }
+        
+        // Process from second query
+        students = [];
+        snapshot2.forEach(doc => {
+          const data = doc.data();
+          students.push({
+            id: doc.id,
+            roll: data.rollNumber || data.rollNo || parseInt(doc.id.slice(-3)) || 0,
+            name: data.studentName || data.name || 'Unknown',
+            class: data.class || selectedClass
+          });
+        });
+      } else {
+        // Process from first query
+        students = [];
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          students.push({
+            id: doc.id,
+            roll: data.rollNumber || data.rollNo || parseInt(doc.id.slice(-3)) || 0,
+            name: data.studentName || data.name || 'Unknown',
+            class: data.classApplying || selectedClass
+          });
+        });
+      }
 
       // Sort by roll number
       students.sort((a, b) => a.roll - b.roll);
@@ -587,7 +663,7 @@
         attendanceData[s.roll] = { status: 'present', remark: '' };
       });
 
-      // Try to load existing attendance for this month & class
+      // Load existing attendance for this month & class
       await loadExistingAttendance();
 
       renderTable();
@@ -609,7 +685,9 @@
       const month = monthSelect.value;
       const year = new Date().getFullYear();
       const classValue = classSelect.value;
-      const docId = `${classValue}_${month}_${year}`;
+
+      // Document ID format: CLASS_MONTH_YEAR (replace special chars)
+      const docId = `${classValue.replace(/[^a-zA-Z0-9]/g, '_')}_${month}_${year}`;
 
       const docRef = db.collection('attendance').doc(docId);
       const docSnap = await docRef.get();
@@ -636,6 +714,10 @@
   // ============================================================
   function renderTable() {
     if (students.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" class="no-students-msg">
+        <i class="fas fa-users"></i>
+        No students found.
+      </td></tr>`;
       return;
     }
 
@@ -672,6 +754,7 @@
       if (!nameDiv) return;
       const roll = parseInt(nameDiv.dataset.roll);
 
+      // Radio buttons
       const radios = row.querySelectorAll(`input[name="status_${roll}"]`);
       radios.forEach(r => {
         r.addEventListener('change', function() {
@@ -682,6 +765,7 @@
         });
       });
 
+      // Remark input
       const remarkInput = row.querySelector('.remark-input');
       if (remarkInput) {
         remarkInput.addEventListener('input', function() {
@@ -691,6 +775,7 @@
         });
       }
 
+      // Click on name -> individual report
       nameDiv.addEventListener('click', function() {
         const roll = parseInt(this.dataset.roll);
         const name = this.dataset.name;
@@ -700,12 +785,12 @@
   }
 
   // ============================================================
-  // GENERATE INDIVIDUAL REPORT
+  // GENERATE INDIVIDUAL REPORT (PDF)
   // ============================================================
   function generateIndividualReport(roll, name) {
     const rec = attendanceData[roll] || { status: 'present', remark: '' };
     const month = monthSelect.options[monthSelect.selectedIndex].text;
-    const classVal = classSelect.value.replace('A', '-A').replace('B', '-B');
+    const classVal = classSelect.value;
 
     const content = `📋 INDIVIDUAL ATTENDANCE REPORT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -751,8 +836,9 @@
       const month = monthSelect.value;
       const year = new Date().getFullYear();
       const classValue = classSelect.value;
-      const docId = `${classValue}_${month}_${year}`;
+      const docId = `${classValue.replace(/[^a-zA-Z0-9]/g, '_')}_${month}_${year}`;
 
+      // Prepare data
       const studentsData = {};
       students.forEach(s => {
         const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
@@ -764,7 +850,6 @@
 
       await db.collection('attendance').doc(docId).set({
         class: classValue,
-        className: classMap[classValue] || classValue,
         month: parseInt(month),
         year: year,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -774,7 +859,7 @@
       showToast('✅ Attendance saved successfully!');
     } catch (error) {
       console.error('Error saving attendance:', error);
-      showToast('❌ Error: ' + error.message, true);
+      showToast('❌ Error saving attendance: ' + error.message, true);
     } finally {
       isSaving = false;
       saveBtn.disabled = false;
@@ -815,7 +900,7 @@
       return;
     }
     const month = monthSelect.options[monthSelect.selectedIndex].text;
-    const classVal = classSelect.value.replace('A', '-A').replace('B', '-B');
+    const classVal = classSelect.value;
     let report = `📅 MONTHLY ATTENDANCE REPORT - ${month}\n`;
     report += `🏫 Class: ${classVal}\n`;
     report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
@@ -845,7 +930,7 @@
       return;
     }
     const month = monthSelect.options[monthSelect.selectedIndex].text;
-    const classVal = classSelect.value.replace('A', '-A').replace('B', '-B');
+    const classVal = classSelect.value;
     const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
     
     let content = `📋 DAILY ATTENDANCE REPORT\n`;
@@ -888,7 +973,7 @@
       return;
     }
     const month = monthSelect.options[monthSelect.selectedIndex].text;
-    const classVal = classSelect.value.replace('A', '-A').replace('B', '-B');
+    const classVal = classSelect.value;
     
     let content = `📊 MONTHLY ATTENDANCE REPORT\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
@@ -931,6 +1016,30 @@
   });
 
   // ============================================================
+  // INIT: LOAD CLASSES AND STUDENTS
+  // ============================================================
+  async function init() {
+    try {
+      // Load all classes first
+      const classes = await fetchAllClasses();
+      populateClassDropdown(classes);
+      
+      if (classes.length > 0) {
+        // Load students for first class
+        await fetchStudents();
+      } else {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:40px;color:#666;">
+          <i class="fas fa-database" style="font-size:3rem;display:block;margin-bottom:10px;"></i>
+          No students found in database.<br>
+          Please add admissions first.
+        </td></tr>`;
+      }
+    } catch (error) {
+      console.error('Init error:', error);
+    }
+  }
+
+  // ============================================================
   // EVENT LISTENERS
   // ============================================================
   classSelect.addEventListener('change', function() {
@@ -943,12 +1052,18 @@
 
   saveBtn.addEventListener('click', saveAttendance);
 
+  refreshBtn.addEventListener('click', function() {
+    fetchStudents();
+    showToast('🔄 Refreshed!');
+  });
+
+  // Enter key support
   rollInput.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') parentViewSubmit.click();
   });
 
   // ============================================================
-  // INIT
+  // AUTH CHECK & START
   // ============================================================
   auth.onAuthStateChanged((user) => {
     if (!user) {
@@ -958,11 +1073,13 @@
       }, 2000);
       return;
     }
-    fetchStudents();
+    // Load data
+    init();
   });
 
-  console.log('✅ Attendance System Loaded with Admission Form mapping!');
+  console.log('✅ Attendance System Loaded!');
+  console.log('📌 It will fetch students from Firebase "admissions" collection.');
+  console.log('📌 Class field used: "classApplying" or "class"');
 </script>
-
 </body>
 </html>
