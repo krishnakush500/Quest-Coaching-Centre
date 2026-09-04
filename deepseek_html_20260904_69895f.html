@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>Attendance · Quest Coaching</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0f6ff;
+      min-height: 100vh;
+      padding: 20px 16px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 1200px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 40px 40px 32px 32px;
+      box-shadow: 0 20px 50px rgba(0, 40, 100, 0.12), 0 8px 20px rgba(0, 20, 60, 0.06);
+      padding: 24px 22px 32px;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+    /* Header */
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+      border-bottom: 2px solid #e6effa;
+      padding-bottom: 18px;
+    }
+    .header h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      background: linear-gradient(145deg, #0a2a66, #1f4b9e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header h1 i {
+      background: #1f4b9e;
+      -webkit-text-fill-color: white;
+      padding: 10px 12px;
+      border-radius: 60px;
+      font-size: 1.4rem;
+      box-shadow: 0 6px 14px rgba(20, 60, 150, 0.25);
+    }
+    .month-picker {
+      background: #eef5fe;
+      padding: 6px 18px 6px 14px;
+      border-radius: 60px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #0a2a66;
+      font-weight: 600;
+      border: 1px solid #c7daf5;
+    }
+    .month-picker select {
+      border: none;
+      background: transparent;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #0a2a66;
+      padding: 6px 0;
+      outline: none;
+      cursor: pointer;
+    }
+    /* Class Filter */
+    .class-filter {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px 18px;
+      background: #f4f9ff;
+      padding: 12px 20px;
+      border-radius: 60px;
+      margin-bottom: 28px;
+      border: 1px solid #d7e5fc;
+    }
+    .class-filter label {
+      font-weight: 600;
+      color: #0f3b7a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .class-filter select {
+      background: white;
+      border: 1px solid #b8cff0;
+      border-radius: 40px;
+      padding: 8px 24px 8px 18px;
+      font-weight: 500;
+      color: #0a2a66;
+      font-size: 0.95rem;
+      outline: none;
+      cursor: pointer;
+    }
+    .class-filter .view-parent-btn {
+      margin-left: auto;
+      background: #0a2a66;
+      border: none;
+      border-radius: 60px;
+      padding: 8px 24px;
+      color: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 6px 14px rgba(10, 42, 102, 0.25);
+      cursor: pointer;
+      border: 1px solid #3f6ec0;
+    }
+    .class-filter .view-parent-btn:hover {
+      background: #13458b;
+      transform: scale(1.01);
+    }
+    /* Save Button */
+    .save-btn-container {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 16px;
+    }
+    .save-btn {
+      background: #10b981;
+      border: none;
+      padding: 10px 28px;
+      border-radius: 60px;
+      color: white;
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .save-btn:hover {
+      background: #059669;
+      transform: scale(1.01);
+    }
+    .save-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    /* Table */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 28px;
+      background: #fafcff;
+      padding: 4px 2px 6px 2px;
+      box-shadow: inset 0 0 0 1px rgba(60, 120, 210, 0.08);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      min-width: 620px;
+    }
+    th {
+      text-align: left;
+      padding: 16px 12px 12px 12px;
+      font-weight: 600;
+      color: #0a2a66;
+      background: #e7f0fe;
+      border-bottom: 2px solid #bdd2f0;
+    }
+    td {
+      padding: 12px 12px;
+      border-bottom: 1px solid #e2ecfc;
+      vertical-align: middle;
+      background: white;
+    }
+    tr:last-child td { border-bottom: none; }
+    .student-name {
+      font-weight: 600;
+      color: #0a2a66;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .student-name:hover {
+      color: #0033aa;
+      text-decoration: underline;
+    }
+    .roll-badge {
+      background: #e3edfe;
+      padding: 4px 12px;
+      border-radius: 40px;
+      font-weight: 500;
+      font-size: 0.75rem;
+      color: #0a2a66;
+      display: inline-block;
+    }
+    .attendance-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      align-items: center;
+    }
+    .attendance-actions label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 500;
+      font-size: 0.85rem;
+      color: #1f4170;
+      cursor: pointer;
+      background: #f2f8ff;
+      padding: 4px 12px 4px 8px;
+      border-radius: 40px;
+      border: 1px solid transparent;
+    }
+    .attendance-actions label input[type="radio"] {
+      accent-color: #0a2a66;
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+    .attendance-actions label:has(input:checked) {
+      background: #d4e4fe;
+      border-color: #1f4b9e;
+      box-shadow: 0 0 0 2px rgba(26, 80, 180, 0.15);
+    }
+    .remark-input {
+      border: 1px solid #c8dbf7;
+      border-radius: 40px;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      background: white;
+      width: 100px;
+      color: #0a2a66;
+    }
+    .remark-input:focus {
+      border-color: #0a2a66;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(10, 42, 102, 0.12);
+    }
+    /* Report Actions */
+    .report-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 28px;
+      gap: 18px 12px;
+      background: #edf5ff;
+      padding: 14px 20px;
+      border-radius: 60px;
+      border: 1px solid #c7dbfa;
+    }
+    .report-actions .left {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px 20px;
+    }
+    .report-actions .left .monthly-btn {
+      background: white;
+      border: 1px solid #b1caf0;
+      padding: 8px 28px;
+      border-radius: 60px;
+      font-weight: 600;
+      color: #0a2a66;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+    .report-actions .left .monthly-btn:hover {
+      background: #e2edfe;
+      border-color: #1f4b9e;
+    }
+    .report-actions .right {
+      display: flex;
+      gap: 12px;
+    }
+    .download-btn {
+      background: #0a2a66;
+      border: none;
+      padding: 8px 24px;
+      border-radius: 60px;
+      color: white;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 6px 16px rgba(10, 42, 102, 0.25);
+      cursor: pointer;
+      border: 1px solid #3c6fc0;
+      font-size: 0.9rem;
+    }
+    .download-btn:hover {
+      background: #13458b;
+      transform: scale(1.01);
+    }
+    .download-btn.outline {
+      background: white;
+      color: #0a2a66;
+      border: 1px solid #b8cef0;
+      box-shadow: none;
+    }
+    .download-btn.outline:hover {
+      background: #e8f0fe;
+    }
+    .download-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    /* Parent View */
+    .parent-view-box {
+      background: #e3efff;
+      border-radius: 60px;
+      padding: 12px 24px;
+      display: none;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      margin-top: 12px;
+      border: 1px solid #b7cef3;
+    }
+    .parent-view-box span {
+      font-weight: 600;
+      color: #0a2a66;
+    }
+    .parent-view-box input {
+      border: 1px solid #b0caf0;
+      border-radius: 60px;
+      padding: 8px 20px;
+      font-weight: 500;
+      width: 140px;
+      background: white;
+    }
+    .parent-view-box button {
+      background: #0a2a66;
+      border: none;
+      border-radius: 60px;
+      color: white;
+      padding: 8px 24px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .status-present { background: #d1fae5; color: #065f46; }
+    .status-absent { background: #fee2e2; color: #991b1b; }
+    .status-leave { background: #fef3c7; color: #92400e; }
+    .loading-shimmer {
+      text-align: center;
+      padding: 30px;
+      color: #1f4b9e;
+    }
+    .toast-msg {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a237e;
+      color: white;
+      padding: 12px 28px;
+      border-radius: 60px;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      z-index: 9999;
+      display: none;
+    }
+    @media (max-width: 720px) {
+      .container { padding: 18px 14px; }
+      .header h1 { font-size: 1.6rem; }
+      .class-filter { border-radius: 30px; padding: 14px; flex-direction: column; align-items: stretch; }
+      .class-filter .view-parent-btn { margin-left: 0; justify-content: center; }
+      .report-actions { flex-direction: column; align-items: stretch; border-radius: 30px; }
+      .report-actions .left { flex-wrap: wrap; justify-content: center; }
+      .report-actions .right { justify-content: center; }
+      .parent-view-box { flex-direction: column; align-items: stretch; }
+      td, th { padding: 10px 8px; }
+      .attendance-actions label { padding: 2px 8px; font-size: 0.75rem; }
+      .remark-input { width: 70px; }
+      .save-btn-container { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1><i class="fas fa-clipboard-check"></i> Attendance</h1>
+    <div class="month-picker">
+      <i class="fas fa-calendar-alt"></i>
+      <select id="monthSelect">
+        <option value="0">January</option><option value="1">February</option>
+        <option value="2">March</option><option value="3">April</option>
+        <option value="4">May</option><option value="5">June</option>
+        <option value="6">July</option><option value="7">August</option>
+        <option value="8" selected>September</option>
+        <option value="9">October</option><option value="10">November</option>
+        <option value="11">December</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- CLASS FILTER + PARENT VIEW -->
+  <div class="class-filter">
+    <label><i class="fas fa-users"></i> Class</label>
+    <select id="classSelect">
+      <option value="10A">10-A (Science)</option>
+      <option value="10B">10-B (Commerce)</option>
+      <option value="9A">9-A (Maths)</option>
+    </select>
+    <button class="view-parent-btn" id="parentViewBtn">
+      <i class="fas fa-eye"></i> Parent View (Roll No.)
+    </button>
+  </div>
+
+  <!-- Parent View Box -->
+  <div id="parentViewBox" class="parent-view-box">
+    <span><i class="fas fa-id-badge"></i> Parent access · Roll No.</span>
+    <input type="text" placeholder="e.g. 101" id="rollInput">
+    <button id="parentViewSubmit"><i class="fas fa-search"></i> Show</button>
+    <small style="color:#1f4b9e;">(demo: 101, 102, 103...)</small>
+  </div>
+
+  <!-- SAVE BUTTON -->
+  <div class="save-btn-container">
+    <button class="save-btn" id="saveAttendanceBtn">
+      <i class="fas fa-save"></i> Save Attendance
+    </button>
+  </div>
+
+  <!-- ATTENDANCE TABLE -->
+  <div class="table-wrap">
+    <table id="attendanceTable">
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Roll</th>
+          <th>Status</th>
+          <th>Remarks</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <tr><td colspan="4" class="loading-shimmer">
+          <i class="fas fa-spinner fa-spin"></i> Loading students...
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- REPORT & DOWNLOAD -->
+  <div class="report-actions">
+    <div class="left">
+      <button class="monthly-btn" id="monthlyReportBtn">
+        <i class="fas fa-file-alt"></i> Monthly Report
+      </button>
+      <span style="color:#1f4170; font-weight:500;">
+        <i class="fas fa-print"></i> Daily attendance
+      </span>
+    </div>
+    <div class="right">
+      <button class="download-btn outline" id="downloadDailyBtn">
+        <i class="fas fa-download"></i> Daily PDF
+      </button>
+      <button class="download-btn" id="downloadMonthlyBtn">
+        <i class="fas fa-file-pdf"></i> Monthly PDF
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast Message -->
+<div id="toastMsg" class="toast-msg"></div>
+
+<script>
+  // ============================================================
+  // FIREBASE CONFIG
+  // ============================================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
+    authDomain: "quest-coaching.firebaseapp.com",
+    databaseURL: "https://quest-coaching-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "quest-coaching",
+    storageBucket: "quest-coaching.firebasestorage.app",
+    messagingSenderId: "131948734089",
+    appId: "1:131948734089:web:f4ba25110c8b1298360858"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+
+  // ============================================================
+  // DOM REFS
+  // ============================================================
+  const tbody = document.getElementById('tableBody');
+  const classSelect = document.getElementById('classSelect');
+  const monthSelect = document.getElementById('monthSelect');
+  const parentViewBtn = document.getElementById('parentViewBtn');
+  const parentViewBox = document.getElementById('parentViewBox');
+  const rollInput = document.getElementById('rollInput');
+  const parentViewSubmit = document.getElementById('parentViewSubmit');
+  const saveBtn = document.getElementById('saveAttendanceBtn');
+  const toast = document.getElementById('toastMsg');
+
+  // ============================================================
+  // STATE
+  // ============================================================
+  let currentClass = '10A';
+  let currentMonth = 8; // September
+  let students = [];
+  let attendanceData = {}; // { roll: { status, remark } }
+  let isSaving = false;
+
+  // ============================================================
+  // HELPER: Show Toast
+  // ============================================================
+  function showToast(msg, isError = false) {
+    toast.textContent = msg;
+    toast.style.display = 'block';
+    toast.style.background = isError ? '#dc3545' : '#1a237e';
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => { toast.style.display = 'none'; }, 3000);
+  }
+
+  // ============================================================
+  // FETCH STUDENTS FROM FIREBASE
+  // ============================================================
+  async function fetchStudents() {
+    try {
+      tbody.innerHTML = `<tr><td colspan="4" class="loading-shimmer">
+        <i class="fas fa-spinner fa-spin"></i> Loading students...
+      </td></tr>`;
+
+      // Get class name from select value (e.g., "10A" -> "10-A")
+      const classValue = classSelect.value;
+      const className = classValue.replace('A', '-A').replace('B', '-B');
+
+      // Query admissions collection where class = className
+      const snapshot = await db.collection('admissions')
+        .where('class', '==', className)
+        .get();
+
+      if (snapshot.empty) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:#666;">
+          <i class="fas fa-users" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
+          No students found in ${className}. Please add admissions first.
+        </td></tr>`;
+        students = [];
+        attendanceData = {};
+        return;
+      }
+
+      students = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        students.push({
+          id: doc.id,
+          roll: data.rollNo || parseInt(doc.id.slice(-3)) || 0,
+          name: data.studentName || data.name || 'Unknown',
+          class: data.class || className
+        });
+      });
+
+      // Sort by roll number
+      students.sort((a, b) => a.roll - b.roll);
+
+      // Initialize attendance data
+      attendanceData = {};
+      students.forEach(s => {
+        attendanceData[s.roll] = { status: 'present', remark: '' };
+      });
+
+      // Try to load existing attendance for this month & class
+      await loadExistingAttendance();
+
+      renderTable();
+
+    } catch (error) {
+      console.error('Error fetching students:', error);
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:#dc3545;">
+        <i class="fas fa-exclamation-circle" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
+        Error loading students. Please refresh.
+      </td></tr>`;
+    }
+  }
+
+  // ============================================================
+  // LOAD EXISTING ATTENDANCE FROM FIREBASE
+  // ============================================================
+  async function loadExistingAttendance() {
+    try {
+      const month = monthSelect.value;
+      const year = new Date().getFullYear();
+      const classValue = classSelect.value;
+
+      // Document ID format: CLASS_MONTH_YEAR e.g., 10A_8_2025
+      const docId = `${classValue}_${month}_${year}`;
+
+      const docRef = db.collection('attendance').doc(docId);
+      const docSnap = await docRef.get();
+
+      if (docSnap.exists) {
+        const data = docSnap.data();
+        if (data.students) {
+          Object.keys(data.students).forEach(roll => {
+            const rollNum = parseInt(roll);
+            if (attendanceData[rollNum]) {
+              attendanceData[rollNum].status = data.students[roll].status || 'present';
+              attendanceData[rollNum].remark = data.students[roll].remark || '';
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.warn('Could not load existing attendance:', error);
+    }
+  }
+
+  // ============================================================
+  // RENDER TABLE
+  // ============================================================
+  function renderTable() {
+    if (students.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:#666;">
+        <i class="fas fa-users" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
+        No students found.
+      </td></tr>`;
+      return;
+    }
+
+    let html = '';
+    students.forEach((s, idx) => {
+      const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
+      const status = rec.status || 'present';
+      const remark = rec.remark || '';
+
+      html += `<tr>
+        <td>
+          <div class="student-name" data-roll="${s.roll}" data-name="${s.name}">
+            <i class="fas fa-user-graduate"></i> ${s.name}
+          </div>
+        </td>
+        <td><span class="roll-badge">${s.roll}</span></td>
+        <td>
+          <div class="attendance-actions">
+            <label><input type="radio" name="status_${s.roll}" value="present" ${status==='present'?'checked':''}> P</label>
+            <label><input type="radio" name="status_${s.roll}" value="absent" ${status==='absent'?'checked':''}> A</label>
+            <label><input type="radio" name="status_${s.roll}" value="leave" ${status==='leave'?'checked':''}> L</label>
+          </div>
+        </td>
+        <td>
+          <input class="remark-input" type="text" placeholder="remark" value="${remark}" data-roll="${s.roll}">
+        </td>
+      </tr>`;
+    });
+    tbody.innerHTML = html;
+
+    // Attach event listeners
+    document.querySelectorAll('#attendanceTable tbody tr').forEach(row => {
+      const nameDiv = row.querySelector('.student-name');
+      if (!nameDiv) return;
+      const roll = parseInt(nameDiv.dataset.roll);
+
+      // Radio buttons
+      const radios = row.querySelectorAll(`input[name="status_${roll}"]`);
+      radios.forEach(r => {
+        r.addEventListener('change', function() {
+          if (this.checked) {
+            attendanceData[roll] = attendanceData[roll] || {};
+            attendanceData[roll].status = this.value;
+          }
+        });
+      });
+
+      // Remark input
+      const remarkInput = row.querySelector('.remark-input');
+      if (remarkInput) {
+        remarkInput.addEventListener('input', function() {
+          const r = parseInt(this.dataset.roll);
+          attendanceData[r] = attendanceData[r] || {};
+          attendanceData[r].remark = this.value;
+        });
+      }
+
+      // Click on name -> individual report
+      nameDiv.addEventListener('click', function() {
+        const roll = parseInt(this.dataset.roll);
+        const name = this.dataset.name;
+        generateIndividualReport(roll, name);
+      });
+    });
+  }
+
+  // ============================================================
+  // GENERATE INDIVIDUAL REPORT (PDF)
+  // ============================================================
+  function generateIndividualReport(roll, name) {
+    const rec = attendanceData[roll] || { status: 'present', remark: '' };
+    const month = monthSelect.options[monthSelect.selectedIndex].text;
+    const classVal = classSelect.value.replace('A', '-A').replace('B', '-B');
+
+    const content = `📋 INDIVIDUAL ATTENDANCE REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏫 Quest Coaching Centre
+👤 Student: ${name}
+🎯 Roll No: ${roll}
+📚 Class: ${classVal}
+📅 Month: ${month}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Status: ${rec.status.toUpperCase()}
+📝 Remark: ${rec.remark || '—'}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📅 Report generated: ${new Date().toLocaleDateString()}
+`;
+
+    const blob = new Blob([content], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${name}_${roll}_attendance.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`📥 ${name}'s report downloaded!`);
+  }
+
+  // ============================================================
+  // SAVE ATTENDANCE TO FIREBASE
+  // ============================================================
+  async function saveAttendance() {
+    if (isSaving) return;
+    if (students.length === 0) {
+      showToast('No students to save!', true);
+      return;
+    }
+
+    isSaving = true;
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+    try {
+      const month = monthSelect.value;
+      const year = new Date().getFullYear();
+      const classValue = classSelect.value;
+      const docId = `${classValue}_${month}_${year}`;
+
+      // Prepare data
+      const studentsData = {};
+      students.forEach(s => {
+        const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
+        studentsData[s.roll] = {
+          status: rec.status || 'present',
+          remark: rec.remark || ''
+        };
+      });
+
+      await db.collection('attendance').doc(docId).set({
+        class: classValue,
+        month: parseInt(month),
+        year: year,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        students: studentsData
+      });
+
+      showToast('✅ Attendance saved successfully!');
+    } catch (error) {
+      console.error('Error saving attendance:', error);
+      showToast('❌ Error saving attendance: ' + error.message, true);
+    } finally {
+      isSaving = false;
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Attendance';
+    }
+  }
+
+  // ============================================================
+  // PARENT VIEW
+  // ============================================================
+  parentViewBtn.addEventListener('click', function() {
+    parentViewBox.style.display = parentViewBox.style.display === 'none' ? 'flex' : 'none';
+  });
+
+  parentViewSubmit.addEventListener('click', function() {
+    const rollVal = rollInput.value.trim();
+    if (!rollVal) {
+      showToast('Please enter a Roll number', true);
+      return;
+    }
+    const rollNum = parseInt(rollVal);
+    const found = students.find(s => s.roll === rollNum);
+    if (!found) {
+      showToast(`Roll ${rollNum} not found in current class`, true);
+      return;
+    }
+    const rec = attendanceData[rollNum] || { status: 'present', remark: '' };
+    const statusEmoji = rec.status === 'present' ? '✅' : rec.status === 'absent' ? '❌' : '🟡';
+    showToast(`${found.name} (${rollNum}) ${statusEmoji} ${rec.status.toUpperCase()} ${rec.remark ? '| '+rec.remark : ''}`);
+  });
+
+  // ============================================================
+  // MONTHLY REPORT
+  // ============================================================
+  document.getElementById('monthlyReportBtn').addEventListener('click', function() {
+    if (students.length === 0) {
+      showToast('No students to show report!', true);
+      return;
+    }
+    const month = monthSelect.options[monthSelect.selectedIndex].text;
+    const classVal = classSelect.value.replace('A', '-A').replace('B', '-B');
+    let report = `📅 MONTHLY ATTENDANCE REPORT - ${month}\n`;
+    report += `🏫 Class: ${classVal}\n`;
+    report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    
+    let present = 0, absent = 0, leave = 0;
+    students.forEach(s => {
+      const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
+      report += `${s.name} (${s.roll}) → ${rec.status.toUpperCase()}`;
+      if (rec.remark) report += ` | ${rec.remark}`;
+      report += '\n';
+      if (rec.status === 'present') present++;
+      else if (rec.status === 'absent') absent++;
+      else if (rec.status === 'leave') leave++;
+    });
+    report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    report += `📊 Summary: P=${present} | A=${absent} | L=${leave} | Total=${students.length}`;
+    
+    alert(report);
+  });
+
+  // ============================================================
+  // DOWNLOAD DAILY PDF
+  // ============================================================
+  document.getElementById('downloadDailyBtn').addEventListener('click', function() {
+    if (students.length === 0) {
+      showToast('No students to generate report!', true);
+      return;
+    }
+    const month = monthSelect.options[monthSelect.selectedIndex].text;
+    const classVal = classSelect.value.replace('A', '-A').replace('B', '-B');
+    const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+    
+    let content = `📋 DAILY ATTENDANCE REPORT\n`;
+    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    content += `🏫 Quest Coaching Centre\n`;
+    content += `📚 Class: ${classVal}\n`;
+    content += `📅 Date: ${today}\n`;
+    content += `📆 Month: ${month}\n`;
+    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+    
+    students.forEach(s => {
+      const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
+      const statusSymbol = rec.status === 'present' ? '✅' : rec.status === 'absent' ? '❌' : '🟡';
+      content += `${statusSymbol} ${s.name} (${s.roll}) → ${rec.status.toUpperCase()}`;
+      if (rec.remark) content += ` | ${rec.remark}`;
+      content += '\n';
+    });
+    
+    content += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    content += `📊 Generated: ${new Date().toLocaleString()}`;
+
+    const blob = new Blob([content], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Daily_Attendance_${classVal}_${today.replace(/\//g, '-')}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('📥 Daily report downloaded!');
+  });
+
+  // ============================================================
+  // DOWNLOAD MONTHLY PDF
+  // ============================================================
+  document.getElementById('downloadMonthlyBtn').addEventListener('click', function() {
+    if (students.length === 0) {
+      showToast('No students to generate report!', true);
+      return;
+    }
+    const month = monthSelect.options[monthSelect.selectedIndex].text;
+    const classVal = classSelect.value.replace('A', '-A').replace('B', '-B');
+    
+    let content = `📊 MONTHLY ATTENDANCE REPORT\n`;
+    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    content += `🏫 Quest Coaching Centre\n`;
+    content += `📚 Class: ${classVal}\n`;
+    content += `📆 Month: ${month}\n`;
+    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+    
+    let present = 0, absent = 0, leave = 0;
+    students.forEach(s => {
+      const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
+      content += `👤 ${s.name} (${s.roll})\n`;
+      content += `   Status: ${rec.status.toUpperCase()}`;
+      if (rec.remark) content += ` | Remark: ${rec.remark}`;
+      content += '\n\n';
+      if (rec.status === 'present') present++;
+      else if (rec.status === 'absent') absent++;
+      else if (rec.status === 'leave') leave++;
+    });
+    
+    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    content += `📊 SUMMARY\n`;
+    content += `✅ Present: ${present}\n`;
+    content += `❌ Absent: ${absent}\n`;
+    content += `🟡 Leave: ${leave}\n`;
+    content += `📌 Total Students: ${students.length}\n`;
+    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    content += `📅 Generated: ${new Date().toLocaleString()}`;
+
+    const blob = new Blob([content], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Monthly_Attendance_${classVal}_${month}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('📥 Monthly report downloaded!');
+  });
+
+  // ============================================================
+  // EVENT LISTENERS
+  // ============================================================
+  classSelect.addEventListener('change', function() {
+    fetchStudents();
+  });
+
+  monthSelect.addEventListener('change', function() {
+    fetchStudents();
+  });
+
+  saveBtn.addEventListener('click', saveAttendance);
+
+  // ============================================================
+  // INIT
+  // ============================================================
+  // Check if user is logged in
+  auth.onAuthStateChanged((user) => {
+    if (!user) {
+      showToast('⚠️ Please login from main page!', true);
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 2000);
+      return;
+    }
+    // Load data
+    fetchStudents();
+  });
+
+  // Enter key support
+  rollInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') parentViewSubmit.click();
+  });
+
+  console.log('✅ Attendance System Loaded!');
+</script>
+
+</body>
+</html>
