@@ -32,7 +32,6 @@
       padding: 24px 22px 32px;
       border: 1px solid rgba(255, 255, 255, 0.6);
     }
-    /* Header */
     .header {
       display: flex;
       flex-wrap: wrap;
@@ -60,7 +59,18 @@
       font-size: 1.4rem;
       box-shadow: 0 6px 14px rgba(20, 60, 150, 0.25);
     }
-    /* TOP ROW: Date + Parent View + Holiday */
+    .header .date-display {
+      background: #eef5fe;
+      padding: 8px 20px;
+      border-radius: 60px;
+      font-weight: 600;
+      color: #0a2a66;
+      border: 1px solid #c7daf5;
+      font-size: 0.9rem;
+    }
+    .header .date-display i { margin-right: 8px; }
+
+    /* TOP CONTROLS */
     .top-controls {
       display: flex;
       flex-wrap: wrap;
@@ -72,17 +82,17 @@
       margin-bottom: 16px;
       border: 1px solid #d7e5fc;
     }
-    .top-controls .date-group {
+    .top-controls .session-group {
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .top-controls .date-group label {
+    .top-controls .session-group label {
       font-weight: 600;
       color: #0f3b7a;
       font-size: 0.9rem;
     }
-    .top-controls .date-group input[type="date"] {
+    .top-controls .session-group select {
       border: 1px solid #b8cff0;
       border-radius: 40px;
       padding: 8px 16px;
@@ -92,10 +102,6 @@
       outline: none;
       background: white;
       cursor: pointer;
-    }
-    .top-controls .date-group input[type="date"]:focus {
-      border-color: #1f4b9e;
-      box-shadow: 0 0 0 3px rgba(26, 80, 180, 0.12);
     }
     .top-controls .holiday-group {
       display: flex;
@@ -140,7 +146,6 @@
       transform: scale(1.01);
     }
 
-    /* Class Filter - Second Row */
     .class-filter {
       display: flex;
       flex-wrap: wrap;
@@ -172,7 +177,6 @@
       min-width: 160px;
     }
 
-    /* Parent View Box (hidden by default) */
     .parent-view-box {
       background: #e3efff;
       border-radius: 60px;
@@ -206,7 +210,6 @@
       cursor: pointer;
     }
 
-    /* Holiday Message */
     .holiday-msg {
       background: #fef2f2;
       border: 2px solid #fecaca;
@@ -217,16 +220,9 @@
       margin-bottom: 16px;
       display: none;
     }
-    .holiday-msg i {
-      font-size: 3rem;
-      display: block;
-      margin-bottom: 10px;
-    }
-    .holiday-msg h2 {
-      font-size: 1.5rem;
-    }
+    .holiday-msg i { font-size: 3rem; display: block; margin-bottom: 10px; }
+    .holiday-msg h2 { font-size: 1.5rem; }
 
-    /* Save Button */
     .save-btn-container {
       display: flex;
       justify-content: flex-end;
@@ -265,7 +261,6 @@
     }
     .refresh-btn:hover { background: #cbd5e1; }
 
-    /* Table */
     .table-wrap {
       overflow-x: auto;
       border-radius: 28px;
@@ -357,7 +352,6 @@
       box-shadow: 0 0 0 3px rgba(10, 42, 102, 0.12);
     }
 
-    /* Report Actions */
     .report-actions {
       display: flex;
       flex-wrap: wrap;
@@ -451,6 +445,7 @@
     @media (max-width: 720px) {
       .container { padding: 18px 14px; }
       .header h1 { font-size: 1.6rem; }
+      .header .date-display { font-size: 0.75rem; padding: 6px 14px; }
       .top-controls { border-radius: 30px; padding: 14px; flex-direction: column; align-items: stretch; }
       .top-controls .view-parent-btn { margin-left: 0; justify-content: center; }
       .class-filter { border-radius: 30px; padding: 14px; flex-direction: column; align-items: stretch; }
@@ -471,24 +466,22 @@
   <!-- HEADER -->
   <div class="header">
     <h1><i class="fas fa-clipboard-check"></i> Attendance</h1>
-    <div class="month-picker" style="display:none;">
-      <select id="monthSelect">
-        <option value="0">January</option><option value="1">February</option>
-        <option value="2">March</option><option value="3">April</option>
-        <option value="4">May</option><option value="5">June</option>
-        <option value="6">July</option><option value="7">August</option>
-        <option value="8" selected>September</option>
-        <option value="9">October</option><option value="10">November</option>
-        <option value="11">December</option>
-      </select>
+    <div class="date-display" id="dateDisplay">
+      <i class="fas fa-calendar-day"></i> <span id="todayDate">Loading...</span>
     </div>
   </div>
 
-  <!-- TOP CONTROLS: Date + Parent View + Holiday -->
+  <!-- TOP CONTROLS: Session + Holiday + Parent View -->
   <div class="top-controls">
-    <div class="date-group">
-      <label><i class="fas fa-calendar-day"></i> Date:</label>
-      <input type="date" id="attendanceDate">
+    <div class="session-group">
+      <label><i class="fas fa-calendar-alt"></i> Session:</label>
+      <select id="sessionSelect">
+        <option value="2026-27" selected>2026-27</option>
+        <option value="2027-28">2027-28</option>
+        <option value="2028-29">2028-29</option>
+        <option value="2029-30">2029-30</option>
+        <option value="2030-31">2030-31</option>
+      </select>
     </div>
     <div class="holiday-group" id="holidayGroup">
       <input type="checkbox" id="holidayCheck">
@@ -517,7 +510,18 @@
   <div class="class-filter" id="classFilterRow">
     <label><i class="fas fa-users"></i> Class</label>
     <select id="classSelect">
-      <option value="">-- Loaded from database --</option>
+      <option value="">-- Select Class --</option>
+      <option value="6th">6th</option>
+      <option value="7th">7th</option>
+      <option value="8th">8th</option>
+      <option value="9th">9th</option>
+      <option value="10th">10th</option>
+      <option value="11th (Science)">11th (Science)</option>
+      <option value="11th (Commerce)">11th (Commerce)</option>
+      <option value="11th (Arts)">11th (Arts)</option>
+      <option value="12th (Science)">12th (Science)</option>
+      <option value="12th (Commerce)">12th (Commerce)</option>
+      <option value="12th (Arts)">12th (Arts)</option>
     </select>
   </div>
 
@@ -543,7 +547,7 @@
       <tbody id="tableBody">
         <tr><td colspan="4" style="text-align:center;padding:40px;color:#1f4b9e;">
           <i class="fas fa-spinner fa-spin" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
-          Select date and class to load students...
+          Select session and class to load students...
         </td></tr>
       </tbody>
     </table>
@@ -596,7 +600,8 @@
   // ============================================================
   const tbody = document.getElementById('tableBody');
   const classSelect = document.getElementById('classSelect');
-  const dateInput = document.getElementById('attendanceDate');
+  const sessionSelect = document.getElementById('sessionSelect');
+  const dateDisplay = document.getElementById('todayDate');
   const holidayCheck = document.getElementById('holidayCheck');
   const holidayMsg = document.getElementById('holidayMsg');
   const tableWrap = document.getElementById('tableWrap');
@@ -616,7 +621,6 @@
   let students = [];
   let attendanceData = {};
   let isSaving = false;
-  let allClasses = [];
   let currentDate = '';
 
   // ============================================================
@@ -631,99 +635,43 @@
   }
 
   // ============================================================
-  // SET DEFAULT DATE (Today)
+  // GET TODAY'S DATE (Auto Update)
   // ============================================================
-  function setDefaultDate() {
+  function getTodayDate() {
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
-    dateInput.value = `${year}-${month}-${day}`;
-    currentDate = dateInput.value;
+    return `${year}-${month}-${day}`;
+  }
+
+  function formatDateDisplay(dateStr) {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
   }
 
   // ============================================================
-  // FETCH ALL CLASSES
+  // UPDATE DATE DISPLAY (Auto)
   // ============================================================
-  async function fetchAllClasses() {
-    try {
-      const snapshot = await db.collection('admissions').get();
-      const classSet = new Set();
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        if (data.classApplying) classSet.add(data.classApplying);
-        if (data.class) classSet.add(data.class);
-      });
-      allClasses = Array.from(classSet).sort();
-      return allClasses;
-    } catch (error) {
-      console.error('Error fetching classes:', error);
-      return [];
-    }
+  function updateDateDisplay() {
+    const today = getTodayDate();
+    currentDate = today;
+    dateDisplay.textContent = formatDateDisplay(today);
   }
 
   // ============================================================
-  // POPULATE CLASS DROPDOWN
-  // ============================================================
-  function populateClassDropdown(classes) {
-    classSelect.innerHTML = '';
-    if (classes.length === 0) {
-      classSelect.innerHTML = `<option value="">-- No classes found --</option>`;
-      return;
-    }
-    classes.forEach(cls => {
-      const option = document.createElement('option');
-      option.value = cls;
-      option.textContent = cls;
-      classSelect.appendChild(option);
-    });
-    if (classes.length > 0) {
-      classSelect.value = classes[0];
-    }
-  }
-
-  // ============================================================
-  // CHECK IF HOLIDAY
-  // ============================================================
-  function handleHolidayToggle() {
-    if (holidayCheck.checked) {
-      holidayMsg.style.display = 'block';
-      tableWrap.style.display = 'none';
-      saveBtnContainer.style.display = 'none';
-      classFilterRow.style.display = 'none';
-      showToast('🎉 Holiday mode ON - No attendance today');
-    } else {
-      holidayMsg.style.display = 'none';
-      tableWrap.style.display = 'block';
-      saveBtnContainer.style.display = 'flex';
-      classFilterRow.style.display = 'flex';
-      // Load students
-      fetchStudents();
-    }
-  }
-
-  // ============================================================
-  // FETCH STUDENTS FROM FIREBASE
+  // FETCH STUDENTS FROM ADMISSIONS
   // ============================================================
   async function fetchStudents() {
     if (holidayCheck.checked) return;
     
     const selectedClass = classSelect.value;
-    if (!selectedClass) {
+    const selectedSession = sessionSelect.value;
+    
+    if (!selectedClass || !selectedSession) {
       tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:#666;">
         <i class="fas fa-info-circle" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
-        Please select a class from dropdown.
-      </td></tr>`;
-      students = [];
-      attendanceData = {};
-      return;
-    }
-
-    // Check date is selected
-    if (!dateInput.value) {
-      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:#666;">
-        <i class="fas fa-calendar-day" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
-        Please select a date first.
+        Please select Session and Class.
       </td></tr>`;
       return;
     }
@@ -731,24 +679,27 @@
     try {
       tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:40px;color:#1f4b9e;">
         <i class="fas fa-spinner fa-spin" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
-        Loading students for ${selectedClass}...
+        Loading students for ${selectedClass} (${selectedSession})...
       </td></tr>`;
 
-      // Query admissions
+      // Query admissions with both class and session
       let snapshot = await db.collection('admissions')
         .where('classApplying', '==', selectedClass)
+        .where('session', '==', selectedSession)
         .get();
 
       if (snapshot.empty) {
+        // Try with 'class' field
         snapshot = await db.collection('admissions')
           .where('class', '==', selectedClass)
+          .where('session', '==', selectedSession)
           .get();
       }
 
       if (snapshot.empty) {
         tbody.innerHTML = `<tr><td colspan="4" class="no-students-msg">
           <i class="fas fa-users"></i>
-          No students found in <strong>${selectedClass}</strong>.<br>
+          No students found in <strong>${selectedClass}</strong> (${selectedSession}).<br>
           Please add admissions first.
         </td></tr>`;
         students = [];
@@ -775,7 +726,7 @@
         attendanceData[s.roll] = { status: 'present', remark: '' };
       });
 
-      // Load existing attendance
+      // Load existing attendance for today
       await loadExistingAttendance();
       renderTable();
 
@@ -789,34 +740,34 @@
   }
 
   // ============================================================
-  // LOAD EXISTING ATTENDANCE
+  // LOAD EXISTING ATTENDANCE (Student-wise collection)
   // ============================================================
   async function loadExistingAttendance() {
     try {
-      const selectedDate = dateInput.value;
-      if (!selectedDate) return;
-      
-      const dateObj = new Date(selectedDate);
-      const month = dateObj.getMonth(); // 0-11
-      const year = dateObj.getFullYear();
-      const day = String(dateObj.getDate()).padStart(2, '0');
-      const classValue = classSelect.value;
+      const selectedSession = sessionSelect.value;
+      const selectedClass = classSelect.value;
+      const today = getTodayDate();
 
-      const docId = `${classValue.replace(/[^a-zA-Z0-9]/g, '_')}_${month}_${year}`;
+      if (!selectedSession || !selectedClass || students.length === 0) return;
 
-      const docSnap = await db.collection('attendance').doc(docId).get();
+      // For each student, check if attendance exists for today
+      for (const student of students) {
+        const docRef = db.collection('attendance')
+          .doc(selectedSession)
+          .collection('classes')
+          .doc(selectedClass)
+          .collection('students')
+          .doc(student.name) // Student name as document ID
+          .collection('attendance')
+          .doc(today);
 
-      if (docSnap.exists) {
-        const data = docSnap.data();
-        if (data.dailyAttendance && data.dailyAttendance[day]) {
-          const dayData = data.dailyAttendance[day];
-          Object.keys(dayData).forEach(roll => {
-            const rollNum = parseInt(roll);
-            if (attendanceData[rollNum]) {
-              attendanceData[rollNum].status = dayData[roll].status || 'present';
-              attendanceData[rollNum].remark = dayData[roll].remark || '';
-            }
-          });
+        const docSnap = await docRef.get();
+        if (docSnap.exists) {
+          const data = docSnap.data();
+          attendanceData[student.roll] = {
+            status: data.status || 'present',
+            remark: data.remark || ''
+          };
         }
       }
     } catch (error) {
@@ -901,8 +852,9 @@
   // ============================================================
   function generateIndividualReport(roll, name) {
     const rec = attendanceData[roll] || { status: 'present', remark: '' };
-    const dateStr = dateInput.value ? new Date(dateInput.value).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Today';
+    const dateStr = formatDateDisplay(currentDate);
     const classVal = classSelect.value;
+    const session = sessionSelect.value;
 
     const content = `📋 INDIVIDUAL ATTENDANCE REPORT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -910,6 +862,7 @@
 👤 Student: ${name}
 🎯 Roll No: ${roll}
 📚 Class: ${classVal}
+📆 Session: ${session}
 📅 Date: ${dateStr}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ Status: ${rec.status.toUpperCase()}
@@ -931,7 +884,7 @@
   }
 
   // ============================================================
-  // SAVE ATTENDANCE TO FIREBASE
+  // SAVE ATTENDANCE (Student-wise collection)
   // ============================================================
   async function saveAttendance() {
     if (isSaving) return;
@@ -939,8 +892,13 @@
       showToast('No students to save!', true);
       return;
     }
-    if (!dateInput.value) {
-      showToast('Please select a date first!', true);
+
+    const selectedSession = sessionSelect.value;
+    const selectedClass = classSelect.value;
+    const today = getTodayDate();
+
+    if (!selectedSession || !selectedClass) {
+      showToast('Please select Session and Class!', true);
       return;
     }
 
@@ -949,47 +907,36 @@
     saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
     try {
-      const dateObj = new Date(dateInput.value);
-      const month = dateObj.getMonth();
-      const year = dateObj.getFullYear();
-      const day = String(dateObj.getDate()).padStart(2, '0');
-      const classValue = classSelect.value;
-      const docId = `${classValue.replace(/[^a-zA-Z0-9]/g, '_')}_${month}_${year}`;
+      // Save each student's attendance
+      const batch = db.batch();
+      let savedCount = 0;
 
-      // Prepare daily attendance data
-      const dayData = {};
-      students.forEach(s => {
-        const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
-        dayData[s.roll] = {
+      for (const student of students) {
+        const rec = attendanceData[student.roll] || { status: 'present', remark: '' };
+        
+        const docRef = db.collection('attendance')
+          .doc(selectedSession)
+          .collection('classes')
+          .doc(selectedClass)
+          .collection('students')
+          .doc(student.name) // Student name as document ID
+          .collection('attendance')
+          .doc(today);
+
+        batch.set(docRef, {
           status: rec.status || 'present',
-          remark: rec.remark || ''
-        };
-      });
-
-      const docRef = db.collection('attendance').doc(docId);
-      const docSnap = await docRef.get();
-
-      if (docSnap.exists) {
-        // Update existing document
-        await docRef.update({
-          [`dailyAttendance.${day}`]: dayData,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          remark: rec.remark || '',
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          roll: student.roll,
+          date: today,
+          session: selectedSession,
+          class: selectedClass
         });
-      } else {
-        // Create new document
-        await docRef.set({
-          class: classValue,
-          month: month,
-          year: year,
-          dailyAttendance: {
-            [day]: dayData
-          },
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        savedCount++;
       }
 
-      showToast(`✅ Attendance saved for ${dateObj.toLocaleDateString('en-IN')}!`);
+      await batch.commit();
+      showToast(`✅ Attendance saved for ${savedCount} students (${formatDateDisplay(today)})!`);
     } catch (error) {
       console.error('Error saving attendance:', error);
       showToast('❌ Error saving attendance: ' + error.message, true);
@@ -1001,13 +948,13 @@
   }
 
   // ============================================================
-  // PARENT VIEW
+  // PARENT VIEW (Fast lookup from student's collection)
   // ============================================================
   parentViewBtn.addEventListener('click', function() {
     parentViewBox.style.display = parentViewBox.style.display === 'none' ? 'flex' : 'none';
   });
 
-  parentViewSubmit.addEventListener('click', function() {
+  parentViewSubmit.addEventListener('click', async function() {
     const rollVal = rollInput.value.trim();
     if (!rollVal) {
       showToast('Please enter a Roll number', true);
@@ -1019,10 +966,37 @@
       showToast(`Roll ${rollNum} not found in current class`, true);
       return;
     }
-    const rec = attendanceData[rollNum] || { status: 'present', remark: '' };
-    const statusEmoji = rec.status === 'present' ? '✅' : rec.status === 'absent' ? '❌' : '🟡';
-    const dateStr = dateInput.value ? new Date(dateInput.value).toLocaleDateString('en-IN') : 'Today';
-    showToast(`${found.name} (${rollNum}) ${statusEmoji} ${rec.status.toUpperCase()} ${rec.remark ? '| '+rec.remark : ''} (${dateStr})`);
+
+    // Fast lookup: directly access student's collection
+    try {
+      const selectedSession = sessionSelect.value;
+      const selectedClass = classSelect.value;
+      const today = getTodayDate();
+
+      const docRef = db.collection('attendance')
+        .doc(selectedSession)
+        .collection('classes')
+        .doc(selectedClass)
+        .collection('students')
+        .doc(found.name)
+        .collection('attendance')
+        .doc(today);
+
+      const docSnap = await docRef.get();
+      let status = 'Not marked';
+      let remark = '';
+      if (docSnap.exists) {
+        const data = docSnap.data();
+        status = data.status || 'Not marked';
+        remark = data.remark || '';
+      }
+
+      const statusEmoji = status === 'present' ? '✅' : status === 'absent' ? '❌' : status === 'leave' ? '🟡' : '⏳';
+      const dateStr = formatDateDisplay(today);
+      showToast(`${found.name} (${rollNum}) ${statusEmoji} ${status.toUpperCase()} ${remark ? '| '+remark : ''} (${dateStr})`);
+    } catch (error) {
+      showToast('Error fetching attendance: ' + error.message, true);
+    }
   });
 
   // ============================================================
@@ -1033,16 +1007,17 @@
       showToast('No students to show report!', true);
       return;
     }
-    const dateObj = dateInput.value ? new Date(dateInput.value) : new Date();
-    const monthName = dateObj.toLocaleString('default', { month: 'long' });
-    const year = dateObj.getFullYear();
+    const monthName = new Date().toLocaleString('default', { month: 'long' });
+    const year = new Date().getFullYear();
     const classVal = classSelect.value;
+    const session = sessionSelect.value;
     
     let report = `📅 MONTHLY ATTENDANCE REPORT - ${monthName} ${year}\n`;
     report += `🏫 Class: ${classVal}\n`;
+    report += `📆 Session: ${session}\n`;
     report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     
-    let present = 0, absent = 0, leave = 0;
+    let present = 0, absent = 0, leave = 0, notMarked = 0;
     students.forEach(s => {
       const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
       report += `${s.name} (${s.roll}) → ${rec.status.toUpperCase()}`;
@@ -1051,6 +1026,7 @@
       if (rec.status === 'present') present++;
       else if (rec.status === 'absent') absent++;
       else if (rec.status === 'leave') leave++;
+      else notMarked++;
     });
     report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     report += `📊 Summary: P=${present} | A=${absent} | L=${leave} | Total=${students.length}`;
@@ -1066,14 +1042,15 @@
       showToast('No students to generate report!', true);
       return;
     }
-    const dateObj = dateInput.value ? new Date(dateInput.value) : new Date();
-    const dateStr = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+    const dateStr = formatDateDisplay(currentDate);
     const classVal = classSelect.value;
+    const session = sessionSelect.value;
     
     let content = `📋 DAILY ATTENDANCE REPORT\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     content += `🏫 Quest Coaching Centre\n`;
     content += `📚 Class: ${classVal}\n`;
+    content += `📆 Session: ${session}\n`;
     content += `📅 Date: ${dateStr}\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
     
@@ -1092,7 +1069,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Daily_Attendance_${classVal}_${dateStr.replace(/\//g, '-')}.pdf`;
+    a.download = `Daily_Attendance_${classVal}_${currentDate}.pdf`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -1108,15 +1085,16 @@
       showToast('No students to generate report!', true);
       return;
     }
-    const dateObj = dateInput.value ? new Date(dateInput.value) : new Date();
-    const monthName = dateObj.toLocaleString('default', { month: 'long' });
-    const year = dateObj.getFullYear();
+    const monthName = new Date().toLocaleString('default', { month: 'long' });
+    const year = new Date().getFullYear();
     const classVal = classSelect.value;
+    const session = sessionSelect.value;
     
     let content = `📊 MONTHLY ATTENDANCE REPORT\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     content += `🏫 Quest Coaching Centre\n`;
     content += `📚 Class: ${classVal}\n`;
+    content += `📆 Session: ${session}\n`;
     content += `📆 Month: ${monthName} ${year}\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
     
@@ -1154,27 +1132,35 @@
   });
 
   // ============================================================
+  // HANDLE HOLIDAY TOGGLE
+  // ============================================================
+  function handleHolidayToggle() {
+    if (holidayCheck.checked) {
+      holidayMsg.style.display = 'block';
+      tableWrap.style.display = 'none';
+      saveBtnContainer.style.display = 'none';
+      classFilterRow.style.display = 'none';
+      showToast('🎉 Holiday mode ON - No attendance today');
+    } else {
+      holidayMsg.style.display = 'none';
+      tableWrap.style.display = 'block';
+      saveBtnContainer.style.display = 'flex';
+      classFilterRow.style.display = 'flex';
+      fetchStudents();
+    }
+  }
+
+  // ============================================================
   // INIT
   // ============================================================
   async function init() {
-    setDefaultDate();
+    updateDateDisplay();
     
-    try {
-      const classes = await fetchAllClasses();
-      populateClassDropdown(classes);
-      
-      if (classes.length > 0) {
-        await fetchStudents();
-      } else {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:40px;color:#666;">
-          <i class="fas fa-database" style="font-size:3rem;display:block;margin-bottom:10px;"></i>
-          No students found in database.<br>
-          Please add admissions first.
-        </td></tr>`;
-      }
-    } catch (error) {
-      console.error('Init error:', error);
-    }
+    // Auto-select session 2026-27
+    sessionSelect.value = '2026-27';
+    
+    // Load students
+    await fetchStudents();
   }
 
   // ============================================================
@@ -1184,8 +1170,7 @@
     if (!holidayCheck.checked) fetchStudents();
   });
 
-  dateInput.addEventListener('change', function() {
-    currentDate = this.value;
+  sessionSelect.addEventListener('change', function() {
     if (!holidayCheck.checked) fetchStudents();
   });
 
@@ -1202,6 +1187,11 @@
     if (e.key === 'Enter') parentViewSubmit.click();
   });
 
+  // Auto-update date every minute
+  setInterval(() => {
+    updateDateDisplay();
+  }, 60000);
+
   // ============================================================
   // AUTH CHECK
   // ============================================================
@@ -1217,8 +1207,9 @@
   });
 
   console.log('✅ Attendance System Loaded!');
-  console.log('📌 Teacher selects: Date → Holiday (if any) → Class → Students load');
-  console.log('📌 Parent View button is on TOP row');
+  console.log('📌 Firebase Structure: attendance/{session}/classes/{class}/students/{studentName}/attendance/{date}');
+  console.log('📌 Auto date: Today\'s date is auto-selected');
+  console.log('📌 Session: 2026-27 auto-selected');
 </script>
 </body>
 </html>
