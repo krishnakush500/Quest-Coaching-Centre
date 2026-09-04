@@ -4,12 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
   <title>Attendance · Quest Coaching</title>
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -30,11 +27,10 @@
       width: 100%;
       background: #ffffff;
       border-radius: 40px 40px 32px 32px;
-      box-shadow: 0 20px 50px rgba(0, 40, 100, 0.12), 0 8px 20px rgba(0, 20, 60, 0.06);
+      box-shadow: 0 20px 50px rgba(0, 40, 100, 0.12);
       padding: 24px 22px 32px;
       border: 1px solid rgba(255, 255, 255, 0.6);
     }
-    /* Header */
     .header {
       display: flex;
       flex-wrap: wrap;
@@ -50,7 +46,6 @@
       background: linear-gradient(145deg, #0a2a66, #1f4b9e);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      background-clip: text;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -84,7 +79,6 @@
       outline: none;
       cursor: pointer;
     }
-    /* Class Filter */
     .class-filter {
       display: flex;
       flex-wrap: wrap;
@@ -134,7 +128,6 @@
       background: #13458b;
       transform: scale(1.01);
     }
-    /* Save Button */
     .save-btn-container {
       display: flex;
       justify-content: flex-end;
@@ -163,7 +156,6 @@
       opacity: 0.6;
       cursor: not-allowed;
     }
-    /* Table */
     .table-wrap {
       overflow-x: auto;
       border-radius: 28px;
@@ -257,7 +249,6 @@
       outline: none;
       box-shadow: 0 0 0 3px rgba(10, 42, 102, 0.12);
     }
-    /* Report Actions */
     .report-actions {
       display: flex;
       flex-wrap: wrap;
@@ -324,11 +315,6 @@
     .download-btn.outline:hover {
       background: #e8f0fe;
     }
-    .download-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    /* Parent View */
     .parent-view-box {
       background: #e3efff;
       border-radius: 60px;
@@ -360,21 +346,6 @@
       padding: 8px 24px;
       font-weight: 600;
       cursor: pointer;
-    }
-    .status-badge {
-      display: inline-block;
-      padding: 4px 14px;
-      border-radius: 40px;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-    .status-present { background: #d1fae5; color: #065f46; }
-    .status-absent { background: #fee2e2; color: #991b1b; }
-    .status-leave { background: #fef3c7; color: #92400e; }
-    .loading-shimmer {
-      text-align: center;
-      padding: 30px;
-      color: #1f4b9e;
     }
     .toast-msg {
       position: fixed;
@@ -409,8 +380,6 @@
 <body>
 
 <div class="container">
-
-  <!-- HEADER -->
   <div class="header">
     <h1><i class="fas fa-clipboard-check"></i> Attendance</h1>
     <div class="month-picker">
@@ -427,35 +396,33 @@
     </div>
   </div>
 
-  <!-- CLASS FILTER + PARENT VIEW -->
   <div class="class-filter">
     <label><i class="fas fa-users"></i> Class</label>
     <select id="classSelect">
       <option value="10A">10-A (Science)</option>
       <option value="10B">10-B (Commerce)</option>
       <option value="9A">9-A (Maths)</option>
+      <option value="8A">8-A</option>
+      <option value="7A">7-A</option>
+      <option value="6A">6-A</option>
     </select>
     <button class="view-parent-btn" id="parentViewBtn">
       <i class="fas fa-eye"></i> Parent View (Roll No.)
     </button>
   </div>
 
-  <!-- Parent View Box -->
   <div id="parentViewBox" class="parent-view-box">
     <span><i class="fas fa-id-badge"></i> Parent access · Roll No.</span>
     <input type="text" placeholder="e.g. 101" id="rollInput">
     <button id="parentViewSubmit"><i class="fas fa-search"></i> Show</button>
-    <small style="color:#1f4b9e;">(demo: 101, 102, 103...)</small>
   </div>
 
-  <!-- SAVE BUTTON -->
   <div class="save-btn-container">
     <button class="save-btn" id="saveAttendanceBtn">
       <i class="fas fa-save"></i> Save Attendance
     </button>
   </div>
 
-  <!-- ATTENDANCE TABLE -->
   <div class="table-wrap">
     <table id="attendanceTable">
       <thead>
@@ -467,14 +434,13 @@
         </tr>
       </thead>
       <tbody id="tableBody">
-        <tr><td colspan="4" class="loading-shimmer">
+        <tr><td colspan="4" style="text-align:center;padding:30px;color:#1f4b9e;">
           <i class="fas fa-spinner fa-spin"></i> Loading students...
         </td></tr>
       </tbody>
     </table>
   </div>
 
-  <!-- REPORT & DOWNLOAD -->
   <div class="report-actions">
     <div class="left">
       <button class="monthly-btn" id="monthlyReportBtn">
@@ -493,10 +459,8 @@
       </button>
     </div>
   </div>
-
 </div>
 
-<!-- Toast Message -->
 <div id="toastMsg" class="toast-msg"></div>
 
 <script>
@@ -534,10 +498,25 @@
   // STATE
   // ============================================================
   let currentClass = '10A';
-  let currentMonth = 8; // September
   let students = [];
-  let attendanceData = {}; // { roll: { status, remark } }
+  let attendanceData = {};
   let isSaving = false;
+
+  // ============================================================
+  // CLASS MAPPING - Admission Form se match karega
+  // ============================================================
+  const classMap = {
+    '6A': '6th',
+    '7A': '7th',
+    '8A': '8th',
+    '9A': '9th',
+    '10A': '10th',
+    '10B': '10th',
+    '11A': '11th (Science)',
+    '11B': '11th (Commerce)',
+    '12A': '12th (Science)',
+    '12B': '12th (Commerce)'
+  };
 
   // ============================================================
   // HELPER: Show Toast
@@ -551,27 +530,32 @@
   }
 
   // ============================================================
-  // FETCH STUDENTS FROM FIREBASE
+  // FETCH STUDENTS FROM FIREBASE - FIXED for Admission Form
   // ============================================================
   async function fetchStudents() {
     try {
-      tbody.innerHTML = `<tr><td colspan="4" class="loading-shimmer">
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:#1f4b9e;">
         <i class="fas fa-spinner fa-spin"></i> Loading students...
       </td></tr>`;
 
-      // Get class name from select value (e.g., "10A" -> "10-A")
       const classValue = classSelect.value;
-      const className = classValue.replace('A', '-A').replace('B', '-B');
+      // Map to admission form classApplying format
+      const className = classMap[classValue] || classValue;
 
-      // Query admissions collection where class = className
+      console.log('🔍 Searching for class:', className);
+
+      // Query admissions collection using classApplying field
       const snapshot = await db.collection('admissions')
-        .where('class', '==', className)
+        .where('classApplying', '==', className)
         .get();
+
+      console.log('📊 Found:', snapshot.size, 'students');
 
       if (snapshot.empty) {
         tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:#666;">
           <i class="fas fa-users" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
-          No students found in ${className}. Please add admissions first.
+          No students found in ${className}.<br>
+          <small style="color:#999;">Please add students via Admission Form first.</small>
         </td></tr>`;
         students = [];
         attendanceData = {};
@@ -581,11 +565,16 @@
       students = [];
       snapshot.forEach(doc => {
         const data = doc.data();
+        // Try multiple possible field names for roll number
+        let roll = data.rollNumber || data.rollNo || data.roll || parseInt(doc.id.slice(-3)) || 0;
+        if (typeof roll === 'string') roll = parseInt(roll) || 0;
+        
         students.push({
           id: doc.id,
-          roll: data.rollNo || parseInt(doc.id.slice(-3)) || 0,
+          roll: roll,
           name: data.studentName || data.name || 'Unknown',
-          class: data.class || className
+          class: data.classApplying || className,
+          admissionNo: data.admissionNo || ''
         });
       });
 
@@ -607,7 +596,7 @@
       console.error('Error fetching students:', error);
       tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:#dc3545;">
         <i class="fas fa-exclamation-circle" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
-        Error loading students. Please refresh.
+        Error loading students: ${error.message}
       </td></tr>`;
     }
   }
@@ -620,8 +609,6 @@
       const month = monthSelect.value;
       const year = new Date().getFullYear();
       const classValue = classSelect.value;
-
-      // Document ID format: CLASS_MONTH_YEAR e.g., 10A_8_2025
       const docId = `${classValue}_${month}_${year}`;
 
       const docRef = db.collection('attendance').doc(docId);
@@ -649,15 +636,11 @@
   // ============================================================
   function renderTable() {
     if (students.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:#666;">
-        <i class="fas fa-users" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
-        No students found.
-      </td></tr>`;
       return;
     }
 
     let html = '';
-    students.forEach((s, idx) => {
+    students.forEach((s) => {
       const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
       const status = rec.status || 'present';
       const remark = rec.remark || '';
@@ -689,7 +672,6 @@
       if (!nameDiv) return;
       const roll = parseInt(nameDiv.dataset.roll);
 
-      // Radio buttons
       const radios = row.querySelectorAll(`input[name="status_${roll}"]`);
       radios.forEach(r => {
         r.addEventListener('change', function() {
@@ -700,7 +682,6 @@
         });
       });
 
-      // Remark input
       const remarkInput = row.querySelector('.remark-input');
       if (remarkInput) {
         remarkInput.addEventListener('input', function() {
@@ -710,7 +691,6 @@
         });
       }
 
-      // Click on name -> individual report
       nameDiv.addEventListener('click', function() {
         const roll = parseInt(this.dataset.roll);
         const name = this.dataset.name;
@@ -720,7 +700,7 @@
   }
 
   // ============================================================
-  // GENERATE INDIVIDUAL REPORT (PDF)
+  // GENERATE INDIVIDUAL REPORT
   // ============================================================
   function generateIndividualReport(roll, name) {
     const rec = attendanceData[roll] || { status: 'present', remark: '' };
@@ -773,7 +753,6 @@
       const classValue = classSelect.value;
       const docId = `${classValue}_${month}_${year}`;
 
-      // Prepare data
       const studentsData = {};
       students.forEach(s => {
         const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
@@ -785,6 +764,7 @@
 
       await db.collection('attendance').doc(docId).set({
         class: classValue,
+        className: classMap[classValue] || classValue,
         month: parseInt(month),
         year: year,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -794,7 +774,7 @@
       showToast('✅ Attendance saved successfully!');
     } catch (error) {
       console.error('Error saving attendance:', error);
-      showToast('❌ Error saving attendance: ' + error.message, true);
+      showToast('❌ Error: ' + error.message, true);
     } finally {
       isSaving = false;
       saveBtn.disabled = false;
@@ -963,10 +943,13 @@
 
   saveBtn.addEventListener('click', saveAttendance);
 
+  rollInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') parentViewSubmit.click();
+  });
+
   // ============================================================
   // INIT
   // ============================================================
-  // Check if user is logged in
   auth.onAuthStateChanged((user) => {
     if (!user) {
       showToast('⚠️ Please login from main page!', true);
@@ -975,16 +958,10 @@
       }, 2000);
       return;
     }
-    // Load data
     fetchStudents();
   });
 
-  // Enter key support
-  rollInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') parentViewSubmit.click();
-  });
-
-  console.log('✅ Attendance System Loaded!');
+  console.log('✅ Attendance System Loaded with Admission Form mapping!');
 </script>
 
 </body>
