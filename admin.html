@@ -66,7 +66,7 @@
         /* Dashboard Cards Grid */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 22px;
             margin-bottom: 30px;
         }
@@ -102,6 +102,8 @@
         .card-3 .card-icon { background: #fee2e2; color: #dc3545; }
         .card-4 .card-icon { background: #e0f2fe; color: #0ea5e9; }
         .card-5 .card-icon { background: #f3e8ff; color: #8b5cf6; }
+        /* NEW: Attendance Card Color */
+        .card-6 .card-icon { background: #fef3c7; color: #d97706; }
         
         .card-title {
             font-size: 1.1rem;
@@ -134,6 +136,7 @@
         .card-3:hover .card-btn { background: #dc3545; }
         .card-4:hover .card-btn { background: #0ea5e9; }
         .card-5:hover .card-btn { background: #8b5cf6; }
+        .card-6:hover .card-btn { background: #d97706; }
         
         /* Logout Button */
         .logout-btn {
@@ -196,12 +199,21 @@
         }
         @media (max-width: 768px) {
             body { padding: 15px; }
-            .dashboard-grid { gap: 15px; }
+            .dashboard-grid { gap: 15px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
             .welcome-title { font-size: 1.4rem; }
             .admin-card { padding: 15px 10px; }
             .card-icon { width: 50px; height: 50px; font-size: 24px; }
-            .card-title { font-size: 1rem; }
-            .card-btn { padding: 6px 14px; font-size: 0.75rem; }
+            .card-title { font-size: 0.9rem; }
+            .card-desc { font-size: 0.7rem; }
+            .card-btn { padding: 6px 12px; font-size: 0.7rem; }
+        }
+        @media (max-width: 480px) {
+            .dashboard-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .admin-card { padding: 12px 8px; }
+            .card-icon { width: 40px; height: 40px; font-size: 18px; }
+            .card-title { font-size: 0.75rem; }
+            .card-desc { display: none; }
+            .card-btn { padding: 4px 10px; font-size: 0.6rem; }
         }
     </style>
 </head>
@@ -265,6 +277,14 @@
             <p class="card-desc">Generate admit cards</p>
             <button class="card-btn">Open →</button>
         </div>
+
+        <!-- 🔥 NEW CARD 6: Attendance Management -->
+        <div class="admin-card card-6" id="attendanceCard">
+            <div class="card-icon"><i class="fas fa-clipboard-check"></i></div>
+            <h3 class="card-title">📋 Attendance</h3>
+            <p class="card-desc">Mark & manage daily attendance</p>
+            <button class="card-btn">Open →</button>
+        </div>
     </div>
 </div>
 
@@ -295,6 +315,7 @@
                     <div class="help-step"><strong>💰 Fee Management</strong><div class="simple-instruction">Track student fees, add fee records, update payments</div></div>
                     <div class="help-step"><strong>💻 Online Test</strong><div class="simple-instruction">Create and publish online tests for students</div></div>
                     <div class="help-step"><strong>🎫 Admit Card Generator</strong><div class="simple-instruction">Generate professional admit cards (enter exam details & roll number)</div></div>
+                    <div class="help-step"><strong>📋 Attendance Management</strong><div class="simple-instruction">Mark daily attendance (Present/Absent/Leave), view reports, download PDF</div></div>
                 </div>
                 <div id="hindiInstructions" style="display:none;">
                     <div class="help-step"><strong>📊 रिजल्ट प्रबंधन</strong><div class="simple-instruction">"Manage Results" पर क्लिक करें → रिजल्ट बनाएं, एडिट करें, प्रकाशित करें</div></div>
@@ -302,6 +323,7 @@
                     <div class="help-step"><strong>💰 फीस प्रबंधन</strong><div class="simple-instruction">छात्रों की फीस ट्रैक करें, भुगतान अपडेट करें</div></div>
                     <div class="help-step"><strong>💻 ऑनलाइन टेस्ट</strong><div class="simple-instruction">ऑनलाइन टेस्ट बनाएं और प्रकाशित करें</div></div>
                     <div class="help-step"><strong>🎫 एडमिट कार्ड</strong><div class="simple-instruction">परीक्षा विवरण और रोल नंबर भरकर एडमिट कार्ड बनाएं</div></div>
+                    <div class="help-step"><strong>📋 अटेंडेंस प्रबंधन</strong><div class="simple-instruction">दैनिक अटेंडेंस (Present/Absent/Leave) मार्क करें, रिपोर्ट देखें, PDF डाउनलोड करें</div></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -349,6 +371,7 @@
     const feeCard = document.getElementById('feeCard');
     const onlineTestCard = document.getElementById('onlineTestCard');
     const admitCardCard = document.getElementById('admitCardCard');
+    const attendanceCard = document.getElementById('attendanceCard'); // NEW
 
     // Authentication & Fetch Coaching Details
     onAuthStateChanged(auth, async (user) => {
@@ -394,6 +417,11 @@
     });
     admitCardCard.addEventListener('click', () => {
         window.location.href = 'admit-card.html';
+    });
+
+    // 🔥 NEW: Attendance Card Navigation
+    attendanceCard.addEventListener('click', () => {
+        window.location.href = 'attendance.html';
     });
 
     // Logout
