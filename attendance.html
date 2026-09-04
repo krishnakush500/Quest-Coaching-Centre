@@ -38,7 +38,7 @@
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 28px;
+      margin-bottom: 20px;
       border-bottom: 2px solid #e6effa;
       padding-bottom: 18px;
     }
@@ -60,28 +60,87 @@
       font-size: 1.4rem;
       box-shadow: 0 6px 14px rgba(20, 60, 150, 0.25);
     }
-    .month-picker {
-      background: #eef5fe;
-      padding: 6px 18px 6px 14px;
+    /* TOP ROW: Date + Parent View + Holiday */
+    .top-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px 20px;
+      background: #f4f9ff;
+      padding: 12px 20px;
       border-radius: 60px;
+      margin-bottom: 16px;
+      border: 1px solid #d7e5fc;
+    }
+    .top-controls .date-group {
       display: flex;
       align-items: center;
-      gap: 12px;
-      color: #0a2a66;
-      font-weight: 600;
-      border: 1px solid #c7daf5;
+      gap: 8px;
     }
-    .month-picker select {
-      border: none;
-      background: transparent;
+    .top-controls .date-group label {
       font-weight: 600;
-      font-size: 1rem;
+      color: #0f3b7a;
+      font-size: 0.9rem;
+    }
+    .top-controls .date-group input[type="date"] {
+      border: 1px solid #b8cff0;
+      border-radius: 40px;
+      padding: 8px 16px;
+      font-weight: 500;
       color: #0a2a66;
-      padding: 6px 0;
+      font-size: 0.9rem;
       outline: none;
+      background: white;
       cursor: pointer;
     }
-    /* Class Filter */
+    .top-controls .date-group input[type="date"]:focus {
+      border-color: #1f4b9e;
+      box-shadow: 0 0 0 3px rgba(26, 80, 180, 0.12);
+    }
+    .top-controls .holiday-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #fee2e2;
+      padding: 4px 16px 4px 12px;
+      border-radius: 40px;
+      border: 1px solid #fecaca;
+      cursor: pointer;
+    }
+    .top-controls .holiday-group input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #dc3545;
+      cursor: pointer;
+    }
+    .top-controls .holiday-group label {
+      font-weight: 600;
+      color: #991b1b;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .top-controls .view-parent-btn {
+      margin-left: auto;
+      background: #0a2a66;
+      border: none;
+      border-radius: 60px;
+      padding: 8px 24px;
+      color: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 6px 14px rgba(10, 42, 102, 0.25);
+      cursor: pointer;
+      border: 1px solid #3f6ec0;
+    }
+    .top-controls .view-parent-btn:hover {
+      background: #13458b;
+      transform: scale(1.01);
+    }
+
+    /* Class Filter - Second Row */
     .class-filter {
       display: flex;
       flex-wrap: wrap;
@@ -112,26 +171,61 @@
       cursor: pointer;
       min-width: 160px;
     }
-    .class-filter .view-parent-btn {
-      margin-left: auto;
+
+    /* Parent View Box (hidden by default) */
+    .parent-view-box {
+      background: #e3efff;
+      border-radius: 60px;
+      padding: 12px 24px;
+      display: none;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+      border: 1px solid #b7cef3;
+    }
+    .parent-view-box span {
+      font-weight: 600;
+      color: #0a2a66;
+    }
+    .parent-view-box input {
+      border: 1px solid #b0caf0;
+      border-radius: 60px;
+      padding: 8px 20px;
+      font-weight: 500;
+      width: 140px;
+      background: white;
+    }
+    .parent-view-box button {
       background: #0a2a66;
       border: none;
       border-radius: 60px;
-      padding: 8px 24px;
       color: white;
+      padding: 8px 24px;
       font-weight: 600;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      box-shadow: 0 6px 14px rgba(10, 42, 102, 0.25);
       cursor: pointer;
-      border: 1px solid #3f6ec0;
     }
-    .class-filter .view-parent-btn:hover {
-      background: #13458b;
-      transform: scale(1.01);
+
+    /* Holiday Message */
+    .holiday-msg {
+      background: #fef2f2;
+      border: 2px solid #fecaca;
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+      color: #991b1b;
+      margin-bottom: 16px;
+      display: none;
     }
+    .holiday-msg i {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .holiday-msg h2 {
+      font-size: 1.5rem;
+    }
+
     /* Save Button */
     .save-btn-container {
       display: flex;
@@ -170,6 +264,7 @@
       cursor: pointer;
     }
     .refresh-btn:hover { background: #cbd5e1; }
+
     /* Table */
     .table-wrap {
       overflow-x: auto;
@@ -261,6 +356,7 @@
       outline: none;
       box-shadow: 0 0 0 3px rgba(10, 42, 102, 0.12);
     }
+
     /* Report Actions */
     .report-actions {
       display: flex;
@@ -325,39 +421,7 @@
     }
     .download-btn.outline:hover { background: #e8f0fe; }
     .download-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    /* Parent View */
-    .parent-view-box {
-      background: #e3efff;
-      border-radius: 60px;
-      padding: 12px 24px;
-      display: none;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 16px;
-      margin-top: 12px;
-      border: 1px solid #b7cef3;
-    }
-    .parent-view-box span {
-      font-weight: 600;
-      color: #0a2a66;
-    }
-    .parent-view-box input {
-      border: 1px solid #b0caf0;
-      border-radius: 60px;
-      padding: 8px 20px;
-      font-weight: 500;
-      width: 140px;
-      background: white;
-    }
-    .parent-view-box button {
-      background: #0a2a66;
-      border: none;
-      border-radius: 60px;
-      color: white;
-      padding: 8px 24px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+
     .toast-msg {
       position: fixed;
       bottom: 30px;
@@ -383,11 +447,13 @@
       display: block;
       margin-bottom: 15px;
     }
+
     @media (max-width: 720px) {
       .container { padding: 18px 14px; }
       .header h1 { font-size: 1.6rem; }
+      .top-controls { border-radius: 30px; padding: 14px; flex-direction: column; align-items: stretch; }
+      .top-controls .view-parent-btn { margin-left: 0; justify-content: center; }
       .class-filter { border-radius: 30px; padding: 14px; flex-direction: column; align-items: stretch; }
-      .class-filter .view-parent-btn { margin-left: 0; justify-content: center; }
       .report-actions { flex-direction: column; align-items: stretch; border-radius: 30px; }
       .report-actions .left { flex-wrap: wrap; justify-content: center; }
       .report-actions .right { justify-content: center; }
@@ -405,8 +471,7 @@
   <!-- HEADER -->
   <div class="header">
     <h1><i class="fas fa-clipboard-check"></i> Attendance</h1>
-    <div class="month-picker">
-      <i class="fas fa-calendar-alt"></i>
+    <div class="month-picker" style="display:none;">
       <select id="monthSelect">
         <option value="0">January</option><option value="1">February</option>
         <option value="2">March</option><option value="3">April</option>
@@ -419,12 +484,16 @@
     </div>
   </div>
 
-  <!-- CLASS FILTER + PARENT VIEW -->
-  <div class="class-filter">
-    <label><i class="fas fa-users"></i> Class</label>
-    <select id="classSelect">
-      <option value="">-- Loaded from database --</option>
-    </select>
+  <!-- TOP CONTROLS: Date + Parent View + Holiday -->
+  <div class="top-controls">
+    <div class="date-group">
+      <label><i class="fas fa-calendar-day"></i> Date:</label>
+      <input type="date" id="attendanceDate">
+    </div>
+    <div class="holiday-group" id="holidayGroup">
+      <input type="checkbox" id="holidayCheck">
+      <label for="holidayCheck"><i class="fas fa-calendar-times"></i> Holiday</label>
+    </div>
     <button class="view-parent-btn" id="parentViewBtn">
       <i class="fas fa-eye"></i> Parent View (Roll No.)
     </button>
@@ -437,8 +506,23 @@
     <button id="parentViewSubmit"><i class="fas fa-search"></i> Show</button>
   </div>
 
+  <!-- Holiday Message -->
+  <div class="holiday-msg" id="holidayMsg">
+    <i class="fas fa-calendar-times"></i>
+    <h2>🎉 Today is Holiday!</h2>
+    <p>No attendance will be marked today.</p>
+  </div>
+
+  <!-- CLASS FILTER -->
+  <div class="class-filter" id="classFilterRow">
+    <label><i class="fas fa-users"></i> Class</label>
+    <select id="classSelect">
+      <option value="">-- Loaded from database --</option>
+    </select>
+  </div>
+
   <!-- SAVE BUTTON -->
-  <div class="save-btn-container">
+  <div class="save-btn-container" id="saveBtnContainer">
     <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync"></i> Refresh</button>
     <button class="save-btn" id="saveAttendanceBtn">
       <i class="fas fa-save"></i> Save Attendance
@@ -446,7 +530,7 @@
   </div>
 
   <!-- ATTENDANCE TABLE -->
-  <div class="table-wrap">
+  <div class="table-wrap" id="tableWrap">
     <table id="attendanceTable">
       <thead>
         <tr>
@@ -459,7 +543,7 @@
       <tbody id="tableBody">
         <tr><td colspan="4" style="text-align:center;padding:40px;color:#1f4b9e;">
           <i class="fas fa-spinner fa-spin" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
-          Loading students...
+          Select date and class to load students...
         </td></tr>
       </tbody>
     </table>
@@ -512,7 +596,12 @@
   // ============================================================
   const tbody = document.getElementById('tableBody');
   const classSelect = document.getElementById('classSelect');
-  const monthSelect = document.getElementById('monthSelect');
+  const dateInput = document.getElementById('attendanceDate');
+  const holidayCheck = document.getElementById('holidayCheck');
+  const holidayMsg = document.getElementById('holidayMsg');
+  const tableWrap = document.getElementById('tableWrap');
+  const saveBtnContainer = document.getElementById('saveBtnContainer');
+  const classFilterRow = document.getElementById('classFilterRow');
   const parentViewBtn = document.getElementById('parentViewBtn');
   const parentViewBox = document.getElementById('parentViewBox');
   const rollInput = document.getElementById('rollInput');
@@ -525,9 +614,10 @@
   // STATE
   // ============================================================
   let students = [];
-  let attendanceData = {}; // { roll: { status, remark } }
+  let attendanceData = {};
   let isSaving = false;
   let allClasses = [];
+  let currentDate = '';
 
   // ============================================================
   // HELPER: Show Toast
@@ -541,7 +631,19 @@
   }
 
   // ============================================================
-  // FETCH ALL CLASSES FROM FIREBASE (admissions collection)
+  // SET DEFAULT DATE (Today)
+  // ============================================================
+  function setDefaultDate() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    dateInput.value = `${year}-${month}-${day}`;
+    currentDate = dateInput.value;
+  }
+
+  // ============================================================
+  // FETCH ALL CLASSES
   // ============================================================
   async function fetchAllClasses() {
     try {
@@ -549,13 +651,8 @@
       const classSet = new Set();
       snapshot.forEach(doc => {
         const data = doc.data();
-        if (data.classApplying) {
-          classSet.add(data.classApplying);
-        }
-        // Also check if 'class' field exists (for backward compatibility)
-        if (data.class) {
-          classSet.add(data.class);
-        }
+        if (data.classApplying) classSet.add(data.classApplying);
+        if (data.class) classSet.add(data.class);
       });
       allClasses = Array.from(classSet).sort();
       return allClasses;
@@ -580,16 +677,37 @@
       option.textContent = cls;
       classSelect.appendChild(option);
     });
-    // Select first class by default
     if (classes.length > 0) {
       classSelect.value = classes[0];
     }
   }
 
   // ============================================================
-  // FETCH STUDENTS FROM FIREBASE (based on selected class)
+  // CHECK IF HOLIDAY
+  // ============================================================
+  function handleHolidayToggle() {
+    if (holidayCheck.checked) {
+      holidayMsg.style.display = 'block';
+      tableWrap.style.display = 'none';
+      saveBtnContainer.style.display = 'none';
+      classFilterRow.style.display = 'none';
+      showToast('🎉 Holiday mode ON - No attendance today');
+    } else {
+      holidayMsg.style.display = 'none';
+      tableWrap.style.display = 'block';
+      saveBtnContainer.style.display = 'flex';
+      classFilterRow.style.display = 'flex';
+      // Load students
+      fetchStudents();
+    }
+  }
+
+  // ============================================================
+  // FETCH STUDENTS FROM FIREBASE
   // ============================================================
   async function fetchStudents() {
+    if (holidayCheck.checked) return;
+    
     const selectedClass = classSelect.value;
     if (!selectedClass) {
       tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:#666;">
@@ -601,60 +719,54 @@
       return;
     }
 
+    // Check date is selected
+    if (!dateInput.value) {
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:#666;">
+        <i class="fas fa-calendar-day" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
+        Please select a date first.
+      </td></tr>`;
+      return;
+    }
+
     try {
       tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:40px;color:#1f4b9e;">
         <i class="fas fa-spinner fa-spin" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
         Loading students for ${selectedClass}...
       </td></tr>`;
 
-      // Query admissions where classApplying = selectedClass
-      const snapshot = await db.collection('admissions')
+      // Query admissions
+      let snapshot = await db.collection('admissions')
         .where('classApplying', '==', selectedClass)
         .get();
 
-      // If no results with classApplying, try 'class' field
       if (snapshot.empty) {
-        const snapshot2 = await db.collection('admissions')
+        snapshot = await db.collection('admissions')
           .where('class', '==', selectedClass)
           .get();
-        
-        if (snapshot2.empty) {
-          tbody.innerHTML = `<tr><td colspan="4" class="no-students-msg">
-            <i class="fas fa-users"></i>
-            No students found in <strong>${selectedClass}</strong>.<br>
-            Please add admissions first.
-          </td></tr>`;
-          students = [];
-          attendanceData = {};
-          return;
-        }
-        
-        // Process from second query
-        students = [];
-        snapshot2.forEach(doc => {
-          const data = doc.data();
-          students.push({
-            id: doc.id,
-            roll: data.rollNumber || data.rollNo || parseInt(doc.id.slice(-3)) || 0,
-            name: data.studentName || data.name || 'Unknown',
-            class: data.class || selectedClass
-          });
-        });
-      } else {
-        // Process from first query
-        students = [];
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          students.push({
-            id: doc.id,
-            roll: data.rollNumber || data.rollNo || parseInt(doc.id.slice(-3)) || 0,
-            name: data.studentName || data.name || 'Unknown',
-            class: data.classApplying || selectedClass
-          });
-        });
       }
 
-      // Sort by roll number
+      if (snapshot.empty) {
+        tbody.innerHTML = `<tr><td colspan="4" class="no-students-msg">
+          <i class="fas fa-users"></i>
+          No students found in <strong>${selectedClass}</strong>.<br>
+          Please add admissions first.
+        </td></tr>`;
+        students = [];
+        attendanceData = {};
+        return;
+      }
+
+      students = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        students.push({
+          id: doc.id,
+          roll: data.rollNumber || data.rollNo || parseInt(doc.id.slice(-3)) || 0,
+          name: data.studentName || data.name || 'Unknown',
+          class: data.classApplying || data.class || selectedClass
+        });
+      });
+
       students.sort((a, b) => a.roll - b.roll);
 
       // Initialize attendance data
@@ -663,9 +775,8 @@
         attendanceData[s.roll] = { status: 'present', remark: '' };
       });
 
-      // Load existing attendance for this month & class
+      // Load existing attendance
       await loadExistingAttendance();
-
       renderTable();
 
     } catch (error) {
@@ -678,28 +789,32 @@
   }
 
   // ============================================================
-  // LOAD EXISTING ATTENDANCE FROM FIREBASE
+  // LOAD EXISTING ATTENDANCE
   // ============================================================
   async function loadExistingAttendance() {
     try {
-      const month = monthSelect.value;
-      const year = new Date().getFullYear();
+      const selectedDate = dateInput.value;
+      if (!selectedDate) return;
+      
+      const dateObj = new Date(selectedDate);
+      const month = dateObj.getMonth(); // 0-11
+      const year = dateObj.getFullYear();
+      const day = String(dateObj.getDate()).padStart(2, '0');
       const classValue = classSelect.value;
 
-      // Document ID format: CLASS_MONTH_YEAR (replace special chars)
       const docId = `${classValue.replace(/[^a-zA-Z0-9]/g, '_')}_${month}_${year}`;
 
-      const docRef = db.collection('attendance').doc(docId);
-      const docSnap = await docRef.get();
+      const docSnap = await db.collection('attendance').doc(docId).get();
 
       if (docSnap.exists) {
         const data = docSnap.data();
-        if (data.students) {
-          Object.keys(data.students).forEach(roll => {
+        if (data.dailyAttendance && data.dailyAttendance[day]) {
+          const dayData = data.dailyAttendance[day];
+          Object.keys(dayData).forEach(roll => {
             const rollNum = parseInt(roll);
             if (attendanceData[rollNum]) {
-              attendanceData[rollNum].status = data.students[roll].status || 'present';
-              attendanceData[rollNum].remark = data.students[roll].remark || '';
+              attendanceData[rollNum].status = dayData[roll].status || 'present';
+              attendanceData[rollNum].remark = dayData[roll].remark || '';
             }
           });
         }
@@ -754,7 +869,6 @@
       if (!nameDiv) return;
       const roll = parseInt(nameDiv.dataset.roll);
 
-      // Radio buttons
       const radios = row.querySelectorAll(`input[name="status_${roll}"]`);
       radios.forEach(r => {
         r.addEventListener('change', function() {
@@ -765,7 +879,6 @@
         });
       });
 
-      // Remark input
       const remarkInput = row.querySelector('.remark-input');
       if (remarkInput) {
         remarkInput.addEventListener('input', function() {
@@ -775,7 +888,6 @@
         });
       }
 
-      // Click on name -> individual report
       nameDiv.addEventListener('click', function() {
         const roll = parseInt(this.dataset.roll);
         const name = this.dataset.name;
@@ -785,11 +897,11 @@
   }
 
   // ============================================================
-  // GENERATE INDIVIDUAL REPORT (PDF)
+  // GENERATE INDIVIDUAL REPORT
   // ============================================================
   function generateIndividualReport(roll, name) {
     const rec = attendanceData[roll] || { status: 'present', remark: '' };
-    const month = monthSelect.options[monthSelect.selectedIndex].text;
+    const dateStr = dateInput.value ? new Date(dateInput.value).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Today';
     const classVal = classSelect.value;
 
     const content = `📋 INDIVIDUAL ATTENDANCE REPORT
@@ -798,12 +910,12 @@
 👤 Student: ${name}
 🎯 Roll No: ${roll}
 📚 Class: ${classVal}
-📅 Month: ${month}
+📅 Date: ${dateStr}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ Status: ${rec.status.toUpperCase()}
 📝 Remark: ${rec.remark || '—'}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📅 Report generated: ${new Date().toLocaleDateString()}
+📅 Report generated: ${new Date().toLocaleString()}
 `;
 
     const blob = new Blob([content], { type: 'application/pdf' });
@@ -827,36 +939,57 @@
       showToast('No students to save!', true);
       return;
     }
+    if (!dateInput.value) {
+      showToast('Please select a date first!', true);
+      return;
+    }
 
     isSaving = true;
     saveBtn.disabled = true;
     saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
     try {
-      const month = monthSelect.value;
-      const year = new Date().getFullYear();
+      const dateObj = new Date(dateInput.value);
+      const month = dateObj.getMonth();
+      const year = dateObj.getFullYear();
+      const day = String(dateObj.getDate()).padStart(2, '0');
       const classValue = classSelect.value;
       const docId = `${classValue.replace(/[^a-zA-Z0-9]/g, '_')}_${month}_${year}`;
 
-      // Prepare data
-      const studentsData = {};
+      // Prepare daily attendance data
+      const dayData = {};
       students.forEach(s => {
         const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
-        studentsData[s.roll] = {
+        dayData[s.roll] = {
           status: rec.status || 'present',
           remark: rec.remark || ''
         };
       });
 
-      await db.collection('attendance').doc(docId).set({
-        class: classValue,
-        month: parseInt(month),
-        year: year,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        students: studentsData
-      });
+      const docRef = db.collection('attendance').doc(docId);
+      const docSnap = await docRef.get();
 
-      showToast('✅ Attendance saved successfully!');
+      if (docSnap.exists) {
+        // Update existing document
+        await docRef.update({
+          [`dailyAttendance.${day}`]: dayData,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      } else {
+        // Create new document
+        await docRef.set({
+          class: classValue,
+          month: month,
+          year: year,
+          dailyAttendance: {
+            [day]: dayData
+          },
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+
+      showToast(`✅ Attendance saved for ${dateObj.toLocaleDateString('en-IN')}!`);
     } catch (error) {
       console.error('Error saving attendance:', error);
       showToast('❌ Error saving attendance: ' + error.message, true);
@@ -888,7 +1021,8 @@
     }
     const rec = attendanceData[rollNum] || { status: 'present', remark: '' };
     const statusEmoji = rec.status === 'present' ? '✅' : rec.status === 'absent' ? '❌' : '🟡';
-    showToast(`${found.name} (${rollNum}) ${statusEmoji} ${rec.status.toUpperCase()} ${rec.remark ? '| '+rec.remark : ''}`);
+    const dateStr = dateInput.value ? new Date(dateInput.value).toLocaleDateString('en-IN') : 'Today';
+    showToast(`${found.name} (${rollNum}) ${statusEmoji} ${rec.status.toUpperCase()} ${rec.remark ? '| '+rec.remark : ''} (${dateStr})`);
   });
 
   // ============================================================
@@ -899,9 +1033,12 @@
       showToast('No students to show report!', true);
       return;
     }
-    const month = monthSelect.options[monthSelect.selectedIndex].text;
+    const dateObj = dateInput.value ? new Date(dateInput.value) : new Date();
+    const monthName = dateObj.toLocaleString('default', { month: 'long' });
+    const year = dateObj.getFullYear();
     const classVal = classSelect.value;
-    let report = `📅 MONTHLY ATTENDANCE REPORT - ${month}\n`;
+    
+    let report = `📅 MONTHLY ATTENDANCE REPORT - ${monthName} ${year}\n`;
     report += `🏫 Class: ${classVal}\n`;
     report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     
@@ -929,16 +1066,15 @@
       showToast('No students to generate report!', true);
       return;
     }
-    const month = monthSelect.options[monthSelect.selectedIndex].text;
+    const dateObj = dateInput.value ? new Date(dateInput.value) : new Date();
+    const dateStr = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
     const classVal = classSelect.value;
-    const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
     
     let content = `📋 DAILY ATTENDANCE REPORT\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     content += `🏫 Quest Coaching Centre\n`;
     content += `📚 Class: ${classVal}\n`;
-    content += `📅 Date: ${today}\n`;
-    content += `📆 Month: ${month}\n`;
+    content += `📅 Date: ${dateStr}\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
     
     students.forEach(s => {
@@ -956,7 +1092,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Daily_Attendance_${classVal}_${today.replace(/\//g, '-')}.pdf`;
+    a.download = `Daily_Attendance_${classVal}_${dateStr.replace(/\//g, '-')}.pdf`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -972,14 +1108,16 @@
       showToast('No students to generate report!', true);
       return;
     }
-    const month = monthSelect.options[monthSelect.selectedIndex].text;
+    const dateObj = dateInput.value ? new Date(dateInput.value) : new Date();
+    const monthName = dateObj.toLocaleString('default', { month: 'long' });
+    const year = dateObj.getFullYear();
     const classVal = classSelect.value;
     
     let content = `📊 MONTHLY ATTENDANCE REPORT\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     content += `🏫 Quest Coaching Centre\n`;
     content += `📚 Class: ${classVal}\n`;
-    content += `📆 Month: ${month}\n`;
+    content += `📆 Month: ${monthName} ${year}\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
     
     let present = 0, absent = 0, leave = 0;
@@ -1007,7 +1145,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Monthly_Attendance_${classVal}_${month}.pdf`;
+    a.download = `Monthly_Attendance_${classVal}_${monthName}_${year}.pdf`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -1016,16 +1154,16 @@
   });
 
   // ============================================================
-  // INIT: LOAD CLASSES AND STUDENTS
+  // INIT
   // ============================================================
   async function init() {
+    setDefaultDate();
+    
     try {
-      // Load all classes first
       const classes = await fetchAllClasses();
       populateClassDropdown(classes);
       
       if (classes.length > 0) {
-        // Load students for first class
         await fetchStudents();
       } else {
         tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:40px;color:#666;">
@@ -1043,27 +1181,29 @@
   // EVENT LISTENERS
   // ============================================================
   classSelect.addEventListener('change', function() {
-    fetchStudents();
+    if (!holidayCheck.checked) fetchStudents();
   });
 
-  monthSelect.addEventListener('change', function() {
-    fetchStudents();
+  dateInput.addEventListener('change', function() {
+    currentDate = this.value;
+    if (!holidayCheck.checked) fetchStudents();
   });
+
+  holidayCheck.addEventListener('change', handleHolidayToggle);
 
   saveBtn.addEventListener('click', saveAttendance);
 
   refreshBtn.addEventListener('click', function() {
-    fetchStudents();
+    if (!holidayCheck.checked) fetchStudents();
     showToast('🔄 Refreshed!');
   });
 
-  // Enter key support
   rollInput.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') parentViewSubmit.click();
   });
 
   // ============================================================
-  // AUTH CHECK & START
+  // AUTH CHECK
   // ============================================================
   auth.onAuthStateChanged((user) => {
     if (!user) {
@@ -1073,13 +1213,12 @@
       }, 2000);
       return;
     }
-    // Load data
     init();
   });
 
   console.log('✅ Attendance System Loaded!');
-  console.log('📌 It will fetch students from Firebase "admissions" collection.');
-  console.log('📌 Class field used: "classApplying" or "class"');
+  console.log('📌 Teacher selects: Date → Holiday (if any) → Class → Students load');
+  console.log('📌 Parent View button is on TOP row');
 </script>
 </body>
 </html>
