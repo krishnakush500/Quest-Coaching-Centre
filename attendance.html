@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-  <title>📋 Attendance · Quest Coaching</title>
+  <title>👨‍👩‍👧 Parent View · Quest Coaching</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -24,93 +23,72 @@
       align-items: center;
     }
     .container {
-      max-width: 1200px;
+      max-width: 900px;
       width: 100%;
       background: #ffffff;
-      border-radius: 40px 40px 32px 32px;
+      border-radius: 40px;
       box-shadow: 0 20px 50px rgba(0, 40, 100, 0.12);
-      padding: 24px 22px 32px;
+      padding: 30px 28px 32px;
       border: 1px solid rgba(255, 255, 255, 0.6);
     }
     .header {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
+      text-align: center;
       border-bottom: 2px solid #e6effa;
-      padding-bottom: 18px;
+      padding-bottom: 20px;
+      margin-bottom: 25px;
     }
     .header h1 {
-      font-size: 1.9rem;
+      font-size: 2rem;
       font-weight: 700;
       background: linear-gradient(145deg, #0a2a66, #1f4b9e);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      display: flex;
-      align-items: center;
-      gap: 10px;
     }
-    .header h1 i {
-      background: #1f4b9e;
-      -webkit-text-fill-color: white;
-      padding: 10px 12px;
-      border-radius: 60px;
-      font-size: 1.4rem;
-      box-shadow: 0 6px 14px rgba(20, 60, 150, 0.25);
-    }
-    .header .date-display {
-      background: #eef5fe;
-      padding: 8px 20px;
-      border-radius: 60px;
-      font-weight: 600;
-      color: #0a2a66;
-      border: 1px solid #c7daf5;
+    .header p {
+      color: #64748b;
       font-size: 0.9rem;
+      margin-top: 5px;
     }
-    .header .date-display i { margin-right: 8px; }
 
-    .top-controls {
+    .search-section {
+      background: #f4f9ff;
+      padding: 20px 25px;
+      border-radius: 60px;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 12px 20px;
-      background: #f4f9ff;
-      padding: 12px 20px;
-      border-radius: 60px;
-      margin-bottom: 16px;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 25px;
       border: 1px solid #d7e5fc;
     }
-    .top-controls .session-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .top-controls .session-group label {
+    .search-section label {
       font-weight: 600;
       color: #0f3b7a;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
     }
-    .top-controls .session-group select {
+    .search-section input {
       border: 1px solid #b8cff0;
       border-radius: 40px;
-      padding: 8px 16px;
+      padding: 10px 20px;
       font-weight: 500;
-      color: #0a2a66;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      width: 180px;
       outline: none;
       background: white;
-      cursor: pointer;
     }
-    .top-controls .view-parent-btn {
-      margin-left: auto;
+    .search-section input:focus {
+      border-color: #1f4b9e;
+      box-shadow: 0 0 0 3px rgba(26, 80, 180, 0.12);
+    }
+    .search-section button {
       background: #0a2a66;
       border: none;
       border-radius: 60px;
-      padding: 8px 24px;
+      padding: 10px 30px;
       color: white;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -118,312 +96,126 @@
       cursor: pointer;
       border: 1px solid #3f6ec0;
     }
-    .top-controls .view-parent-btn:hover {
+    .search-section button:hover {
       background: #13458b;
       transform: scale(1.01);
     }
+    .search-section button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
 
-    .class-filter {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 12px 18px;
-      background: #f4f9ff;
-      padding: 12px 20px;
-      border-radius: 60px;
-      margin-bottom: 16px;
-      border: 1px solid #d7e5fc;
-    }
-    .class-filter label {
-      font-weight: 600;
-      color: #0f3b7a;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .class-filter select {
-      background: white;
-      border: 1px solid #b8cff0;
-      border-radius: 40px;
-      padding: 8px 24px 8px 18px;
-      font-weight: 500;
-      color: #0a2a66;
-      font-size: 0.95rem;
-      outline: none;
-      cursor: pointer;
-      min-width: 160px;
-    }
-    .class-holiday-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #fee2e2;
-      padding: 4px 16px 4px 12px;
-      border-radius: 40px;
-      border: 1px solid #fecaca;
-    }
-    .class-holiday-group input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      accent-color: #dc3545;
-      cursor: pointer;
-    }
-    .class-holiday-group label {
-      font-weight: 600;
-      color: #991b1b;
-      font-size: 0.85rem;
-      cursor: pointer;
-    }
-    .holiday-reason-group {
+    .result-card {
+      background: #f8fafc;
+      border-radius: 30px;
+      padding: 25px 30px;
+      border: 1px solid #e2e8f0;
       display: none;
-      align-items: center;
-      gap: 8px;
-      background: #fff5f5;
-      padding: 4px 16px 4px 12px;
-      border-radius: 40px;
-      border: 2px solid #dc3545;
+      animation: fadeIn 0.5s ease;
     }
-    .holiday-reason-group input {
-      border: none;
-      background: transparent;
-      padding: 6px 10px;
-      font-size: 0.85rem;
-      color: #991b1b;
-      font-weight: 600;
-      width: 150px;
-      outline: none;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    .holiday-reason-group input::placeholder {
-      color: #f87171;
-      font-weight: 400;
-    }
-    .holiday-reason-group i {
-      color: #dc3545;
-    }
-
-    .holiday-msg {
-      background: #fef2f2;
-      border: 2px solid #fecaca;
-      border-radius: 20px;
-      padding: 30px;
-      text-align: center;
-      color: #991b1b;
-      margin-bottom: 16px;
-      display: none;
-    }
-    .holiday-msg i { font-size: 3rem; display: block; margin-bottom: 10px; }
-    .holiday-msg h2 { font-size: 1.5rem; }
-    .holiday-msg .reason-text { 
-      font-size: 1.2rem; 
-      font-weight: 700; 
-      color: #dc3545; 
-      background: white; 
-      padding: 8px 20px; 
-      border-radius: 40px; 
-      display: inline-block;
-      margin-top: 10px;
-    }
-
-    .save-btn-container {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 16px;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .save-btn {
-      background: #10b981;
-      border: none;
-      padding: 10px 28px;
-      border-radius: 60px;
-      color: white;
+    .result-card .student-name {
+      font-size: 1.5rem;
       font-weight: 700;
+      color: #0a2a66;
+      margin-bottom: 5px;
+    }
+    .result-card .student-roll {
+      color: #64748b;
       font-size: 0.95rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
-      cursor: pointer;
-      transition: 0.15s;
+      margin-bottom: 15px;
     }
-    .save-btn:hover { background: #059669; transform: scale(1.01); }
-    .save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .refresh-btn {
-      background: #e2e8f0;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 60px;
-      color: #1a237e;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-    }
-    .refresh-btn:hover { background: #cbd5e1; }
-
-    .table-wrap {
-      overflow-x: auto;
-      border-radius: 28px;
-      background: #fafcff;
-      padding: 4px 2px 6px 2px;
-      box-shadow: inset 0 0 0 1px rgba(60, 120, 210, 0.08);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.95rem;
-      min-width: 720px;
-    }
-    th {
-      text-align: left;
-      padding: 16px 12px 12px 12px;
-      font-weight: 600;
-      color: #0a2a66;
-      background: #e7f0fe;
-      border-bottom: 2px solid #bdd2f0;
-    }
-    td {
-      padding: 12px 12px;
-      border-bottom: 1px solid #e2ecfc;
-      vertical-align: middle;
-      background: white;
-    }
-    tr:last-child td { border-bottom: none; }
-    .student-name {
-      font-weight: 600;
-      color: #0a2a66;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-    }
-    .student-name:hover { color: #0033aa; text-decoration: underline; }
-    .roll-badge {
-      background: #e3edfe;
-      padding: 4px 12px;
-      border-radius: 40px;
-      font-weight: 500;
-      font-size: 0.75rem;
-      color: #0a2a66;
+    .result-card .status-badge {
       display: inline-block;
-    }
-    .attendance-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px 10px;
-      align-items: center;
-    }
-    .attendance-actions label {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-weight: 600;
-      font-size: 0.8rem;
-      color: #1f4170;
-      cursor: pointer;
-      background: #f2f8ff;
-      padding: 4px 12px 4px 8px;
-      border-radius: 40px;
-      border: 1px solid transparent;
-    }
-    .attendance-actions label input[type="radio"] {
-      accent-color: #0a2a66;
-      width: 16px;
-      height: 16px;
-      cursor: pointer;
-    }
-    .attendance-actions label:has(input:checked) {
-      background: #d4e4fe;
-      border-color: #1f4b9e;
-      box-shadow: 0 0 0 2px rgba(26, 80, 180, 0.15);
-    }
-    .attendance-actions label.holiday-option {
-      background: #fee2e2;
-      border-color: #fecaca;
-    }
-    .attendance-actions label.holiday-option:has(input:checked) {
-      background: #fecaca;
-      border-color: #dc3545;
-      box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
-    }
-    .remark-input {
-      border: 1px solid #c8dbf7;
-      border-radius: 40px;
-      padding: 6px 14px;
-      font-size: 0.8rem;
-      background: white;
-      width: 100px;
-      color: #0a2a66;
-    }
-    .remark-input:focus {
-      border-color: #0a2a66;
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(10, 42, 102, 0.12);
-    }
-
-    .report-actions {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 28px;
-      gap: 18px 12px;
-      background: #edf5ff;
-      padding: 14px 20px;
-      border-radius: 60px;
-      border: 1px solid #c7dbfa;
-    }
-    .report-actions .left {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 12px 20px;
-    }
-    .report-actions .left .monthly-btn {
-      background: white;
-      border: 1px solid #b1caf0;
-      padding: 8px 28px;
-      border-radius: 60px;
-      font-weight: 600;
-      color: #0a2a66;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-    }
-    .report-actions .left .monthly-btn:hover {
-      background: #e2edfe;
-      border-color: #1f4b9e;
-    }
-    .report-actions .right {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .download-btn {
-      background: #0a2a66;
-      border: none;
       padding: 8px 24px;
       border-radius: 60px;
-      color: white;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+    }
+    .status-present { background: #d1fae5; color: #065f46; }
+    .status-absent { background: #fee2e2; color: #991b1b; }
+    .status-leave { background: #fef3c7; color: #92400e; }
+    .status-holiday { background: #fecaca; color: #991b1b; }
+    .status-notmarked { background: #f1f5f9; color: #64748b; }
+
+    .fee-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 12px;
-      box-shadow: 0 6px 16px rgba(10, 42, 102, 0.25);
-      cursor: pointer;
-      border: 1px solid #3c6fc0;
-      font-size: 0.9rem;
-    }
-    .download-btn:hover { background: #13458b; transform: scale(1.01); }
-    .download-btn.outline {
       background: white;
-      color: #0a2a66;
-      border: 1px solid #b8cef0;
-      box-shadow: none;
+      padding: 15px 20px;
+      border-radius: 16px;
+      margin: 15px 0;
+      border: 1px solid #e2e8f0;
     }
-    .download-btn.outline:hover { background: #e8f0fe; }
+    .fee-details .fee-item {
+      text-align: center;
+    }
+    .fee-details .fee-item .label {
+      font-size: 0.7rem;
+      color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .fee-details .fee-item .value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #0a2a66;
+    }
+    .fee-details .fee-item .value.due { color: #dc3545; }
+    .fee-details .fee-item .value.paid { color: #10b981; }
+
+    .remark-box {
+      background: #f1f5f9;
+      padding: 12px 18px;
+      border-radius: 16px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #334155;
+    }
+    .remark-box i { color: #1f4b9e; margin-right: 8px; }
+
+    .not-found {
+      text-align: center;
+      padding: 40px 20px;
+      color: #64748b;
+      display: none;
+    }
+    .not-found i {
+      font-size: 3rem;
+      color: #cbd5e1;
+      display: block;
+      margin-bottom: 15px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      color: #1f4b9e;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    .loading-spinner {
+      text-align: center;
+      padding: 20px;
+      display: none;
+    }
+    .loading-spinner i {
+      font-size: 2rem;
+      color: #1f4b9e;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
     .toast-msg {
       position: fixed;
@@ -441,33 +233,15 @@
       max-width: 90%;
       text-align: center;
     }
-    .no-students-msg {
-      text-align: center;
-      padding: 40px 20px;
-      color: #666;
-    }
-    .no-students-msg i {
-      font-size: 3rem;
-      color: #cbd5e1;
-      display: block;
-      margin-bottom: 15px;
-    }
 
-    @media (max-width: 720px) {
-      .container { padding: 18px 14px; }
-      .header h1 { font-size: 1.6rem; }
-      .header .date-display { font-size: 0.75rem; padding: 6px 14px; }
-      .top-controls { border-radius: 30px; padding: 14px; flex-direction: column; align-items: stretch; }
-      .top-controls .view-parent-btn { margin-left: 0; justify-content: center; }
-      .class-filter { border-radius: 30px; padding: 14px; flex-direction: column; align-items: stretch; }
-      .holiday-reason-group input { width: 100%; }
-      .report-actions { flex-direction: column; align-items: stretch; border-radius: 30px; }
-      .report-actions .left { flex-wrap: wrap; justify-content: center; }
-      .report-actions .right { justify-content: center; }
-      td, th { padding: 10px 8px; font-size: 0.8rem; }
-      .attendance-actions label { padding: 2px 8px; font-size: 0.7rem; }
-      .remark-input { width: 60px; }
-      .save-btn-container { justify-content: center; }
+    @media (max-width: 600px) {
+      .container { padding: 20px 16px; }
+      .header h1 { font-size: 1.5rem; }
+      .search-section { flex-direction: column; border-radius: 30px; padding: 18px; }
+      .search-section input { width: 100%; }
+      .search-section button { width: 100%; justify-content: center; }
+      .result-card { padding: 20px; }
+      .fee-details { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -475,107 +249,60 @@
 
 <div class="container">
   <div class="header">
-    <h1><i class="fas fa-clipboard-check"></i> Attendance</h1>
-    <div class="date-display" id="dateDisplay">
-      <i class="fas fa-calendar-day"></i> <span id="todayDate">Loading...</span>
+    <h1><i class="fas fa-eye"></i> Parent View</h1>
+    <p>Enter your child's Roll Number to check attendance &amp; fees</p>
+  </div>
+
+  <div class="search-section">
+    <label><i class="fas fa-id-badge"></i> Roll No.</label>
+    <input type="number" id="rollInput" placeholder="e.g. 101" autofocus>
+    <button id="searchBtn"><i class="fas fa-search"></i> Check Attendance</button>
+  </div>
+
+  <div class="loading-spinner" id="loadingSpinner">
+    <i class="fas fa-spinner"></i>
+    <p style="margin-top:10px;color:#64748b;">Searching student records...</p>
+  </div>
+
+  <!-- Not Found -->
+  <div class="not-found" id="notFound">
+    <i class="fas fa-user-slash"></i>
+    <h3>Student Not Found</h3>
+    <p id="notFoundMsg">Please check the Roll Number and try again.</p>
+  </div>
+
+  <!-- Result Card -->
+  <div class="result-card" id="resultCard">
+    <div class="student-name" id="studentName">--</div>
+    <div class="student-roll" id="studentRoll">Roll No: -- | Class: --</div>
+    
+    <div class="status-badge" id="statusBadge">⏳ Not Marked</div>
+    
+    <div class="fee-details">
+      <div class="fee-item">
+        <div class="label">Monthly Fee</div>
+        <div class="value" id="monthlyFeeDisplay">₹--</div>
+      </div>
+      <div class="fee-item">
+        <div class="label">Paid</div>
+        <div class="value paid" id="paidFeeDisplay">₹--</div>
+      </div>
+      <div class="fee-item">
+        <div class="label">Due</div>
+        <div class="value due" id="dueFeeDisplay">₹--</div>
+      </div>
+    </div>
+
+    <div class="remark-box" id="remarkBox">
+      <i class="fas fa-comment"></i> <span id="remarkText">No remarks</span>
+    </div>
+
+    <div style="margin-top:15px; font-size:0.8rem; color:#94a3b8;">
+      <i class="fas fa-calendar-day"></i> <span id="attendanceDate">--</span>
     </div>
   </div>
 
-  <div class="top-controls">
-    <div class="session-group">
-      <label><i class="fas fa-calendar-alt"></i> Session:</label>
-      <select id="sessionSelect">
-        <option value="2026-27" selected>2026-27</option>
-        <option value="2027-28">2027-28</option>
-        <option value="2028-29">2028-29</option>
-        <option value="2029-30">2029-30</option>
-        <option value="2030-31">2030-31</option>
-      </select>
-    </div>
-    <button class="view-parent-btn" id="parentViewBtn">
-      <i class="fas fa-eye"></i> Parent View (Roll No.)
-    </button>
-  </div>
-
-  <div class="class-filter" id="classFilterRow">
-    <label><i class="fas fa-users"></i> Class</label>
-    <select id="classSelect">
-      <option value="">-- Select Class --</option>
-      <option value="6th">6th</option>
-      <option value="7th">7th</option>
-      <option value="8th">8th</option>
-      <option value="9th">9th</option>
-      <option value="10th">10th</option>
-      <option value="11th (Science)">11th (Science)</option>
-      <option value="11th (Commerce)">11th (Commerce)</option>
-      <option value="11th (Arts)">11th (Arts)</option>
-      <option value="12th (Science)">12th (Science)</option>
-      <option value="12th (Commerce)">12th (Commerce)</option>
-      <option value="12th (Arts)">12th (Arts)</option>
-    </select>
-
-    <div class="class-holiday-group">
-      <input type="checkbox" id="classHolidayCheck">
-      <label for="classHolidayCheck"><i class="fas fa-calendar-times"></i> Class Holiday</label>
-    </div>
-
-    <div class="holiday-reason-group" id="holidayReasonGroup">
-      <i class="fas fa-pen"></i>
-      <input type="text" id="holidayReason" placeholder="Reason: SUNDAY, JANAMASHTMI...">
-    </div>
-  </div>
-
-  <div class="holiday-msg" id="holidayMsg">
-    <i class="fas fa-calendar-times"></i>
-    <h2>🎉 Class Holiday Today!</h2>
-    <div class="reason-text" id="holidayReasonDisplay">HOLIDAY</div>
-    <p style="margin-top: 10px;">No attendance will be marked for this class.</p>
-  </div>
-
-  <div class="save-btn-container" id="saveBtnContainer">
-    <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync"></i> Refresh</button>
-    <button class="save-btn" id="saveAttendanceBtn">
-      <i class="fas fa-save"></i> Save Attendance
-    </button>
-  </div>
-
-  <div class="table-wrap" id="tableWrap">
-    <table id="attendanceTable">
-      <thead>
-        <tr>
-          <th>Student</th>
-          <th>Roll</th>
-          <th>Status (P/A/L/H)</th>
-          <th>Remarks</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody">
-        <tr><td colspan="4" style="text-align:center;padding:40px;color:#1f4b9e;">
-          <i class="fas fa-spinner fa-spin" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
-          Select session and class to load students...
-        </td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="report-actions">
-    <div class="left">
-      <button class="monthly-btn" id="monthlyReportBtn">
-        <i class="fas fa-file-alt"></i> Monthly Report
-      </button>
-      <span style="color:#1f4170; font-weight:500;">
-        <i class="fas fa-print"></i> Daily attendance
-      </span>
-    </div>
-    <div class="right">
-      <button class="download-btn outline" id="downloadDailyBtn">
-        <i class="fas fa-download"></i> Daily PDF
-      </button>
-      <button class="download-btn" id="downloadMonthlyBtn">
-        <i class="fas fa-file-pdf"></i> Monthly PDF
-      </button>
-    </div>
-  </div>
+  <a class="back-link" onclick="window.close()"><i class="fas fa-arrow-left"></i> Close</a>
 </div>
 
 <div id="toastMsg" class="toast-msg"></div>
@@ -596,35 +323,28 @@
 
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
-  const auth = firebase.auth();
 
   // ============================================================
   // DOM REFS
   // ============================================================
-  const tbody = document.getElementById('tableBody');
-  const classSelect = document.getElementById('classSelect');
-  const sessionSelect = document.getElementById('sessionSelect');
-  const dateDisplay = document.getElementById('todayDate');
-  const classHolidayCheck = document.getElementById('classHolidayCheck');
-  const holidayReason = document.getElementById('holidayReason');
-  const holidayReasonGroup = document.getElementById('holidayReasonGroup');
-  const holidayMsg = document.getElementById('holidayMsg');
-  const holidayReasonDisplay = document.getElementById('holidayReasonDisplay');
-  const tableWrap = document.getElementById('tableWrap');
-  const saveBtnContainer = document.getElementById('saveBtnContainer');
-  const classFilterRow = document.getElementById('classFilterRow');
-  const parentViewBtn = document.getElementById('parentViewBtn');
-  const saveBtn = document.getElementById('saveAttendanceBtn');
-  const refreshBtn = document.getElementById('refreshBtn');
+  const rollInput = document.getElementById('rollInput');
+  const searchBtn = document.getElementById('searchBtn');
+  const loadingSpinner = document.getElementById('loadingSpinner');
+  const resultCard = document.getElementById('resultCard');
+  const notFound = document.getElementById('notFound');
+  const notFoundMsg = document.getElementById('notFoundMsg');
+  const studentName = document.getElementById('studentName');
+  const studentRoll = document.getElementById('studentRoll');
+  const statusBadge = document.getElementById('statusBadge');
+  const monthlyFeeDisplay = document.getElementById('monthlyFeeDisplay');
+  const paidFeeDisplay = document.getElementById('paidFeeDisplay');
+  const dueFeeDisplay = document.getElementById('dueFeeDisplay');
+  const remarkText = document.getElementById('remarkText');
+  const attendanceDate = document.getElementById('attendanceDate');
   const toast = document.getElementById('toastMsg');
 
-  let students = [];
-  let attendanceData = {};
-  let isSaving = false;
-  let currentDate = '';
-
   // ============================================================
-  // HELPER: Show Toast
+  // HELPER
   // ============================================================
   function showToast(msg, isError = false) {
     toast.textContent = msg;
@@ -634,558 +354,186 @@
     toast._timer = setTimeout(() => { toast.style.display = 'none'; }, 4000);
   }
 
-  // ============================================================
-  // GET TODAY'S DATE
-  // ============================================================
   function getTodayDate() {
     const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return today.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
   }
 
   function formatDateDisplay(dateStr) {
+    if (!dateStr) return '--';
     const d = new Date(dateStr);
     return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
   }
 
-  function updateDateDisplay() {
-    const today = getTodayDate();
-    currentDate = today;
-    dateDisplay.textContent = formatDateDisplay(today);
+  // ============================================================
+  // GET URL PARAMETERS (Session & Class from attendance page)
+  // ============================================================
+  function getUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      session: params.get('session') || '2026-27',
+      class: params.get('class') || ''
+    };
   }
 
   // ============================================================
-  // PARENT VIEW - Opens parent-view.html
+  // SEARCH STUDENT FROM FIREBASE
   // ============================================================
-  parentViewBtn.addEventListener('click', function() {
-    const session = sessionSelect.value;
-    const className = classSelect.value;
-    window.open(`parent-view.html?session=${session}&class=${className}`, '_blank');
-  });
-
-  // ============================================================
-  // HANDLE CLASS HOLIDAY
-  // ============================================================
-  function handleClassHoliday() {
-    if (classHolidayCheck.checked) {
-      holidayReasonGroup.style.display = 'flex';
-      holidayMsg.style.display = 'block';
-      tableWrap.style.display = 'none';
-      saveBtnContainer.style.display = 'none';
-      classFilterRow.style.display = 'flex';
-      const reason = holidayReason.value.trim() || 'Holiday';
-      holidayReasonDisplay.textContent = reason.toUpperCase();
-      showToast(`🎉 Class Holiday: ${reason.toUpperCase()}`);
-    } else {
-      holidayReasonGroup.style.display = 'none';
-      holidayMsg.style.display = 'none';
-      tableWrap.style.display = 'block';
-      saveBtnContainer.style.display = 'flex';
-      fetchStudents();
-    }
-  }
-
-  // ============================================================
-  // FETCH STUDENTS
-  // ============================================================
-  async function fetchStudents() {
-    if (classHolidayCheck.checked) return;
-    
-    const selectedClass = classSelect.value;
-    const selectedSession = sessionSelect.value;
-    
-    if (!selectedClass || !selectedSession) {
-      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:#666;">
-        <i class="fas fa-info-circle" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
-        Please select Session and Class.
-      </td></tr>`;
+  async function searchStudent() {
+    const roll = parseInt(rollInput.value.trim());
+    if (!roll || isNaN(roll)) {
+      showToast('Please enter a valid Roll Number!', true);
       return;
     }
 
-    try {
-      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:40px;color:#1f4b9e;">
-        <i class="fas fa-spinner fa-spin" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
-        Loading students...
-      </td></tr>`;
+    const { session, class: className } = getUrlParams();
+    
+    if (!className) {
+      showToast('Please select a class from attendance page first!', true);
+      return;
+    }
 
-      let snapshot = await db.collection('admissions')
-        .where('classApplying', '==', selectedClass)
-        .where('session', '==', selectedSession)
+    // Show loading
+    loadingSpinner.style.display = 'block';
+    resultCard.style.display = 'none';
+    notFound.style.display = 'none';
+    searchBtn.disabled = true;
+    searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+
+    try {
+      // 🔥 STEP 1: Find student by roll number in admissions collection
+      let studentDoc = null;
+      let studentData = null;
+
+      // Query admissions with rollNumber and class
+      const snapshot = await db.collection('admissions')
+        .where('rollNumber', '==', String(roll))
+        .where('classApplying', '==', className)
         .get();
 
       if (snapshot.empty) {
-        snapshot = await db.collection('admissions')
-          .where('class', '==', selectedClass)
-          .where('session', '==', selectedSession)
+        // Try with 'class' field
+        const snapshot2 = await db.collection('admissions')
+          .where('rollNumber', '==', String(roll))
+          .where('class', '==', className)
           .get();
-      }
-
-      if (snapshot.empty) {
-        tbody.innerHTML = `<tr><td colspan="4" class="no-students-msg">
-          <i class="fas fa-users"></i>
-          No students found in <strong>${selectedClass}</strong> (${selectedSession}).<br>
-          Please add admissions first.
-        </td></tr>`;
-        students = [];
-        attendanceData = {};
-        return;
-      }
-
-      students = [];
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        students.push({
-          id: doc.id,
-          roll: data.rollNumber || data.rollNo || parseInt(doc.id.slice(-3)) || 0,
-          name: data.studentName || data.name || 'Unknown',
-          class: data.classApplying || data.class || selectedClass
-        });
-      });
-
-      students.sort((a, b) => a.roll - b.roll);
-
-      attendanceData = {};
-      students.forEach(s => {
-        attendanceData[s.roll] = { status: 'present', remark: '' };
-      });
-
-      await loadExistingAttendance();
-      renderTable();
-
-    } catch (error) {
-      console.error('Error fetching students:', error);
-      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:#dc3545;">
-        <i class="fas fa-exclamation-circle" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
-        Error loading students: ${error.message}
-      </td></tr>`;
-    }
-  }
-
-  // ============================================================
-  // LOAD EXISTING ATTENDANCE
-  // ============================================================
-  async function loadExistingAttendance() {
-    try {
-      const selectedSession = sessionSelect.value;
-      const selectedClass = classSelect.value;
-      const today = getTodayDate();
-
-      if (!selectedSession || !selectedClass || students.length === 0) return;
-
-      for (const student of students) {
-        const docRef = db.collection('attendance')
-          .doc(selectedSession)
-          .collection('classes')
-          .doc(selectedClass)
-          .collection('students')
-          .doc(student.name)
-          .collection('attendance')
-          .doc(today);
-
-        const docSnap = await docRef.get();
-        if (docSnap.exists) {
-          const data = docSnap.data();
-          attendanceData[student.roll] = {
-            status: data.status || 'present',
-            remark: data.remark || ''
-          };
+        
+        if (snapshot2.empty) {
+          loadingSpinner.style.display = 'none';
+          notFound.style.display = 'block';
+          notFoundMsg.textContent = `Roll No. ${roll} not found in ${className} class. Please check the Roll Number.`;
+          searchBtn.disabled = false;
+          searchBtn.innerHTML = '<i class="fas fa-search"></i> Check Attendance';
+          return;
         }
+        studentDoc = snapshot2.docs[0];
+        studentData = studentDoc.data();
+      } else {
+        studentDoc = snapshot.docs[0];
+        studentData = studentDoc.data();
       }
+
+      const studentNameVal = studentData.studentName || studentData.name || 'Unknown';
+      const studentClass = studentData.classApplying || studentData.class || className;
+      const studentRoll = studentData.rollNumber || studentData.rollNo || roll;
+
+      // 🔥 STEP 2: Get today's attendance for this student
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      
+      const attendanceRef = db.collection('attendance')
+        .doc(session)
+        .collection('classes')
+        .doc(studentClass)
+        .collection('students')
+        .doc(studentNameVal)
+        .collection('attendance')
+        .doc(today);
+
+      const attendanceSnap = await attendanceRef.get();
+
+      let status = 'notmarked';
+      let remark = '';
+      let monthlyFee = 0;
+      let paidFee = 0;
+      let dueFee = 0;
+
+      if (attendanceSnap.exists) {
+        const attData = attendanceSnap.data();
+        status = attData.status || 'notmarked';
+        remark = attData.remark || '';
+        monthlyFee = attData.monthlyFee || 0;
+        paidFee = attData.paidFee || 0;
+        dueFee = attData.dueFee || (monthlyFee - paidFee);
+      }
+
+      // 🔥 STEP 3: Display result
+      loadingSpinner.style.display = 'none';
+      resultCard.style.display = 'block';
+      notFound.style.display = 'none';
+
+      studentName.textContent = studentNameVal;
+      studentRoll.textContent = `Roll No: ${studentRoll} | Class: ${studentClass} | Session: ${session}`;
+      attendanceDate.textContent = formatDateDisplay(today);
+
+      // Status Badge
+      const statusMap = {
+        present: { label: '✅ Present', class: 'status-present' },
+        absent: { label: '❌ Absent', class: 'status-absent' },
+        leave: { label: '🟡 Leave', class: 'status-leave' },
+        holiday: { label: '🎉 Holiday', class: 'status-holiday' },
+        notmarked: { label: '⏳ Not Marked Yet', class: 'status-notmarked' }
+      };
+      const statusInfo = statusMap[status] || statusMap.notmarked;
+      statusBadge.textContent = statusInfo.label;
+      statusBadge.className = `status-badge ${statusInfo.class}`;
+
+      // Fee Details
+      monthlyFeeDisplay.textContent = `₹${monthlyFee || 0}`;
+      paidFeeDisplay.textContent = `₹${paidFee || 0}`;
+      const due = dueFee || (monthlyFee - paidFee);
+      if (due <= 0) {
+        dueFeeDisplay.textContent = '✅ Paid Full';
+        dueFeeDisplay.style.color = '#10b981';
+      } else {
+        dueFeeDisplay.textContent = `₹${due}`;
+        dueFeeDisplay.style.color = '#dc3545';
+      }
+
+      // Remark
+      remarkText.textContent = remark || 'No remarks';
+
     } catch (error) {
-      console.warn('Could not load existing attendance:', error);
-    }
-  }
-
-  // ============================================================
-  // RENDER TABLE
-  // ============================================================
-  function renderTable() {
-    if (students.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="4" class="no-students-msg">
-        <i class="fas fa-users"></i>
-        No students found.
-      </td></tr>`;
-      return;
-    }
-
-    let html = '';
-    students.forEach((s) => {
-      const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
-      const status = rec.status || 'present';
-      const remark = rec.remark || '';
-
-      html += `<tr>
-        <td>
-          <div class="student-name" data-roll="${s.roll}" data-name="${s.name}">
-            <i class="fas fa-user-graduate"></i> ${s.name}
-          </div>
-        </td>
-        <td><span class="roll-badge">${s.roll}</span></td>
-        <td>
-          <div class="attendance-actions">
-            <label><input type="radio" name="status_${s.roll}" value="present" ${status==='present'?'checked':''}> P</label>
-            <label><input type="radio" name="status_${s.roll}" value="absent" ${status==='absent'?'checked':''}> A</label>
-            <label><input type="radio" name="status_${s.roll}" value="leave" ${status==='leave'?'checked':''}> L</label>
-            <label class="holiday-option"><input type="radio" name="status_${s.roll}" value="holiday" ${status==='holiday'?'checked':''}> H</label>
-          </div>
-        </td>
-        <td>
-          <input class="remark-input" type="text" placeholder="remark" value="${remark}" data-roll="${s.roll}">
-        </td>
-      </tr>`;
-    });
-    tbody.innerHTML = html;
-
-    document.querySelectorAll('#attendanceTable tbody tr').forEach(row => {
-      const nameDiv = row.querySelector('.student-name');
-      if (!nameDiv) return;
-      const roll = parseInt(nameDiv.dataset.roll);
-
-      const radios = row.querySelectorAll(`input[name="status_${roll}"]`);
-      radios.forEach(r => {
-        r.addEventListener('change', function() {
-          if (this.checked) {
-            attendanceData[roll] = attendanceData[roll] || {};
-            attendanceData[roll].status = this.value;
-          }
-        });
-      });
-
-      const remarkInput = row.querySelector('.remark-input');
-      if (remarkInput) {
-        remarkInput.addEventListener('input', function() {
-          const r = parseInt(this.dataset.roll);
-          attendanceData[r] = attendanceData[r] || {};
-          attendanceData[r].remark = this.value;
-        });
-      }
-
-      nameDiv.addEventListener('click', function() {
-        const roll = parseInt(this.dataset.roll);
-        const name = this.dataset.name;
-        generateIndividualReport(roll, name);
-      });
-    });
-  }
-
-  // ============================================================
-  // INDIVIDUAL REPORT
-  // ============================================================
-  function generateIndividualReport(roll, name) {
-    const rec = attendanceData[roll] || { status: 'present', remark: '' };
-    const dateStr = formatDateDisplay(currentDate);
-    const classVal = classSelect.value;
-    const session = sessionSelect.value;
-
-    const content = `📋 INDIVIDUAL ATTENDANCE REPORT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🏫 Quest Coaching Centre
-👤 Student: ${name}
-🎯 Roll No: ${roll}
-📚 Class: ${classVal}
-📆 Session: ${session}
-📅 Date: ${dateStr}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ Status: ${rec.status.toUpperCase()}
-📝 Remark: ${rec.remark || '—'}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📅 Report generated: ${new Date().toLocaleString()}
-`;
-
-    const blob = new Blob([content], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${name}_${roll}_attendance.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showToast(`📥 ${name}'s report downloaded!`);
-  }
-
-  // ============================================================
-  // SAVE ATTENDANCE
-  // ============================================================
-  async function saveAttendance() {
-    if (isSaving) return;
-    if (students.length === 0) {
-      showToast('No students to save!', true);
-      return;
-    }
-
-    const selectedSession = sessionSelect.value;
-    const selectedClass = classSelect.value;
-    const today = getTodayDate();
-
-    if (!selectedSession || !selectedClass) {
-      showToast('Please select Session and Class!', true);
-      return;
-    }
-
-    isSaving = true;
-    saveBtn.disabled = true;
-    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-
-    try {
-      const batch = db.batch();
-      let savedCount = 0;
-
-      // 🔥 Save Holiday if checked
-      if (classHolidayCheck.checked) {
-        const reason = holidayReason.value.trim() || 'Holiday';
-        const holidayDocRef = db.collection('attendance')
-          .doc(selectedSession)
-          .collection('classes')
-          .doc(selectedClass)
-          .collection('holidays')
-          .doc(today);
-        
-        batch.set(holidayDocRef, {
-          reason: reason,
-          date: today,
-          session: selectedSession,
-          class: selectedClass,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        await batch.commit();
-        showToast(`🎉 Holiday saved: ${reason}`);
-        isSaving = false;
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Attendance';
-        return;
-      }
-
-      // Save each student's attendance
-      for (const student of students) {
-        const rec = attendanceData[student.roll] || { status: 'present', remark: '' };
-        
-        const docRef = db.collection('attendance')
-          .doc(selectedSession)
-          .collection('classes')
-          .doc(selectedClass)
-          .collection('students')
-          .doc(student.name)
-          .collection('attendance')
-          .doc(today);
-
-        batch.set(docRef, {
-          status: rec.status || 'present',
-          remark: rec.remark || '',
-          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-          roll: student.roll,
-          date: today,
-          session: selectedSession,
-          class: selectedClass
-        });
-        savedCount++;
-      }
-
-      await batch.commit();
-      showToast(`✅ Attendance saved for ${savedCount} students!`);
-    } catch (error) {
-      console.error('Error saving attendance:', error);
-      showToast('❌ Error saving attendance: ' + error.message, true);
+      console.error('Error searching student:', error);
+      loadingSpinner.style.display = 'none';
+      showToast('Error searching: ' + error.message, true);
     } finally {
-      isSaving = false;
-      saveBtn.disabled = false;
-      saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Attendance';
+      searchBtn.disabled = false;
+      searchBtn.innerHTML = '<i class="fas fa-search"></i> Check Attendance';
     }
-  }
-
-  // ============================================================
-  // DAILY PDF
-  // ============================================================
-  document.getElementById('downloadDailyBtn').addEventListener('click', function() {
-    if (students.length === 0) {
-      showToast('No students to generate report!', true);
-      return;
-    }
-    const dateStr = formatDateDisplay(currentDate);
-    const classVal = classSelect.value;
-    const session = sessionSelect.value;
-    
-    let content = `📋 DAILY ATTENDANCE REPORT\n`;
-    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    content += `🏫 Quest Coaching Centre\n`;
-    content += `📚 Class: ${classVal}\n`;
-    content += `📆 Session: ${session}\n`;
-    content += `📅 Date: ${dateStr}\n`;
-    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-    
-    let present = 0, absent = 0, leave = 0, holiday = 0;
-    students.forEach(s => {
-      const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
-      const statusSymbol = rec.status === 'present' ? '✅' : rec.status === 'absent' ? '❌' : rec.status === 'leave' ? '🟡' : '🎉';
-      content += `${statusSymbol} ${s.name} (${s.roll}) → ${rec.status.toUpperCase()}`;
-      if (rec.remark) content += ` | ${rec.remark}`;
-      content += '\n';
-      if (rec.status === 'present') present++;
-      else if (rec.status === 'absent') absent++;
-      else if (rec.status === 'leave') leave++;
-      else if (rec.status === 'holiday') holiday++;
-    });
-    
-    content += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    content += `📊 SUMMARY: P=${present} | A=${absent} | L=${leave} | H=${holiday} | Total=${students.length}\n`;
-    content += `📅 Generated: ${new Date().toLocaleString()}`;
-
-    const blob = new Blob([content], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Daily_Attendance_${classVal}_${currentDate}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showToast('📥 Daily report downloaded!');
-  });
-
-  // ============================================================
-  // MONTHLY PDF
-  // ============================================================
-  document.getElementById('downloadMonthlyBtn').addEventListener('click', function() {
-    if (students.length === 0) {
-      showToast('No students to generate report!', true);
-      return;
-    }
-    const monthName = new Date().toLocaleString('default', { month: 'long' });
-    const year = new Date().getFullYear();
-    const classVal = classSelect.value;
-    const session = sessionSelect.value;
-    
-    let content = `📊 MONTHLY ATTENDANCE REPORT\n`;
-    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    content += `🏫 Quest Coaching Centre\n`;
-    content += `📚 Class: ${classVal}\n`;
-    content += `📆 Session: ${session}\n`;
-    content += `📆 Month: ${monthName} ${year}\n`;
-    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-    
-    let present = 0, absent = 0, leave = 0, holiday = 0;
-    students.forEach(s => {
-      const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
-      content += `👤 ${s.name} (${s.roll})\n`;
-      content += `   Status: ${rec.status.toUpperCase()}`;
-      if (rec.remark) content += ` | Remark: ${rec.remark}`;
-      content += '\n\n';
-      if (rec.status === 'present') present++;
-      else if (rec.status === 'absent') absent++;
-      else if (rec.status === 'leave') leave++;
-      else if (rec.status === 'holiday') holiday++;
-    });
-    
-    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    content += `📊 SUMMARY\n`;
-    content += `✅ Present: ${present}\n`;
-    content += `❌ Absent: ${absent}\n`;
-    content += `🟡 Leave: ${leave}\n`;
-    content += `🎉 Holiday: ${holiday}\n`;
-    content += `📌 Total Students: ${students.length}\n`;
-    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    content += `📅 Generated: ${new Date().toLocaleString()}`;
-
-    const blob = new Blob([content], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Monthly_Attendance_${classVal}_${monthName}_${year}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showToast('📥 Monthly report downloaded!');
-  });
-
-  // ============================================================
-  // MONTHLY REPORT (Alert)
-  // ============================================================
-  document.getElementById('monthlyReportBtn').addEventListener('click', function() {
-    if (students.length === 0) {
-      showToast('No students to show report!', true);
-      return;
-    }
-    const monthName = new Date().toLocaleString('default', { month: 'long' });
-    const year = new Date().getFullYear();
-    const classVal = classSelect.value;
-    const session = sessionSelect.value;
-    
-    let report = `📅 MONTHLY ATTENDANCE - ${monthName} ${year}\n`;
-    report += `🏫 Class: ${classVal} | Session: ${session}\n`;
-    report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    
-    let present = 0, absent = 0, leave = 0, holiday = 0;
-    students.forEach(s => {
-      const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
-      report += `${s.name} (${s.roll}) → ${rec.status.toUpperCase()}`;
-      if (rec.remark) report += ` | ${rec.remark}`;
-      report += '\n';
-      if (rec.status === 'present') present++;
-      else if (rec.status === 'absent') absent++;
-      else if (rec.status === 'leave') leave++;
-      else if (rec.status === 'holiday') holiday++;
-    });
-    report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    report += `📊 Summary: P=${present} | A=${absent} | L=${leave} | H=${holiday} | Total=${students.length}`;
-    
-    alert(report);
-  });
-
-  // ============================================================
-  // INIT
-  // ============================================================
-  async function init() {
-    updateDateDisplay();
-    sessionSelect.value = '2026-27';
-    await fetchStudents();
   }
 
   // ============================================================
   // EVENT LISTENERS
   // ============================================================
-  classSelect.addEventListener('change', function() {
-    if (!classHolidayCheck.checked) fetchStudents();
+  searchBtn.addEventListener('click', searchStudent);
+
+  rollInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') searchStudent();
   });
 
-  sessionSelect.addEventListener('change', function() {
-    if (!classHolidayCheck.checked) fetchStudents();
-  });
-
-  classHolidayCheck.addEventListener('change', handleClassHoliday);
-
-  holidayReason.addEventListener('input', function() {
-    const reason = this.value.trim() || 'Holiday';
-    holidayReasonDisplay.textContent = reason.toUpperCase();
-  });
-
-  saveBtn.addEventListener('click', saveAttendance);
-
-  refreshBtn.addEventListener('click', function() {
-    if (!classHolidayCheck.checked) fetchStudents();
-    showToast('🔄 Refreshed!');
-  });
-
-  setInterval(() => {
-    updateDateDisplay();
-  }, 60000);
-
-  auth.onAuthStateChanged((user) => {
-    if (!user) {
-      showToast('⚠️ Please login from main page!', true);
-      setTimeout(() => {
-        window.location.href = 'index.html';
-      }, 2000);
-      return;
+  // Auto-focus on load
+  window.addEventListener('load', function() {
+    rollInput.focus();
+    const { class: className } = getUrlParams();
+    if (className) {
+      // Show which class is being searched
+      document.querySelector('.header p').textContent = 
+        `Class: ${className} | Enter Roll Number to check attendance & fees`;
     }
-    init();
   });
 
-  console.log('✅ Attendance System Loaded!');
-  console.log('📌 Fees section removed from attendance page');
-  console.log('📌 Fees will show in parent-view.html only');
+  console.log('✅ Parent View Loaded - Firebase Connected!');
+  console.log('📌 Searching from Firebase admissions & attendance collections');
 </script>
 </body>
 </html>
