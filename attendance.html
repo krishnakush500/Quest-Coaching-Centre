@@ -102,7 +102,6 @@
       background: white;
       cursor: pointer;
     }
-    /* 🔥 Parent View Button - Opens New Page */
     .top-controls .view-parent-btn {
       margin-left: auto;
       background: #0a2a66;
@@ -363,49 +362,6 @@
       box-shadow: 0 0 0 3px rgba(10, 42, 102, 0.12);
     }
 
-    .fee-section {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      background: #f8fafc;
-      padding: 15px 20px;
-      border-radius: 20px;
-      margin-bottom: 16px;
-      border: 1px solid #e2e8f0;
-    }
-    .fee-section .fee-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .fee-section .fee-group label {
-      font-weight: 600;
-      color: #0a2a66;
-      font-size: 0.85rem;
-    }
-    .fee-section .fee-group input {
-      border: 1px solid #b8cff0;
-      border-radius: 40px;
-      padding: 6px 16px;
-      font-weight: 500;
-      font-size: 0.9rem;
-      width: 120px;
-      outline: none;
-    }
-    .fee-section .fee-group input:focus {
-      border-color: #1f4b9e;
-      box-shadow: 0 0 0 3px rgba(26, 80, 180, 0.12);
-    }
-    .fee-section .fee-total {
-      font-weight: 700;
-      color: #1a237e;
-      font-size: 0.95rem;
-      margin-left: auto;
-      padding: 6px 16px;
-      background: #e8eafe;
-      border-radius: 40px;
-    }
-
     .report-actions {
       display: flex;
       flex-wrap: wrap;
@@ -505,8 +461,6 @@
       .top-controls .view-parent-btn { margin-left: 0; justify-content: center; }
       .class-filter { border-radius: 30px; padding: 14px; flex-direction: column; align-items: stretch; }
       .holiday-reason-group input { width: 100%; }
-      .fee-section { flex-direction: column; align-items: stretch; }
-      .fee-section .fee-total { margin-left: 0; text-align: center; }
       .report-actions { flex-direction: column; align-items: stretch; border-radius: 30px; }
       .report-actions .left { flex-wrap: wrap; justify-content: center; }
       .report-actions .right { justify-content: center; }
@@ -538,7 +492,6 @@
         <option value="2030-31">2030-31</option>
       </select>
     </div>
-    <!-- 🔥 Parent View Button - Opens parent-view.html -->
     <button class="view-parent-btn" id="parentViewBtn">
       <i class="fas fa-eye"></i> Parent View (Roll No.)
     </button>
@@ -577,20 +530,6 @@
     <h2>🎉 Class Holiday Today!</h2>
     <div class="reason-text" id="holidayReasonDisplay">HOLIDAY</div>
     <p style="margin-top: 10px;">No attendance will be marked for this class.</p>
-  </div>
-
-  <div class="fee-section" id="feeSection">
-    <div class="fee-group">
-      <label><i class="fas fa-money-bill-wave"></i> Monthly Fee:</label>
-      <input type="number" id="monthlyFee" placeholder="e.g. 1200" value="1200">
-    </div>
-    <div class="fee-group">
-      <label><i class="fas fa-check-circle" style="color:#10b981;"></i> Paid:</label>
-      <input type="number" id="paidFee" placeholder="e.g. 500" value="500">
-    </div>
-    <div class="fee-total" id="dueFeeDisplay">
-      <i class="fas fa-exclamation-triangle" style="color:#dc3545;"></i> Due: ₹700
-    </div>
   </div>
 
   <div class="save-btn-container" id="saveBtnContainer">
@@ -642,6 +581,9 @@
 <div id="toastMsg" class="toast-msg"></div>
 
 <script>
+  // ============================================================
+  // FIREBASE CONFIG
+  // ============================================================
   const firebaseConfig = {
     apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
     authDomain: "quest-coaching.firebaseapp.com",
@@ -656,6 +598,9 @@
   const db = firebase.firestore();
   const auth = firebase.auth();
 
+  // ============================================================
+  // DOM REFS
+  // ============================================================
   const tbody = document.getElementById('tableBody');
   const classSelect = document.getElementById('classSelect');
   const sessionSelect = document.getElementById('sessionSelect');
@@ -668,10 +613,6 @@
   const tableWrap = document.getElementById('tableWrap');
   const saveBtnContainer = document.getElementById('saveBtnContainer');
   const classFilterRow = document.getElementById('classFilterRow');
-  const feeSection = document.getElementById('feeSection');
-  const monthlyFeeInput = document.getElementById('monthlyFee');
-  const paidFeeInput = document.getElementById('paidFee');
-  const dueFeeDisplay = document.getElementById('dueFeeDisplay');
   const parentViewBtn = document.getElementById('parentViewBtn');
   const saveBtn = document.getElementById('saveAttendanceBtn');
   const refreshBtn = document.getElementById('refreshBtn');
@@ -682,6 +623,9 @@
   let isSaving = false;
   let currentDate = '';
 
+  // ============================================================
+  // HELPER: Show Toast
+  // ============================================================
   function showToast(msg, isError = false) {
     toast.textContent = msg;
     toast.style.display = 'block';
@@ -690,6 +634,9 @@
     toast._timer = setTimeout(() => { toast.style.display = 'none'; }, 4000);
   }
 
+  // ============================================================
+  // GET TODAY'S DATE
+  // ============================================================
   function getTodayDate() {
     const today = new Date();
     const year = today.getFullYear();
@@ -709,34 +656,25 @@
     dateDisplay.textContent = formatDateDisplay(today);
   }
 
-  function updateDueFee() {
-    const monthlyFee = parseFloat(monthlyFeeInput.value) || 0;
-    const paidFee = parseFloat(paidFeeInput.value) || 0;
-    const due = monthlyFee - paidFee;
-    if (due <= 0) {
-      dueFeeDisplay.innerHTML = `<i class="fas fa-check-circle" style="color:#10b981;"></i> ✅ No Due`;
-      dueFeeDisplay.style.color = '#10b981';
-    } else {
-      dueFeeDisplay.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:#dc3545;"></i> Due: ₹${due}`;
-      dueFeeDisplay.style.color = '#dc3545';
-    }
-  }
-
-  // 🔥 Parent View - Opens parent-view.html
+  // ============================================================
+  // PARENT VIEW - Opens parent-view.html
+  // ============================================================
   parentViewBtn.addEventListener('click', function() {
-    // Pass session and class as query params
     const session = sessionSelect.value;
     const className = classSelect.value;
     window.open(`parent-view.html?session=${session}&class=${className}`, '_blank');
   });
 
+  // ============================================================
+  // HANDLE CLASS HOLIDAY
+  // ============================================================
   function handleClassHoliday() {
     if (classHolidayCheck.checked) {
       holidayReasonGroup.style.display = 'flex';
       holidayMsg.style.display = 'block';
       tableWrap.style.display = 'none';
       saveBtnContainer.style.display = 'none';
-      feeSection.style.display = 'none';
+      classFilterRow.style.display = 'flex';
       const reason = holidayReason.value.trim() || 'Holiday';
       holidayReasonDisplay.textContent = reason.toUpperCase();
       showToast(`🎉 Class Holiday: ${reason.toUpperCase()}`);
@@ -745,11 +683,13 @@
       holidayMsg.style.display = 'none';
       tableWrap.style.display = 'block';
       saveBtnContainer.style.display = 'flex';
-      feeSection.style.display = 'flex';
       fetchStudents();
     }
   }
 
+  // ============================================================
+  // FETCH STUDENTS
+  // ============================================================
   async function fetchStudents() {
     if (classHolidayCheck.checked) return;
     
@@ -823,6 +763,9 @@
     }
   }
 
+  // ============================================================
+  // LOAD EXISTING ATTENDANCE
+  // ============================================================
   async function loadExistingAttendance() {
     try {
       const selectedSession = sessionSelect.value;
@@ -855,6 +798,9 @@
     }
   }
 
+  // ============================================================
+  // RENDER TABLE
+  // ============================================================
   function renderTable() {
     if (students.length === 0) {
       tbody.innerHTML = `<tr><td colspan="4" class="no-students-msg">
@@ -924,14 +870,14 @@
     });
   }
 
+  // ============================================================
+  // INDIVIDUAL REPORT
+  // ============================================================
   function generateIndividualReport(roll, name) {
     const rec = attendanceData[roll] || { status: 'present', remark: '' };
     const dateStr = formatDateDisplay(currentDate);
     const classVal = classSelect.value;
     const session = sessionSelect.value;
-    const monthlyFee = monthlyFeeInput.value || '0';
-    const paidFee = paidFeeInput.value || '0';
-    const due = parseFloat(monthlyFee) - parseFloat(paidFee);
 
     const content = `📋 INDIVIDUAL ATTENDANCE REPORT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -944,11 +890,6 @@
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ Status: ${rec.status.toUpperCase()}
 📝 Remark: ${rec.remark || '—'}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💰 FEE DETAILS
-   Monthly Fee: ₹${monthlyFee}
-   Paid: ₹${paidFee}
-   Due: ₹${due > 0 ? due : '0 (Paid Full)'}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📅 Report generated: ${new Date().toLocaleString()}
 `;
@@ -965,7 +906,9 @@
     showToast(`📥 ${name}'s report downloaded!`);
   }
 
-  // 🔥 SAVE ATTENDANCE with Holiday Reason
+  // ============================================================
+  // SAVE ATTENDANCE
+  // ============================================================
   async function saveAttendance() {
     if (isSaving) return;
     if (students.length === 0) {
@@ -993,7 +936,6 @@
       // 🔥 Save Holiday if checked
       if (classHolidayCheck.checked) {
         const reason = holidayReason.value.trim() || 'Holiday';
-        // Save holiday info in a separate document
         const holidayDocRef = db.collection('attendance')
           .doc(selectedSession)
           .collection('classes')
@@ -1008,6 +950,7 @@
           class: selectedClass,
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
+        await batch.commit();
         showToast(`🎉 Holiday saved: ${reason}`);
         isSaving = false;
         saveBtn.disabled = false;
@@ -1035,10 +978,7 @@
           roll: student.roll,
           date: today,
           session: selectedSession,
-          class: selectedClass,
-          monthlyFee: parseFloat(monthlyFeeInput.value) || 0,
-          paidFee: parseFloat(paidFeeInput.value) || 0,
-          dueFee: (parseFloat(monthlyFeeInput.value) || 0) - (parseFloat(paidFeeInput.value) || 0)
+          class: selectedClass
         });
         savedCount++;
       }
@@ -1066,7 +1006,6 @@
     const dateStr = formatDateDisplay(currentDate);
     const classVal = classSelect.value;
     const session = sessionSelect.value;
-    const monthlyFee = monthlyFeeInput.value || '0';
     
     let content = `📋 DAILY ATTENDANCE REPORT\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
@@ -1074,7 +1013,6 @@
     content += `📚 Class: ${classVal}\n`;
     content += `📆 Session: ${session}\n`;
     content += `📅 Date: ${dateStr}\n`;
-    content += `💰 Monthly Fee: ₹${monthlyFee}\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
     
     let present = 0, absent = 0, leave = 0, holiday = 0;
@@ -1118,7 +1056,6 @@
     const year = new Date().getFullYear();
     const classVal = classSelect.value;
     const session = sessionSelect.value;
-    const monthlyFee = monthlyFeeInput.value || '0';
     
     let content = `📊 MONTHLY ATTENDANCE REPORT\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
@@ -1126,7 +1063,6 @@
     content += `📚 Class: ${classVal}\n`;
     content += `📆 Session: ${session}\n`;
     content += `📆 Month: ${monthName} ${year}\n`;
-    content += `💰 Monthly Fee: ₹${monthlyFee}\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
     
     let present = 0, absent = 0, leave = 0, holiday = 0;
@@ -1204,7 +1140,6 @@
   async function init() {
     updateDateDisplay();
     sessionSelect.value = '2026-27';
-    updateDueFee();
     await fetchStudents();
   }
 
@@ -1225,9 +1160,6 @@
     const reason = this.value.trim() || 'Holiday';
     holidayReasonDisplay.textContent = reason.toUpperCase();
   });
-
-  monthlyFeeInput.addEventListener('input', updateDueFee);
-  paidFeeInput.addEventListener('input', updateDueFee);
 
   saveBtn.addEventListener('click', saveAttendance);
 
@@ -1252,9 +1184,8 @@
   });
 
   console.log('✅ Attendance System Loaded!');
-  console.log('📌 Parent View opens new page: parent-view.html');
-  console.log('📌 Holiday saved with reason in Firebase');
-  console.log('📌 Fees: Monthly Fee, Paid, Due - per student');
+  console.log('📌 Fees section removed from attendance page');
+  console.log('📌 Fees will show in parent-view.html only');
 </script>
 </body>
 </html>
