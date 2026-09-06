@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
@@ -98,6 +99,10 @@
     .search-section button:hover {
       background: #13458b;
       transform: scale(1.01);
+    }
+    .search-section button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     .result-card {
@@ -197,6 +202,21 @@
     }
     .back-link:hover { text-decoration: underline; }
 
+    .loading-spinner {
+      text-align: center;
+      padding: 20px;
+      display: none;
+    }
+    .loading-spinner i {
+      font-size: 2rem;
+      color: #1f4b9e;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     .toast-msg {
       position: fixed;
       bottom: 30px;
@@ -230,7 +250,7 @@
 <div class="container">
   <div class="header">
     <h1><i class="fas fa-eye"></i> Parent View</h1>
-    <p>Enter your child's Roll Number to check attendance & fees</p>
+    <p>Enter your child's Roll Number to check attendance &amp; fees</p>
   </div>
 
   <div class="search-section">
@@ -239,32 +259,37 @@
     <button id="searchBtn"><i class="fas fa-search"></i> Check Attendance</button>
   </div>
 
+  <div class="loading-spinner" id="loadingSpinner">
+    <i class="fas fa-spinner"></i>
+    <p style="margin-top:10px;color:#64748b;">Searching student records...</p>
+  </div>
+
   <!-- Not Found -->
   <div class="not-found" id="notFound">
     <i class="fas fa-user-slash"></i>
     <h3>Student Not Found</h3>
-    <p>Please check the Roll Number and try again.</p>
+    <p id="notFoundMsg">Please check the Roll Number and try again.</p>
   </div>
 
   <!-- Result Card -->
   <div class="result-card" id="resultCard">
-    <div class="student-name" id="studentName">Arjun Singh</div>
-    <div class="student-roll" id="studentRoll">Roll No: 101 | Class: 10th</div>
+    <div class="student-name" id="studentName">--</div>
+    <div class="student-roll" id="studentRoll">Roll No: -- | Class: --</div>
     
-    <div class="status-badge" id="statusBadge">✅ Present</div>
+    <div class="status-badge" id="statusBadge">⏳ Not Marked</div>
     
     <div class="fee-details">
       <div class="fee-item">
         <div class="label">Monthly Fee</div>
-        <div class="value" id="monthlyFeeDisplay">₹1,200</div>
+        <div class="value" id="monthlyFeeDisplay">₹--</div>
       </div>
       <div class="fee-item">
         <div class="label">Paid</div>
-        <div class="value paid" id="paidFeeDisplay">₹500</div>
+        <div class="value paid" id="paidFeeDisplay">₹--</div>
       </div>
       <div class="fee-item">
         <div class="label">Due</div>
-        <div class="value due" id="dueFeeDisplay">₹700</div>
+        <div class="value due" id="dueFeeDisplay">₹--</div>
       </div>
     </div>
 
@@ -273,7 +298,7 @@
     </div>
 
     <div style="margin-top:15px; font-size:0.8rem; color:#94a3b8;">
-      <i class="fas fa-calendar-day"></i> <span id="attendanceDate">2025-09-04</span>
+      <i class="fas fa-calendar-day"></i> <span id="attendanceDate">--</span>
     </div>
   </div>
 
@@ -300,68 +325,14 @@
   const db = firebase.firestore();
 
   // ============================================================
-  // 🔥 FAKE DATA (Abhi ke liye - Baad me Firebase se connect karenge)
-  // ============================================================
-  const fakeStudents = {
-    101: {
-      name: "Arjun Singh",
-      class: "10th",
-      session: "2026-27",
-      status: "present",
-      remark: "Well done!",
-      monthlyFee: 1200,
-      paidFee: 500,
-      dueFee: 700
-    },
-    102: {
-      name: "Priya Sharma",
-      class: "10th",
-      session: "2026-27",
-      status: "absent",
-      remark: "Sick",
-      monthlyFee: 1200,
-      paidFee: 1200,
-      dueFee: 0
-    },
-    103: {
-      name: "Rohit Verma",
-      class: "10th",
-      session: "2026-27",
-      status: "leave",
-      remark: "Family function",
-      monthlyFee: 1200,
-      paidFee: 800,
-      dueFee: 400
-    },
-    104: {
-      name: "Sneha Patel",
-      class: "10th",
-      session: "2026-27",
-      status: "holiday",
-      remark: "Janamashtmi",
-      monthlyFee: 1200,
-      paidFee: 600,
-      dueFee: 600
-    },
-    105: {
-      name: "Karan Joshi",
-      class: "10th",
-      session: "2026-27",
-      status: "present",
-      remark: "Good performance",
-      monthlyFee: 1200,
-      paidFee: 1000,
-      dueFee: 200
-    }
-  };
-
-  // ============================================================
   // DOM REFS
   // ============================================================
   const rollInput = document.getElementById('rollInput');
   const searchBtn = document.getElementById('searchBtn');
+  const loadingSpinner = document.getElementById('loadingSpinner');
   const resultCard = document.getElementById('resultCard');
   const notFound = document.getElementById('notFound');
+  const notFoundMsg = document.getElementById('notFoundMsg');
   const studentName = document.getElementById('studentName');
   const studentRoll = document.getElementById('studentRoll');
   const statusBadge = document.getElementById('statusBadge');
@@ -388,53 +359,157 @@
     return today.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
   }
 
+  function formatDateDisplay(dateStr) {
+    if (!dateStr) return '--';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
   // ============================================================
-  // SEARCH STUDENT
+  // GET URL PARAMETERS (Session & Class from attendance page)
   // ============================================================
-  function searchStudent() {
+  function getUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      session: params.get('session') || '2026-27',
+      class: params.get('class') || ''
+    };
+  }
+
+  // ============================================================
+  // SEARCH STUDENT FROM FIREBASE
+  // ============================================================
+  async function searchStudent() {
     const roll = parseInt(rollInput.value.trim());
     if (!roll || isNaN(roll)) {
       showToast('Please enter a valid Roll Number!', true);
       return;
     }
 
-    // 🔥 Fake data search (Baad me Firebase se connect karenge)
-    const student = fakeStudents[roll];
+    const { session, class: className } = getUrlParams();
     
-    if (!student) {
-      resultCard.style.display = 'none';
-      notFound.style.display = 'block';
+    if (!className) {
+      showToast('Please select a class from attendance page first!', true);
       return;
     }
 
-    // Show result
+    // Show loading
+    loadingSpinner.style.display = 'block';
+    resultCard.style.display = 'none';
     notFound.style.display = 'none';
-    resultCard.style.display = 'block';
+    searchBtn.disabled = true;
+    searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
 
-    studentName.textContent = student.name;
-    studentRoll.textContent = `Roll No: ${roll} | Class: ${student.class} | Session: ${student.session}`;
-    attendanceDate.textContent = getTodayDate();
+    try {
+      // 🔥 STEP 1: Find student by roll number in admissions collection
+      let studentDoc = null;
+      let studentData = null;
 
-    // Status Badge
-    const statusMap = {
-      present: { label: '✅ Present', class: 'status-present' },
-      absent: { label: '❌ Absent', class: 'status-absent' },
-      leave: { label: '🟡 Leave', class: 'status-leave' },
-      holiday: { label: '🎉 Holiday', class: 'status-holiday' }
-    };
-    const statusInfo = statusMap[student.status] || { label: '⏳ Not Marked', class: 'status-notmarked' };
-    statusBadge.textContent = statusInfo.label;
-    statusBadge.className = `status-badge ${statusInfo.class}`;
+      // Query admissions with rollNumber and class
+      const snapshot = await db.collection('admissions')
+        .where('rollNumber', '==', String(roll))
+        .where('classApplying', '==', className)
+        .get();
 
-    // Fee Details
-    monthlyFeeDisplay.textContent = `₹${student.monthlyFee}`;
-    paidFeeDisplay.textContent = `₹${student.paidFee}`;
-    const due = student.dueFee;
-    dueFeeDisplay.textContent = due > 0 ? `₹${due}` : '✅ Paid Full';
-    dueFeeDisplay.style.color = due > 0 ? '#dc3545' : '#10b981';
+      if (snapshot.empty) {
+        // Try with 'class' field
+        const snapshot2 = await db.collection('admissions')
+          .where('rollNumber', '==', String(roll))
+          .where('class', '==', className)
+          .get();
+        
+        if (snapshot2.empty) {
+          loadingSpinner.style.display = 'none';
+          notFound.style.display = 'block';
+          notFoundMsg.textContent = `Roll No. ${roll} not found in ${className} class. Please check the Roll Number.`;
+          searchBtn.disabled = false;
+          searchBtn.innerHTML = '<i class="fas fa-search"></i> Check Attendance';
+          return;
+        }
+        studentDoc = snapshot2.docs[0];
+        studentData = studentDoc.data();
+      } else {
+        studentDoc = snapshot.docs[0];
+        studentData = studentDoc.data();
+      }
 
-    // Remark
-    remarkText.textContent = student.remark || 'No remarks';
+      const studentNameVal = studentData.studentName || studentData.name || 'Unknown';
+      const studentClass = studentData.classApplying || studentData.class || className;
+      const studentRoll = studentData.rollNumber || studentData.rollNo || roll;
+
+      // 🔥 STEP 2: Get today's attendance for this student
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      
+      const attendanceRef = db.collection('attendance')
+        .doc(session)
+        .collection('classes')
+        .doc(studentClass)
+        .collection('students')
+        .doc(studentNameVal)
+        .collection('attendance')
+        .doc(today);
+
+      const attendanceSnap = await attendanceRef.get();
+
+      let status = 'notmarked';
+      let remark = '';
+      let monthlyFee = 0;
+      let paidFee = 0;
+      let dueFee = 0;
+
+      if (attendanceSnap.exists) {
+        const attData = attendanceSnap.data();
+        status = attData.status || 'notmarked';
+        remark = attData.remark || '';
+        monthlyFee = attData.monthlyFee || 0;
+        paidFee = attData.paidFee || 0;
+        dueFee = attData.dueFee || (monthlyFee - paidFee);
+      }
+
+      // 🔥 STEP 3: Display result
+      loadingSpinner.style.display = 'none';
+      resultCard.style.display = 'block';
+      notFound.style.display = 'none';
+
+      studentName.textContent = studentNameVal;
+      studentRoll.textContent = `Roll No: ${studentRoll} | Class: ${studentClass} | Session: ${session}`;
+      attendanceDate.textContent = formatDateDisplay(today);
+
+      // Status Badge
+      const statusMap = {
+        present: { label: '✅ Present', class: 'status-present' },
+        absent: { label: '❌ Absent', class: 'status-absent' },
+        leave: { label: '🟡 Leave', class: 'status-leave' },
+        holiday: { label: '🎉 Holiday', class: 'status-holiday' },
+        notmarked: { label: '⏳ Not Marked Yet', class: 'status-notmarked' }
+      };
+      const statusInfo = statusMap[status] || statusMap.notmarked;
+      statusBadge.textContent = statusInfo.label;
+      statusBadge.className = `status-badge ${statusInfo.class}`;
+
+      // Fee Details
+      monthlyFeeDisplay.textContent = `₹${monthlyFee || 0}`;
+      paidFeeDisplay.textContent = `₹${paidFee || 0}`;
+      const due = dueFee || (monthlyFee - paidFee);
+      if (due <= 0) {
+        dueFeeDisplay.textContent = '✅ Paid Full';
+        dueFeeDisplay.style.color = '#10b981';
+      } else {
+        dueFeeDisplay.textContent = `₹${due}`;
+        dueFeeDisplay.style.color = '#dc3545';
+      }
+
+      // Remark
+      remarkText.textContent = remark || 'No remarks';
+
+    } catch (error) {
+      console.error('Error searching student:', error);
+      loadingSpinner.style.display = 'none';
+      showToast('Error searching: ' + error.message, true);
+    } finally {
+      searchBtn.disabled = false;
+      searchBtn.innerHTML = '<i class="fas fa-search"></i> Check Attendance';
+    }
   }
 
   // ============================================================
@@ -449,11 +524,16 @@
   // Auto-focus on load
   window.addEventListener('load', function() {
     rollInput.focus();
+    const { class: className } = getUrlParams();
+    if (className) {
+      // Show which class is being searched
+      document.querySelector('.header p').textContent = 
+        `Class: ${className} | Enter Roll Number to check attendance & fees`;
+    }
   });
 
-  console.log('✅ Parent View Loaded!');
-  console.log('📌 Fake Data: Roll numbers 101, 102, 103, 104, 105');
-  console.log('📌 Baad me Firebase se connect karenge');
+  console.log('✅ Parent View Loaded - Firebase Connected!');
+  console.log('📌 Searching from Firebase admissions & attendance collections');
 </script>
 </body>
 </html>
