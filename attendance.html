@@ -70,7 +70,6 @@
     }
     .header .date-display i { margin-right: 8px; }
 
-    /* TOP CONTROLS */
     .top-controls {
       display: flex;
       flex-wrap: wrap;
@@ -103,28 +102,7 @@
       background: white;
       cursor: pointer;
     }
-    .top-controls .holiday-group {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: #fee2e2;
-      padding: 4px 16px 4px 12px;
-      border-radius: 40px;
-      border: 1px solid #fecaca;
-      cursor: pointer;
-    }
-    .top-controls .holiday-group input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      accent-color: #dc3545;
-      cursor: pointer;
-    }
-    .top-controls .holiday-group label {
-      font-weight: 600;
-      color: #991b1b;
-      font-size: 0.85rem;
-      cursor: pointer;
-    }
+    /* 🔥 Parent View Button - Opens New Page */
     .top-controls .view-parent-btn {
       margin-left: auto;
       background: #0a2a66;
@@ -176,38 +154,52 @@
       cursor: pointer;
       min-width: 160px;
     }
-
-    .parent-view-box {
-      background: #e3efff;
-      border-radius: 60px;
-      padding: 12px 24px;
-      display: none;
-      flex-wrap: wrap;
+    .class-holiday-group {
+      display: flex;
       align-items: center;
-      gap: 16px;
-      margin-bottom: 16px;
-      border: 1px solid #b7cef3;
+      gap: 8px;
+      background: #fee2e2;
+      padding: 4px 16px 4px 12px;
+      border-radius: 40px;
+      border: 1px solid #fecaca;
     }
-    .parent-view-box span {
-      font-weight: 600;
-      color: #0a2a66;
-    }
-    .parent-view-box input {
-      border: 1px solid #b0caf0;
-      border-radius: 60px;
-      padding: 8px 20px;
-      font-weight: 500;
-      width: 140px;
-      background: white;
-    }
-    .parent-view-box button {
-      background: #0a2a66;
-      border: none;
-      border-radius: 60px;
-      color: white;
-      padding: 8px 24px;
-      font-weight: 600;
+    .class-holiday-group input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #dc3545;
       cursor: pointer;
+    }
+    .class-holiday-group label {
+      font-weight: 600;
+      color: #991b1b;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .holiday-reason-group {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      background: #fff5f5;
+      padding: 4px 16px 4px 12px;
+      border-radius: 40px;
+      border: 2px solid #dc3545;
+    }
+    .holiday-reason-group input {
+      border: none;
+      background: transparent;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      color: #991b1b;
+      font-weight: 600;
+      width: 150px;
+      outline: none;
+    }
+    .holiday-reason-group input::placeholder {
+      color: #f87171;
+      font-weight: 400;
+    }
+    .holiday-reason-group i {
+      color: #dc3545;
     }
 
     .holiday-msg {
@@ -222,6 +214,16 @@
     }
     .holiday-msg i { font-size: 3rem; display: block; margin-bottom: 10px; }
     .holiday-msg h2 { font-size: 1.5rem; }
+    .holiday-msg .reason-text { 
+      font-size: 1.2rem; 
+      font-weight: 700; 
+      color: #dc3545; 
+      background: white; 
+      padding: 8px 20px; 
+      border-radius: 40px; 
+      display: inline-block;
+      margin-top: 10px;
+    }
 
     .save-btn-container {
       display: flex;
@@ -272,7 +274,7 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 0.95rem;
-      min-width: 620px;
+      min-width: 720px;
     }
     th {
       text-align: left;
@@ -310,15 +312,15 @@
     .attendance-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px 12px;
+      gap: 6px 10px;
       align-items: center;
     }
     .attendance-actions label {
       display: flex;
       align-items: center;
       gap: 4px;
-      font-weight: 500;
-      font-size: 0.85rem;
+      font-weight: 600;
+      font-size: 0.8rem;
       color: #1f4170;
       cursor: pointer;
       background: #f2f8ff;
@@ -337,6 +339,15 @@
       border-color: #1f4b9e;
       box-shadow: 0 0 0 2px rgba(26, 80, 180, 0.15);
     }
+    .attendance-actions label.holiday-option {
+      background: #fee2e2;
+      border-color: #fecaca;
+    }
+    .attendance-actions label.holiday-option:has(input:checked) {
+      background: #fecaca;
+      border-color: #dc3545;
+      box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
+    }
     .remark-input {
       border: 1px solid #c8dbf7;
       border-radius: 40px;
@@ -350,6 +361,49 @@
       border-color: #0a2a66;
       outline: none;
       box-shadow: 0 0 0 3px rgba(10, 42, 102, 0.12);
+    }
+
+    .fee-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      background: #f8fafc;
+      padding: 15px 20px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+      border: 1px solid #e2e8f0;
+    }
+    .fee-section .fee-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .fee-section .fee-group label {
+      font-weight: 600;
+      color: #0a2a66;
+      font-size: 0.85rem;
+    }
+    .fee-section .fee-group input {
+      border: 1px solid #b8cff0;
+      border-radius: 40px;
+      padding: 6px 16px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      width: 120px;
+      outline: none;
+    }
+    .fee-section .fee-group input:focus {
+      border-color: #1f4b9e;
+      box-shadow: 0 0 0 3px rgba(26, 80, 180, 0.12);
+    }
+    .fee-section .fee-total {
+      font-weight: 700;
+      color: #1a237e;
+      font-size: 0.95rem;
+      margin-left: auto;
+      padding: 6px 16px;
+      background: #e8eafe;
+      border-radius: 40px;
     }
 
     .report-actions {
@@ -414,7 +468,6 @@
       box-shadow: none;
     }
     .download-btn.outline:hover { background: #e8f0fe; }
-    .download-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
     .toast-msg {
       position: fixed;
@@ -429,6 +482,8 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.2);
       z-index: 9999;
       display: none;
+      max-width: 90%;
+      text-align: center;
     }
     .no-students-msg {
       text-align: center;
@@ -449,13 +504,15 @@
       .top-controls { border-radius: 30px; padding: 14px; flex-direction: column; align-items: stretch; }
       .top-controls .view-parent-btn { margin-left: 0; justify-content: center; }
       .class-filter { border-radius: 30px; padding: 14px; flex-direction: column; align-items: stretch; }
+      .holiday-reason-group input { width: 100%; }
+      .fee-section { flex-direction: column; align-items: stretch; }
+      .fee-section .fee-total { margin-left: 0; text-align: center; }
       .report-actions { flex-direction: column; align-items: stretch; border-radius: 30px; }
       .report-actions .left { flex-wrap: wrap; justify-content: center; }
       .report-actions .right { justify-content: center; }
-      .parent-view-box { flex-direction: column; align-items: stretch; }
-      td, th { padding: 10px 8px; }
-      .attendance-actions label { padding: 2px 8px; font-size: 0.75rem; }
-      .remark-input { width: 70px; }
+      td, th { padding: 10px 8px; font-size: 0.8rem; }
+      .attendance-actions label { padding: 2px 8px; font-size: 0.7rem; }
+      .remark-input { width: 60px; }
       .save-btn-container { justify-content: center; }
     }
   </style>
@@ -463,7 +520,6 @@
 <body>
 
 <div class="container">
-  <!-- HEADER -->
   <div class="header">
     <h1><i class="fas fa-clipboard-check"></i> Attendance</h1>
     <div class="date-display" id="dateDisplay">
@@ -471,7 +527,6 @@
     </div>
   </div>
 
-  <!-- TOP CONTROLS: Session + Holiday + Parent View -->
   <div class="top-controls">
     <div class="session-group">
       <label><i class="fas fa-calendar-alt"></i> Session:</label>
@@ -483,30 +538,12 @@
         <option value="2030-31">2030-31</option>
       </select>
     </div>
-    <div class="holiday-group" id="holidayGroup">
-      <input type="checkbox" id="holidayCheck">
-      <label for="holidayCheck"><i class="fas fa-calendar-times"></i> Holiday</label>
-    </div>
+    <!-- 🔥 Parent View Button - Opens parent-view.html -->
     <button class="view-parent-btn" id="parentViewBtn">
       <i class="fas fa-eye"></i> Parent View (Roll No.)
     </button>
   </div>
 
-  <!-- Parent View Box -->
-  <div id="parentViewBox" class="parent-view-box">
-    <span><i class="fas fa-id-badge"></i> Parent access · Roll No.</span>
-    <input type="text" placeholder="e.g. 101" id="rollInput">
-    <button id="parentViewSubmit"><i class="fas fa-search"></i> Show</button>
-  </div>
-
-  <!-- Holiday Message -->
-  <div class="holiday-msg" id="holidayMsg">
-    <i class="fas fa-calendar-times"></i>
-    <h2>🎉 Today is Holiday!</h2>
-    <p>No attendance will be marked today.</p>
-  </div>
-
-  <!-- CLASS FILTER -->
   <div class="class-filter" id="classFilterRow">
     <label><i class="fas fa-users"></i> Class</label>
     <select id="classSelect">
@@ -523,9 +560,39 @@
       <option value="12th (Commerce)">12th (Commerce)</option>
       <option value="12th (Arts)">12th (Arts)</option>
     </select>
+
+    <div class="class-holiday-group">
+      <input type="checkbox" id="classHolidayCheck">
+      <label for="classHolidayCheck"><i class="fas fa-calendar-times"></i> Class Holiday</label>
+    </div>
+
+    <div class="holiday-reason-group" id="holidayReasonGroup">
+      <i class="fas fa-pen"></i>
+      <input type="text" id="holidayReason" placeholder="Reason: SUNDAY, JANAMASHTMI...">
+    </div>
   </div>
 
-  <!-- SAVE BUTTON -->
+  <div class="holiday-msg" id="holidayMsg">
+    <i class="fas fa-calendar-times"></i>
+    <h2>🎉 Class Holiday Today!</h2>
+    <div class="reason-text" id="holidayReasonDisplay">HOLIDAY</div>
+    <p style="margin-top: 10px;">No attendance will be marked for this class.</p>
+  </div>
+
+  <div class="fee-section" id="feeSection">
+    <div class="fee-group">
+      <label><i class="fas fa-money-bill-wave"></i> Monthly Fee:</label>
+      <input type="number" id="monthlyFee" placeholder="e.g. 1200" value="1200">
+    </div>
+    <div class="fee-group">
+      <label><i class="fas fa-check-circle" style="color:#10b981;"></i> Paid:</label>
+      <input type="number" id="paidFee" placeholder="e.g. 500" value="500">
+    </div>
+    <div class="fee-total" id="dueFeeDisplay">
+      <i class="fas fa-exclamation-triangle" style="color:#dc3545;"></i> Due: ₹700
+    </div>
+  </div>
+
   <div class="save-btn-container" id="saveBtnContainer">
     <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync"></i> Refresh</button>
     <button class="save-btn" id="saveAttendanceBtn">
@@ -533,14 +600,13 @@
     </button>
   </div>
 
-  <!-- ATTENDANCE TABLE -->
   <div class="table-wrap" id="tableWrap">
     <table id="attendanceTable">
       <thead>
         <tr>
           <th>Student</th>
           <th>Roll</th>
-          <th>Status</th>
+          <th>Status (P/A/L/H)</th>
           <th>Remarks</th>
         </tr>
       </thead>
@@ -553,7 +619,6 @@
     </table>
   </div>
 
-  <!-- REPORT & DOWNLOAD -->
   <div class="report-actions">
     <div class="left">
       <button class="monthly-btn" id="monthlyReportBtn">
@@ -574,13 +639,9 @@
   </div>
 </div>
 
-<!-- Toast Message -->
 <div id="toastMsg" class="toast-msg"></div>
 
 <script>
-  // ============================================================
-  // FIREBASE CONFIG
-  // ============================================================
   const firebaseConfig = {
     apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
     authDomain: "quest-coaching.firebaseapp.com",
@@ -595,48 +656,40 @@
   const db = firebase.firestore();
   const auth = firebase.auth();
 
-  // ============================================================
-  // DOM REFS
-  // ============================================================
   const tbody = document.getElementById('tableBody');
   const classSelect = document.getElementById('classSelect');
   const sessionSelect = document.getElementById('sessionSelect');
   const dateDisplay = document.getElementById('todayDate');
-  const holidayCheck = document.getElementById('holidayCheck');
+  const classHolidayCheck = document.getElementById('classHolidayCheck');
+  const holidayReason = document.getElementById('holidayReason');
+  const holidayReasonGroup = document.getElementById('holidayReasonGroup');
   const holidayMsg = document.getElementById('holidayMsg');
+  const holidayReasonDisplay = document.getElementById('holidayReasonDisplay');
   const tableWrap = document.getElementById('tableWrap');
   const saveBtnContainer = document.getElementById('saveBtnContainer');
   const classFilterRow = document.getElementById('classFilterRow');
+  const feeSection = document.getElementById('feeSection');
+  const monthlyFeeInput = document.getElementById('monthlyFee');
+  const paidFeeInput = document.getElementById('paidFee');
+  const dueFeeDisplay = document.getElementById('dueFeeDisplay');
   const parentViewBtn = document.getElementById('parentViewBtn');
-  const parentViewBox = document.getElementById('parentViewBox');
-  const rollInput = document.getElementById('rollInput');
-  const parentViewSubmit = document.getElementById('parentViewSubmit');
   const saveBtn = document.getElementById('saveAttendanceBtn');
   const refreshBtn = document.getElementById('refreshBtn');
   const toast = document.getElementById('toastMsg');
 
-  // ============================================================
-  // STATE
-  // ============================================================
   let students = [];
   let attendanceData = {};
   let isSaving = false;
   let currentDate = '';
 
-  // ============================================================
-  // HELPER: Show Toast
-  // ============================================================
   function showToast(msg, isError = false) {
     toast.textContent = msg;
     toast.style.display = 'block';
     toast.style.background = isError ? '#dc3545' : '#1a237e';
     clearTimeout(toast._timer);
-    toast._timer = setTimeout(() => { toast.style.display = 'none'; }, 3000);
+    toast._timer = setTimeout(() => { toast.style.display = 'none'; }, 4000);
   }
 
-  // ============================================================
-  // GET TODAY'S DATE (Auto Update)
-  // ============================================================
   function getTodayDate() {
     const today = new Date();
     const year = today.getFullYear();
@@ -650,20 +703,55 @@
     return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
   }
 
-  // ============================================================
-  // UPDATE DATE DISPLAY (Auto)
-  // ============================================================
   function updateDateDisplay() {
     const today = getTodayDate();
     currentDate = today;
     dateDisplay.textContent = formatDateDisplay(today);
   }
 
-  // ============================================================
-  // FETCH STUDENTS FROM ADMISSIONS
-  // ============================================================
+  function updateDueFee() {
+    const monthlyFee = parseFloat(monthlyFeeInput.value) || 0;
+    const paidFee = parseFloat(paidFeeInput.value) || 0;
+    const due = monthlyFee - paidFee;
+    if (due <= 0) {
+      dueFeeDisplay.innerHTML = `<i class="fas fa-check-circle" style="color:#10b981;"></i> ✅ No Due`;
+      dueFeeDisplay.style.color = '#10b981';
+    } else {
+      dueFeeDisplay.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:#dc3545;"></i> Due: ₹${due}`;
+      dueFeeDisplay.style.color = '#dc3545';
+    }
+  }
+
+  // 🔥 Parent View - Opens parent-view.html
+  parentViewBtn.addEventListener('click', function() {
+    // Pass session and class as query params
+    const session = sessionSelect.value;
+    const className = classSelect.value;
+    window.open(`parent-view.html?session=${session}&class=${className}`, '_blank');
+  });
+
+  function handleClassHoliday() {
+    if (classHolidayCheck.checked) {
+      holidayReasonGroup.style.display = 'flex';
+      holidayMsg.style.display = 'block';
+      tableWrap.style.display = 'none';
+      saveBtnContainer.style.display = 'none';
+      feeSection.style.display = 'none';
+      const reason = holidayReason.value.trim() || 'Holiday';
+      holidayReasonDisplay.textContent = reason.toUpperCase();
+      showToast(`🎉 Class Holiday: ${reason.toUpperCase()}`);
+    } else {
+      holidayReasonGroup.style.display = 'none';
+      holidayMsg.style.display = 'none';
+      tableWrap.style.display = 'block';
+      saveBtnContainer.style.display = 'flex';
+      feeSection.style.display = 'flex';
+      fetchStudents();
+    }
+  }
+
   async function fetchStudents() {
-    if (holidayCheck.checked) return;
+    if (classHolidayCheck.checked) return;
     
     const selectedClass = classSelect.value;
     const selectedSession = sessionSelect.value;
@@ -679,17 +767,15 @@
     try {
       tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:40px;color:#1f4b9e;">
         <i class="fas fa-spinner fa-spin" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
-        Loading students for ${selectedClass} (${selectedSession})...
+        Loading students...
       </td></tr>`;
 
-      // Query admissions with both class and session
       let snapshot = await db.collection('admissions')
         .where('classApplying', '==', selectedClass)
         .where('session', '==', selectedSession)
         .get();
 
       if (snapshot.empty) {
-        // Try with 'class' field
         snapshot = await db.collection('admissions')
           .where('class', '==', selectedClass)
           .where('session', '==', selectedSession)
@@ -720,13 +806,11 @@
 
       students.sort((a, b) => a.roll - b.roll);
 
-      // Initialize attendance data
       attendanceData = {};
       students.forEach(s => {
         attendanceData[s.roll] = { status: 'present', remark: '' };
       });
 
-      // Load existing attendance for today
       await loadExistingAttendance();
       renderTable();
 
@@ -739,9 +823,6 @@
     }
   }
 
-  // ============================================================
-  // LOAD EXISTING ATTENDANCE (Student-wise collection)
-  // ============================================================
   async function loadExistingAttendance() {
     try {
       const selectedSession = sessionSelect.value;
@@ -750,14 +831,13 @@
 
       if (!selectedSession || !selectedClass || students.length === 0) return;
 
-      // For each student, check if attendance exists for today
       for (const student of students) {
         const docRef = db.collection('attendance')
           .doc(selectedSession)
           .collection('classes')
           .doc(selectedClass)
           .collection('students')
-          .doc(student.name) // Student name as document ID
+          .doc(student.name)
           .collection('attendance')
           .doc(today);
 
@@ -775,9 +855,6 @@
     }
   }
 
-  // ============================================================
-  // RENDER TABLE
-  // ============================================================
   function renderTable() {
     if (students.length === 0) {
       tbody.innerHTML = `<tr><td colspan="4" class="no-students-msg">
@@ -805,6 +882,7 @@
             <label><input type="radio" name="status_${s.roll}" value="present" ${status==='present'?'checked':''}> P</label>
             <label><input type="radio" name="status_${s.roll}" value="absent" ${status==='absent'?'checked':''}> A</label>
             <label><input type="radio" name="status_${s.roll}" value="leave" ${status==='leave'?'checked':''}> L</label>
+            <label class="holiday-option"><input type="radio" name="status_${s.roll}" value="holiday" ${status==='holiday'?'checked':''}> H</label>
           </div>
         </td>
         <td>
@@ -814,7 +892,6 @@
     });
     tbody.innerHTML = html;
 
-    // Attach event listeners
     document.querySelectorAll('#attendanceTable tbody tr').forEach(row => {
       const nameDiv = row.querySelector('.student-name');
       if (!nameDiv) return;
@@ -847,14 +924,14 @@
     });
   }
 
-  // ============================================================
-  // GENERATE INDIVIDUAL REPORT
-  // ============================================================
   function generateIndividualReport(roll, name) {
     const rec = attendanceData[roll] || { status: 'present', remark: '' };
     const dateStr = formatDateDisplay(currentDate);
     const classVal = classSelect.value;
     const session = sessionSelect.value;
+    const monthlyFee = monthlyFeeInput.value || '0';
+    const paidFee = paidFeeInput.value || '0';
+    const due = parseFloat(monthlyFee) - parseFloat(paidFee);
 
     const content = `📋 INDIVIDUAL ATTENDANCE REPORT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -867,6 +944,11 @@
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ Status: ${rec.status.toUpperCase()}
 📝 Remark: ${rec.remark || '—'}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💰 FEE DETAILS
+   Monthly Fee: ₹${monthlyFee}
+   Paid: ₹${paidFee}
+   Due: ₹${due > 0 ? due : '0 (Paid Full)'}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📅 Report generated: ${new Date().toLocaleString()}
 `;
@@ -883,9 +965,7 @@
     showToast(`📥 ${name}'s report downloaded!`);
   }
 
-  // ============================================================
-  // SAVE ATTENDANCE (Student-wise collection)
-  // ============================================================
+  // 🔥 SAVE ATTENDANCE with Holiday Reason
   async function saveAttendance() {
     if (isSaving) return;
     if (students.length === 0) {
@@ -907,10 +987,35 @@
     saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
     try {
-      // Save each student's attendance
       const batch = db.batch();
       let savedCount = 0;
 
+      // 🔥 Save Holiday if checked
+      if (classHolidayCheck.checked) {
+        const reason = holidayReason.value.trim() || 'Holiday';
+        // Save holiday info in a separate document
+        const holidayDocRef = db.collection('attendance')
+          .doc(selectedSession)
+          .collection('classes')
+          .doc(selectedClass)
+          .collection('holidays')
+          .doc(today);
+        
+        batch.set(holidayDocRef, {
+          reason: reason,
+          date: today,
+          session: selectedSession,
+          class: selectedClass,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showToast(`🎉 Holiday saved: ${reason}`);
+        isSaving = false;
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Attendance';
+        return;
+      }
+
+      // Save each student's attendance
       for (const student of students) {
         const rec = attendanceData[student.roll] || { status: 'present', remark: '' };
         
@@ -919,7 +1024,7 @@
           .collection('classes')
           .doc(selectedClass)
           .collection('students')
-          .doc(student.name) // Student name as document ID
+          .doc(student.name)
           .collection('attendance')
           .doc(today);
 
@@ -930,13 +1035,16 @@
           roll: student.roll,
           date: today,
           session: selectedSession,
-          class: selectedClass
+          class: selectedClass,
+          monthlyFee: parseFloat(monthlyFeeInput.value) || 0,
+          paidFee: parseFloat(paidFeeInput.value) || 0,
+          dueFee: (parseFloat(monthlyFeeInput.value) || 0) - (parseFloat(paidFeeInput.value) || 0)
         });
         savedCount++;
       }
 
       await batch.commit();
-      showToast(`✅ Attendance saved for ${savedCount} students (${formatDateDisplay(today)})!`);
+      showToast(`✅ Attendance saved for ${savedCount} students!`);
     } catch (error) {
       console.error('Error saving attendance:', error);
       showToast('❌ Error saving attendance: ' + error.message, true);
@@ -948,94 +1056,7 @@
   }
 
   // ============================================================
-  // PARENT VIEW (Fast lookup from student's collection)
-  // ============================================================
-  parentViewBtn.addEventListener('click', function() {
-    parentViewBox.style.display = parentViewBox.style.display === 'none' ? 'flex' : 'none';
-  });
-
-  parentViewSubmit.addEventListener('click', async function() {
-    const rollVal = rollInput.value.trim();
-    if (!rollVal) {
-      showToast('Please enter a Roll number', true);
-      return;
-    }
-    const rollNum = parseInt(rollVal);
-    const found = students.find(s => s.roll === rollNum);
-    if (!found) {
-      showToast(`Roll ${rollNum} not found in current class`, true);
-      return;
-    }
-
-    // Fast lookup: directly access student's collection
-    try {
-      const selectedSession = sessionSelect.value;
-      const selectedClass = classSelect.value;
-      const today = getTodayDate();
-
-      const docRef = db.collection('attendance')
-        .doc(selectedSession)
-        .collection('classes')
-        .doc(selectedClass)
-        .collection('students')
-        .doc(found.name)
-        .collection('attendance')
-        .doc(today);
-
-      const docSnap = await docRef.get();
-      let status = 'Not marked';
-      let remark = '';
-      if (docSnap.exists) {
-        const data = docSnap.data();
-        status = data.status || 'Not marked';
-        remark = data.remark || '';
-      }
-
-      const statusEmoji = status === 'present' ? '✅' : status === 'absent' ? '❌' : status === 'leave' ? '🟡' : '⏳';
-      const dateStr = formatDateDisplay(today);
-      showToast(`${found.name} (${rollNum}) ${statusEmoji} ${status.toUpperCase()} ${remark ? '| '+remark : ''} (${dateStr})`);
-    } catch (error) {
-      showToast('Error fetching attendance: ' + error.message, true);
-    }
-  });
-
-  // ============================================================
-  // MONTHLY REPORT
-  // ============================================================
-  document.getElementById('monthlyReportBtn').addEventListener('click', function() {
-    if (students.length === 0) {
-      showToast('No students to show report!', true);
-      return;
-    }
-    const monthName = new Date().toLocaleString('default', { month: 'long' });
-    const year = new Date().getFullYear();
-    const classVal = classSelect.value;
-    const session = sessionSelect.value;
-    
-    let report = `📅 MONTHLY ATTENDANCE REPORT - ${monthName} ${year}\n`;
-    report += `🏫 Class: ${classVal}\n`;
-    report += `📆 Session: ${session}\n`;
-    report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    
-    let present = 0, absent = 0, leave = 0, notMarked = 0;
-    students.forEach(s => {
-      const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
-      report += `${s.name} (${s.roll}) → ${rec.status.toUpperCase()}`;
-      if (rec.remark) report += ` | ${rec.remark}`;
-      report += '\n';
-      if (rec.status === 'present') present++;
-      else if (rec.status === 'absent') absent++;
-      else if (rec.status === 'leave') leave++;
-      else notMarked++;
-    });
-    report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    report += `📊 Summary: P=${present} | A=${absent} | L=${leave} | Total=${students.length}`;
-    
-    alert(report);
-  });
-
-  // ============================================================
-  // DOWNLOAD DAILY PDF
+  // DAILY PDF
   // ============================================================
   document.getElementById('downloadDailyBtn').addEventListener('click', function() {
     if (students.length === 0) {
@@ -1045,6 +1066,7 @@
     const dateStr = formatDateDisplay(currentDate);
     const classVal = classSelect.value;
     const session = sessionSelect.value;
+    const monthlyFee = monthlyFeeInput.value || '0';
     
     let content = `📋 DAILY ATTENDANCE REPORT\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
@@ -1052,18 +1074,25 @@
     content += `📚 Class: ${classVal}\n`;
     content += `📆 Session: ${session}\n`;
     content += `📅 Date: ${dateStr}\n`;
+    content += `💰 Monthly Fee: ₹${monthlyFee}\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
     
+    let present = 0, absent = 0, leave = 0, holiday = 0;
     students.forEach(s => {
       const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
-      const statusSymbol = rec.status === 'present' ? '✅' : rec.status === 'absent' ? '❌' : '🟡';
+      const statusSymbol = rec.status === 'present' ? '✅' : rec.status === 'absent' ? '❌' : rec.status === 'leave' ? '🟡' : '🎉';
       content += `${statusSymbol} ${s.name} (${s.roll}) → ${rec.status.toUpperCase()}`;
       if (rec.remark) content += ` | ${rec.remark}`;
       content += '\n';
+      if (rec.status === 'present') present++;
+      else if (rec.status === 'absent') absent++;
+      else if (rec.status === 'leave') leave++;
+      else if (rec.status === 'holiday') holiday++;
     });
     
     content += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    content += `📊 Generated: ${new Date().toLocaleString()}`;
+    content += `📊 SUMMARY: P=${present} | A=${absent} | L=${leave} | H=${holiday} | Total=${students.length}\n`;
+    content += `📅 Generated: ${new Date().toLocaleString()}`;
 
     const blob = new Blob([content], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
@@ -1078,7 +1107,7 @@
   });
 
   // ============================================================
-  // DOWNLOAD MONTHLY PDF
+  // MONTHLY PDF
   // ============================================================
   document.getElementById('downloadMonthlyBtn').addEventListener('click', function() {
     if (students.length === 0) {
@@ -1089,6 +1118,7 @@
     const year = new Date().getFullYear();
     const classVal = classSelect.value;
     const session = sessionSelect.value;
+    const monthlyFee = monthlyFeeInput.value || '0';
     
     let content = `📊 MONTHLY ATTENDANCE REPORT\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
@@ -1096,9 +1126,10 @@
     content += `📚 Class: ${classVal}\n`;
     content += `📆 Session: ${session}\n`;
     content += `📆 Month: ${monthName} ${year}\n`;
+    content += `💰 Monthly Fee: ₹${monthlyFee}\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
     
-    let present = 0, absent = 0, leave = 0;
+    let present = 0, absent = 0, leave = 0, holiday = 0;
     students.forEach(s => {
       const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
       content += `👤 ${s.name} (${s.roll})\n`;
@@ -1108,6 +1139,7 @@
       if (rec.status === 'present') present++;
       else if (rec.status === 'absent') absent++;
       else if (rec.status === 'leave') leave++;
+      else if (rec.status === 'holiday') holiday++;
     });
     
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
@@ -1115,6 +1147,7 @@
     content += `✅ Present: ${present}\n`;
     content += `❌ Absent: ${absent}\n`;
     content += `🟡 Leave: ${leave}\n`;
+    content += `🎉 Holiday: ${holiday}\n`;
     content += `📌 Total Students: ${students.length}\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     content += `📅 Generated: ${new Date().toLocaleString()}`;
@@ -1132,34 +1165,46 @@
   });
 
   // ============================================================
-  // HANDLE HOLIDAY TOGGLE
+  // MONTHLY REPORT (Alert)
   // ============================================================
-  function handleHolidayToggle() {
-    if (holidayCheck.checked) {
-      holidayMsg.style.display = 'block';
-      tableWrap.style.display = 'none';
-      saveBtnContainer.style.display = 'none';
-      classFilterRow.style.display = 'none';
-      showToast('🎉 Holiday mode ON - No attendance today');
-    } else {
-      holidayMsg.style.display = 'none';
-      tableWrap.style.display = 'block';
-      saveBtnContainer.style.display = 'flex';
-      classFilterRow.style.display = 'flex';
-      fetchStudents();
+  document.getElementById('monthlyReportBtn').addEventListener('click', function() {
+    if (students.length === 0) {
+      showToast('No students to show report!', true);
+      return;
     }
-  }
+    const monthName = new Date().toLocaleString('default', { month: 'long' });
+    const year = new Date().getFullYear();
+    const classVal = classSelect.value;
+    const session = sessionSelect.value;
+    
+    let report = `📅 MONTHLY ATTENDANCE - ${monthName} ${year}\n`;
+    report += `🏫 Class: ${classVal} | Session: ${session}\n`;
+    report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    
+    let present = 0, absent = 0, leave = 0, holiday = 0;
+    students.forEach(s => {
+      const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
+      report += `${s.name} (${s.roll}) → ${rec.status.toUpperCase()}`;
+      if (rec.remark) report += ` | ${rec.remark}`;
+      report += '\n';
+      if (rec.status === 'present') present++;
+      else if (rec.status === 'absent') absent++;
+      else if (rec.status === 'leave') leave++;
+      else if (rec.status === 'holiday') holiday++;
+    });
+    report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    report += `📊 Summary: P=${present} | A=${absent} | L=${leave} | H=${holiday} | Total=${students.length}`;
+    
+    alert(report);
+  });
 
   // ============================================================
   // INIT
   // ============================================================
   async function init() {
     updateDateDisplay();
-    
-    // Auto-select session 2026-27
     sessionSelect.value = '2026-27';
-    
-    // Load students
+    updateDueFee();
     await fetchStudents();
   }
 
@@ -1167,34 +1212,34 @@
   // EVENT LISTENERS
   // ============================================================
   classSelect.addEventListener('change', function() {
-    if (!holidayCheck.checked) fetchStudents();
+    if (!classHolidayCheck.checked) fetchStudents();
   });
 
   sessionSelect.addEventListener('change', function() {
-    if (!holidayCheck.checked) fetchStudents();
+    if (!classHolidayCheck.checked) fetchStudents();
   });
 
-  holidayCheck.addEventListener('change', handleHolidayToggle);
+  classHolidayCheck.addEventListener('change', handleClassHoliday);
+
+  holidayReason.addEventListener('input', function() {
+    const reason = this.value.trim() || 'Holiday';
+    holidayReasonDisplay.textContent = reason.toUpperCase();
+  });
+
+  monthlyFeeInput.addEventListener('input', updateDueFee);
+  paidFeeInput.addEventListener('input', updateDueFee);
 
   saveBtn.addEventListener('click', saveAttendance);
 
   refreshBtn.addEventListener('click', function() {
-    if (!holidayCheck.checked) fetchStudents();
+    if (!classHolidayCheck.checked) fetchStudents();
     showToast('🔄 Refreshed!');
   });
 
-  rollInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') parentViewSubmit.click();
-  });
-
-  // Auto-update date every minute
   setInterval(() => {
     updateDateDisplay();
   }, 60000);
 
-  // ============================================================
-  // AUTH CHECK
-  // ============================================================
   auth.onAuthStateChanged((user) => {
     if (!user) {
       showToast('⚠️ Please login from main page!', true);
@@ -1207,9 +1252,9 @@
   });
 
   console.log('✅ Attendance System Loaded!');
-  console.log('📌 Firebase Structure: attendance/{session}/classes/{class}/students/{studentName}/attendance/{date}');
-  console.log('📌 Auto date: Today\'s date is auto-selected');
-  console.log('📌 Session: 2026-27 auto-selected');
+  console.log('📌 Parent View opens new page: parent-view.html');
+  console.log('📌 Holiday saved with reason in Firebase');
+  console.log('📌 Fees: Monthly Fee, Paid, Due - per student');
 </script>
 </body>
 </html>
