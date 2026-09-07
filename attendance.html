@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -18,7 +17,7 @@
       font-family: 'Inter', sans-serif;
       background: #f0f6ff;
       min-height: 100vh;
-      padding: 20px 16px 40px;
+      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -29,75 +28,89 @@
       background: #ffffff;
       border-radius: 40px 40px 32px 32px;
       box-shadow: 0 20px 50px rgba(0, 40, 100, 0.12);
-      padding: 24px 22px 32px;
+      padding: 0;
       border: 1px solid rgba(255, 255, 255, 0.6);
+      height: 100vh;
+      max-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
+
+    /* 🔥 FIXED HEADER */
+    .fixed-header {
+      padding: 20px 22px 0 22px;
+      flex-shrink: 0;
+      background: white;
+      border-radius: 40px 40px 0 0;
+    }
+
     .header {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       border-bottom: 2px solid #e6effa;
-      padding-bottom: 18px;
+      padding-bottom: 14px;
     }
     .header h1 {
-      font-size: 1.9rem;
+      font-size: 1.7rem;
       font-weight: 700;
       background: linear-gradient(145deg, #0a2a66, #1f4b9e);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
     .header h1 i {
       background: #1f4b9e;
       -webkit-text-fill-color: white;
-      padding: 10px 12px;
+      padding: 8px 10px;
       border-radius: 60px;
-      font-size: 1.4rem;
+      font-size: 1.2rem;
       box-shadow: 0 6px 14px rgba(20, 60, 150, 0.25);
     }
     .header .date-display {
       background: #eef5fe;
-      padding: 8px 20px;
+      padding: 6px 16px;
       border-radius: 60px;
       font-weight: 600;
       color: #0a2a66;
       border: 1px solid #c7daf5;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
-    .header .date-display i { margin-right: 8px; }
+    .header .date-display i { margin-right: 6px; }
 
     .top-controls {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 12px 20px;
+      gap: 10px 16px;
       background: #f4f9ff;
-      padding: 12px 20px;
+      padding: 10px 16px;
       border-radius: 60px;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       border: 1px solid #d7e5fc;
     }
     .top-controls .session-group {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
     .top-controls .session-group label {
       font-weight: 600;
       color: #0f3b7a;
-      font-size: 0.9rem;
+      font-size: 0.8rem;
     }
     .top-controls .session-group select {
       border: 1px solid #b8cff0;
       border-radius: 40px;
-      padding: 8px 16px;
+      padding: 6px 14px;
       font-weight: 500;
       color: #0a2a66;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       outline: none;
       background: white;
       cursor: pointer;
@@ -107,13 +120,13 @@
       background: #0a2a66;
       border: none;
       border-radius: 60px;
-      padding: 8px 24px;
+      padding: 6px 18px;
       color: white;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       box-shadow: 0 6px 14px rgba(10, 42, 102, 0.25);
       cursor: pointer;
       border: 1px solid #3f6ec0;
@@ -127,11 +140,11 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 12px 18px;
+      gap: 10px 14px;
       background: #f4f9ff;
-      padding: 12px 20px;
+      padding: 10px 16px;
       border-radius: 60px;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       border: 1px solid #d7e5fc;
     }
     .class-filter label {
@@ -139,58 +152,61 @@
       color: #0f3b7a;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
+      font-size: 0.85rem;
     }
     .class-filter select {
       background: white;
       border: 1px solid #b8cff0;
       border-radius: 40px;
-      padding: 8px 24px 8px 18px;
+      padding: 6px 18px 6px 14px;
       font-weight: 500;
       color: #0a2a66;
-      font-size: 0.95rem;
+      font-size: 0.85rem;
       outline: none;
       cursor: pointer;
-      min-width: 160px;
+      min-width: 130px;
     }
+
+    /* 🔥 CLASS HOLIDAY - With Reason */
     .class-holiday-group {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       background: #fee2e2;
-      padding: 4px 16px 4px 12px;
+      padding: 4px 14px 4px 10px;
       border-radius: 40px;
       border: 1px solid #fecaca;
     }
     .class-holiday-group input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
       accent-color: #dc3545;
       cursor: pointer;
     }
     .class-holiday-group label {
       font-weight: 600;
       color: #991b1b;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       cursor: pointer;
     }
     .holiday-reason-group {
       display: none;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       background: #fff5f5;
-      padding: 4px 16px 4px 12px;
+      padding: 4px 14px 4px 10px;
       border-radius: 40px;
       border: 2px solid #dc3545;
     }
     .holiday-reason-group input {
       border: none;
       background: transparent;
-      padding: 6px 10px;
-      font-size: 0.85rem;
+      padding: 4px 8px;
+      font-size: 0.8rem;
       color: #991b1b;
       font-weight: 600;
-      width: 150px;
+      width: 120px;
       outline: none;
     }
     .holiday-reason-group input::placeholder {
@@ -204,44 +220,58 @@
     .holiday-msg {
       background: #fef2f2;
       border: 2px solid #fecaca;
-      border-radius: 20px;
-      padding: 30px;
+      border-radius: 16px;
+      padding: 20px;
       text-align: center;
       color: #991b1b;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       display: none;
     }
-    .holiday-msg i { font-size: 3rem; display: block; margin-bottom: 10px; }
-    .holiday-msg h2 { font-size: 1.5rem; }
+    .holiday-msg i { font-size: 2rem; display: block; margin-bottom: 8px; }
+    .holiday-msg h2 { font-size: 1.2rem; }
     .holiday-msg .reason-text { 
-      font-size: 1.2rem; 
+      font-size: 1rem; 
       font-weight: 700; 
       color: #dc3545; 
       background: white; 
-      padding: 8px 20px; 
+      padding: 6px 18px; 
       border-radius: 40px; 
       display: inline-block;
-      margin-top: 10px;
+      margin-top: 8px;
     }
+
+    /* 🔥 ATTENDANCE DONE MESSAGE */
+    .attendance-done-msg {
+      background: #d1fae5;
+      border: 2px solid #10b981;
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      color: #065f46;
+      margin-bottom: 12px;
+      display: none;
+    }
+    .attendance-done-msg i { font-size: 2rem; display: block; margin-bottom: 8px; color: #10b981; }
+    .attendance-done-msg h2 { font-size: 1.2rem; }
 
     .save-btn-container {
       display: flex;
       justify-content: flex-end;
-      margin-bottom: 16px;
-      gap: 12px;
+      margin-bottom: 10px;
+      gap: 10px;
       flex-wrap: wrap;
     }
     .save-btn {
       background: #10b981;
       border: none;
-      padding: 10px 28px;
+      padding: 8px 22px;
       border-radius: 60px;
       color: white;
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 0.85rem;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
       cursor: pointer;
       transition: 0.15s;
@@ -251,109 +281,190 @@
     .refresh-btn {
       background: #e2e8f0;
       border: none;
-      padding: 10px 20px;
+      padding: 8px 16px;
       border-radius: 60px;
       color: #1a237e;
       font-weight: 600;
+      font-size: 0.85rem;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       cursor: pointer;
     }
     .refresh-btn:hover { background: #cbd5e1; }
 
-    .table-wrap {
-      overflow-x: auto;
-      border-radius: 28px;
-      background: #fafcff;
-      padding: 4px 2px 6px 2px;
-      box-shadow: inset 0 0 0 1px rgba(60, 120, 210, 0.08);
+    /* 🔥 SUMMARY COUNTER */
+    .summary-counter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      background: #f8fafc;
+      padding: 8px 16px;
+      border-radius: 60px;
+      margin-bottom: 10px;
+      border: 1px solid #e2e8f0;
+      font-size: 0.8rem;
+      font-weight: 600;
     }
+    .summary-counter .count-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .summary-counter .count-item .num {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .count-total { color: #1a237e; }
+    .count-present { color: #10b981; }
+    .count-absent { color: #dc3545; }
+    .count-leave { color: #2563eb; }
+    .count-pending { color: #f59e0b; }
+
+    /* 🔥 SCROLLABLE TABLE */
+    .table-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 12px 12px 12px;
+      margin: 0 10px 10px 10px;
+      border-radius: 20px;
+      background: #fafcff;
+      border: 1px solid #e2e8f0;
+    }
+    .table-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .table-scroll::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    .table-scroll::-webkit-scrollbar-thumb {
+      background: #b8cff0;
+      border-radius: 10px;
+    }
+    .table-scroll::-webkit-scrollbar-thumb:hover {
+      background: #1f4b9e;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.95rem;
-      min-width: 720px;
+      font-size: 0.9rem;
+      min-width: 600px;
     }
     th {
       text-align: left;
-      padding: 16px 12px 12px 12px;
+      padding: 12px 10px 10px 10px;
       font-weight: 600;
       color: #0a2a66;
       background: #e7f0fe;
       border-bottom: 2px solid #bdd2f0;
+      position: sticky;
+      top: 0;
+      z-index: 5;
     }
     td {
-      padding: 12px 12px;
+      padding: 10px 10px;
       border-bottom: 1px solid #e2ecfc;
       vertical-align: middle;
       background: white;
     }
     tr:last-child td { border-bottom: none; }
+
     .student-name {
       font-weight: 600;
       color: #0a2a66;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       cursor: pointer;
+      font-size: 0.85rem;
     }
     .student-name:hover { color: #0033aa; text-decoration: underline; }
     .roll-badge {
       background: #e3edfe;
-      padding: 4px 12px;
+      padding: 3px 10px;
       border-radius: 40px;
       font-weight: 500;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: #0a2a66;
       display: inline-block;
     }
+
+    /* 🔥 ATTENDANCE ACTIONS - NO HOLIDAY */
     .attendance-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px 10px;
+      gap: 4px 8px;
       align-items: center;
     }
     .attendance-actions label {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       font-weight: 600;
-      font-size: 0.8rem;
-      color: #1f4170;
+      font-size: 0.75rem;
       cursor: pointer;
-      background: #f2f8ff;
-      padding: 4px 12px 4px 8px;
+      padding: 3px 10px 3px 6px;
       border-radius: 40px;
-      border: 1px solid transparent;
+      border: 2px solid transparent;
+      transition: all 0.2s;
     }
     .attendance-actions label input[type="radio"] {
-      accent-color: #0a2a66;
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       cursor: pointer;
     }
-    .attendance-actions label:has(input:checked) {
-      background: #d4e4fe;
-      border-color: #1f4b9e;
-      box-shadow: 0 0 0 2px rgba(26, 80, 180, 0.15);
+    /* 🔥 Present - Green */
+    .attendance-actions label.present-option {
+      background: #ecfdf5;
+      border-color: #d1fae5;
+      color: #065f46;
     }
-    .attendance-actions label.holiday-option {
-      background: #fee2e2;
-      border-color: #fecaca;
+    .attendance-actions label.present-option:has(input:checked) {
+      background: #10b981;
+      border-color: #10b981;
+      color: white;
     }
-    .attendance-actions label.holiday-option:has(input:checked) {
-      background: #fecaca;
+    .attendance-actions label.present-option:has(input:checked) input[type="radio"] {
+      accent-color: white;
+    }
+    /* 🔥 Absent - Red */
+    .attendance-actions label.absent-option {
+      background: #fef2f2;
+      border-color: #fee2e2;
+      color: #991b1b;
+    }
+    .attendance-actions label.absent-option:has(input:checked) {
+      background: #dc3545;
       border-color: #dc3545;
-      box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
+      color: white;
     }
+    .attendance-actions label.absent-option:has(input:checked) input[type="radio"] {
+      accent-color: white;
+    }
+    /* 🔥 Leave - Blue */
+    .attendance-actions label.leave-option {
+      background: #eff6ff;
+      border-color: #dbeafe;
+      color: #1e40af;
+    }
+    .attendance-actions label.leave-option:has(input:checked) {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: white;
+    }
+    .attendance-actions label.leave-option:has(input:checked) input[type="radio"] {
+      accent-color: white;
+    }
+
     .remark-input {
       border: 1px solid #c8dbf7;
       border-radius: 40px;
-      padding: 6px 14px;
-      font-size: 0.8rem;
+      padding: 4px 12px;
+      font-size: 0.75rem;
       background: white;
-      width: 100px;
+      width: 80px;
       color: #0a2a66;
     }
     .remark-input:focus {
@@ -362,34 +473,37 @@
       box-shadow: 0 0 0 3px rgba(10, 42, 102, 0.12);
     }
 
+    /* 🔥 REPORT ACTIONS */
     .report-actions {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      margin-top: 28px;
-      gap: 18px 12px;
+      padding: 10px 16px;
+      gap: 10px 12px;
       background: #edf5ff;
-      padding: 14px 20px;
       border-radius: 60px;
       border: 1px solid #c7dbfa;
+      flex-shrink: 0;
+      margin: 0 12px 12px 12px;
     }
     .report-actions .left {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 12px 20px;
+      gap: 10px 16px;
     }
     .report-actions .left .monthly-btn {
       background: white;
       border: 1px solid #b1caf0;
-      padding: 8px 28px;
+      padding: 6px 20px;
       border-radius: 60px;
       font-weight: 600;
       color: #0a2a66;
+      font-size: 0.8rem;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       cursor: pointer;
     }
     .report-actions .left .monthly-btn:hover {
@@ -398,23 +512,23 @@
     }
     .report-actions .right {
       display: flex;
-      gap: 12px;
+      gap: 8px;
       flex-wrap: wrap;
     }
     .download-btn {
       background: #0a2a66;
       border: none;
-      padding: 8px 24px;
+      padding: 6px 18px;
       border-radius: 60px;
       color: white;
       font-weight: 600;
+      font-size: 0.8rem;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
       box-shadow: 0 6px 16px rgba(10, 42, 102, 0.25);
       cursor: pointer;
       border: 1px solid #3c6fc0;
-      font-size: 0.9rem;
     }
     .download-btn:hover { background: #13458b; transform: scale(1.01); }
     .download-btn.outline {
@@ -424,6 +538,7 @@
       box-shadow: none;
     }
     .download-btn.outline:hover { background: #e8f0fe; }
+    .download-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
     .toast-msg {
       position: fixed;
@@ -432,9 +547,10 @@
       transform: translateX(-50%);
       background: #1a237e;
       color: white;
-      padding: 12px 28px;
+      padding: 10px 24px;
       border-radius: 60px;
       font-weight: 600;
+      font-size: 0.9rem;
       box-shadow: 0 10px 30px rgba(0,0,0,0.2);
       z-index: 9999;
       display: none;
@@ -443,114 +559,151 @@
     }
     .no-students-msg {
       text-align: center;
-      padding: 40px 20px;
+      padding: 30px 20px;
       color: #666;
     }
     .no-students-msg i {
-      font-size: 3rem;
+      font-size: 2.5rem;
       color: #cbd5e1;
       display: block;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
 
     @media (max-width: 720px) {
-      .container { padding: 18px 14px; }
-      .header h1 { font-size: 1.6rem; }
-      .header .date-display { font-size: 0.75rem; padding: 6px 14px; }
-      .top-controls { border-radius: 30px; padding: 14px; flex-direction: column; align-items: stretch; }
+      .fixed-header { padding: 14px 14px 0 14px; }
+      .header h1 { font-size: 1.3rem; }
+      .header .date-display { font-size: 0.7rem; padding: 4px 12px; }
+      .top-controls { border-radius: 30px; padding: 10px 14px; flex-direction: column; align-items: stretch; }
       .top-controls .view-parent-btn { margin-left: 0; justify-content: center; }
-      .class-filter { border-radius: 30px; padding: 14px; flex-direction: column; align-items: stretch; }
+      .class-filter { border-radius: 30px; padding: 10px 14px; flex-direction: column; align-items: stretch; }
       .holiday-reason-group input { width: 100%; }
+      .summary-counter { font-size: 0.7rem; gap: 6px 12px; justify-content: center; }
+      .table-scroll { padding: 0 6px 6px 6px; margin: 0 6px 6px 6px; }
+      td, th { padding: 8px 6px; font-size: 0.75rem; }
+      .attendance-actions label { font-size: 0.65rem; padding: 2px 6px 2px 4px; }
+      .remark-input { width: 50px; font-size: 0.65rem; padding: 3px 8px; }
       .report-actions { flex-direction: column; align-items: stretch; border-radius: 30px; }
-      .report-actions .left { flex-wrap: wrap; justify-content: center; }
+      .report-actions .left { justify-content: center; }
       .report-actions .right { justify-content: center; }
-      td, th { padding: 10px 8px; font-size: 0.8rem; }
-      .attendance-actions label { padding: 2px 8px; font-size: 0.7rem; }
-      .remark-input { width: 60px; }
       .save-btn-container { justify-content: center; }
+    }
+    @media (max-width: 480px) {
+      .fixed-header { padding: 10px 10px 0 10px; }
+      .header h1 { font-size: 1.1rem; }
+      .header h1 i { font-size: 1rem; padding: 6px 8px; }
+      .top-controls .session-group select { font-size: 0.75rem; padding: 4px 10px; }
+      .class-filter select { font-size: 0.75rem; padding: 4px 12px; }
+      .summary-counter { font-size: 0.6rem; gap: 4px 8px; }
+      .summary-counter .count-item .num { font-size: 0.8rem; }
+      td, th { padding: 6px 4px; font-size: 0.65rem; }
+      .attendance-actions label { font-size: 0.55rem; padding: 2px 4px 2px 3px; }
+      .attendance-actions label input[type="radio"] { width: 12px; height: 12px; }
+      .remark-input { width: 40px; font-size: 0.6rem; padding: 2px 6px; }
+      .save-btn { font-size: 0.75rem; padding: 6px 16px; }
+      .download-btn { font-size: 0.7rem; padding: 4px 12px; }
+      .report-actions .left .monthly-btn { font-size: 0.7rem; padding: 4px 14px; }
     }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <div class="header">
-    <h1><i class="fas fa-clipboard-check"></i> Attendance</h1>
-    <div class="date-display" id="dateDisplay">
-      <i class="fas fa-calendar-day"></i> <span id="todayDate">Loading...</span>
+  <!-- 🔥 FIXED HEADER -->
+  <div class="fixed-header">
+    <div class="header">
+      <h1><i class="fas fa-clipboard-check"></i> Attendance</h1>
+      <div class="date-display" id="dateDisplay">
+        <i class="fas fa-calendar-day"></i> <span id="todayDate">Loading...</span>
+      </div>
     </div>
-  </div>
 
-  <div class="top-controls">
-    <div class="session-group">
-      <label><i class="fas fa-calendar-alt"></i> Session:</label>
-      <select id="sessionSelect">
-        <option value="2026-27" selected>2026-27</option>
-        <option value="2027-28">2027-28</option>
-        <option value="2028-29">2028-29</option>
-        <option value="2029-30">2029-30</option>
-        <option value="2030-31">2030-31</option>
+    <div class="top-controls">
+      <div class="session-group">
+        <label><i class="fas fa-calendar-alt"></i> Session:</label>
+        <select id="sessionSelect">
+          <option value="2026-27" selected>2026-27</option>
+          <option value="2027-28">2027-28</option>
+          <option value="2028-29">2028-29</option>
+          <option value="2029-30">2029-30</option>
+          <option value="2030-31">2030-31</option>
+        </select>
+      </div>
+      <button class="view-parent-btn" id="parentViewBtn">
+        <i class="fas fa-eye"></i> Parent View
+      </button>
+    </div>
+
+    <div class="class-filter" id="classFilterRow">
+      <label><i class="fas fa-users"></i> Class</label>
+      <select id="classSelect">
+        <option value="">-- Select --</option>
+        <option value="6th">6th</option><option value="7th">7th</option>
+        <option value="8th">8th</option><option value="9th">9th</option>
+        <option value="10th">10th</option>
+        <option value="11th (Science)">11th (Science)</option>
+        <option value="11th (Commerce)">11th (Commerce)</option>
+        <option value="11th (Arts)">11th (Arts)</option>
+        <option value="12th (Science)">12th (Science)</option>
+        <option value="12th (Commerce)">12th (Commerce)</option>
+        <option value="12th (Arts)">12th (Arts)</option>
       </select>
-    </div>
-    <button class="view-parent-btn" id="parentViewBtn">
-      <i class="fas fa-eye"></i> Parent View (Roll No.)
-    </button>
-  </div>
 
-  <div class="class-filter" id="classFilterRow">
-    <label><i class="fas fa-users"></i> Class</label>
-    <select id="classSelect">
-      <option value="">-- Select Class --</option>
-      <option value="6th">6th</option>
-      <option value="7th">7th</option>
-      <option value="8th">8th</option>
-      <option value="9th">9th</option>
-      <option value="10th">10th</option>
-      <option value="11th (Science)">11th (Science)</option>
-      <option value="11th (Commerce)">11th (Commerce)</option>
-      <option value="11th (Arts)">11th (Arts)</option>
-      <option value="12th (Science)">12th (Science)</option>
-      <option value="12th (Commerce)">12th (Commerce)</option>
-      <option value="12th (Arts)">12th (Arts)</option>
-    </select>
-
-    <div class="class-holiday-group">
-      <input type="checkbox" id="classHolidayCheck">
-      <label for="classHolidayCheck"><i class="fas fa-calendar-times"></i> Class Holiday</label>
+      <!-- 🔥 CLASS HOLIDAY -->
+      <div class="class-holiday-group">
+        <input type="checkbox" id="classHolidayCheck">
+        <label for="classHolidayCheck"><i class="fas fa-calendar-times"></i> Holiday</label>
+      </div>
+      <div class="holiday-reason-group" id="holidayReasonGroup">
+        <i class="fas fa-pen"></i>
+        <input type="text" id="holidayReason" placeholder="Reason: SUNDAY, JANAMASHTMI...">
+      </div>
     </div>
 
-    <div class="holiday-reason-group" id="holidayReasonGroup">
-      <i class="fas fa-pen"></i>
-      <input type="text" id="holidayReason" placeholder="Reason: SUNDAY, JANAMASHTMI...">
+    <!-- Holiday Message -->
+    <div class="holiday-msg" id="holidayMsg">
+      <i class="fas fa-calendar-times"></i>
+      <h2>🎉 Class Holiday!</h2>
+      <div class="reason-text" id="holidayReasonDisplay">HOLIDAY</div>
+    </div>
+
+    <!-- 🔥 Attendance Done Message -->
+    <div class="attendance-done-msg" id="attendanceDoneMsg">
+      <i class="fas fa-check-circle"></i>
+      <h2>✅ Attendance Already Marked!</h2>
+      <p id="attendanceDoneInfo">Attendance has been completed for this class today.</p>
+    </div>
+
+    <!-- 🔥 SUMMARY COUNTER -->
+    <div class="summary-counter" id="summaryCounter">
+      <span class="count-item count-total">📌 Total: <span class="num" id="totalCount">0</span></span>
+      <span class="count-item count-present">✅ P: <span class="num" id="presentCount">0</span></span>
+      <span class="count-item count-absent">❌ A: <span class="num" id="absentCount">0</span></span>
+      <span class="count-item count-leave">🟡 L: <span class="num" id="leaveCount">0</span></span>
+      <span class="count-item count-pending">⏳ Pending: <span class="num" id="pendingCount">0</span></span>
+    </div>
+
+    <!-- SAVE BUTTON -->
+    <div class="save-btn-container" id="saveBtnContainer">
+      <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync"></i> Refresh</button>
+      <button class="save-btn" id="saveAttendanceBtn">
+        <i class="fas fa-save"></i> Save Attendance
+      </button>
     </div>
   </div>
 
-  <div class="holiday-msg" id="holidayMsg">
-    <i class="fas fa-calendar-times"></i>
-    <h2>🎉 Class Holiday Today!</h2>
-    <div class="reason-text" id="holidayReasonDisplay">HOLIDAY</div>
-    <p style="margin-top: 10px;">No attendance will be marked for this class.</p>
-  </div>
-
-  <div class="save-btn-container" id="saveBtnContainer">
-    <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync"></i> Refresh</button>
-    <button class="save-btn" id="saveAttendanceBtn">
-      <i class="fas fa-save"></i> Save Attendance
-    </button>
-  </div>
-
-  <div class="table-wrap" id="tableWrap">
+  <!-- 🔥 SCROLLABLE TABLE -->
+  <div class="table-scroll" id="tableScroll">
     <table id="attendanceTable">
       <thead>
         <tr>
-          <th>Student</th>
-          <th>Roll</th>
-          <th>Status (P/A/L/H)</th>
-          <th>Remarks</th>
+          <th style="width:35%;">Student</th>
+          <th style="width:15%;">Roll</th>
+          <th style="width:30%;">Status (P/A/L)</th>
+          <th style="width:20%;">Remarks</th>
         </tr>
       </thead>
       <tbody id="tableBody">
-        <tr><td colspan="4" style="text-align:center;padding:40px;color:#1f4b9e;">
+        <tr><td colspan="4" style="text-align:center;padding:30px;color:#1f4b9e;">
           <i class="fas fa-spinner fa-spin" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
           Select session and class to load students...
         </td></tr>
@@ -558,13 +711,14 @@
     </table>
   </div>
 
+  <!-- REPORT ACTIONS -->
   <div class="report-actions">
     <div class="left">
       <button class="monthly-btn" id="monthlyReportBtn">
         <i class="fas fa-file-alt"></i> Monthly Report
       </button>
-      <span style="color:#1f4170; font-weight:500;">
-        <i class="fas fa-print"></i> Daily attendance
+      <span style="color:#1f4170; font-weight:500; font-size:0.8rem;">
+        <i class="fas fa-print"></i> Daily
       </span>
     </div>
     <div class="right">
@@ -610,7 +764,9 @@
   const holidayReasonGroup = document.getElementById('holidayReasonGroup');
   const holidayMsg = document.getElementById('holidayMsg');
   const holidayReasonDisplay = document.getElementById('holidayReasonDisplay');
-  const tableWrap = document.getElementById('tableWrap');
+  const attendanceDoneMsg = document.getElementById('attendanceDoneMsg');
+  const attendanceDoneInfo = document.getElementById('attendanceDoneInfo');
+  const tableScroll = document.getElementById('tableScroll');
   const saveBtnContainer = document.getElementById('saveBtnContainer');
   const classFilterRow = document.getElementById('classFilterRow');
   const parentViewBtn = document.getElementById('parentViewBtn');
@@ -618,10 +774,18 @@
   const refreshBtn = document.getElementById('refreshBtn');
   const toast = document.getElementById('toastMsg');
 
+  // Summary counters
+  const totalCount = document.getElementById('totalCount');
+  const presentCount = document.getElementById('presentCount');
+  const absentCount = document.getElementById('absentCount');
+  const leaveCount = document.getElementById('leaveCount');
+  const pendingCount = document.getElementById('pendingCount');
+
   let students = [];
   let attendanceData = {};
   let isSaving = false;
   let currentDate = '';
+  let isAttendanceDone = false;
 
   // ============================================================
   // HELPER: Show Toast
@@ -657,11 +821,95 @@
   }
 
   // ============================================================
+  // UPDATE SUMMARY COUNTER
+  // ============================================================
+  function updateSummary() {
+    const total = students.length;
+    let present = 0, absent = 0, leave = 0, pending = 0;
+
+    students.forEach(s => {
+      const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
+      if (rec.status === 'present') present++;
+      else if (rec.status === 'absent') absent++;
+      else if (rec.status === 'leave') leave++;
+      else pending++;
+    });
+
+    totalCount.textContent = total;
+    presentCount.textContent = present;
+    absentCount.textContent = absent;
+    leaveCount.textContent = leave;
+    pendingCount.textContent = pending;
+  }
+
+  // ============================================================
+  // CHECK IF ATTENDANCE IS ALREADY DONE
+  // ============================================================
+  async function checkAttendanceDone() {
+    const selectedSession = sessionSelect.value;
+    const selectedClass = classSelect.value;
+    const today = getTodayDate();
+
+    if (!selectedSession || !selectedClass || students.length === 0) {
+      isAttendanceDone = false;
+      attendanceDoneMsg.style.display = 'none';
+      return;
+    }
+
+    try {
+      // Check if all students have attendance marked for today
+      let allMarked = true;
+      let anyMarked = false;
+
+      for (const student of students) {
+        const docRef = db.collection('attendance')
+          .doc(selectedSession)
+          .collection('classes')
+          .doc(selectedClass)
+          .collection('students')
+          .doc(student.name)
+          .collection('attendance')
+          .doc(today);
+
+        const docSnap = await docRef.get();
+        if (docSnap.exists) {
+          anyMarked = true;
+        } else {
+          allMarked = false;
+        }
+      }
+
+      // If all students have attendance, mark as done
+      if (allMarked && students.length > 0 && anyMarked) {
+        isAttendanceDone = true;
+        attendanceDoneMsg.style.display = 'block';
+        attendanceDoneInfo.textContent = `✅ All ${students.length} students have been marked for ${formatDateDisplay(today)}.`;
+        // Disable editing
+        tableScroll.style.opacity = '0.5';
+        saveBtn.style.display = 'none';
+      } else {
+        isAttendanceDone = false;
+        attendanceDoneMsg.style.display = 'none';
+        tableScroll.style.opacity = '1';
+        saveBtn.style.display = 'flex';
+      }
+    } catch (error) {
+      console.warn('Could not check attendance status:', error);
+      isAttendanceDone = false;
+      attendanceDoneMsg.style.display = 'none';
+    }
+  }
+
+  // ============================================================
   // PARENT VIEW - Opens parent-view.html
   // ============================================================
   parentViewBtn.addEventListener('click', function() {
     const session = sessionSelect.value;
     const className = classSelect.value;
+    if (!className) {
+      showToast('Please select a class first!', true);
+      return;
+    }
     window.open(`parent-view.html?session=${session}&class=${className}`, '_blank');
   });
 
@@ -672,16 +920,16 @@
     if (classHolidayCheck.checked) {
       holidayReasonGroup.style.display = 'flex';
       holidayMsg.style.display = 'block';
-      tableWrap.style.display = 'none';
+      tableScroll.style.display = 'none';
       saveBtnContainer.style.display = 'none';
-      classFilterRow.style.display = 'flex';
+      attendanceDoneMsg.style.display = 'none';
       const reason = holidayReason.value.trim() || 'Holiday';
       holidayReasonDisplay.textContent = reason.toUpperCase();
-      showToast(`🎉 Class Holiday: ${reason.toUpperCase()}`);
+      showToast(`🎉 Holiday: ${reason.toUpperCase()}`);
     } else {
       holidayReasonGroup.style.display = 'none';
       holidayMsg.style.display = 'none';
-      tableWrap.style.display = 'block';
+      tableScroll.style.display = 'block';
       saveBtnContainer.style.display = 'flex';
       fetchStudents();
     }
@@ -701,11 +949,14 @@
         <i class="fas fa-info-circle" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
         Please select Session and Class.
       </td></tr>`;
+      students = [];
+      attendanceData = {};
+      updateSummary();
       return;
     }
 
     try {
-      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:40px;color:#1f4b9e;">
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:#1f4b9e;">
         <i class="fas fa-spinner fa-spin" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
         Loading students...
       </td></tr>`;
@@ -730,6 +981,7 @@
         </td></tr>`;
         students = [];
         attendanceData = {};
+        updateSummary();
         return;
       }
 
@@ -753,6 +1005,8 @@
 
       await loadExistingAttendance();
       renderTable();
+      await checkAttendanceDone();
+      updateSummary();
 
     } catch (error) {
       console.error('Error fetching students:', error);
@@ -799,7 +1053,7 @@
   }
 
   // ============================================================
-  // RENDER TABLE
+  // RENDER TABLE - No Holiday option
   // ============================================================
   function renderTable() {
     if (students.length === 0) {
@@ -825,10 +1079,9 @@
         <td><span class="roll-badge">${s.roll}</span></td>
         <td>
           <div class="attendance-actions">
-            <label><input type="radio" name="status_${s.roll}" value="present" ${status==='present'?'checked':''}> P</label>
-            <label><input type="radio" name="status_${s.roll}" value="absent" ${status==='absent'?'checked':''}> A</label>
-            <label><input type="radio" name="status_${s.roll}" value="leave" ${status==='leave'?'checked':''}> L</label>
-            <label class="holiday-option"><input type="radio" name="status_${s.roll}" value="holiday" ${status==='holiday'?'checked':''}> H</label>
+            <label class="present-option"><input type="radio" name="status_${s.roll}" value="present" ${status==='present'?'checked':''}> P</label>
+            <label class="absent-option"><input type="radio" name="status_${s.roll}" value="absent" ${status==='absent'?'checked':''}> A</label>
+            <label class="leave-option"><input type="radio" name="status_${s.roll}" value="leave" ${status==='leave'?'checked':''}> L</label>
           </div>
         </td>
         <td>
@@ -849,6 +1102,7 @@
           if (this.checked) {
             attendanceData[roll] = attendanceData[roll] || {};
             attendanceData[roll].status = this.value;
+            updateSummary();
           }
         });
       });
@@ -868,6 +1122,8 @@
         generateIndividualReport(roll, name);
       });
     });
+
+    updateSummary();
   }
 
   // ============================================================
@@ -894,16 +1150,23 @@
 📅 Report generated: ${new Date().toLocaleString()}
 `;
 
+    downloadAsPDF(content, `${name}_${roll}_attendance.pdf`);
+    showToast(`📥 ${name}'s report downloaded!`);
+  }
+
+  // ============================================================
+  // PDF DOWNLOAD HELPER (A4 Size)
+  // ============================================================
+  function downloadAsPDF(content, filename) {
     const blob = new Blob([content], { type: 'application/pdf' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${name}_${roll}_attendance.pdf`;
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast(`📥 ${name}'s report downloaded!`);
   }
 
   // ============================================================
@@ -931,7 +1194,6 @@
 
     try {
       const batch = db.batch();
-      let savedCount = 0;
 
       // 🔥 Save Holiday if checked
       if (classHolidayCheck.checked) {
@@ -959,6 +1221,7 @@
       }
 
       // Save each student's attendance
+      let savedCount = 0;
       for (const student of students) {
         const rec = attendanceData[student.roll] || { status: 'present', remark: '' };
         
@@ -985,6 +1248,11 @@
 
       await batch.commit();
       showToast(`✅ Attendance saved for ${savedCount} students!`);
+      
+      // Check if attendance is now complete
+      await checkAttendanceDone();
+      updateSummary();
+
     } catch (error) {
       console.error('Error saving attendance:', error);
       showToast('❌ Error saving attendance: ' + error.message, true);
@@ -996,7 +1264,7 @@
   }
 
   // ============================================================
-  // DAILY PDF
+  // DAILY PDF - A4 Size
   // ============================================================
   document.getElementById('downloadDailyBtn').addEventListener('click', function() {
     if (students.length === 0) {
@@ -1007,45 +1275,38 @@
     const classVal = classSelect.value;
     const session = sessionSelect.value;
     
-    let content = `📋 DAILY ATTENDANCE REPORT\n`;
-    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    content += `🏫 Quest Coaching Centre\n`;
-    content += `📚 Class: ${classVal}\n`;
-    content += `📆 Session: ${session}\n`;
-    content += `📅 Date: ${dateStr}\n`;
-    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+    let content = `📋 DAILY ATTENDANCE REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏫 QUEST COACHING CENTRE
+📚 Class: ${classVal}
+📆 Session: ${session}
+📅 Date: ${dateStr}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
     
-    let present = 0, absent = 0, leave = 0, holiday = 0;
+    let present = 0, absent = 0, leave = 0;
     students.forEach(s => {
       const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
-      const statusSymbol = rec.status === 'present' ? '✅' : rec.status === 'absent' ? '❌' : rec.status === 'leave' ? '🟡' : '🎉';
-      content += `${statusSymbol} ${s.name} (${s.roll}) → ${rec.status.toUpperCase()}`;
-      if (rec.remark) content += ` | ${rec.remark}`;
+      const statusSymbol = rec.status === 'present' ? '✅' : rec.status === 'absent' ? '❌' : '🟡';
+      content += `${statusSymbol}  ${s.name.padEnd(20)}  Roll: ${String(s.roll).padEnd(5)}  →  ${rec.status.toUpperCase()}`;
+      if (rec.remark) content += `  |  ${rec.remark}`;
       content += '\n';
       if (rec.status === 'present') present++;
       else if (rec.status === 'absent') absent++;
       else if (rec.status === 'leave') leave++;
-      else if (rec.status === 'holiday') holiday++;
     });
     
-    content += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    content += `📊 SUMMARY: P=${present} | A=${absent} | L=${leave} | H=${holiday} | Total=${students.length}\n`;
-    content += `📅 Generated: ${new Date().toLocaleString()}`;
+    content += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    content += `📊 SUMMARY:  Present: ${present}  |  Absent: ${absent}  |  Leave: ${leave}  |  Total: ${students.length}\n`;
+    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    content += `📅 Generated: ${new Date().toLocaleString()}\n`;
+    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
 
-    const blob = new Blob([content], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Daily_Attendance_${classVal}_${currentDate}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    downloadAsPDF(content, `Daily_Attendance_${classVal}_${currentDate}.pdf`);
     showToast('📥 Daily report downloaded!');
   });
 
   // ============================================================
-  // MONTHLY PDF
+  // MONTHLY PDF - A4 Size
   // ============================================================
   document.getElementById('downloadMonthlyBtn').addEventListener('click', function() {
     if (students.length === 0) {
@@ -1057,46 +1318,37 @@
     const classVal = classSelect.value;
     const session = sessionSelect.value;
     
-    let content = `📊 MONTHLY ATTENDANCE REPORT\n`;
-    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    content += `🏫 Quest Coaching Centre\n`;
-    content += `📚 Class: ${classVal}\n`;
-    content += `📆 Session: ${session}\n`;
-    content += `📆 Month: ${monthName} ${year}\n`;
-    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+    let content = `📊 MONTHLY ATTENDANCE REPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏫 QUEST COACHING CENTRE
+📚 Class: ${classVal}
+📆 Session: ${session}
+📆 Month: ${monthName} ${year}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
     
-    let present = 0, absent = 0, leave = 0, holiday = 0;
+    let present = 0, absent = 0, leave = 0;
     students.forEach(s => {
       const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
-      content += `👤 ${s.name} (${s.roll})\n`;
+      content += `👤  ${s.name.padEnd(20)}  Roll: ${String(s.roll).padEnd(5)}\n`;
       content += `   Status: ${rec.status.toUpperCase()}`;
-      if (rec.remark) content += ` | Remark: ${rec.remark}`;
+      if (rec.remark) content += `  |  Remark: ${rec.remark}`;
       content += '\n\n';
       if (rec.status === 'present') present++;
       else if (rec.status === 'absent') absent++;
       else if (rec.status === 'leave') leave++;
-      else if (rec.status === 'holiday') holiday++;
     });
     
-    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     content += `📊 SUMMARY\n`;
-    content += `✅ Present: ${present}\n`;
-    content += `❌ Absent: ${absent}\n`;
-    content += `🟡 Leave: ${leave}\n`;
-    content += `🎉 Holiday: ${holiday}\n`;
-    content += `📌 Total Students: ${students.length}\n`;
-    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    content += `📅 Generated: ${new Date().toLocaleString()}`;
+    content += `   ✅ Present: ${present}\n`;
+    content += `   ❌ Absent:  ${absent}\n`;
+    content += `   🟡 Leave:   ${leave}\n`;
+    content += `   📌 Total:   ${students.length}\n`;
+    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    content += `📅 Generated: ${new Date().toLocaleString()}\n`;
+    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
 
-    const blob = new Blob([content], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Monthly_Attendance_${classVal}_${monthName}_${year}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    downloadAsPDF(content, `Monthly_Attendance_${classVal}_${monthName}_${year}.pdf`);
     showToast('📥 Monthly report downloaded!');
   });
 
@@ -1117,7 +1369,7 @@
     report += `🏫 Class: ${classVal} | Session: ${session}\n`;
     report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     
-    let present = 0, absent = 0, leave = 0, holiday = 0;
+    let present = 0, absent = 0, leave = 0;
     students.forEach(s => {
       const rec = attendanceData[s.roll] || { status: 'present', remark: '' };
       report += `${s.name} (${s.roll}) → ${rec.status.toUpperCase()}`;
@@ -1126,10 +1378,9 @@
       if (rec.status === 'present') present++;
       else if (rec.status === 'absent') absent++;
       else if (rec.status === 'leave') leave++;
-      else if (rec.status === 'holiday') holiday++;
     });
     report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    report += `📊 Summary: P=${present} | A=${absent} | L=${leave} | H=${holiday} | Total=${students.length}`;
+    report += `📊 Summary: P=${present} | A=${absent} | L=${leave} | Total=${students.length}`;
     
     alert(report);
   });
@@ -1184,8 +1435,7 @@
   });
 
   console.log('✅ Attendance System Loaded!');
-  console.log('📌 Fees section removed from attendance page');
-  console.log('📌 Fees will show in parent-view.html only');
+  console.log('📌 Features: Scrollable table | P/A/L colors | Attendance Done check | Holiday save with reason | PDF A4');
 </script>
 </body>
 </html>
