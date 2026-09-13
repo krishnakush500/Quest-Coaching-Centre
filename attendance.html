@@ -230,7 +230,6 @@
       margin-top: 4px;
     }
 
-    /* 🔥 ATTENDANCE DONE MESSAGE */
     .attendance-done-msg {
       background: #d1fae5;
       border: 2px solid #10b981;
@@ -244,7 +243,6 @@
     .attendance-done-msg i { font-size: 1.5rem; display: block; margin-bottom: 4px; color: #10b981; }
     .attendance-done-msg h2 { font-size: 1rem; }
 
-    /* 🔥 CHECKING MESSAGE */
     .checking-msg {
       background: #e0f2fe;
       border: 2px solid #0ea5e9;
@@ -549,6 +547,7 @@
       margin-bottom: 8px;
     }
 
+    /* 🔥 PROGRESS OVERLAY with PERCENTAGE */
     .progress-overlay {
       position: fixed;
       top: 0;
@@ -564,14 +563,20 @@
     }
     .progress-card {
       background: white;
-      padding: 25px 35px;
+      padding: 28px 38px;
       border-radius: 24px;
       text-align: center;
-      min-width: 250px;
+      min-width: 280px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+    .progress-card h3 {
+      font-size: 1.1rem;
+      color: #1a237e;
+      margin-bottom: 5px;
     }
     .progress-bar-container {
       width: 100%;
-      height: 8px;
+      height: 10px;
       background: #e2e8f0;
       border-radius: 20px;
       overflow: hidden;
@@ -582,10 +587,50 @@
       height: 100%;
       background: linear-gradient(90deg, #1b4f9b, #10b981);
       border-radius: 20px;
-      transition: width 0.3s ease;
+      transition: width 0.2s ease;
     }
-    .progress-status { font-size: 0.85rem; color: #334155; }
-    .progress-percent { font-size: 1.2rem; font-weight: 700; color: #1a237e; margin-top: 5px; }
+    .progress-status { font-size: 0.85rem; color: #334155; margin-bottom: 5px; }
+    .progress-percent { font-size: 1.5rem; font-weight: 700; color: #1a237e; }
+
+    /* 🔥 LOADING OVERLAY for list loading */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.9);
+      z-index: 9999;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .loading-card {
+      background: white;
+      padding: 25px 40px;
+      border-radius: 24px;
+      text-align: center;
+      min-width: 250px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    }
+    .loading-card i {
+      font-size: 2rem;
+      color: #1b4f9b;
+      animation: spin 1s linear infinite;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .loading-card p {
+      color: #334155;
+      font-size: 0.9rem;
+    }
+    .loading-percent {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #1a237e;
+      margin-top: 5px;
+    }
 
     @media (max-width: 720px) {
       .fixed-header { padding: 6px 10px 0 10px; }
@@ -619,6 +664,10 @@
       .holiday-msg h2 { font-size: 0.85rem; }
       .attendance-done-msg { padding: 8px; }
       .attendance-done-msg h2 { font-size: 0.85rem; }
+      .progress-card { padding: 20px 24px; min-width: 220px; }
+      .progress-card h3 { font-size: 0.95rem; }
+      .progress-percent { font-size: 1.2rem; }
+      .loading-card { padding: 20px 28px; min-width: 200px; }
     }
   </style>
 </head>
@@ -680,13 +729,13 @@
       <div class="reason-text" id="holidayReasonDisplay">HOLIDAY</div>
     </div>
 
-    <!-- 🔥 Checking Message -->
+    <!-- Checking Message -->
     <div class="checking-msg" id="checkingMsg">
       <i class="fas fa-spinner"></i>
       <h2>Checking Attendance Status...</h2>
     </div>
 
-    <!-- 🔥 Attendance Done Message -->
+    <!-- Attendance Done Message -->
     <div class="attendance-done-msg" id="attendanceDoneMsg">
       <i class="fas fa-check-circle"></i>
       <h2>✅ Attendance Already Done!</h2>
@@ -743,10 +792,19 @@
   </div>
 </div>
 
+<!-- 🔥 LOADING OVERLAY with PERCENTAGE -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-card">
+    <i class="fas fa-spinner"></i>
+    <p id="loadingStatus">Loading students...</p>
+    <div class="loading-percent" id="loadingPercent">0%</div>
+  </div>
+</div>
+
 <!-- PROGRESS OVERLAY -->
 <div class="progress-overlay" id="progressOverlay">
   <div class="progress-card">
-    <h3 style="font-size:1.1rem;color:#1a237e;"><i class="fas fa-spinner fa-spin"></i> Saving...</h3>
+    <h3><i class="fas fa-spinner fa-spin"></i> Saving...</h3>
     <div class="progress-bar-container"><div class="progress-bar-fill" id="progressFill"></div></div>
     <div class="progress-status" id="progressStatus">Saving attendance...</div>
     <div class="progress-percent" id="progressPercent">0%</div>
@@ -796,6 +854,10 @@
   const saveBtn = document.getElementById('saveAttendanceBtn');
   const refreshBtn = document.getElementById('refreshBtn');
   const toast = document.getElementById('toastMsg');
+
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  const loadingStatus = document.getElementById('loadingStatus');
+  const loadingPercent = document.getElementById('loadingPercent');
 
   const progressOverlay = document.getElementById('progressOverlay');
   const progressFill = document.getElementById('progressFill');
@@ -849,6 +911,11 @@
     if (status) progressStatus.textContent = status;
   }
 
+  function updateLoading(percent, status) {
+    loadingPercent.textContent = percent + '%';
+    if (status) loadingStatus.textContent = status;
+  }
+
   // ============================================================
   // UPDATE SUMMARY
   // ============================================================
@@ -870,99 +937,75 @@
   }
 
   // ============================================================
-  // 🔥 CHECK IF ATTENDANCE ALREADY DONE (Fast Check)
+  // 🔥 FAST: FETCH ALL ATTENDANCE IN ONE GO
   // ============================================================
-  async function checkAttendanceDoneFast() {
-    const selectedSession = sessionSelect.value;
-    const selectedClass = classSelect.value;
-    const today = getTodayDate();
-
-    if (!selectedSession || !selectedClass) {
-      return { done: false, count: 0 };
-    }
-
+  async function fetchAllAttendanceForDate(selectedSession, selectedClass, today) {
     try {
-      // 🔥 Fast check: Query first student only
-      // Get one student from admissions to check
+      // Get all students first
       let snapshot = await db.collection('admissions')
         .where('classApplying', '==', selectedClass)
         .where('session', '==', selectedSession)
-        .limit(1)
         .get();
 
       if (snapshot.empty) {
         snapshot = await db.collection('admissions')
           .where('class', '==', selectedClass)
           .where('session', '==', selectedSession)
-          .limit(1)
           .get();
       }
 
-      if (snapshot.empty) {
-        return { done: false, count: 0, noStudents: true };
-      }
+      if (snapshot.empty) return { students: [], attendance: {}, markedCount: 0, total: 0 };
 
-      const firstStudent = snapshot.docs[0].data();
-      const studentName = firstStudent.studentName || firstStudent.name || 'Unknown';
-
-      // Check if this student has attendance today
-      const docRef = db.collection('attendance')
-        .doc(selectedSession)
-        .collection('classes')
-        .doc(selectedClass)
-        .collection('students')
-        .doc(studentName)
-        .collection('attendance')
-        .doc(today);
-
-      const docSnap = await docRef.get();
-
-      if (!docSnap.exists) {
-        return { done: false, count: 0 };
-      }
-
-      // If one student has attendance, check all students (fast batch)
-      // Get total students count
-      let totalSnapshot = await db.collection('admissions')
-        .where('classApplying', '==', selectedClass)
-        .where('session', '==', selectedSession)
-        .get();
-
-      if (totalSnapshot.empty) {
-        totalSnapshot = await db.collection('admissions')
-          .where('class', '==', selectedClass)
-          .where('session', '==', selectedSession)
-          .get();
-      }
-
-      const totalStudents = totalSnapshot.size;
-
-      if (totalStudents === 0) {
-        return { done: false, count: 0, noStudents: true };
-      }
-
-      // Check how many have attendance
-      let markedCount = 0;
-      for (const doc of totalSnapshot.docs) {
+      // Build students list
+      const studentsList = [];
+      snapshot.forEach(doc => {
         const data = doc.data();
-        const name = data.studentName || data.name || 'Unknown';
-        const checkRef = db.collection('attendance')
+        studentsList.push({
+          id: doc.id,
+          roll: data.rollNumber || data.rollNo || parseInt(doc.id.slice(-3)) || 0,
+          name: data.studentName || data.name || 'Unknown',
+          class: data.classApplying || data.class || selectedClass
+        });
+      });
+      studentsList.sort((a, b) => a.roll - b.roll);
+
+      // 🔥 FAST: Parallel fetch all attendance
+      const attendancePromises = studentsList.map(student => {
+        const docRef = db.collection('attendance')
           .doc(selectedSession)
           .collection('classes')
           .doc(selectedClass)
           .collection('students')
-          .doc(name)
+          .doc(student.name)
           .collection('attendance')
           .doc(today);
-        const checkSnap = await checkRef.get();
-        if (checkSnap.exists) markedCount++;
-      }
+        return docRef.get();
+      });
 
-      return { done: markedCount === totalStudents && totalStudents > 0, count: markedCount, total: totalStudents };
+      const attendanceSnaps = await Promise.all(attendancePromises);
+
+      const attendanceMap = {};
+      let markedCount = 0;
+
+      studentsList.forEach((student, index) => {
+        const snap = attendanceSnaps[index];
+        if (snap.exists) {
+          const data = snap.data();
+          attendanceMap[student.roll] = {
+            status: data.status || '',
+            remark: data.remark || ''
+          };
+          markedCount++;
+        } else {
+          attendanceMap[student.roll] = { status: '', remark: '' };
+        }
+      });
+
+      return { students: studentsList, attendance: attendanceMap, markedCount, total: studentsList.length };
 
     } catch (error) {
-      console.warn('Fast check error:', error);
-      return { done: false, count: 0 };
+      console.error('fetchAllAttendance error:', error);
+      return { students: [], attendance: {}, markedCount: 0, total: 0 };
     }
   }
 
@@ -994,13 +1037,12 @@
     } else {
       holidayReasonGroup.style.display = 'none';
       holidayMsg.style.display = 'none';
-      // Re-check status
       handleClassSelect();
     }
   }
 
   // ============================================================
-  // 🔥 MAIN FUNCTION: Class Select Handler
+  // 🔥 MAIN: Class Select Handler (FAST)
   // ============================================================
   async function handleClassSelect() {
     if (classHolidayCheck.checked) return;
@@ -1015,165 +1057,83 @@
       reportActions.style.display = 'none';
       attendanceDoneMsg.style.display = 'none';
       checkingMsg.style.display = 'none';
+      loadingOverlay.style.display = 'none';
       return;
     }
 
-    // 🔥 Show checking message
-    checkingMsg.style.display = 'block';
+    // 🔥 Show loading with progress
+    loadingOverlay.style.display = 'flex';
+    updateLoading(10, 'Fetching students...');
     tableScroll.style.display = 'none';
     summaryCounter.style.display = 'none';
     saveBtnContainer.style.display = 'none';
     reportActions.style.display = 'none';
     attendanceDoneMsg.style.display = 'none';
-
-    // 🔥 Check if attendance already done
-    const result = await checkAttendanceDoneFast();
-
     checkingMsg.style.display = 'none';
 
-    if (result.noStudents) {
-      tableScroll.style.display = 'block';
-      tbody.innerHTML = `<tr><td colspan="4" class="no-students-msg">
-        <i class="fas fa-users"></i> No students in <strong>${selectedClass}</strong>
-      </td></tr>`;
-      summaryCounter.style.display = 'flex';
-      saveBtnContainer.style.display = 'flex';
-      reportActions.style.display = 'flex';
-      students = [];
-      attendanceData = {};
-      updateSummary();
-      return;
-    }
-
-    if (result.done && result.count > 0) {
-      // 🔥 Attendance already done - Show message, hide list
-      attendanceDoneMsg.style.display = 'block';
-      attendanceDoneInfo.textContent = `✅ ${result.count} students marked for ${formatDateDisplay(currentDate)}`;
-      tableScroll.style.display = 'none';
-      summaryCounter.style.display = 'none';
-      saveBtnContainer.style.display = 'none';
-      reportActions.style.display = 'flex';
-      students = [];
-      attendanceData = {};
-      isAttendanceDone = true;
-      return;
-    }
-
-    // 🔥 Attendance NOT done - Show list
-    attendanceDoneMsg.style.display = 'none';
-    tableScroll.style.display = 'block';
-    summaryCounter.style.display = 'flex';
-    saveBtnContainer.style.display = 'flex';
-    reportActions.style.display = 'flex';
-    isAttendanceDone = false;
-
-    // Load students
-    await fetchStudents();
-  }
-
-  // ============================================================
-  // FETCH STUDENTS (Fast)
-  // ============================================================
-  async function fetchStudents() {
-    if (classHolidayCheck.checked) return;
-    
-    const selectedClass = classSelect.value;
-    const selectedSession = sessionSelect.value;
-    
-    if (!selectedClass || !selectedSession) return;
+    const today = getTodayDate();
 
     try {
-      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:25px;color:#1f4b9e;font-size:0.8rem;">
-        <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;display:block;margin-bottom:6px;"></i>
-        Loading...
-      </td></tr>`;
+      updateLoading(30, 'Loading student data...');
+      
+      // 🔥 SINGLE FAST FETCH
+      const result = await fetchAllAttendanceForDate(selectedSession, selectedClass, today);
 
-      // 🔥 Fast query - Get all students at once
-      let snapshot = await db.collection('admissions')
-        .where('classApplying', '==', selectedClass)
-        .where('session', '==', selectedSession)
-        .get();
+      updateLoading(80, 'Checking attendance status...');
 
-      if (snapshot.empty) {
-        snapshot = await db.collection('admissions')
-          .where('class', '==', selectedClass)
-          .where('session', '==', selectedSession)
-          .get();
-      }
-
-      if (snapshot.empty) {
+      if (result.total === 0) {
+        loadingOverlay.style.display = 'none';
+        tableScroll.style.display = 'block';
         tbody.innerHTML = `<tr><td colspan="4" class="no-students-msg">
           <i class="fas fa-users"></i> No students in <strong>${selectedClass}</strong>
         </td></tr>`;
+        summaryCounter.style.display = 'flex';
+        saveBtnContainer.style.display = 'flex';
+        reportActions.style.display = 'flex';
         students = [];
         attendanceData = {};
         updateSummary();
         return;
       }
 
-      students = [];
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        students.push({
-          id: doc.id,
-          roll: data.rollNumber || data.rollNo || parseInt(doc.id.slice(-3)) || 0,
-          name: data.studentName || data.name || 'Unknown',
-          class: data.classApplying || data.class || selectedClass
-        });
-      });
+      students = result.students;
+      attendanceData = result.attendance;
 
-      students.sort((a, b) => a.roll - b.roll);
+      updateLoading(100, 'Done!');
 
-      // 🔥 NO AUTO-TICK - Sab empty
-      attendanceData = {};
-      students.forEach(s => {
-        attendanceData[s.roll] = { status: '', remark: '' };
-      });
+      // 🔥 Check if ALL students are marked
+      const allMarked = result.markedCount === result.total && result.total > 0;
 
-      // 🔥 Load existing attendance (if any partially marked)
-      await loadExistingAttendance();
-      renderTable();
-      updateSummary();
+      setTimeout(() => {
+        loadingOverlay.style.display = 'none';
+
+        if (allMarked) {
+          // Attendance already done - Show message
+          attendanceDoneMsg.style.display = 'block';
+          attendanceDoneInfo.textContent = `✅ ${result.markedCount} students marked for ${formatDateDisplay(today)}`;
+          tableScroll.style.display = 'none';
+          summaryCounter.style.display = 'none';
+          saveBtnContainer.style.display = 'none';
+          reportActions.style.display = 'flex';
+          isAttendanceDone = true;
+        } else {
+          // Attendance not done - Show list
+          attendanceDoneMsg.style.display = 'none';
+          tableScroll.style.display = 'block';
+          summaryCounter.style.display = 'flex';
+          saveBtnContainer.style.display = 'flex';
+          reportActions.style.display = 'flex';
+          isAttendanceDone = false;
+          renderTable();
+          updateSummary();
+        }
+      }, 200);
 
     } catch (error) {
       console.error('Error:', error);
-      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:20px;color:#dc3545;font-size:0.8rem;">
-        <i class="fas fa-exclamation-circle" style="font-size:1.5rem;display:block;margin-bottom:6px;"></i>
-        Error: ${error.message}
-      </td></tr>`;
+      loadingOverlay.style.display = 'none';
+      showToast('Error loading: ' + error.message, true);
     }
-  }
-
-  // ============================================================
-  // LOAD EXISTING ATTENDANCE
-  // ============================================================
-  async function loadExistingAttendance() {
-    try {
-      const selectedSession = sessionSelect.value;
-      const selectedClass = classSelect.value;
-      const today = getTodayDate();
-      if (!selectedSession || !selectedClass || students.length === 0) return;
-
-      // 🔥 Batch load - Faster
-      for (const student of students) {
-        const docRef = db.collection('attendance')
-          .doc(selectedSession)
-          .collection('classes')
-          .doc(selectedClass)
-          .collection('students')
-          .doc(student.name)
-          .collection('attendance')
-          .doc(today);
-        const docSnap = await docRef.get();
-        if (docSnap.exists) {
-          const data = docSnap.data();
-          attendanceData[student.roll] = {
-            status: data.status || '',
-            remark: data.remark || ''
-          };
-        }
-      }
-    } catch (error) { console.warn('Load existing error:', error); }
   }
 
   // ============================================================
@@ -1214,7 +1174,6 @@
     });
     tbody.innerHTML = html;
 
-    // Event listeners
     document.querySelectorAll('#attendanceTable tbody tr').forEach(row => {
       const nameDiv = row.querySelector('.student-name');
       if (!nameDiv) return;
@@ -1246,8 +1205,6 @@
         generateIndividualReport(roll, name);
       });
     });
-
-    updateSummary();
   }
 
   // ============================================================
@@ -1279,21 +1236,14 @@
   }
 
   // ============================================================
-  // 🔥 PDF DOWNLOAD - FIXED (Proper PDF)
+  // PDF DOWNLOAD
   // ============================================================
   function downloadAsPDF(content, filename) {
     try {
-      // Create PDF with proper formatting
-      const pdfContent = content;
-      const blob = new Blob([pdfContent], { 
-        type: 'application/pdf;charset=utf-8' 
-      });
+      const blob = new Blob([content], { type: 'application/pdf;charset=utf-8' });
       const url = URL.createObjectURL(blob);
-      
-      // Open in new tab
       const win = window.open(url, '_blank');
       if (!win) {
-        // If popup blocked, download directly
         const a = document.createElement('a');
         a.href = url;
         a.download = filename;
@@ -1302,13 +1252,10 @@
         document.body.removeChild(a);
         setTimeout(() => URL.revokeObjectURL(url), 1000);
       } else {
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
       }
     } catch (error) {
       console.error('PDF error:', error);
-      showToast('Error generating PDF. Trying alternate method...', true);
-      
-      // Fallback: Simple text download
       const blob = new Blob([content], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -1348,7 +1295,6 @@
     try {
       const batch = db.batch();
 
-      // Holiday
       if (classHolidayCheck.checked) {
         const reason = holidayReason.value.trim() || 'Holiday';
         const holidayDocRef = db.collection('attendance')
@@ -1369,7 +1315,6 @@
         return;
       }
 
-      // Save each student
       let savedCount = 0;
       const total = students.length;
 
@@ -1407,7 +1352,6 @@
       setTimeout(() => {
         progressOverlay.style.display = 'none';
         showToast(`✅ Attendance saved for ${savedCount} students!`);
-        // 🔥 Re-check attendance status
         handleClassSelect();
       }, 400);
 
@@ -1422,7 +1366,7 @@
   }
 
   // ============================================================
-  // DAILY PDF - A4
+  // DAILY PDF
   // ============================================================
   document.getElementById('downloadDailyBtn').addEventListener('click', function() {
     if (students.length === 0) { showToast('No students!', true); return; }
@@ -1439,7 +1383,6 @@
     
     let present = 0, absent = 0, leave = 0, notMarked = 0;
     
-    // Header
     content += `  ┌─────────────────────────────────┬──────────┬──────────────┬────────────────────┐\n`;
     content += `  │ Student Name                    │ Roll No  │ Status       │ Remarks            │\n`;
     content += `  ├─────────────────────────────────┼──────────┼──────────────┼────────────────────┤\n`;
@@ -1475,7 +1418,7 @@
   });
 
   // ============================================================
-  // MONTHLY PDF - A4
+  // MONTHLY PDF
   // ============================================================
   document.getElementById('downloadMonthlyBtn').addEventListener('click', function() {
     if (students.length === 0) { showToast('No students!', true); return; }
@@ -1599,8 +1542,8 @@
     init();
   });
 
-  console.log('✅ Attendance System Loaded!');
-  console.log('📌 Features: Auto-check attendance done | No auto-tick | Fast load | PDF open fix');
+  console.log('✅ Fast Attendance System Loaded!');
+  console.log('📌 Features: Batch loading | Progress % | Fast fetch with Promise.all');
 </script>
 </body>
 </html>
