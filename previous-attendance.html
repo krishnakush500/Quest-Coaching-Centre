@@ -71,7 +71,6 @@
     }
     .header .close-btn:hover { background: #cbd5e1; }
 
-    /* FILTERS */
     .filters {
       display: flex;
       flex-wrap: wrap;
@@ -116,7 +115,6 @@
     .filters .load-btn:hover { background: #7c3aed; }
     .filters .load-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    /* LOADING */
     .loading-progress {
       display: none;
       background: #f0f9ff;
@@ -149,7 +147,6 @@
       align-items: center;
     }
 
-    /* MONTH TITLE */
     .month-title {
       display: none;
       text-align: center;
@@ -171,7 +168,6 @@
       letter-spacing: 0.5px;
     }
 
-    /* REGISTER TABLE */
     .register-wrapper {
       display: none;
       overflow-x: auto;
@@ -179,18 +175,11 @@
       border: 2px solid #1a237e;
       background: white;
       margin-bottom: 15px;
+      max-height: 65vh;
     }
-    .register-wrapper::-webkit-scrollbar {
-      height: 8px;
-    }
-    .register-wrapper::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 10px;
-    }
-    .register-wrapper::-webkit-scrollbar-thumb {
-      background: #1a237e;
-      border-radius: 10px;
-    }
+    .register-wrapper::-webkit-scrollbar { height: 8px; width: 8px; }
+    .register-wrapper::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+    .register-wrapper::-webkit-scrollbar-thumb { background: #1a237e; border-radius: 10px; }
 
     table.register-table {
       width: 100%;
@@ -252,18 +241,13 @@
       left: 150px;
       z-index: 4;
     }
-    .register-table tbody .roll-col {
-      font-size: 0.7rem;
-    }
 
-    /* STATUS CELLS */
-    .cell-P { background: #d1fae5 !important; color: #065f46 !important; font-weight: 800 !important; font-size: 0.8rem !important; }
-    .cell-A { background: #fee2e2 !important; color: #991b1b !important; font-weight: 800 !important; font-size: 0.8rem !important; }
-    .cell-L { background: #fef3c7 !important; color: #92400e !important; font-weight: 800 !important; font-size: 0.8rem !important; }
-    .cell-H { background: #e0e7ff !important; color: #3730a3 !important; font-weight: 800 !important; font-size: 0.8rem !important; }
+    .cell-P { background: #d1fae5 !important; color: #065f46 !important; font-weight: 800 !important; }
+    .cell-A { background: #fee2e2 !important; color: #991b1b !important; font-weight: 800 !important; }
+    .cell-L { background: #fef3c7 !important; color: #92400e !important; font-weight: 800 !important; }
+    .cell-H { background: #e0e7ff !important; color: #3730a3 !important; font-weight: 800 !important; }
     .cell-empty { background: #fafafa !important; color: #94a3b8 !important; }
 
-    /* SUMMARY ROW */
     .summary-row {
       display: none;
       flex-wrap: wrap;
@@ -290,7 +274,6 @@
     .stat-absent { color: #dc3545; }
     .stat-leave { color: #f59e0b; }
 
-    /* ACTION BUTTONS */
     .action-buttons {
       display: none;
       flex-wrap: wrap;
@@ -346,6 +329,18 @@
       margin-bottom: 10px;
       animation: spin 1s linear infinite;
     }
+    .empty-msg {
+      text-align: center;
+      padding: 40px 20px;
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+    .empty-msg i {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 12px;
+      color: #cbd5e1;
+    }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     @media (max-width: 720px) {
@@ -355,12 +350,10 @@
       .filters select, .filters input[type="month"] { font-size: 0.7rem; padding: 5px 10px; }
       .filters .load-btn { font-size: 0.7rem; padding: 5px 14px; }
       .month-title { font-size: 0.9rem; padding: 10px 14px; }
-      .month-title .sub-info { font-size: 0.65rem; }
       .register-table th, .register-table td { padding: 4px 3px; font-size: 0.65rem; }
       .register-table .name-col { min-width: 100px; font-size: 0.65rem; padding-left: 6px; }
       .register-table .roll-col { left: 100px; min-width: 40px; }
       .register-table thead th.date-col { min-width: 26px; font-size: 0.55rem; padding: 5px 2px; }
-      .cell-P, .cell-A, .cell-L, .cell-H { font-size: 0.65rem !important; }
       .action-btn { padding: 8px 16px; font-size: 0.7rem; }
     }
   </style>
@@ -373,10 +366,11 @@
     <button class="close-btn" onclick="window.close()"><i class="fas fa-times"></i> Close</button>
   </div>
 
-  <!-- FILTERS -->
+  <!-- FILTERS - No Auto Class -->
   <div class="filters">
     <label>Class:</label>
     <select id="classSelect">
+      <option value="">-- Select Class --</option>
       <option value="6th">6th</option><option value="7th">7th</option>
       <option value="8th">8th</option><option value="9th">9th</option>
       <option value="10th">10th</option>
@@ -386,6 +380,13 @@
       <option value="12th (Science)">12th (Science)</option>
       <option value="12th (Commerce)">12th (Commerce)</option>
       <option value="12th (Arts)">12th (Arts)</option>
+    </select>
+    <label>Session:</label>
+    <select id="sessionSelect">
+      <option value="2026-27">2026-27</option>
+      <option value="2027-28">2027-28</option>
+      <option value="2028-29">2028-29</option>
+      <option value="2029-30">2029-30</option>
     </select>
     <label>Month:</label>
     <input type="month" id="monthSelect">
@@ -432,7 +433,7 @@
   </div>
 
   <div id="emptyState">
-    <div class="loading-msg"><i class="fas fa-calendar-alt"></i> Select class and month, then click Load</div>
+    <div class="empty-msg"><i class="fas fa-calendar-alt"></i> Select Class, Session & Month then click Load</div>
   </div>
 </div>
 
@@ -455,13 +456,9 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  // URL PARAMS
-  const urlParams = new URLSearchParams(window.location.search);
-  const sessionParam = urlParams.get('session') || '2026-27';
-  const classParam = urlParams.get('class') || '';
-
   // DOM REFS
   const classSelect = document.getElementById('classSelect');
+  const sessionSelect = document.getElementById('sessionSelect');
   const monthSelect = document.getElementById('monthSelect');
   const loadBtn = document.getElementById('loadBtn');
   const loadingProgress = document.getElementById('loadingProgress');
@@ -487,22 +484,22 @@
 
   // STATE
   let currentClass = '';
+  let currentSession = '';
   let currentMonth = '';
   let currentYear = '';
   let currentMonthNum = 0;
   let studentsList = [];
-  let attendanceMatrix = {}; // { roll: { day: 'P'|'A'|'L'|'H'|'' } }
+  let attendanceMatrix = {};
 
   // ============================================================
-  // INIT
+  // INIT - No auto class select
   // ============================================================
   function init() {
-    if (classParam) classSelect.value = classParam;
-    else classSelect.value = '10th';
-    
+    // 🔥 Set default month to current month only
     const now = new Date();
     const monthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     monthSelect.value = monthStr;
+    // Class NOT auto-selected
   }
 
   function showToast(msg, isError = false) {
@@ -520,20 +517,20 @@
   }
 
   // ============================================================
-  // 🔥 MAIN LOAD FUNCTION
+  // MAIN LOAD
   // ============================================================
   async function loadMonthlyAttendance() {
     currentClass = classSelect.value;
+    currentSession = sessionSelect.value;
     currentMonth = monthSelect.value;
 
-    if (!currentClass || !currentMonth) {
-      showToast('Select class and month!', true);
-      return;
-    }
+    if (!currentClass) { showToast('Please select a class!', true); return; }
+    if (!currentSession) { showToast('Please select a session!', true); return; }
+    if (!currentMonth) { showToast('Please select a month!', true); return; }
 
     const [year, month] = currentMonth.split('-');
     currentYear = year;
-    currentMonthNum = parseInt(month) - 1; // 0-11
+    currentMonthNum = parseInt(month) - 1;
 
     // Reset UI
     loadingProgress.style.display = 'block';
@@ -546,16 +543,16 @@
     updateProgress(0, 'Loading students...');
 
     try {
-      // STEP 1: Get students
+      // STEP 1: Get students from admissions
       let studentSnapshot = await db.collection('admissions')
         .where('classApplying', '==', currentClass)
-        .where('session', '==', sessionParam)
+        .where('session', '==', currentSession)
         .get();
 
       if (studentSnapshot.empty) {
         studentSnapshot = await db.collection('admissions')
           .where('class', '==', currentClass)
-          .where('session', '==', sessionParam)
+          .where('session', '==', currentSession)
           .get();
       }
 
@@ -563,7 +560,7 @@
         loadingProgress.style.display = 'none';
         loadBtn.disabled = false;
         emptyState.style.display = 'block';
-        emptyState.innerHTML = `<div class="loading-msg"><i class="fas fa-users"></i> No students found in ${currentClass}</div>`;
+        emptyState.innerHTML = `<div class="empty-msg"><i class="fas fa-users"></i> No students found in <strong>${currentClass}</strong> (${currentSession})</div>`;
         return;
       }
 
@@ -583,19 +580,21 @@
       // STEP 2: Days in month
       const daysInMonth = new Date(parseInt(year), currentMonthNum + 1, 0).getDate();
 
-      // STEP 3: Parallel fetch - har student ke har din ka data
+      // STEP 3: Build attendance matrix
       attendanceMatrix = {};
       studentsList.forEach(s => {
         attendanceMatrix[s.roll] = {};
       });
 
-      // Build all promises
+      // 🔥 Build all promises with EXACT path as save
       const allPromises = [];
       for (const student of studentsList) {
         for (let day = 1; day <= daysInMonth; day++) {
           const dateStr = `${year}-${String(currentMonthNum + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          
+          // 🔥 EXACT SAME PATH AS SAVE
           const docRef = db.collection('attendance')
-            .doc(sessionParam)
+            .doc(currentSession)
             .collection('classes')
             .doc(currentClass)
             .collection('students')
@@ -606,6 +605,7 @@
           allPromises.push({
             roll: student.roll,
             day: day,
+            date: dateStr,
             promise: docRef.get()
           });
         }
@@ -615,6 +615,7 @@
 
       // Execute in chunks
       const chunkSize = 60;
+      let processed = 0;
       for (let i = 0; i < allPromises.length; i += chunkSize) {
         const chunk = allPromises.slice(i, i + chunkSize);
         const results = await Promise.all(chunk.map(p => p.promise));
@@ -635,13 +636,14 @@
           }
         });
 
-        const percent = 30 + Math.round((i + chunkSize) / allPromises.length * 60);
-        updateProgress(Math.min(percent, 90), `Loading... ${Math.min(i + chunkSize, allPromises.length)}/${allPromises.length}`);
+        processed = Math.min(i + chunkSize, allPromises.length);
+        const percent = 30 + Math.round(processed / allPromises.length * 60);
+        updateProgress(Math.min(percent, 90), `Loading... ${processed}/${allPromises.length}`);
       }
 
       updateProgress(95, 'Rendering register...');
 
-      // STEP 4: Render register
+      // STEP 4: Render
       renderRegister(daysInMonth);
 
       updateProgress(100, 'Done!');
@@ -659,33 +661,32 @@
       loadingProgress.style.display = 'none';
       loadBtn.disabled = false;
       emptyState.style.display = 'block';
-      emptyState.innerHTML = `<div class="loading-msg"><i class="fas fa-exclamation-circle"></i> Error: ${error.message}</div>`;
+      emptyState.innerHTML = `<div class="empty-msg"><i class="fas fa-exclamation-circle"></i> Error: ${error.message}</div>`;
     }
   }
 
   // ============================================================
-  // RENDER REGISTER TABLE
+  // RENDER REGISTER
   // ============================================================
   function renderRegister(daysInMonth) {
-    // Month title
     const monthName = new Date(currentYear, currentMonthNum).toLocaleString('default', { month: 'long' });
     monthTitleText.textContent = `${monthName} ${currentYear}`;
-    monthTitleSub.textContent = `Class: ${currentClass} | Session: ${sessionParam} | Total Students: ${studentsList.length}`;
+    monthTitleSub.textContent = `Class: ${currentClass} | Session: ${currentSession} | Total Students: ${studentsList.length}`;
 
-    // Build header
+    // Header
     let headHtml = `<tr>
       <th class="name-col" style="position:sticky;left:0;z-index:11;">Student Name</th>
       <th class="roll-col" style="position:sticky;left:150px;z-index:11;">Roll</th>`;
     
     for (let day = 1; day <= daysInMonth; day++) {
       const dateObj = new Date(currentYear, currentMonthNum, day);
-      const isWeekend = dateObj.getDay() === 0; // Sunday
+      const isWeekend = dateObj.getDay() === 0;
       headHtml += `<th class="date-col ${isWeekend ? 'weekend' : ''}">${day}</th>`;
     }
     headHtml += `</tr>`;
     registerHead.innerHTML = headHtml;
 
-    // Build body
+    // Body
     let bodyHtml = '';
     let totalPCount = 0, totalACount = 0, totalLCount = 0;
 
@@ -708,7 +709,6 @@
     });
     registerBody.innerHTML = bodyHtml;
 
-    // Summary
     totalStudents.textContent = studentsList.length;
     totalP.textContent = totalPCount;
     totalA.textContent = totalACount;
@@ -716,39 +716,28 @@
   }
 
   // ============================================================
-  // DOWNLOAD PDF (Register Format)
+  // DOWNLOAD PDF
   // ============================================================
   downloadBtn.addEventListener('click', function() {
-    if (studentsList.length === 0) {
-      showToast('No data to download!', true);
-      return;
-    }
+    if (studentsList.length === 0) { showToast('No data!', true); return; }
 
     const monthName = new Date(currentYear, currentMonthNum).toLocaleString('default', { month: 'long' });
     const daysInMonth = new Date(currentYear, currentMonthNum + 1, 0).getDate();
 
-    // Build fixed-width text table
     let content = `📋 MONTHLY ATTENDANCE REGISTER
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🏫 QUEST COACHING CENTRE
-📚 Class: ${currentClass}  |  📆 Session: ${sessionParam}  |  📅 Month: ${monthName} ${currentYear}
+📚 Class: ${currentClass}  |  📆 Session: ${currentSession}  |  📅 Month: ${monthName} ${currentYear}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
 
-    // Header row
     let headerRow = `  ${'Student Name'.padEnd(22)} ${'Roll'.padEnd(6)} `;
-    for (let day = 1; day <= daysInMonth; day++) {
-      headerRow += `${String(day).padStart(2)} `;
-    }
+    for (let day = 1; day <= daysInMonth; day++) headerRow += `${String(day).padStart(2)} `;
     content += headerRow + '\n';
-    
-    // Separator
+
     let separator = `  ${'─'.repeat(22)} ${'─'.repeat(6)} `;
-    for (let day = 1; day <= daysInMonth; day++) {
-      separator += `───`;
-    }
+    for (let day = 1; day <= daysInMonth; day++) separator += `───`;
     content += separator + '\n';
 
-    // Student rows
     studentsList.forEach(student => {
       let row = `  ${student.name.padEnd(22)} ${String(student.roll).padEnd(6)} `;
       for (let day = 1; day <= daysInMonth; day++) {
@@ -759,10 +748,7 @@
     });
 
     content += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    content += `📊 SUMMARY\n`;
-    content += `   Total Students: ${studentsList.length}\n`;
-    content += `   Legend: P = Present | A = Absent | L = Leave | H = Holiday | - = Not Marked\n`;
-    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    content += `📊 Legend: P = Present | A = Absent | L = Leave | H = Holiday | - = Not Marked\n`;
     content += `📅 Generated: ${new Date().toLocaleString()}\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
 
@@ -772,59 +758,49 @@
     if (!win) {
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Attendance_Register_${currentClass}_${monthName}_${currentYear}.pdf`;
+      a.download = `Attendance_${currentClass}_${monthName}_${currentYear}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
     }
     setTimeout(() => URL.revokeObjectURL(url), 2000);
-    showToast('📥 Register PDF downloaded!');
+    showToast('📥 PDF downloaded!');
   });
 
   // ============================================================
   // PRINT
   // ============================================================
   printBtn.addEventListener('click', function() {
-    if (studentsList.length === 0) {
-      showToast('No data to print!', true);
-      return;
-    }
+    if (studentsList.length === 0) { showToast('No data!', true); return; }
 
     const monthName = new Date(currentYear, currentMonthNum).toLocaleString('default', { month: 'long' });
+    const daysInMonth = new Date(currentYear, currentMonthNum + 1, 0).getDate();
     const printWindow = window.open('', '_blank');
     
     let tableHtml = `
-      <html>
-      <head>
-        <title>Attendance Register - ${currentClass} - ${monthName} ${currentYear}</title>
-        <style>
-          body { font-family: 'Segoe UI', Arial, sans-serif; padding: 20px; }
-          h1 { color: #1a237e; text-align: center; margin-bottom: 5px; font-size: 20px; }
-          h2 { color: #283593; text-align: center; margin-bottom: 15px; font-size: 14px; font-weight: 500; }
-          table { width: 100%; border-collapse: collapse; font-size: 10px; }
-          th, td { border: 1px solid #999; padding: 4px; text-align: center; }
-          th { background: #1a237e; color: white; font-size: 9px; }
-          .name-col { text-align: left; padding-left: 8px; font-weight: bold; min-width: 120px; }
-          .roll-col { background: #f1f5f9; font-weight: bold; }
-          .cell-P { background: #d1fae5; color: #065f46; font-weight: bold; }
-          .cell-A { background: #fee2e2; color: #991b1b; font-weight: bold; }
-          .cell-L { background: #fef3c7; color: #92400e; font-weight: bold; }
-          .cell-H { background: #e0e7ff; color: #3730a3; font-weight: bold; }
-          .cell-empty { background: #fafafa; color: #94a3b8; }
-        </style>
-      </head>
-      <body>
+      <html><head><title>Attendance Register</title>
+      <style>
+        body { font-family: Arial; padding: 15px; }
+        h1 { color: #1a237e; text-align: center; margin-bottom: 5px; font-size: 18px; }
+        h2 { color: #283593; text-align: center; margin-bottom: 12px; font-size: 12px; font-weight: 500; }
+        table { width: 100%; border-collapse: collapse; font-size: 9px; }
+        th, td { border: 1px solid #999; padding: 3px; text-align: center; }
+        th { background: #1a237e; color: white; font-size: 8px; }
+        .name-col { text-align: left; padding-left: 6px; font-weight: bold; min-width: 100px; }
+        .roll-col { background: #f1f5f9; font-weight: bold; }
+        .cell-P { background: #d1fae5; color: #065f46; font-weight: bold; }
+        .cell-A { background: #fee2e2; color: #991b1b; font-weight: bold; }
+        .cell-L { background: #fef3c7; color: #92400e; font-weight: bold; }
+        .cell-H { background: #e0e7ff; color: #3730a3; font-weight: bold; }
+        .cell-empty { background: #fafafa; color: #94a3b8; }
+      </style></head><body>
         <h1>🏫 QUEST COACHING CENTRE</h1>
-        <h2>Attendance Register · Class: ${currentClass} · Month: ${monthName} ${currentYear} · Session: ${sessionParam}</h2>
-        <table>
-          <thead>
-            <tr>
-              <th class="name-col">Student Name</th>
-              <th class="roll-col">Roll</th>`;
+        <h2>Attendance Register · Class: ${currentClass} · ${monthName} ${currentYear} · Session: ${currentSession}</h2>
+        <table><thead><tr>
+          <th class="name-col">Student Name</th>
+          <th class="roll-col">Roll</th>`;
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      tableHtml += `<th>${day}</th>`;
-    }
+    for (let day = 1; day <= daysInMonth; day++) tableHtml += `<th>${day}</th>`;
     tableHtml += `</tr></thead><tbody>`;
 
     studentsList.forEach(student => {
@@ -844,11 +820,9 @@
     });
 
     tableHtml += `</tbody></table>
-        <p style="text-align:center; margin-top:15px; font-size:11px; color:#666;">
-          Legend: P = Present | A = Absent | L = Leave | H = Holiday | - = Not Marked<br>
-          Generated: ${new Date().toLocaleString()}
-        </p>
-      </body></html>`;
+      <p style="text-align:center; margin-top:12px; font-size:10px; color:#666;">
+        Legend: P = Present | A = Absent | L = Leave | H = Holiday | - = Not Marked
+      </p></body></html>`;
 
     printWindow.document.write(tableHtml);
     printWindow.document.close();
@@ -856,16 +830,17 @@
   });
 
   // ============================================================
-  // EVENT LISTENERS
+  // EVENTS
   // ============================================================
   loadBtn.addEventListener('click', loadMonthlyAttendance);
 
   // ============================================================
-  // INIT CALL
+  // INIT
   // ============================================================
   init();
   console.log('✅ Previous Attendance Page Loaded!');
-  console.log('📌 Register format: Month → Students × Dates Matrix');
+  console.log('📌 Path: attendance/{session}/classes/{class}/students/{name}/attendance/{date}');
+  console.log('📌 No auto class select - teacher will select');
 </script>
 </body>
 </html>
