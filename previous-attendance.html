@@ -89,7 +89,7 @@
       color: #0f3b7a;
       font-size: 0.85rem;
     }
-    .filters select, .filters input[type="date"] {
+    .filters select, .filters input[type="month"] {
       background: white;
       border: 1px solid #b8cff0;
       border-radius: 40px;
@@ -115,24 +115,86 @@
       box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
     }
     .filters .load-btn:hover { background: #7c3aed; }
+    .filters .load-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* 🔥 LOADING PROGRESS */
+    .loading-progress {
+      display: none;
+      background: #f0f9ff;
+      border: 2px solid #0ea5e9;
+      border-radius: 16px;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+    }
+    .loading-progress .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+    .loading-progress .progress-bar-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #0ea5e9, #8b5cf6);
+      border-radius: 20px;
+      transition: width 0.2s ease;
+    }
+    .loading-progress .progress-text {
+      font-size: 0.85rem;
+      color: #0369a1;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .loading-progress .progress-percent {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #8b5cf6;
+    }
+
+    .summary-bar {
+      display: none;
+      flex-wrap: wrap;
+      gap: 10px 20px;
+      background: #f8fafc;
+      padding: 12px 20px;
+      border-radius: 16px;
+      margin-bottom: 15px;
+      border: 1px solid #e2e8f0;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .summary-bar .stat {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .summary-bar .stat .num {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .stat-total { color: #1a237e; }
+    .stat-present { color: #10b981; }
+    .stat-absent { color: #dc3545; }
+    .stat-leave { color: #2563eb; }
 
     .date-list {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
       gap: 10px;
       margin-bottom: 20px;
     }
     .date-item {
       background: white;
       border: 2px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 12px 20px;
+      border-radius: 14px;
+      padding: 12px 10px;
       cursor: pointer;
       transition: all 0.2s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-width: 130px;
+      text-align: center;
     }
     .date-item:hover {
       border-color: #8b5cf6;
@@ -145,21 +207,22 @@
       color: white;
     }
     .date-item .day {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       font-weight: 700;
     }
     .date-item .month {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       opacity: 0.8;
     }
     .date-item .status {
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       margin-top: 4px;
-      padding: 2px 10px;
+      padding: 2px 8px;
       border-radius: 20px;
       background: #d1fae5;
       color: #065f46;
       font-weight: 600;
+      display: inline-block;
     }
     .date-item.active .status {
       background: rgba(255,255,255,0.3);
@@ -185,7 +248,7 @@
     }
     .attendance-detail .detail-header h3 {
       color: #0a2a66;
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
     .attendance-detail .detail-header .actions {
       display: flex;
@@ -195,7 +258,7 @@
     .btn {
       border: none;
       border-radius: 40px;
-      padding: 6px 18px;
+      padding: 6px 16px;
       font-weight: 600;
       font-size: 0.75rem;
       cursor: pointer;
@@ -297,6 +360,7 @@
       padding: 40px 20px;
       color: #1f4b9e;
       font-size: 0.9rem;
+      grid-column: 1 / -1;
     }
     .loading-msg i {
       font-size: 2rem;
@@ -310,9 +374,11 @@
       .container { padding: 14px 12px 20px; }
       .header h1 { font-size: 1.1rem; }
       .filters { padding: 10px 14px; gap: 8px 10px; border-radius: 20px; }
-      .filters select, .filters input[type="date"] { font-size: 0.75rem; padding: 6px 12px; }
-      .date-item { min-width: 100px; padding: 10px 14px; }
-      .date-item .day { font-size: 1rem; }
+      .filters select, .filters input[type="month"] { font-size: 0.75rem; padding: 6px 12px; }
+      .date-list { grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 6px; }
+      .date-item { padding: 8px 6px; }
+      .date-item .day { font-size: 0.95rem; }
+      .date-item .month { font-size: 0.6rem; }
       .attendance-detail { padding: 14px; }
       table { font-size: 0.7rem; }
       th, td { padding: 6px 4px; }
@@ -346,8 +412,25 @@
     <button class="load-btn" id="loadBtn"><i class="fas fa-search"></i> Load</button>
   </div>
 
+  <!-- 🔥 LOADING PROGRESS -->
+  <div class="loading-progress" id="loadingProgress">
+    <div class="progress-text">
+      <span id="progressLabel">Loading dates...</span>
+      <span class="progress-percent" id="progressPercent">0%</span>
+    </div>
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <!-- SUMMARY BAR -->
+  <div class="summary-bar" id="summaryBar">
+    <span class="stat stat-total">📌 Total Days: <span class="num" id="totalDays">0</span></span>
+    <span class="stat stat-present">✅ Present Days: <span class="num" id="totalPresentDays">0</span></span>
+  </div>
+
   <div id="dateListContainer">
-    <div class="loading-msg"><i class="fas fa-spinner"></i> Select class and month, then click Load</div>
+    <div class="loading-msg"><i class="fas fa-calendar-alt"></i> Select class and month, then click Load</div>
   </div>
 
   <!-- Attendance Detail -->
@@ -358,7 +441,7 @@
         <button class="btn btn-edit" id="editBtn"><i class="fas fa-edit"></i> Edit</button>
         <button class="btn btn-save" id="saveBtn" style="display:none;"><i class="fas fa-save"></i> Save</button>
         <button class="btn btn-cancel" id="cancelBtn" style="display:none;"><i class="fas fa-times"></i> Cancel</button>
-        <button class="btn btn-download" id="downloadBtn"><i class="fas fa-download"></i> Download PDF</button>
+        <button class="btn btn-download" id="downloadBtn"><i class="fas fa-download"></i> Download</button>
         <button class="btn btn-delete" id="deleteBtn"><i class="fas fa-trash"></i> Delete</button>
       </div>
     </div>
@@ -409,6 +492,15 @@
   const deleteBtn = document.getElementById('deleteBtn');
   const toast = document.getElementById('toastMsg');
 
+  const loadingProgress = document.getElementById('loadingProgress');
+  const progressLabel = document.getElementById('progressLabel');
+  const progressPercent = document.getElementById('progressPercent');
+  const progressFill = document.getElementById('progressFill');
+
+  const summaryBar = document.getElementById('summaryBar');
+  const totalDaysEl = document.getElementById('totalDays');
+  const totalPresentDaysEl = document.getElementById('totalPresentDays');
+
   // ============================================================
   // STATE
   // ============================================================
@@ -424,20 +516,15 @@
   // INIT
   // ============================================================
   function init() {
-    // Set default class
     if (classParam) {
       classSelect.value = classParam;
     } else {
       classSelect.value = '10th';
     }
     
-    // Set default month (current month)
     const now = new Date();
     const monthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     monthSelect.value = monthStr;
-
-    // Show session info
-    detailTitle.textContent = `Session: ${sessionParam}`;
   }
 
   // ============================================================
@@ -451,8 +538,14 @@
     toast._timer = setTimeout(() => { toast.style.display = 'none'; }, 3000);
   }
 
+  function updateProgress(percent, label) {
+    progressFill.style.width = percent + '%';
+    progressPercent.textContent = percent + '%';
+    if (label) progressLabel.textContent = label;
+  }
+
   // ============================================================
-  // LOAD DATES FOR MONTH
+  // 🔥 LOAD DATES FOR MONTH - FIXED
   // ============================================================
   async function loadDatesForMonth() {
     currentClass = classSelect.value;
@@ -466,11 +559,16 @@
     const [year, month] = currentMonth.split('-');
     const monthNum = parseInt(month) - 1;
 
-    dateListContainer.innerHTML = `<div class="loading-msg"><i class="fas fa-spinner"></i> Loading dates...</div>`;
+    // Show loading
+    loadingProgress.style.display = 'block';
+    summaryBar.style.display = 'none';
+    dateListContainer.innerHTML = `<div class="loading-msg"><i class="fas fa-spinner"></i> Loading students...</div>`;
     attendanceDetail.style.display = 'none';
+    loadBtn.disabled = true;
+    updateProgress(0, 'Loading students...');
 
     try {
-      // 🔥 Get all students first
+      // 🔥 STEP 1: Get all students
       let studentSnapshot = await db.collection('admissions')
         .where('classApplying', '==', currentClass)
         .where('session', '==', sessionParam)
@@ -484,50 +582,112 @@
       }
 
       if (studentSnapshot.empty) {
+        loadingProgress.style.display = 'none';
         dateListContainer.innerHTML = `<div class="loading-msg"><i class="fas fa-users"></i> No students found in ${currentClass}</div>`;
+        loadBtn.disabled = false;
         return;
       }
 
-      const studentNames = [];
+      const studentsList = [];
       studentSnapshot.forEach(doc => {
         const data = doc.data();
-        studentNames.push(data.studentName || data.name || 'Unknown');
+        studentsList.push({
+          id: doc.id,
+          roll: data.rollNumber || data.rollNo || 0,
+          name: data.studentName || data.name || 'Unknown'
+        });
       });
+      studentsList.sort((a, b) => a.roll - b.roll);
 
-      // 🔥 Check each date in the month
+      updateProgress(20, `Found ${studentsList.length} students. Checking dates...`);
+
+      // 🔥 STEP 2: Get all days in month
       const daysInMonth = new Date(parseInt(year), monthNum + 1, 0).getDate();
-      availableDates = [];
 
-      // 🔥 Parallel fetch all dates
-      const datePromises = [];
+      // 🔥 STEP 3: PARALLEL FETCH - Har student ke har din ka attendance check karo
+      // Build all promises
+      const allPromises = [];
+      const dateTracker = {};
+
       for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${year}-${String(monthNum + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        // Check first student only to know if attendance exists
-        const firstStudentName = studentNames[0];
-        const docRef = db.collection('attendance')
-          .doc(sessionParam)
-          .collection('classes')
-          .doc(currentClass)
-          .collection('students')
-          .doc(firstStudentName)
-          .collection('attendance')
-          .doc(dateStr);
-        datePromises.push({ date: dateStr, promise: docRef.get() });
+        dateTracker[dateStr] = { total: 0, marked: 0 };
+
+        for (const student of studentsList) {
+          const docRef = db.collection('attendance')
+            .doc(sessionParam)
+            .collection('classes')
+            .doc(currentClass)
+            .collection('students')
+            .doc(student.name)
+            .collection('attendance')
+            .doc(dateStr);
+          
+          allPromises.push({
+            date: dateStr,
+            promise: docRef.get()
+          });
+        }
       }
 
-      const results = await Promise.all(datePromises.map(d => d.promise));
+      updateProgress(40, `Checking ${allPromises.length} records...`);
 
-      results.forEach((snap, index) => {
-        if (snap.exists) {
-          availableDates.push(datePromises[index].date);
+      // Execute in chunks to show progress
+      const chunkSize = 50;
+      const results = [];
+      
+      for (let i = 0; i < allPromises.length; i += chunkSize) {
+        const chunk = allPromises.slice(i, i + chunkSize);
+        const chunkResults = await Promise.all(chunk.map(p => p.promise));
+        results.push(...chunkResults.map((snap, idx) => ({
+          date: chunk[idx].date,
+          exists: snap.exists,
+          data: snap.exists ? snap.data() : null
+        })));
+
+        const percent = 40 + Math.round((i + chunkSize) / allPromises.length * 50);
+        updateProgress(Math.min(percent, 90), `Checking... ${Math.min(i + chunkSize, allPromises.length)}/${allPromises.length}`);
+      }
+
+      updateProgress(90, 'Processing results...');
+
+      // 🔥 STEP 4: Process results
+      results.forEach(r => {
+        if (r.exists) {
+          dateTracker[r.date].marked++;
         }
+        dateTracker[r.date].total++;
       });
 
-      // Render date list
-      renderDateList(availableDates);
+      // 🔥 STEP 5: Filter dates that have at least 1 marked student
+      availableDates = Object.keys(dateTracker)
+        .filter(date => dateTracker[date].marked > 0)
+        .sort((a, b) => new Date(b) - new Date(a)); // Latest first
+
+      updateProgress(100, `Found ${availableDates.length} dates with attendance`);
+
+      setTimeout(() => {
+        loadingProgress.style.display = 'none';
+        loadBtn.disabled = false;
+
+        if (availableDates.length === 0) {
+          dateListContainer.innerHTML = `<div class="loading-msg"><i class="fas fa-calendar-times"></i> No attendance records found for this month in ${currentClass}.</div>`;
+          return;
+        }
+
+        // Show summary
+        summaryBar.style.display = 'flex';
+        totalDaysEl.textContent = availableDates.length;
+
+        // Render date list
+        renderDateList(availableDates);
+
+      }, 300);
 
     } catch (error) {
       console.error('Error:', error);
+      loadingProgress.style.display = 'none';
+      loadBtn.disabled = false;
       dateListContainer.innerHTML = `<div class="loading-msg"><i class="fas fa-exclamation-circle"></i> Error: ${error.message}</div>`;
     }
   }
@@ -537,12 +697,9 @@
   // ============================================================
   function renderDateList(dates) {
     if (dates.length === 0) {
-      dateListContainer.innerHTML = `<div class="loading-msg"><i class="fas fa-calendar-times"></i> No attendance records found for this month.</div>`;
+      dateListContainer.innerHTML = `<div class="loading-msg"><i class="fas fa-calendar-times"></i> No attendance records found.</div>`;
       return;
     }
-
-    // Sort dates descending (latest first)
-    dates.sort((a, b) => new Date(b) - new Date(a));
 
     let html = '';
     dates.forEach(dateStr => {
@@ -558,7 +715,6 @@
 
     dateListContainer.innerHTML = `<div class="date-list">${html}</div>`;
 
-    // Attach click listeners
     document.querySelectorAll('.date-item').forEach(item => {
       item.addEventListener('click', function() {
         const date = this.dataset.date;
@@ -605,7 +761,7 @@
       });
       currentStudents.sort((a, b) => a.roll - b.roll);
 
-      // 🔥 Parallel fetch attendance
+      // 🔥 Parallel fetch attendance for all students
       const promises = currentStudents.map(s => {
         return db.collection('attendance')
           .doc(sessionParam)
@@ -693,7 +849,6 @@
     detailContent.innerHTML = html;
 
     if (isEditing) {
-      // Attach edit listeners
       document.querySelectorAll('.edit-select').forEach(sel => {
         sel.addEventListener('change', function() {
           const roll = parseInt(this.dataset.roll);
@@ -712,7 +867,7 @@
   }
 
   // ============================================================
-  // SHOW VIEW MODE
+  // VIEW / EDIT MODE
   // ============================================================
   function showViewMode() {
     isEditing = false;
@@ -723,9 +878,6 @@
     deleteBtn.style.display = 'flex';
   }
 
-  // ============================================================
-  // SHOW EDIT MODE
-  // ============================================================
   function showEditMode() {
     isEditing = true;
     editBtn.style.display = 'none';
@@ -867,6 +1019,7 @@
   // ============================================================
   init();
   console.log('✅ Previous Attendance Page Loaded!');
+  console.log('📌 Fixed: All dates of month will show if any student has attendance');
 </script>
 </body>
 </html>
