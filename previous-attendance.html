@@ -56,6 +56,67 @@
       font-size: 1rem;
       box-shadow: 0 4px 10px rgba(139, 92, 246, 0.25);
     }
+    .header .header-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .header .mode-badge {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 40px;
+      padding: 6px 14px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #64748b;
+    }
+    .header .mode-badge.editing {
+      background: #fef3c7;
+      border-color: #f59e0b;
+      color: #92400e;
+    }
+    .header .edit-mode-btn {
+      background: #f59e0b;
+      border: none;
+      border-radius: 40px;
+      padding: 6px 16px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .header .edit-mode-btn:hover { background: #d97706; }
+    .header .save-btn-header {
+      background: #10b981;
+      border: none;
+      border-radius: 40px;
+      padding: 6px 16px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.75rem;
+      display: none;
+      align-items: center;
+      gap: 6px;
+    }
+    .header .save-btn-header:hover { background: #059669; }
+    .header .cancel-btn-header {
+      background: #e2e8f0;
+      border: none;
+      border-radius: 40px;
+      padding: 6px 16px;
+      color: #1a237e;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.75rem;
+      display: none;
+      align-items: center;
+      gap: 6px;
+    }
+    .header .cancel-btn-header:hover { background: #cbd5e1; }
     .header .close-btn {
       background: #e2e8f0;
       border: none;
@@ -64,7 +125,7 @@
       font-weight: 600;
       color: #1a237e;
       cursor: pointer;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -168,9 +229,24 @@
       letter-spacing: 0.5px;
     }
 
+    /* EDIT MODE HINT */
+    .edit-hint {
+      display: none;
+      background: #fef3c7;
+      border: 2px dashed #f59e0b;
+      border-radius: 12px;
+      padding: 10px 16px;
+      margin-bottom: 12px;
+      font-size: 0.8rem;
+      color: #92400e;
+      font-weight: 600;
+      text-align: center;
+    }
+    .edit-hint i { margin-right: 6px; }
+
     .register-wrapper {
       display: none;
-      overflow-x: auto;
+      overflow: auto;
       border-radius: 12px;
       border: 2px solid #1a237e;
       background: white;
@@ -206,7 +282,7 @@
     }
     .register-table thead th.date-col {
       background: #283593;
-      min-width: 34px;
+      min-width: 36px;
       font-size: 0.65rem;
     }
     .register-table thead th.date-col.weekend {
@@ -242,11 +318,27 @@
       z-index: 4;
     }
 
+    /* CELLS */
     .cell-P { background: #d1fae5 !important; color: #065f46 !important; font-weight: 800 !important; }
     .cell-A { background: #fee2e2 !important; color: #991b1b !important; font-weight: 800 !important; }
     .cell-L { background: #fef3c7 !important; color: #92400e !important; font-weight: 800 !important; }
     .cell-H { background: #e0e7ff !important; color: #3730a3 !important; font-weight: 800 !important; }
     .cell-empty { background: #fafafa !important; color: #94a3b8 !important; }
+
+    /* 🔥 CLICKABLE CELLS IN EDIT MODE */
+    .register-table td.editable-cell {
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+    }
+    .register-table td.editable-cell:hover {
+      transform: scale(1.15);
+      z-index: 20;
+      box-shadow: 0 0 0 2px #f59e0b;
+    }
+    .register-table td.editable-cell.changed {
+      box-shadow: 0 0 0 2px #f59e0b inset;
+    }
 
     .summary-row {
       display: none;
@@ -346,6 +438,7 @@
     @media (max-width: 720px) {
       .container { padding: 12px 8px 18px; border-radius: 16px; }
       .header h1 { font-size: 1rem; }
+      .header .close-btn, .header .edit-mode-btn, .header .save-btn-header, .header .cancel-btn-header { font-size: 0.65rem; padding: 4px 12px; }
       .filters { padding: 8px 12px; gap: 6px 8px; border-radius: 20px; }
       .filters select, .filters input[type="month"] { font-size: 0.7rem; padding: 5px 10px; }
       .filters .load-btn { font-size: 0.7rem; padding: 5px 14px; }
@@ -363,10 +456,15 @@
 <div class="container">
   <div class="header">
     <h1><i class="fas fa-history"></i> Previous Attendance</h1>
-    <button class="close-btn" onclick="window.close()"><i class="fas fa-times"></i> Close</button>
+    <div class="header-actions">
+      <span class="mode-badge" id="modeBadge">👁️ View Mode</span>
+      <button class="edit-mode-btn" id="editModeBtn"><i class="fas fa-edit"></i> Edit Mode</button>
+      <button class="save-btn-header" id="saveHeaderBtn"><i class="fas fa-save"></i> Save Changes</button>
+      <button class="cancel-btn-header" id="cancelHeaderBtn"><i class="fas fa-times"></i> Cancel</button>
+      <button class="close-btn" onclick="window.close()"><i class="fas fa-times"></i> Close</button>
+    </div>
   </div>
 
-  <!-- FILTERS - No Auto Class -->
   <div class="filters">
     <label>Class:</label>
     <select id="classSelect">
@@ -393,7 +491,6 @@
     <button class="load-btn" id="loadBtn"><i class="fas fa-search"></i> Load</button>
   </div>
 
-  <!-- LOADING -->
   <div class="loading-progress" id="loadingProgress">
     <div class="progress-text">
       <span id="progressLabel">Loading...</span>
@@ -404,13 +501,15 @@
     </div>
   </div>
 
-  <!-- MONTH TITLE -->
-  <div class="month-title" id="monthTitle">
-    <div id="monthTitleText">September 2025</div>
-    <div class="sub-info" id="monthTitleSub">Class: 10th | Session: 2026-27</div>
+  <div class="edit-hint" id="editHint">
+    <i class="fas fa-hand-pointer"></i> <strong>Edit Mode ON</strong> – Cell par click karke P → A → L → H cycle karein
   </div>
 
-  <!-- REGISTER TABLE -->
+  <div class="month-title" id="monthTitle">
+    <div id="monthTitleText">September 2025</div>
+    <div class="sub-info" id="monthTitleSub">Class: -- | Session: --</div>
+  </div>
+
   <div class="register-wrapper" id="registerWrapper">
     <table class="register-table" id="registerTable">
       <thead id="registerHead"></thead>
@@ -418,7 +517,6 @@
     </table>
   </div>
 
-  <!-- SUMMARY -->
   <div class="summary-row" id="summaryRow">
     <span class="stat stat-total">📌 Total Students: <span class="num" id="totalStudents">0</span></span>
     <span class="stat stat-present">✅ Total P: <span class="num" id="totalP">0</span></span>
@@ -426,7 +524,6 @@
     <span class="stat stat-leave">🟡 Total L: <span class="num" id="totalL">0</span></span>
   </div>
 
-  <!-- ACTION BUTTONS -->
   <div class="action-buttons" id="actionButtons">
     <button class="action-btn btn-download" id="downloadBtn"><i class="fas fa-file-pdf"></i> Download PDF</button>
     <button class="action-btn btn-print" id="printBtn"><i class="fas fa-print"></i> Print</button>
@@ -481,6 +578,11 @@
   const printBtn = document.getElementById('printBtn');
   const emptyState = document.getElementById('emptyState');
   const toast = document.getElementById('toastMsg');
+  const modeBadge = document.getElementById('modeBadge');
+  const editModeBtn = document.getElementById('editModeBtn');
+  const saveHeaderBtn = document.getElementById('saveHeaderBtn');
+  const cancelHeaderBtn = document.getElementById('cancelHeaderBtn');
+  const editHint = document.getElementById('editHint');
 
   // STATE
   let currentClass = '';
@@ -488,18 +590,20 @@
   let currentMonth = '';
   let currentYear = '';
   let currentMonthNum = 0;
+  let currentDaysInMonth = 0;
   let studentsList = [];
-  let attendanceMatrix = {};
+  let attendanceMatrix = {}; // { roll: { day: 'P'|'A'|'L'|'H'|'' } }
+  let originalMatrix = {}; // For cancel
+  let isEditMode = false;
+  let changedCells = new Set(); // "roll_day"
 
   // ============================================================
-  // INIT - No auto class select
+  // INIT
   // ============================================================
   function init() {
-    // 🔥 Set default month to current month only
     const now = new Date();
     const monthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     monthSelect.value = monthStr;
-    // Class NOT auto-selected
   }
 
   function showToast(msg, isError = false) {
@@ -517,7 +621,7 @@
   }
 
   // ============================================================
-  // MAIN LOAD
+  // 🔥 FAST LOAD - Subcollection Query
   // ============================================================
   async function loadMonthlyAttendance() {
     currentClass = classSelect.value;
@@ -531,6 +635,7 @@
     const [year, month] = currentMonth.split('-');
     currentYear = year;
     currentMonthNum = parseInt(month) - 1;
+    currentDaysInMonth = new Date(parseInt(year), currentMonthNum + 1, 0).getDate();
 
     // Reset UI
     loadingProgress.style.display = 'block';
@@ -540,10 +645,11 @@
     monthTitle.style.display = 'none';
     emptyState.style.display = 'none';
     loadBtn.disabled = true;
+    exitEditMode(false);
     updateProgress(0, 'Loading students...');
 
     try {
-      // STEP 1: Get students from admissions
+      // STEP 1: Get students
       let studentSnapshot = await db.collection('admissions')
         .where('classApplying', '==', currentClass)
         .where('session', '==', currentSession)
@@ -575,78 +681,80 @@
       });
       studentsList.sort((a, b) => a.roll - b.roll);
 
-      updateProgress(15, `Found ${studentsList.length} students. Loading attendance...`);
+      updateProgress(30, `Found ${studentsList.length} students. Fetching attendance...`);
 
-      // STEP 2: Days in month
-      const daysInMonth = new Date(parseInt(year), currentMonthNum + 1, 0).getDate();
-
-      // STEP 3: Build attendance matrix
+      // 🔥🔥🔥 FAST APPROACH: Query whole subcollection per student (1 query per student!)
+      // Instead of 1 query per day per student
       attendanceMatrix = {};
-      studentsList.forEach(s => {
-        attendanceMatrix[s.roll] = {};
-      });
-
-      // 🔥 Build all promises with EXACT path as save
-      const allPromises = [];
-      for (const student of studentsList) {
-        for (let day = 1; day <= daysInMonth; day++) {
-          const dateStr = `${year}-${String(currentMonthNum + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-          
-          // 🔥 EXACT SAME PATH AS SAVE
-          const docRef = db.collection('attendance')
+      
+      const studentPromises = studentsList.map(async (student) => {
+        try {
+          // 🔥 Query the WHOLE attendance subcollection for this student
+          const attendanceSnapshot = await db.collection('attendance')
             .doc(currentSession)
             .collection('classes')
             .doc(currentClass)
             .collection('students')
             .doc(student.name)
             .collection('attendance')
-            .doc(dateStr);
-          
-          allPromises.push({
-            roll: student.roll,
-            day: day,
-            date: dateStr,
-            promise: docRef.get()
+            .get(); // ← This gets ALL documents at once!
+
+          const studentMap = {};
+          attendanceSnapshot.forEach(doc => {
+            // doc.id is the date "YYYY-MM-DD"
+            const dateParts = doc.id.split('-');
+            if (dateParts.length === 3) {
+              const docYear = dateParts[0];
+              const docMonth = parseInt(dateParts[1]) - 1;
+              const docDay = parseInt(dateParts[2]);
+              
+              // Only include if it matches the current month/year
+              if (docYear === currentYear && docMonth === currentMonthNum) {
+                const data = doc.data();
+                const status = data.status || '';
+                let cell = '';
+                if (status === 'present') cell = 'P';
+                else if (status === 'absent') cell = 'A';
+                else if (status === 'leave') cell = 'L';
+                else if (status === 'holiday') cell = 'H';
+                studentMap[docDay] = cell;
+              }
+            }
           });
+          
+          return { roll: student.roll, data: studentMap };
+        } catch (err) {
+          console.warn(`Error loading ${student.name}:`, err);
+          return { roll: student.roll, data: {} };
         }
-      }
+      });
 
-      updateProgress(30, `Checking ${allPromises.length} records...`);
+      // Progress tracking
+      let completed = 0;
+      const results = await Promise.all(studentPromises.map(p => 
+        p.then(res => {
+          completed++;
+          const percent = 30 + Math.round(completed / studentsList.length * 60);
+          updateProgress(Math.min(percent, 90), `Loading... ${completed}/${studentsList.length} students`);
+          return res;
+        })
+      ));
 
-      // Execute in chunks
-      const chunkSize = 60;
-      let processed = 0;
-      for (let i = 0; i < allPromises.length; i += chunkSize) {
-        const chunk = allPromises.slice(i, i + chunkSize);
-        const results = await Promise.all(chunk.map(p => p.promise));
+      // Build final matrix
+      results.forEach(r => {
+        attendanceMatrix[r.roll] = r.data;
+      });
 
-        results.forEach((snap, idx) => {
-          const { roll, day } = chunk[idx];
-          if (snap.exists) {
-            const data = snap.data();
-            const status = data.status || '';
-            let cell = '';
-            if (status === 'present') cell = 'P';
-            else if (status === 'absent') cell = 'A';
-            else if (status === 'leave') cell = 'L';
-            else if (status === 'holiday') cell = 'H';
-            attendanceMatrix[roll][day] = cell;
-          } else {
-            attendanceMatrix[roll][day] = '';
-          }
-        });
-
-        processed = Math.min(i + chunkSize, allPromises.length);
-        const percent = 30 + Math.round(processed / allPromises.length * 60);
-        updateProgress(Math.min(percent, 90), `Loading... ${processed}/${allPromises.length}`);
-      }
+      // Save original for cancel
+      originalMatrix = JSON.parse(JSON.stringify(attendanceMatrix));
+      changedCells.clear();
 
       updateProgress(95, 'Rendering register...');
 
-      // STEP 4: Render
-      renderRegister(daysInMonth);
+      // Render
+      renderRegister();
 
-      updateProgress(100, 'Done!');
+      updateProgress(100, 'Done! ✅');
       setTimeout(() => {
         loadingProgress.style.display = 'none';
         loadBtn.disabled = false;
@@ -668,7 +776,7 @@
   // ============================================================
   // RENDER REGISTER
   // ============================================================
-  function renderRegister(daysInMonth) {
+  function renderRegister() {
     const monthName = new Date(currentYear, currentMonthNum).toLocaleString('default', { month: 'long' });
     monthTitleText.textContent = `${monthName} ${currentYear}`;
     monthTitleSub.textContent = `Class: ${currentClass} | Session: ${currentSession} | Total Students: ${studentsList.length}`;
@@ -678,7 +786,7 @@
       <th class="name-col" style="position:sticky;left:0;z-index:11;">Student Name</th>
       <th class="roll-col" style="position:sticky;left:150px;z-index:11;">Roll</th>`;
     
-    for (let day = 1; day <= daysInMonth; day++) {
+    for (let day = 1; day <= currentDaysInMonth; day++) {
       const dateObj = new Date(currentYear, currentMonthNum, day);
       const isWeekend = dateObj.getDay() === 0;
       headHtml += `<th class="date-col ${isWeekend ? 'weekend' : ''}">${day}</th>`;
@@ -695,7 +803,7 @@
       bodyHtml += `<td class="name-col">${student.name}</td>`;
       bodyHtml += `<td class="roll-col">${student.roll}</td>`;
 
-      for (let day = 1; day <= daysInMonth; day++) {
+      for (let day = 1; day <= currentDaysInMonth; day++) {
         const cell = (attendanceMatrix[student.roll] && attendanceMatrix[student.roll][day]) || '';
         let cellClass = 'cell-empty';
         if (cell === 'P') { cellClass = 'cell-P'; totalPCount++; }
@@ -703,7 +811,10 @@
         else if (cell === 'L') { cellClass = 'cell-L'; totalLCount++; }
         else if (cell === 'H') { cellClass = 'cell-H'; }
         
-        bodyHtml += `<td class="${cellClass}">${cell || '-'}</td>`;
+        const changed = changedCells.has(`${student.roll}_${day}`) ? 'changed' : '';
+        const editable = isEditMode ? 'editable-cell' : '';
+        
+        bodyHtml += `<td class="${cellClass} ${editable} ${changed}" data-roll="${student.roll}" data-day="${day}">${cell || '-'}</td>`;
       }
       bodyHtml += `</tr>`;
     });
@@ -713,7 +824,203 @@
     totalP.textContent = totalPCount;
     totalA.textContent = totalACount;
     totalL.textContent = totalLCount;
+
+    // Attach click handlers if edit mode
+    if (isEditMode) {
+      attachCellClickHandlers();
+    }
   }
+
+  // ============================================================
+  // ATTACH CELL CLICK HANDLERS
+  // ============================================================
+  function attachCellClickHandlers() {
+    document.querySelectorAll('.register-table td.editable-cell').forEach(td => {
+      td.addEventListener('click', function() {
+        const roll = parseInt(this.dataset.roll);
+        const day = parseInt(this.dataset.day);
+        
+        // Cycle: '' → P → A → L → H → ''
+        const current = attendanceMatrix[roll][day] || '';
+        let next = '';
+        if (current === '') next = 'P';
+        else if (current === 'P') next = 'A';
+        else if (current === 'A') next = 'L';
+        else if (current === 'L') next = 'H';
+        else if (current === 'H') next = '';
+        
+        attendanceMatrix[roll][day] = next;
+        
+        // Mark as changed
+        const key = `${roll}_${day}`;
+        if (originalMatrix[roll] && originalMatrix[roll][day] === next) {
+          changedCells.delete(key);
+        } else {
+          changedCells.add(key);
+        }
+        
+        // Update cell
+        this.classList.remove('cell-P', 'cell-A', 'cell-L', 'cell-H', 'cell-empty');
+        if (next === 'P') this.classList.add('cell-P');
+        else if (next === 'A') this.classList.add('cell-A');
+        else if (next === 'L') this.classList.add('cell-L');
+        else if (next === 'H') this.classList.add('cell-H');
+        else this.classList.add('cell-empty');
+        
+        this.textContent = next || '-';
+        
+        // Update changed indicator
+        if (changedCells.has(key)) this.classList.add('changed');
+        else this.classList.remove('changed');
+        
+        // Update summary
+        updateSummaryCounts();
+      });
+    });
+  }
+
+  // ============================================================
+  // UPDATE SUMMARY
+  // ============================================================
+  function updateSummaryCounts() {
+    let totalPCount = 0, totalACount = 0, totalLCount = 0;
+    studentsList.forEach(student => {
+      for (let day = 1; day <= currentDaysInMonth; day++) {
+        const cell = (attendanceMatrix[student.roll] && attendanceMatrix[student.roll][day]) || '';
+        if (cell === 'P') totalPCount++;
+        else if (cell === 'A') totalACount++;
+        else if (cell === 'L') totalLCount++;
+      }
+    });
+    totalP.textContent = totalPCount;
+    totalA.textContent = totalACount;
+    totalL.textContent = totalLCount;
+  }
+
+  // ============================================================
+  // EDIT MODE TOGGLE
+  // ============================================================
+  function enterEditMode() {
+    isEditMode = true;
+    modeBadge.textContent = '✏️ Edit Mode';
+    modeBadge.classList.add('editing');
+    editModeBtn.style.display = 'none';
+    saveHeaderBtn.style.display = 'flex';
+    cancelHeaderBtn.style.display = 'flex';
+    editHint.style.display = 'block';
+    
+    // Re-render with editable cells
+    renderRegister();
+    showToast('✏️ Edit mode ON – Cell par click karein');
+  }
+
+  function exitEditMode(showMsg = true) {
+    isEditMode = false;
+    modeBadge.textContent = '👁️ View Mode';
+    modeBadge.classList.remove('editing');
+    editModeBtn.style.display = 'flex';
+    saveHeaderBtn.style.display = 'none';
+    cancelHeaderBtn.style.display = 'none';
+    editHint.style.display = 'none';
+    changedCells.clear();
+    if (showMsg) showToast('👁️ View mode');
+  }
+
+  editModeBtn.addEventListener('click', enterEditMode);
+
+  cancelHeaderBtn.addEventListener('click', function() {
+    if (changedCells.size > 0) {
+      if (!confirm(`You have ${changedCells.size} unsaved changes. Cancel?`)) return;
+    }
+    // Restore original
+    attendanceMatrix = JSON.parse(JSON.stringify(originalMatrix));
+    changedCells.clear();
+    exitEditMode(false);
+    renderRegister();
+    updateSummaryCounts();
+    showToast('❌ Changes cancelled');
+  });
+
+  // ============================================================
+  // SAVE CHANGES
+  // ============================================================
+  saveHeaderBtn.addEventListener('click', async function() {
+    if (changedCells.size === 0) {
+      showToast('No changes to save!', true);
+      return;
+    }
+
+    if (!confirm(`Save ${changedCells.size} changes?`)) return;
+
+    saveHeaderBtn.disabled = true;
+    saveHeaderBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+    try {
+      const batch = db.batch();
+      let savedCount = 0;
+
+      changedCells.forEach(key => {
+        const [roll, day] = key.split('_').map(Number);
+        const cell = attendanceMatrix[roll][day] || '';
+        const student = studentsList.find(s => s.roll === roll);
+        if (!student) return;
+
+        // Convert cell to status
+        let status = '';
+        if (cell === 'P') status = 'present';
+        else if (cell === 'A') status = 'absent';
+        else if (cell === 'L') status = 'leave';
+        else if (cell === 'H') status = 'holiday';
+        else status = '';
+
+        const dateStr = `${currentYear}-${String(currentMonthNum + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        
+        const docRef = db.collection('attendance')
+          .doc(currentSession)
+          .collection('classes')
+          .doc(currentClass)
+          .collection('students')
+          .doc(student.name)
+          .collection('attendance')
+          .doc(dateStr);
+
+        if (status === '') {
+          // If empty, delete the document
+          batch.delete(docRef);
+        } else {
+          batch.set(docRef, {
+            status: status,
+            remark: '',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            roll: roll,
+            date: dateStr,
+            session: currentSession,
+            class: currentClass
+          });
+        }
+        savedCount++;
+      });
+
+      await batch.commit();
+
+      // Update original matrix
+      originalMatrix = JSON.parse(JSON.stringify(attendanceMatrix));
+      changedCells.clear();
+
+      saveHeaderBtn.disabled = false;
+      saveHeaderBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+      
+      exitEditMode(false);
+      renderRegister();
+      showToast(`✅ ${savedCount} changes saved!`);
+
+    } catch (error) {
+      console.error('Save error:', error);
+      saveHeaderBtn.disabled = false;
+      saveHeaderBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+      showToast('❌ Error: ' + error.message, true);
+    }
+  });
 
   // ============================================================
   // DOWNLOAD PDF
@@ -722,7 +1029,6 @@
     if (studentsList.length === 0) { showToast('No data!', true); return; }
 
     const monthName = new Date(currentYear, currentMonthNum).toLocaleString('default', { month: 'long' });
-    const daysInMonth = new Date(currentYear, currentMonthNum + 1, 0).getDate();
 
     let content = `📋 MONTHLY ATTENDANCE REGISTER
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -731,16 +1037,16 @@
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
 
     let headerRow = `  ${'Student Name'.padEnd(22)} ${'Roll'.padEnd(6)} `;
-    for (let day = 1; day <= daysInMonth; day++) headerRow += `${String(day).padStart(2)} `;
+    for (let day = 1; day <= currentDaysInMonth; day++) headerRow += `${String(day).padStart(2)} `;
     content += headerRow + '\n';
 
     let separator = `  ${'─'.repeat(22)} ${'─'.repeat(6)} `;
-    for (let day = 1; day <= daysInMonth; day++) separator += `───`;
+    for (let day = 1; day <= currentDaysInMonth; day++) separator += `───`;
     content += separator + '\n';
 
     studentsList.forEach(student => {
       let row = `  ${student.name.padEnd(22)} ${String(student.roll).padEnd(6)} `;
-      for (let day = 1; day <= daysInMonth; day++) {
+      for (let day = 1; day <= currentDaysInMonth; day++) {
         const cell = (attendanceMatrix[student.roll] && attendanceMatrix[student.roll][day]) || '';
         row += ` ${(cell || '-').padEnd(2)}`;
       }
@@ -774,7 +1080,6 @@
     if (studentsList.length === 0) { showToast('No data!', true); return; }
 
     const monthName = new Date(currentYear, currentMonthNum).toLocaleString('default', { month: 'long' });
-    const daysInMonth = new Date(currentYear, currentMonthNum + 1, 0).getDate();
     const printWindow = window.open('', '_blank');
     
     let tableHtml = `
@@ -800,14 +1105,14 @@
           <th class="name-col">Student Name</th>
           <th class="roll-col">Roll</th>`;
 
-    for (let day = 1; day <= daysInMonth; day++) tableHtml += `<th>${day}</th>`;
+    for (let day = 1; day <= currentDaysInMonth; day++) tableHtml += `<th>${day}</th>`;
     tableHtml += `</tr></thead><tbody>`;
 
     studentsList.forEach(student => {
       tableHtml += `<tr>
         <td class="name-col">${student.name}</td>
         <td class="roll-col">${student.roll}</td>`;
-      for (let day = 1; day <= daysInMonth; day++) {
+      for (let day = 1; day <= currentDaysInMonth; day++) {
         const cell = (attendanceMatrix[student.roll] && attendanceMatrix[student.roll][day]) || '';
         let cellClass = 'cell-empty';
         if (cell === 'P') cellClass = 'cell-P';
@@ -839,8 +1144,8 @@
   // ============================================================
   init();
   console.log('✅ Previous Attendance Page Loaded!');
-  console.log('📌 Path: attendance/{session}/classes/{class}/students/{name}/attendance/{date}');
-  console.log('📌 No auto class select - teacher will select');
+  console.log('📌 FAST: 1 query per student (subcollection get)');
+  console.log('📌 Edit Mode: Cell par click karke P→A→L→H cycle');
 </script>
 </body>
 </html>
