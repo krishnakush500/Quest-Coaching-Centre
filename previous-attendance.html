@@ -103,6 +103,7 @@
       gap: 6px;
     }
     .header .save-btn-header:hover { background: #059669; }
+    .header .save-btn-header:disabled { opacity: 0.6; cursor: not-allowed; }
     .header .cancel-btn-header {
       background: #e2e8f0;
       border: none;
@@ -229,7 +230,6 @@
       letter-spacing: 0.5px;
     }
 
-    /* EDIT MODE HINT */
     .edit-hint {
       display: none;
       background: #fef3c7;
@@ -288,6 +288,17 @@
     .register-table thead th.date-col.weekend {
       background: #dc3545;
     }
+    /* 🔥 LOCKED COLUMN HEADER */
+    .register-table thead th.date-col.locked-header {
+      background: #64748b;
+      color: #cbd5e1;
+      opacity: 0.7;
+    }
+    .register-table thead th.date-col.locked-header i {
+      font-size: 0.55rem;
+      margin-left: 2px;
+    }
+
     .register-table tbody tr:nth-child(even) {
       background: #f8fafc;
     }
@@ -325,7 +336,28 @@
     .cell-H { background: #e0e7ff !important; color: #3730a3 !important; font-weight: 800 !important; }
     .cell-empty { background: #fafafa !important; color: #94a3b8 !important; }
 
-    /* 🔥 CLICKABLE CELLS IN EDIT MODE */
+    /* 🔥 LOCKED CELLS */
+    .register-table td.locked-cell {
+      background: #f1f5f9 !important;
+      color: #94a3b8 !important;
+      cursor: not-allowed !important;
+      opacity: 0.65;
+      position: relative;
+    }
+    .register-table td.locked-cell::after {
+      content: '🔒';
+      position: absolute;
+      top: 1px;
+      right: 2px;
+      font-size: 0.5rem;
+      opacity: 0.7;
+    }
+    .register-table td.locked-cell:hover {
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    /* EDITABLE CELLS */
     .register-table td.editable-cell {
       cursor: pointer;
       transition: all 0.15s;
@@ -502,7 +534,7 @@
   </div>
 
   <div class="edit-hint" id="editHint">
-    <i class="fas fa-hand-pointer"></i> <strong>Edit Mode ON</strong> – Cell par click karke P → A → L → H cycle karein
+    <i class="fas fa-hand-pointer"></i> <strong>Edit Mode ON</strong> – Sirf past/valid dates par click karein · 🔒 Locked dates nahi badal sakte
   </div>
 
   <div class="month-title" id="monthTitle">
@@ -592,10 +624,17 @@
   let currentMonthNum = 0;
   let currentDaysInMonth = 0;
   let studentsList = [];
-  let attendanceMatrix = {}; // { roll: { day: 'P'|'A'|'L'|'H'|'' } }
-  let originalMatrix = {}; // For cancel
+  let attendanceMatrix = {};
+  let originalMatrix = {};
   let isEditMode = false;
-  let changedCells = new Set(); // "roll_day"
+  let changedCells = new Set();
+  
+  // 🔥 LOCKED DAYS TRACKER
+  // A day is editable ONLY IF:
+  // 1. Date is today or before (not future)
+  // 2. At least ONE student has attendance for that date
+  let editableDays = new Set(); // Days that can be edited
+  let lockedDays = new Set();   // Days that are locked
 
   // ============================================================
   // INIT
@@ -621,7 +660,49 @@
   }
 
   // ============================================================
-  // 🔥 FAST LOAD - Subcollection Query
+  // 🔥 HELPER: Check if a day is editable
+  // ============================================================
+  function isDayEditable(day) {
+    return editableDays.has(day);
+  }
+
+  // ============================================================
+  // 🔥 HELPER: Determine editable and locked days
+  // ============================================================
+  function computeEditableDays() {
+    editableDays.clear();
+    lockedDays.clear();
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    for (let day = 1; day <= currentDaysInMonth; day++) {
+      const dateObj = new Date(parseInt(currentYear), currentMonthNum, day);
+      dateObj.setHours(0, 0, 0, 0);
+      
+      const isFutureDate = dateObj > today;
+      
+      // Check if any student has attendance for this day
+      let hasAttendance = false;
+      for (const student of studentsList) {
+        const cell = attendanceMatrix[student.roll] && attendanceMatrix[student.roll][day];
+        if (cell && cell !== '') {
+          hasAttendance = true;
+          break;
+        }
+      }
+      
+      // Editable if: NOT future AND has attendance
+      if (!isFutureDate && hasAttendance) {
+        editableDays.add(day);
+      } else {
+        lockedDays.add(day);
+      }
+    }
+  }
+
+  // ============================================================
+  // FAST LOAD
   // ============================================================
   async function loadMonthlyAttendance() {
     currentClass = classSelect.value;
@@ -637,7 +718,6 @@
     currentMonthNum = parseInt(month) - 1;
     currentDaysInMonth = new Date(parseInt(year), currentMonthNum + 1, 0).getDate();
 
-    // Reset UI
     loadingProgress.style.display = 'block';
     registerWrapper.style.display = 'none';
     summaryRow.style.display = 'none';
@@ -649,7 +729,6 @@
     updateProgress(0, 'Loading students...');
 
     try {
-      // STEP 1: Get students
       let studentSnapshot = await db.collection('admissions')
         .where('classApplying', '==', currentClass)
         .where('session', '==', currentSession)
@@ -683,13 +762,11 @@
 
       updateProgress(30, `Found ${studentsList.length} students. Fetching attendance...`);
 
-      // 🔥🔥🔥 FAST APPROACH: Query whole subcollection per student (1 query per student!)
-      // Instead of 1 query per day per student
+      // 🔥 FAST: Subcollection get per student
       attendanceMatrix = {};
       
       const studentPromises = studentsList.map(async (student) => {
         try {
-          // 🔥 Query the WHOLE attendance subcollection for this student
           const attendanceSnapshot = await db.collection('attendance')
             .doc(currentSession)
             .collection('classes')
@@ -697,18 +774,16 @@
             .collection('students')
             .doc(student.name)
             .collection('attendance')
-            .get(); // ← This gets ALL documents at once!
+            .get();
 
           const studentMap = {};
           attendanceSnapshot.forEach(doc => {
-            // doc.id is the date "YYYY-MM-DD"
             const dateParts = doc.id.split('-');
             if (dateParts.length === 3) {
               const docYear = dateParts[0];
               const docMonth = parseInt(dateParts[1]) - 1;
               const docDay = parseInt(dateParts[2]);
               
-              // Only include if it matches the current month/year
               if (docYear === currentYear && docMonth === currentMonthNum) {
                 const data = doc.data();
                 const status = data.status || '';
@@ -729,7 +804,6 @@
         }
       });
 
-      // Progress tracking
       let completed = 0;
       const results = await Promise.all(studentPromises.map(p => 
         p.then(res => {
@@ -740,18 +814,18 @@
         })
       ));
 
-      // Build final matrix
       results.forEach(r => {
         attendanceMatrix[r.roll] = r.data;
       });
 
-      // Save original for cancel
+      // 🔥 COMPUTE EDITABLE/ LOCKED DAYS
+      computeEditableDays();
+
       originalMatrix = JSON.parse(JSON.stringify(attendanceMatrix));
       changedCells.clear();
 
       updateProgress(95, 'Rendering register...');
 
-      // Render
       renderRegister();
 
       updateProgress(100, 'Done! ✅');
@@ -779,7 +853,7 @@
   function renderRegister() {
     const monthName = new Date(currentYear, currentMonthNum).toLocaleString('default', { month: 'long' });
     monthTitleText.textContent = `${monthName} ${currentYear}`;
-    monthTitleSub.textContent = `Class: ${currentClass} | Session: ${currentSession} | Total Students: ${studentsList.length}`;
+    monthTitleSub.textContent = `Class: ${currentClass} | Session: ${currentSession} | Total Students: ${studentsList.length} | Editable Days: ${editableDays.size} | Locked: ${lockedDays.size}`;
 
     // Header
     let headHtml = `<tr>
@@ -789,7 +863,13 @@
     for (let day = 1; day <= currentDaysInMonth; day++) {
       const dateObj = new Date(currentYear, currentMonthNum, day);
       const isWeekend = dateObj.getDay() === 0;
-      headHtml += `<th class="date-col ${isWeekend ? 'weekend' : ''}">${day}</th>`;
+      const isLocked = lockedDays.has(day);
+      
+      let classes = 'date-col';
+      if (isWeekend) classes += ' weekend';
+      if (isLocked && isEditMode) classes += ' locked-header';
+      
+      headHtml += `<th class="${classes}">${day}${isLocked && isEditMode ? ' <i class="fas fa-lock"></i>' : ''}</th>`;
     }
     headHtml += `</tr>`;
     registerHead.innerHTML = headHtml;
@@ -812,9 +892,18 @@
         else if (cell === 'H') { cellClass = 'cell-H'; }
         
         const changed = changedCells.has(`${student.roll}_${day}`) ? 'changed' : '';
-        const editable = isEditMode ? 'editable-cell' : '';
         
-        bodyHtml += `<td class="${cellClass} ${editable} ${changed}" data-roll="${student.roll}" data-day="${day}">${cell || '-'}</td>`;
+        // 🔥 Determine if editable or locked
+        let editClass = '';
+        if (isEditMode) {
+          if (isDayEditable(day)) {
+            editClass = 'editable-cell';
+          } else {
+            editClass = 'locked-cell';
+          }
+        }
+        
+        bodyHtml += `<td class="${cellClass} ${editClass} ${changed}" data-roll="${student.roll}" data-day="${day}">${cell || '-'}</td>`;
       }
       bodyHtml += `</tr>`;
     });
@@ -825,7 +914,6 @@
     totalA.textContent = totalACount;
     totalL.textContent = totalLCount;
 
-    // Attach click handlers if edit mode
     if (isEditMode) {
       attachCellClickHandlers();
     }
@@ -840,7 +928,12 @@
         const roll = parseInt(this.dataset.roll);
         const day = parseInt(this.dataset.day);
         
-        // Cycle: '' → P → A → L → H → ''
+        // 🔥 Extra safety check
+        if (!isDayEditable(day)) {
+          showToast('🔒 This date is locked!', true);
+          return;
+        }
+        
         const current = attendanceMatrix[roll][day] || '';
         let next = '';
         if (current === '') next = 'P';
@@ -851,7 +944,6 @@
         
         attendanceMatrix[roll][day] = next;
         
-        // Mark as changed
         const key = `${roll}_${day}`;
         if (originalMatrix[roll] && originalMatrix[roll][day] === next) {
           changedCells.delete(key);
@@ -859,7 +951,6 @@
           changedCells.add(key);
         }
         
-        // Update cell
         this.classList.remove('cell-P', 'cell-A', 'cell-L', 'cell-H', 'cell-empty');
         if (next === 'P') this.classList.add('cell-P');
         else if (next === 'A') this.classList.add('cell-A');
@@ -869,12 +960,26 @@
         
         this.textContent = next || '-';
         
-        // Update changed indicator
         if (changedCells.has(key)) this.classList.add('changed');
         else this.classList.remove('changed');
         
-        // Update summary
         updateSummaryCounts();
+      });
+    });
+    
+    // 🔥 Show toast if locked cell clicked
+    document.querySelectorAll('.register-table td.locked-cell').forEach(td => {
+      td.addEventListener('click', function() {
+        const day = parseInt(this.dataset.day);
+        const dateObj = new Date(currentYear, currentMonthNum, day);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (dateObj > today) {
+          showToast(`🔒 Day ${day} is a future date. Cannot edit.`, true);
+        } else {
+          showToast(`🔒 Day ${day} has no attendance to edit.`, true);
+        }
       });
     });
   }
@@ -909,9 +1014,11 @@
     cancelHeaderBtn.style.display = 'flex';
     editHint.style.display = 'block';
     
-    // Re-render with editable cells
+    // Recompute editable days (in case any changed)
+    computeEditableDays();
+    
     renderRegister();
-    showToast('✏️ Edit mode ON – Cell par click karein');
+    showToast(`✏️ Edit mode ON – ${editableDays.size} days editable`);
   }
 
   function exitEditMode(showMsg = true) {
@@ -932,7 +1039,6 @@
     if (changedCells.size > 0) {
       if (!confirm(`You have ${changedCells.size} unsaved changes. Cancel?`)) return;
     }
-    // Restore original
     attendanceMatrix = JSON.parse(JSON.stringify(originalMatrix));
     changedCells.clear();
     exitEditMode(false);
@@ -965,7 +1071,6 @@
         const student = studentsList.find(s => s.roll === roll);
         if (!student) return;
 
-        // Convert cell to status
         let status = '';
         if (cell === 'P') status = 'present';
         else if (cell === 'A') status = 'absent';
@@ -985,7 +1090,6 @@
           .doc(dateStr);
 
         if (status === '') {
-          // If empty, delete the document
           batch.delete(docRef);
         } else {
           batch.set(docRef, {
@@ -1003,9 +1107,11 @@
 
       await batch.commit();
 
-      // Update original matrix
       originalMatrix = JSON.parse(JSON.stringify(attendanceMatrix));
       changedCells.clear();
+      
+      // Recompute editable days after save
+      computeEditableDays();
 
       saveHeaderBtn.disabled = false;
       saveHeaderBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
@@ -1144,8 +1250,8 @@
   // ============================================================
   init();
   console.log('✅ Previous Attendance Page Loaded!');
-  console.log('📌 FAST: 1 query per student (subcollection get)');
-  console.log('📌 Edit Mode: Cell par click karke P→A→L→H cycle');
+  console.log('📌 Edit Mode: Sirf wahi dates editable jinka attendance ho chuka hai');
+  console.log('📌 Future dates aur empty dates locked rahengi');
 </script>
 </body>
 </html>
