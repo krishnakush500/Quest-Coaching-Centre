@@ -288,15 +288,18 @@
     .register-table thead th.date-col.weekend {
       background: #dc3545;
     }
-    /* 🔥 LOCKED COLUMN HEADER */
     .register-table thead th.date-col.locked-header {
       background: #64748b;
       color: #cbd5e1;
       opacity: 0.7;
     }
+    /* 🔥 BIGGER LOCK ICON IN HEADER */
     .register-table thead th.date-col.locked-header i {
-      font-size: 0.55rem;
-      margin-left: 2px;
+      font-size: 0.85rem;
+      margin-left: 3px;
+      color: #fff;
+      display: block;
+      margin-top: 2px;
     }
 
     .register-table tbody tr:nth-child(even) {
@@ -334,23 +337,25 @@
     .cell-A { background: #fee2e2 !important; color: #991b1b !important; font-weight: 800 !important; }
     .cell-L { background: #fef3c7 !important; color: #92400e !important; font-weight: 800 !important; }
     .cell-H { background: #e0e7ff !important; color: #3730a3 !important; font-weight: 800 !important; }
-    .cell-empty { background: #fafafa !important; color: #94a3b8 !important; }
+    .cell-empty { background: #fafafa !important; color: transparent !important; }
 
-    /* 🔥 LOCKED CELLS */
+    /* 🔥 LOCKED CELLS - BIGGER LOCK */
     .register-table td.locked-cell {
       background: #f1f5f9 !important;
       color: #94a3b8 !important;
       cursor: not-allowed !important;
-      opacity: 0.65;
+      opacity: 0.7;
       position: relative;
+      font-size: 0.9rem;
     }
     .register-table td.locked-cell::after {
       content: '🔒';
       position: absolute;
-      top: 1px;
-      right: 2px;
-      font-size: 0.5rem;
-      opacity: 0.7;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 0.85rem;
+      opacity: 0.9;
     }
     .register-table td.locked-cell:hover {
       transform: none !important;
@@ -479,6 +484,8 @@
       .register-table .name-col { min-width: 100px; font-size: 0.65rem; padding-left: 6px; }
       .register-table .roll-col { left: 100px; min-width: 40px; }
       .register-table thead th.date-col { min-width: 26px; font-size: 0.55rem; padding: 5px 2px; }
+      .register-table thead th.date-col.locked-header i { font-size: 0.75rem; }
+      .register-table td.locked-cell::after { font-size: 0.75rem; }
       .action-btn { padding: 8px 16px; font-size: 0.7rem; }
     }
   </style>
@@ -585,7 +592,6 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  // DOM REFS
   const classSelect = document.getElementById('classSelect');
   const sessionSelect = document.getElementById('sessionSelect');
   const monthSelect = document.getElementById('monthSelect');
@@ -616,7 +622,6 @@
   const cancelHeaderBtn = document.getElementById('cancelHeaderBtn');
   const editHint = document.getElementById('editHint');
 
-  // STATE
   let currentClass = '';
   let currentSession = '';
   let currentMonth = '';
@@ -628,17 +633,9 @@
   let originalMatrix = {};
   let isEditMode = false;
   let changedCells = new Set();
-  
-  // 🔥 LOCKED DAYS TRACKER
-  // A day is editable ONLY IF:
-  // 1. Date is today or before (not future)
-  // 2. At least ONE student has attendance for that date
-  let editableDays = new Set(); // Days that can be edited
-  let lockedDays = new Set();   // Days that are locked
+  let editableDays = new Set();
+  let lockedDays = new Set();
 
-  // ============================================================
-  // INIT
-  // ============================================================
   function init() {
     const now = new Date();
     const monthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -659,16 +656,10 @@
     if (label) progressLabel.textContent = label;
   }
 
-  // ============================================================
-  // 🔥 HELPER: Check if a day is editable
-  // ============================================================
   function isDayEditable(day) {
     return editableDays.has(day);
   }
 
-  // ============================================================
-  // 🔥 HELPER: Determine editable and locked days
-  // ============================================================
   function computeEditableDays() {
     editableDays.clear();
     lockedDays.clear();
@@ -682,7 +673,6 @@
       
       const isFutureDate = dateObj > today;
       
-      // Check if any student has attendance for this day
       let hasAttendance = false;
       for (const student of studentsList) {
         const cell = attendanceMatrix[student.roll] && attendanceMatrix[student.roll][day];
@@ -692,7 +682,6 @@
         }
       }
       
-      // Editable if: NOT future AND has attendance
       if (!isFutureDate && hasAttendance) {
         editableDays.add(day);
       } else {
@@ -701,9 +690,6 @@
     }
   }
 
-  // ============================================================
-  // FAST LOAD
-  // ============================================================
   async function loadMonthlyAttendance() {
     currentClass = classSelect.value;
     currentSession = sessionSelect.value;
@@ -762,7 +748,6 @@
 
       updateProgress(30, `Found ${studentsList.length} students. Fetching attendance...`);
 
-      // 🔥 FAST: Subcollection get per student
       attendanceMatrix = {};
       
       const studentPromises = studentsList.map(async (student) => {
@@ -818,17 +803,14 @@
         attendanceMatrix[r.roll] = r.data;
       });
 
-      // 🔥 COMPUTE EDITABLE/ LOCKED DAYS
       computeEditableDays();
-
       originalMatrix = JSON.parse(JSON.stringify(attendanceMatrix));
       changedCells.clear();
 
       updateProgress(95, 'Rendering register...');
-
       renderRegister();
-
       updateProgress(100, 'Done! ✅');
+      
       setTimeout(() => {
         loadingProgress.style.display = 'none';
         loadBtn.disabled = false;
@@ -847,15 +829,11 @@
     }
   }
 
-  // ============================================================
-  // RENDER REGISTER
-  // ============================================================
   function renderRegister() {
     const monthName = new Date(currentYear, currentMonthNum).toLocaleString('default', { month: 'long' });
     monthTitleText.textContent = `${monthName} ${currentYear}`;
     monthTitleSub.textContent = `Class: ${currentClass} | Session: ${currentSession} | Total Students: ${studentsList.length} | Editable Days: ${editableDays.size} | Locked: ${lockedDays.size}`;
 
-    // Header
     let headHtml = `<tr>
       <th class="name-col" style="position:sticky;left:0;z-index:11;">Student Name</th>
       <th class="roll-col" style="position:sticky;left:150px;z-index:11;">Roll</th>`;
@@ -869,12 +847,12 @@
       if (isWeekend) classes += ' weekend';
       if (isLocked && isEditMode) classes += ' locked-header';
       
-      headHtml += `<th class="${classes}">${day}${isLocked && isEditMode ? ' <i class="fas fa-lock"></i>' : ''}</th>`;
+      // 🔥 LOCK ICON BIGGER + NEW LINE
+      headHtml += `<th class="${classes}">${day}${isLocked && isEditMode ? '<i class="fas fa-lock"></i>' : ''}</th>`;
     }
     headHtml += `</tr>`;
     registerHead.innerHTML = headHtml;
 
-    // Body
     let bodyHtml = '';
     let totalPCount = 0, totalACount = 0, totalLCount = 0;
 
@@ -893,7 +871,6 @@
         
         const changed = changedCells.has(`${student.roll}_${day}`) ? 'changed' : '';
         
-        // 🔥 Determine if editable or locked
         let editClass = '';
         if (isEditMode) {
           if (isDayEditable(day)) {
@@ -903,7 +880,8 @@
           }
         }
         
-        bodyHtml += `<td class="${cellClass} ${editClass} ${changed}" data-roll="${student.roll}" data-day="${day}">${cell || '-'}</td>`;
+        // 🔥 NO DASH - empty cells blank
+        bodyHtml += `<td class="${cellClass} ${editClass} ${changed}" data-roll="${student.roll}" data-day="${day}">${cell}</td>`;
       }
       bodyHtml += `</tr>`;
     });
@@ -919,16 +897,12 @@
     }
   }
 
-  // ============================================================
-  // ATTACH CELL CLICK HANDLERS
-  // ============================================================
   function attachCellClickHandlers() {
     document.querySelectorAll('.register-table td.editable-cell').forEach(td => {
       td.addEventListener('click', function() {
         const roll = parseInt(this.dataset.roll);
         const day = parseInt(this.dataset.day);
         
-        // 🔥 Extra safety check
         if (!isDayEditable(day)) {
           showToast('🔒 This date is locked!', true);
           return;
@@ -958,7 +932,8 @@
         else if (next === 'H') this.classList.add('cell-H');
         else this.classList.add('cell-empty');
         
-        this.textContent = next || '-';
+        // 🔥 NO DASH - empty shows blank
+        this.textContent = next;
         
         if (changedCells.has(key)) this.classList.add('changed');
         else this.classList.remove('changed');
@@ -967,7 +942,6 @@
       });
     });
     
-    // 🔥 Show toast if locked cell clicked
     document.querySelectorAll('.register-table td.locked-cell').forEach(td => {
       td.addEventListener('click', function() {
         const day = parseInt(this.dataset.day);
@@ -984,9 +958,6 @@
     });
   }
 
-  // ============================================================
-  // UPDATE SUMMARY
-  // ============================================================
   function updateSummaryCounts() {
     let totalPCount = 0, totalACount = 0, totalLCount = 0;
     studentsList.forEach(student => {
@@ -1002,9 +973,6 @@
     totalL.textContent = totalLCount;
   }
 
-  // ============================================================
-  // EDIT MODE TOGGLE
-  // ============================================================
   function enterEditMode() {
     isEditMode = true;
     modeBadge.textContent = '✏️ Edit Mode';
@@ -1013,10 +981,7 @@
     saveHeaderBtn.style.display = 'flex';
     cancelHeaderBtn.style.display = 'flex';
     editHint.style.display = 'block';
-    
-    // Recompute editable days (in case any changed)
     computeEditableDays();
-    
     renderRegister();
     showToast(`✏️ Edit mode ON – ${editableDays.size} days editable`);
   }
@@ -1047,9 +1012,6 @@
     showToast('❌ Changes cancelled');
   });
 
-  // ============================================================
-  // SAVE CHANGES
-  // ============================================================
   saveHeaderBtn.addEventListener('click', async function() {
     if (changedCells.size === 0) {
       showToast('No changes to save!', true);
@@ -1109,8 +1071,6 @@
 
       originalMatrix = JSON.parse(JSON.stringify(attendanceMatrix));
       changedCells.clear();
-      
-      // Recompute editable days after save
       computeEditableDays();
 
       saveHeaderBtn.disabled = false;
@@ -1128,9 +1088,6 @@
     }
   });
 
-  // ============================================================
-  // DOWNLOAD PDF
-  // ============================================================
   downloadBtn.addEventListener('click', function() {
     if (studentsList.length === 0) { showToast('No data!', true); return; }
 
@@ -1154,13 +1111,13 @@
       let row = `  ${student.name.padEnd(22)} ${String(student.roll).padEnd(6)} `;
       for (let day = 1; day <= currentDaysInMonth; day++) {
         const cell = (attendanceMatrix[student.roll] && attendanceMatrix[student.roll][day]) || '';
-        row += ` ${(cell || '-').padEnd(2)}`;
+        row += ` ${(cell || ' ').padEnd(2)}`;
       }
       content += row + '\n';
     });
 
     content += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    content += `📊 Legend: P = Present | A = Absent | L = Leave | H = Holiday | - = Not Marked\n`;
+    content += `📊 Legend: P = Present | A = Absent | L = Leave | H = Holiday | (blank) = Not Marked\n`;
     content += `📅 Generated: ${new Date().toLocaleString()}\n`;
     content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
 
@@ -1179,9 +1136,6 @@
     showToast('📥 PDF downloaded!');
   });
 
-  // ============================================================
-  // PRINT
-  // ============================================================
   printBtn.addEventListener('click', function() {
     if (studentsList.length === 0) { showToast('No data!', true); return; }
 
@@ -1203,7 +1157,7 @@
         .cell-A { background: #fee2e2; color: #991b1b; font-weight: bold; }
         .cell-L { background: #fef3c7; color: #92400e; font-weight: bold; }
         .cell-H { background: #e0e7ff; color: #3730a3; font-weight: bold; }
-        .cell-empty { background: #fafafa; color: #94a3b8; }
+        .cell-empty { background: #fafafa; }
       </style></head><body>
         <h1>🏫 QUEST COACHING CENTRE</h1>
         <h2>Attendance Register · Class: ${currentClass} · ${monthName} ${currentYear} · Session: ${currentSession}</h2>
@@ -1225,14 +1179,14 @@
         else if (cell === 'A') cellClass = 'cell-A';
         else if (cell === 'L') cellClass = 'cell-L';
         else if (cell === 'H') cellClass = 'cell-H';
-        tableHtml += `<td class="${cellClass}">${cell || '-'}</td>`;
+        tableHtml += `<td class="${cellClass}">${cell}</td>`;
       }
       tableHtml += `</tr>`;
     });
 
     tableHtml += `</tbody></table>
       <p style="text-align:center; margin-top:12px; font-size:10px; color:#666;">
-        Legend: P = Present | A = Absent | L = Leave | H = Holiday | - = Not Marked
+        Legend: P = Present | A = Absent | L = Leave | H = Holiday
       </p></body></html>`;
 
     printWindow.document.write(tableHtml);
@@ -1240,18 +1194,11 @@
     printWindow.print();
   });
 
-  // ============================================================
-  // EVENTS
-  // ============================================================
   loadBtn.addEventListener('click', loadMonthlyAttendance);
 
-  // ============================================================
-  // INIT
-  // ============================================================
   init();
   console.log('✅ Previous Attendance Page Loaded!');
-  console.log('📌 Edit Mode: Sirf wahi dates editable jinka attendance ho chuka hai');
-  console.log('📌 Future dates aur empty dates locked rahengi');
+  console.log('📌 Lock icon bigger + No dash in cells');
 </script>
 </body>
 </html>
