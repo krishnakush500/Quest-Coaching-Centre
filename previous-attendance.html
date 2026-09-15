@@ -7,6 +7,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   
+  <!-- 🔥 REAL PDF LIBRARIES -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
@@ -293,7 +297,6 @@
       color: #cbd5e1;
       opacity: 0.7;
     }
-    /* 🔥 BIGGER LOCK ICON IN HEADER */
     .register-table thead th.date-col.locked-header i {
       font-size: 0.85rem;
       margin-left: 3px;
@@ -332,14 +335,12 @@
       z-index: 4;
     }
 
-    /* CELLS */
     .cell-P { background: #d1fae5 !important; color: #065f46 !important; font-weight: 800 !important; }
     .cell-A { background: #fee2e2 !important; color: #991b1b !important; font-weight: 800 !important; }
     .cell-L { background: #fef3c7 !important; color: #92400e !important; font-weight: 800 !important; }
     .cell-H { background: #e0e7ff !important; color: #3730a3 !important; font-weight: 800 !important; }
     .cell-empty { background: #fafafa !important; color: transparent !important; }
 
-    /* 🔥 LOCKED CELLS - BIGGER LOCK */
     .register-table td.locked-cell {
       background: #f1f5f9 !important;
       color: #94a3b8 !important;
@@ -362,7 +363,6 @@
       box-shadow: none !important;
     }
 
-    /* EDITABLE CELLS */
     .register-table td.editable-cell {
       cursor: pointer;
       transition: all 0.15s;
@@ -426,6 +426,7 @@
     .action-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
     .btn-download { background: #10b981; color: white; }
     .btn-download:hover { background: #059669; }
+    .btn-download:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
     .btn-print { background: #1a237e; color: white; }
     .btn-print:hover { background: #0a2a66; }
 
@@ -847,7 +848,6 @@
       if (isWeekend) classes += ' weekend';
       if (isLocked && isEditMode) classes += ' locked-header';
       
-      // 🔥 LOCK ICON BIGGER + NEW LINE
       headHtml += `<th class="${classes}">${day}${isLocked && isEditMode ? '<i class="fas fa-lock"></i>' : ''}</th>`;
     }
     headHtml += `</tr>`;
@@ -880,7 +880,6 @@
           }
         }
         
-        // 🔥 NO DASH - empty cells blank
         bodyHtml += `<td class="${cellClass} ${editClass} ${changed}" data-roll="${student.roll}" data-day="${day}">${cell}</td>`;
       }
       bodyHtml += `</tr>`;
@@ -932,7 +931,6 @@
         else if (next === 'H') this.classList.add('cell-H');
         else this.classList.add('cell-empty');
         
-        // 🔥 NO DASH - empty shows blank
         this.textContent = next;
         
         if (changedCells.has(key)) this.classList.add('changed');
@@ -1088,117 +1086,215 @@
     }
   });
 
-  downloadBtn.addEventListener('click', function() {
+  // ============================================================
+  // 🔥 REAL PDF GENERATOR (jsPDF + AutoTable)
+  // ============================================================
+  function generateRealPDF(action = 'download') {
     if (studentsList.length === 0) { showToast('No data!', true); return; }
 
+    const { jsPDF } = window.jspdf;
     const monthName = new Date(currentYear, currentMonthNum).toLocaleString('default', { month: 'long' });
 
-    let content = `📋 MONTHLY ATTENDANCE REGISTER
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🏫 QUEST COACHING CENTRE
-📚 Class: ${currentClass}  |  📆 Session: ${currentSession}  |  📅 Month: ${monthName} ${currentYear}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-
-    let headerRow = `  ${'Student Name'.padEnd(22)} ${'Roll'.padEnd(6)} `;
-    for (let day = 1; day <= currentDaysInMonth; day++) headerRow += `${String(day).padStart(2)} `;
-    content += headerRow + '\n';
-
-    let separator = `  ${'─'.repeat(22)} ${'─'.repeat(6)} `;
-    for (let day = 1; day <= currentDaysInMonth; day++) separator += `───`;
-    content += separator + '\n';
-
-    studentsList.forEach(student => {
-      let row = `  ${student.name.padEnd(22)} ${String(student.roll).padEnd(6)} `;
-      for (let day = 1; day <= currentDaysInMonth; day++) {
-        const cell = (attendanceMatrix[student.roll] && attendanceMatrix[student.roll][day]) || '';
-        row += ` ${(cell || ' ').padEnd(2)}`;
-      }
-      content += row + '\n';
+    // 🔥 A4 Landscape for many columns
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm',
+      format: 'a4'
     });
 
-    content += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    content += `📊 Legend: P = Present | A = Absent | L = Leave | H = Holiday | (blank) = Not Marked\n`;
-    content += `📅 Generated: ${new Date().toLocaleString()}\n`;
-    content += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-    const blob = new Blob([content], { type: 'application/pdf;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const win = window.open(url, '_blank');
-    if (!win) {
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Attendance_${currentClass}_${monthName}_${currentYear}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+    // ===== HEADER =====
+    doc.setFillColor(26, 35, 126); // Deep blue
+    doc.rect(0, 0, pageWidth, 20, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('QUEST COACHING CENTRE', pageWidth / 2, 10, { align: 'center' });
+    
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Block More, Gopalganj - 841428 | +91 9708442525', pageWidth / 2, 16, { align: 'center' });
+
+    // ===== SUB HEADER =====
+    doc.setTextColor(40, 53, 147);
+    doc.setFontSize(13);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Monthly Attendance Register - ${monthName} ${currentYear}`, pageWidth / 2, 28, { align: 'center' });
+
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Class: ${currentClass}   |   Session: ${currentSession}   |   Total Students: ${studentsList.length}`, pageWidth / 2, 34, { align: 'center' });
+
+    // ===== TABLE =====
+    // Header row: Student Name, Roll, then dates
+    const headRow = ['Student Name', 'Roll'];
+    for (let day = 1; day <= currentDaysInMonth; day++) {
+      headRow.push(String(day));
     }
-    setTimeout(() => URL.revokeObjectURL(url), 2000);
-    showToast('📥 PDF downloaded!');
+
+    // Body rows
+    const bodyRows = [];
+    studentsList.forEach(student => {
+      const row = [student.name, String(student.roll)];
+      for (let day = 1; day <= currentDaysInMonth; day++) {
+        const cell = (attendanceMatrix[student.roll] && attendanceMatrix[student.roll][day]) || '';
+        row.push(cell || '');
+      }
+      bodyRows.push(row);
+    });
+
+    // Column styles
+    const columnStyles = {
+      0: { cellWidth: 40, halign: 'left', fontStyle: 'bold', textColor: [10, 42, 102], fillColor: [241, 245, 249] },
+      1: { cellWidth: 12, halign: 'center', fontStyle: 'bold', textColor: [26, 35, 126], fillColor: [241, 245, 249] }
+    };
+    for (let day = 1; day <= currentDaysInMonth; day++) {
+      columnStyles[day + 1] = {
+        cellWidth: 'auto',
+        halign: 'center',
+        fontStyle: 'bold',
+        fontSize: 7
+      };
+    }
+
+    doc.autoTable({
+      head: [headRow],
+      body: bodyRows,
+      startY: 38,
+      theme: 'grid',
+      styles: {
+        fontSize: 7,
+        cellPadding: 1,
+        lineColor: [200, 200, 200],
+        lineWidth: 0.1,
+        valign: 'middle',
+        halign: 'center'
+      },
+      headStyles: {
+        fillColor: [26, 35, 126],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        fontSize: 7,
+        halign: 'center',
+        cellPadding: 1.5
+      },
+      columnStyles: columnStyles,
+      margin: { left: 5, right: 5, top: 38, bottom: 15 },
+      didParseCell: function(data) {
+        // Color cells based on P/A/L/H
+        if (data.section === 'body' && data.column.index >= 2) {
+          const value = data.cell.raw;
+          if (value === 'P') {
+            data.cell.styles.fillColor = [209, 250, 229];
+            data.cell.styles.textColor = [6, 95, 70];
+          } else if (value === 'A') {
+            data.cell.styles.fillColor = [254, 226, 226];
+            data.cell.styles.textColor = [153, 27, 27];
+          } else if (value === 'L') {
+            data.cell.styles.fillColor = [254, 243, 199];
+            data.cell.styles.textColor = [146, 64, 14];
+          } else if (value === 'H') {
+            data.cell.styles.fillColor = [224, 231, 255];
+            data.cell.styles.textColor = [55, 48, 163];
+          } else {
+            data.cell.styles.fillColor = [250, 250, 250];
+          }
+        }
+      }
+    });
+
+    // ===== FOOTER =====
+    const finalY = doc.lastAutoTable.finalY + 5;
+    
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(40, 53, 147);
+    doc.text('Legend:', 8, finalY);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text('P = Present   |   A = Absent   |   L = Leave   |   H = Holiday   |   (blank) = Not Marked', 25, finalY);
+
+    // Page number + generated time
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(7);
+      doc.setTextColor(150, 150, 150);
+      doc.text(
+        `Page ${i} of ${pageCount}  |  Generated: ${new Date().toLocaleString()}`,
+        pageWidth / 2,
+        pageHeight - 5,
+        { align: 'center' }
+      );
+    }
+
+    // ===== OUTPUT =====
+    if (action === 'download') {
+      doc.save(`Attendance_${currentClass}_${monthName}_${currentYear}.pdf`);
+      showToast('📥 PDF downloaded successfully!');
+    } else if (action === 'print') {
+      // Open in new tab for print
+      const pdfBlob = doc.output('blob');
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      const win = window.open(pdfUrl, '_blank');
+      if (!win) {
+        // Fallback: download
+        doc.save(`Attendance_${currentClass}_${monthName}_${currentYear}.pdf`);
+        showToast('📥 Popup blocked. PDF downloaded instead.');
+      } else {
+        showToast('🖨️ PDF opened for printing');
+      }
+      setTimeout(() => URL.revokeObjectURL(pdfUrl), 60000);
+    }
+  }
+
+  // ============================================================
+  // DOWNLOAD BUTTON
+  // ============================================================
+  downloadBtn.addEventListener('click', function() {
+    downloadBtn.disabled = true;
+    downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+    setTimeout(() => {
+      try {
+        generateRealPDF('download');
+      } catch (err) {
+        console.error('PDF error:', err);
+        showToast('❌ PDF error: ' + err.message, true);
+      }
+      downloadBtn.disabled = false;
+      downloadBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Download PDF';
+    }, 100);
   });
 
+  // ============================================================
+  // PRINT BUTTON
+  // ============================================================
   printBtn.addEventListener('click', function() {
-    if (studentsList.length === 0) { showToast('No data!', true); return; }
-
-    const monthName = new Date(currentYear, currentMonthNum).toLocaleString('default', { month: 'long' });
-    const printWindow = window.open('', '_blank');
-    
-    let tableHtml = `
-      <html><head><title>Attendance Register</title>
-      <style>
-        body { font-family: Arial; padding: 15px; }
-        h1 { color: #1a237e; text-align: center; margin-bottom: 5px; font-size: 18px; }
-        h2 { color: #283593; text-align: center; margin-bottom: 12px; font-size: 12px; font-weight: 500; }
-        table { width: 100%; border-collapse: collapse; font-size: 9px; }
-        th, td { border: 1px solid #999; padding: 3px; text-align: center; }
-        th { background: #1a237e; color: white; font-size: 8px; }
-        .name-col { text-align: left; padding-left: 6px; font-weight: bold; min-width: 100px; }
-        .roll-col { background: #f1f5f9; font-weight: bold; }
-        .cell-P { background: #d1fae5; color: #065f46; font-weight: bold; }
-        .cell-A { background: #fee2e2; color: #991b1b; font-weight: bold; }
-        .cell-L { background: #fef3c7; color: #92400e; font-weight: bold; }
-        .cell-H { background: #e0e7ff; color: #3730a3; font-weight: bold; }
-        .cell-empty { background: #fafafa; }
-      </style></head><body>
-        <h1>🏫 QUEST COACHING CENTRE</h1>
-        <h2>Attendance Register · Class: ${currentClass} · ${monthName} ${currentYear} · Session: ${currentSession}</h2>
-        <table><thead><tr>
-          <th class="name-col">Student Name</th>
-          <th class="roll-col">Roll</th>`;
-
-    for (let day = 1; day <= currentDaysInMonth; day++) tableHtml += `<th>${day}</th>`;
-    tableHtml += `</tr></thead><tbody>`;
-
-    studentsList.forEach(student => {
-      tableHtml += `<tr>
-        <td class="name-col">${student.name}</td>
-        <td class="roll-col">${student.roll}</td>`;
-      for (let day = 1; day <= currentDaysInMonth; day++) {
-        const cell = (attendanceMatrix[student.roll] && attendanceMatrix[student.roll][day]) || '';
-        let cellClass = 'cell-empty';
-        if (cell === 'P') cellClass = 'cell-P';
-        else if (cell === 'A') cellClass = 'cell-A';
-        else if (cell === 'L') cellClass = 'cell-L';
-        else if (cell === 'H') cellClass = 'cell-H';
-        tableHtml += `<td class="${cellClass}">${cell}</td>`;
+    printBtn.disabled = true;
+    printBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing...';
+    setTimeout(() => {
+      try {
+        generateRealPDF('print');
+      } catch (err) {
+        console.error('Print error:', err);
+        showToast('❌ Print error: ' + err.message, true);
       }
-      tableHtml += `</tr>`;
-    });
-
-    tableHtml += `</tbody></table>
-      <p style="text-align:center; margin-top:12px; font-size:10px; color:#666;">
-        Legend: P = Present | A = Absent | L = Leave | H = Holiday
-      </p></body></html>`;
-
-    printWindow.document.write(tableHtml);
-    printWindow.document.close();
-    printWindow.print();
+      printBtn.disabled = false;
+      printBtn.innerHTML = '<i class="fas fa-print"></i> Print';
+    }, 100);
   });
 
   loadBtn.addEventListener('click', loadMonthlyAttendance);
 
   init();
   console.log('✅ Previous Attendance Page Loaded!');
-  console.log('📌 Lock icon bigger + No dash in cells');
+  console.log('📌 Real PDF Generator: jsPDF + AutoTable');
+  console.log('📌 A4 Landscape · Colorful cells · Professional layout');
 </script>
 </body>
 </html>
