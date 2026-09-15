@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
@@ -31,6 +30,72 @@
       padding: 30px 28px 32px;
       border: 1px solid rgba(255, 255, 255, 0.6);
     }
+
+    /* 🔥 COACHING HEADER (Only shows after result) */
+    .coaching-header {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      background: linear-gradient(135deg, #1a237e, #283593);
+      padding: 18px 22px;
+      border-radius: 16px;
+      margin-bottom: 22px;
+      box-shadow: 0 8px 20px rgba(26, 35, 126, 0.25);
+      flex-wrap: wrap;
+    }
+    .coaching-header .logo-circle {
+      width: 75px;
+      height: 75px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid #ffc107;
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+      flex-shrink: 0;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .coaching-header .logo-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .coaching-header .coaching-text {
+      text-align: left;
+      color: white;
+    }
+    .coaching-header .coaching-text h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 3px;
+    }
+    .coaching-header .coaching-text .director {
+      font-size: 0.85rem;
+      color: #ffc107;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+    .coaching-header .coaching-text .details {
+      font-size: 0.75rem;
+      opacity: 0.92;
+      line-height: 1.5;
+    }
+    .coaching-header .coaching-text .details i {
+      color: #ffc107;
+      margin-right: 4px;
+      font-size: 0.7rem;
+    }
+    @media (max-width: 600px) {
+      .coaching-header { flex-direction: column; text-align: center; padding: 14px 12px; gap: 10px; }
+      .coaching-header .coaching-text { text-align: center; }
+      .coaching-header .coaching-text h2 { font-size: 1.1rem; }
+      .coaching-header .logo-circle { width: 65px; height: 65px; }
+    }
+
     .header {
       text-align: center;
       border-bottom: 2px solid #e6effa;
@@ -248,6 +313,22 @@
 <body>
 
 <div class="container">
+
+  <!-- 🔥 COACHING HEADER (Shows only after search) -->
+  <div class="coaching-header" id="coachingHeader">
+    <div class="logo-circle">
+      <img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" alt="Quest Coaching Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=&quot;color:#1a237e;font-weight:900;font-size:1.8rem;&quot;>Q</span>';">
+    </div>
+    <div class="coaching-text">
+      <h2>QUEST COACHING CENTRE</h2>
+      <div class="director">CEO & Founder: MR. RAVI SIR</div>
+      <div class="details">
+        <i class="fas fa-map-marker-alt"></i>In Front of S.S. Girls High School, Gopalganj &nbsp;|&nbsp;
+        <i class="fas fa-phone"></i>+91 9708442525
+      </div>
+    </div>
+  </div>
+
   <div class="header">
     <h1><i class="fas fa-eye"></i> Parent View</h1>
     <p>Enter your child's Roll Number to check attendance &amp; fees</p>
@@ -308,9 +389,6 @@
 <div id="toastMsg" class="toast-msg"></div>
 
 <script>
-  // ============================================================
-  // FIREBASE CONFIG
-  // ============================================================
   const firebaseConfig = {
     apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
     authDomain: "quest-coaching.firebaseapp.com",
@@ -324,9 +402,6 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  // ============================================================
-  // DOM REFS
-  // ============================================================
   const rollInput = document.getElementById('rollInput');
   const searchBtn = document.getElementById('searchBtn');
   const loadingSpinner = document.getElementById('loadingSpinner');
@@ -342,10 +417,8 @@
   const remarkText = document.getElementById('remarkText');
   const attendanceDate = document.getElementById('attendanceDate');
   const toast = document.getElementById('toastMsg');
+  const coachingHeader = document.getElementById('coachingHeader');
 
-  // ============================================================
-  // HELPER
-  // ============================================================
   function showToast(msg, isError = false) {
     toast.textContent = msg;
     toast.style.display = 'block';
@@ -365,9 +438,6 @@
     return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
   }
 
-  // ============================================================
-  // GET URL PARAMETERS (Session & Class from attendance page)
-  // ============================================================
   function getUrlParams() {
     const params = new URLSearchParams(window.location.search);
     return {
@@ -376,9 +446,6 @@
     };
   }
 
-  // ============================================================
-  // SEARCH STUDENT FROM FIREBASE
-  // ============================================================
   async function searchStudent() {
     const roll = parseInt(rollInput.value.trim());
     if (!roll || isNaN(roll)) {
@@ -393,26 +460,23 @@
       return;
     }
 
-    // Show loading
     loadingSpinner.style.display = 'block';
     resultCard.style.display = 'none';
     notFound.style.display = 'none';
+    coachingHeader.style.display = 'none';
     searchBtn.disabled = true;
     searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
 
     try {
-      // 🔥 STEP 1: Find student by roll number in admissions collection
       let studentDoc = null;
       let studentData = null;
 
-      // Query admissions with rollNumber and class
       const snapshot = await db.collection('admissions')
         .where('rollNumber', '==', String(roll))
         .where('classApplying', '==', className)
         .get();
 
       if (snapshot.empty) {
-        // Try with 'class' field
         const snapshot2 = await db.collection('admissions')
           .where('rollNumber', '==', String(roll))
           .where('class', '==', className)
@@ -435,10 +499,9 @@
 
       const studentNameVal = studentData.studentName || studentData.name || 'Unknown';
       const studentClass = studentData.classApplying || studentData.class || className;
-      const studentRoll = studentData.rollNumber || studentData.rollNo || roll;
+      const studentRollVal = studentData.rollNumber || studentData.rollNo || roll;
 
-      // 🔥 STEP 2: Get today's attendance for this student
-      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      const today = new Date().toISOString().split('T')[0];
       
       const attendanceRef = db.collection('attendance')
         .doc(session)
@@ -466,16 +529,16 @@
         dueFee = attData.dueFee || (monthlyFee - paidFee);
       }
 
-      // 🔥 STEP 3: Display result
+      // 🔥 Show coaching header FIRST
       loadingSpinner.style.display = 'none';
+      coachingHeader.style.display = 'flex';
       resultCard.style.display = 'block';
       notFound.style.display = 'none';
 
       studentName.textContent = studentNameVal;
-      studentRoll.textContent = `Roll No: ${studentRoll} | Class: ${studentClass} | Session: ${session}`;
+      studentRoll.textContent = `Roll No: ${studentRollVal} | Class: ${studentClass} | Session: ${session}`;
       attendanceDate.textContent = formatDateDisplay(today);
 
-      // Status Badge
       const statusMap = {
         present: { label: '✅ Present', class: 'status-present' },
         absent: { label: '❌ Absent', class: 'status-absent' },
@@ -487,7 +550,6 @@
       statusBadge.textContent = statusInfo.label;
       statusBadge.className = `status-badge ${statusInfo.class}`;
 
-      // Fee Details
       monthlyFeeDisplay.textContent = `₹${monthlyFee || 0}`;
       paidFeeDisplay.textContent = `₹${paidFee || 0}`;
       const due = dueFee || (monthlyFee - paidFee);
@@ -499,7 +561,6 @@
         dueFeeDisplay.style.color = '#dc3545';
       }
 
-      // Remark
       remarkText.textContent = remark || 'No remarks';
 
     } catch (error) {
@@ -512,28 +573,23 @@
     }
   }
 
-  // ============================================================
-  // EVENT LISTENERS
-  // ============================================================
   searchBtn.addEventListener('click', searchStudent);
 
   rollInput.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') searchStudent();
   });
 
-  // Auto-focus on load
   window.addEventListener('load', function() {
     rollInput.focus();
     const { class: className } = getUrlParams();
     if (className) {
-      // Show which class is being searched
       document.querySelector('.header p').textContent = 
         `Class: ${className} | Enter Roll Number to check attendance & fees`;
     }
   });
 
-  console.log('✅ Parent View Loaded - Firebase Connected!');
-  console.log('📌 Searching from Firebase admissions & attendance collections');
+  console.log('✅ Parent View Loaded!');
+  console.log('📌 Logo + Coaching details show after search result');
 </script>
 </body>
 </html>
