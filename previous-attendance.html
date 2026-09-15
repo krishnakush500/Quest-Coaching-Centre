@@ -33,6 +33,71 @@
       border: 1px solid rgba(255, 255, 255, 0.6);
     }
 
+    /* 🔥 COACHING HEADER (Web page) */
+    .coaching-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      background: linear-gradient(135deg, #1a237e, #283593);
+      padding: 16px 20px;
+      border-radius: 16px;
+      margin-bottom: 15px;
+      box-shadow: 0 8px 20px rgba(26, 35, 126, 0.25);
+      flex-wrap: wrap;
+    }
+    .coaching-header .logo-circle {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid #ffc107;
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+      flex-shrink: 0;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .coaching-header .logo-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .coaching-header .coaching-text {
+      text-align: left;
+      color: white;
+    }
+    .coaching-header .coaching-text h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 3px;
+    }
+    .coaching-header .coaching-text .director {
+      font-size: 0.8rem;
+      color: #ffc107;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+    .coaching-header .coaching-text .details {
+      font-size: 0.72rem;
+      opacity: 0.92;
+      line-height: 1.5;
+    }
+    .coaching-header .coaching-text .details i {
+      color: #ffc107;
+      margin-right: 4px;
+      font-size: 0.7rem;
+    }
+    @media (max-width: 720px) {
+      .coaching-header { flex-direction: column; text-align: center; padding: 14px 12px; gap: 10px; }
+      .coaching-header .coaching-text { text-align: center; }
+      .coaching-header .coaching-text h2 { font-size: 1.1rem; }
+      .coaching-header .logo-circle { width: 60px; height: 60px; }
+    }
+
     .header {
       display: flex;
       flex-wrap: wrap;
@@ -305,12 +370,8 @@
       margin-top: 2px;
     }
 
-    .register-table tbody tr:nth-child(even) {
-      background: #f8fafc;
-    }
-    .register-table tbody tr:hover {
-      background: #eff6ff;
-    }
+    .register-table tbody tr:nth-child(even) { background: #f8fafc; }
+    .register-table tbody tr:hover { background: #eff6ff; }
     .register-table .name-col {
       text-align: left;
       padding-left: 10px;
@@ -322,9 +383,7 @@
       left: 0;
       z-index: 5;
     }
-    .register-table tbody .name-col {
-      font-size: 0.75rem;
-    }
+    .register-table tbody .name-col { font-size: 0.75rem; }
     .register-table .roll-col {
       background: #f1f5f9;
       color: #1a237e;
@@ -389,15 +448,8 @@
       font-size: 0.8rem;
       font-weight: 600;
     }
-    .summary-row .stat {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .summary-row .stat .num {
-      font-weight: 800;
-      font-size: 1rem;
-    }
+    .summary-row .stat { display: flex; align-items: center; gap: 5px; }
+    .summary-row .stat .num { font-weight: 800; font-size: 1rem; }
     .stat-total { color: #1a237e; }
     .stat-present { color: #10b981; }
     .stat-absent { color: #dc3545; }
@@ -495,6 +547,22 @@
 <body>
 
 <div class="container">
+
+  <!-- 🔥 COACHING HEADER (Web page display) -->
+  <div class="coaching-header">
+    <div class="logo-circle">
+      <img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" alt="Quest Coaching Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=&quot;color:#1a237e;font-weight:900;font-size:1.8rem;&quot;>Q</span>';">
+    </div>
+    <div class="coaching-text">
+      <h2>QUEST COACHING CENTRE</h2>
+      <div class="director">CEO & Founder: MR. RAVI SIR</div>
+      <div class="details">
+        <i class="fas fa-map-marker-alt"></i>In Front of S.S. Girls High School, Gopalganj &nbsp;|&nbsp;
+        <i class="fas fa-phone"></i>+91 9708442525
+      </div>
+    </div>
+  </div>
+
   <div class="header">
     <h1><i class="fas fa-history"></i> Previous Attendance</h1>
     <div class="header-actions">
@@ -579,7 +647,7 @@
 
 <script>
   // ============================================================
-  // 🔥 COACHING INFO (from index.html)
+  // 🔥 COACHING INFO
   // ============================================================
   const COACHING_INFO = {
     logo: 'https://i.ibb.co/hF9tmnpB/20250903-202922.jpg',
@@ -590,31 +658,34 @@
     phone: '+91 9708442525'
   };
 
-  let LOGO_BASE64 = null;
+  let LOGO_BASE64 = null; // 🔥 Circular-cropped logo
 
-  async function preloadLogo() {
-    try {
-      LOGO_BASE64 = await loadImageAsDataURL(COACHING_INFO.logo);
-      console.log('✅ Logo loaded successfully');
-    } catch (err) {
-      console.warn('⚠️ Logo preload failed:', err);
-    }
-  }
-
-  function loadImageAsDataURL(url) {
+  // ============================================================
+  // 🔥 CIRCULAR LOGO CROP (removes square box)
+  // ============================================================
+  function loadImageAsCircularDataURL(url) {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = function() {
         try {
+          const size = Math.min(img.naturalWidth || 300, img.naturalHeight || 300);
           const canvas = document.createElement('canvas');
-          canvas.width = img.naturalWidth || 200;
-          canvas.height = img.naturalHeight || 200;
+          canvas.width = size;
+          canvas.height = size;
           const ctx = canvas.getContext('2d');
-          ctx.fillStyle = '#FFFFFF';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(img, 0, 0);
-          const dataURL = canvas.toDataURL('image/jpeg', 0.9);
+
+          // 🔥 Create circular clipping path
+          ctx.beginPath();
+          ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.clip();
+
+          // Draw image inside circular clip
+          ctx.drawImage(img, 0, 0, size, size);
+
+          // Export as PNG (with transparency outside circle)
+          const dataURL = canvas.toDataURL('image/png');
           resolve(dataURL);
         } catch (e) {
           reject(e);
@@ -625,6 +696,15 @@
       };
       img.src = url;
     });
+  }
+
+  async function preloadLogo() {
+    try {
+      LOGO_BASE64 = await loadImageAsCircularDataURL(COACHING_INFO.logo);
+      console.log('✅ Logo loaded as circular PNG');
+    } catch (err) {
+      console.warn('⚠️ Logo preload failed:', err);
+    }
   }
 
   // ============================================================
@@ -1138,7 +1218,7 @@
   });
 
   // ============================================================
-  // 🔥 PDF GENERATOR - CENTERED LOGO + TEXT
+  // 🔥 PDF GENERATOR - CLEAN CIRCULAR LOGO (No square box)
   // ============================================================
   async function generateRealPDF(action = 'download') {
     if (studentsList.length === 0) { showToast('No data!', true); return; }
@@ -1156,11 +1236,11 @@
     const pageHeight = doc.internal.pageSize.getHeight();
     const centerX = pageWidth / 2;
 
-    // Logo
+    // 🔥 Logo - already circular (transparent PNG)
     let logoData = LOGO_BASE64;
     if (!logoData) {
       try {
-        logoData = await loadImageAsDataURL(COACHING_INFO.logo);
+        logoData = await loadImageAsCircularDataURL(COACHING_INFO.logo);
         LOGO_BASE64 = logoData;
       } catch (err) {
         console.warn('Logo load failed:', err);
@@ -1177,37 +1257,33 @@
     doc.rect(0, headerHeight, pageWidth, 2, 'F');
 
     // ============================================================
-    // 🔥 CENTERED LOGO + TEXT BLOCK
+    // CENTERED LOGO + TEXT BLOCK
     // ============================================================
-    
-    // Calculate total block width to center it
     const logoSize = 22;
     const gapBetweenLogoText = 6;
-    
-    // Text widths (estimate based on font size)
-    const titleWidth = 68;  // "QUEST COACHING CENTRE" at 15pt bold
+    const titleWidth = 68;
     const textBlockWidth = titleWidth;
     
     const totalWidth = logoSize + gapBetweenLogoText + textBlockWidth;
     const blockStartX = centerX - (totalWidth / 2);
     const blockStartY = 5;
 
-    // --- LOGO (Left side of centered block) ---
+    // --- LOGO (Left side) ---
     const logoX = blockStartX;
     const logoY = blockStartY + 1;
     const logoCenterX = logoX + logoSize / 2;
     const logoCenterY = logoY + logoSize / 2;
 
-    // White circle background
-    doc.setFillColor(255, 255, 255);
-    doc.circle(logoCenterX, logoCenterY, logoSize / 2, 'F');
+    // Yellow border circle (behind logo)
+    doc.setFillColor(255, 193, 7);
+    doc.circle(logoCenterX, logoCenterY, logoSize / 2 + 0.8, 'F');
 
     if (logoData) {
       try {
-        // Add logo exactly inside circle
+        // 🔥 Logo is already circular PNG - transparent outside
         doc.addImage(
           logoData,
-          'JPEG',
+          'PNG',
           logoX,
           logoY,
           logoSize,
@@ -1215,23 +1291,6 @@
           undefined,
           'FAST'
         );
-        
-        // 🔥 Cover the corners with white to make it look circular
-        // Draw 4 small white triangles/arcs at corners - or use white circle on top with clip
-        // Simple approach: Draw 4 white rectangles at corners outside the circle
-        const r = logoSize / 2;
-        // We use bezier approximation - simpler: draw 4 white corner pieces
-        doc.setFillColor(255, 255, 255);
-        
-        // Top-left corner
-        doc.triangle(logoX, logoY, logoX + r * 0.3, logoY, logoX, logoY + r * 0.3, 'F');
-        // Top-right corner
-        doc.triangle(logoX + logoSize, logoY, logoX + logoSize - r * 0.3, logoY, logoX + logoSize, logoY + r * 0.3, 'F');
-        // Bottom-left corner
-        doc.triangle(logoX, logoY + logoSize, logoX + r * 0.3, logoY + logoSize, logoX, logoY + logoSize - r * 0.3, 'F');
-        // Bottom-right corner
-        doc.triangle(logoX + logoSize, logoY + logoSize, logoX + logoSize - r * 0.3, logoY + logoSize, logoX + logoSize, logoY + logoSize - r * 0.3, 'F');
-        
       } catch (e) {
         doc.setTextColor(26, 35, 126);
         doc.setFontSize(16);
@@ -1239,18 +1298,15 @@
         doc.text('Q', logoCenterX, logoCenterY + 3, { align: 'center' });
       }
     } else {
+      doc.setFillColor(255, 255, 255);
+      doc.circle(logoCenterX, logoCenterY, logoSize / 2, 'F');
       doc.setTextColor(26, 35, 126);
       doc.setFontSize(16);
       doc.setFont('helvetica', 'bold');
       doc.text('Q', logoCenterX, logoCenterY + 3, { align: 'center' });
     }
 
-    // Thin circle border around logo
-    doc.setDrawColor(255, 193, 7);
-    doc.setLineWidth(0.8);
-    doc.circle(logoCenterX, logoCenterY, logoSize / 2, 'S');
-
-    // --- TEXT (Right side of centered block) ---
+    // --- TEXT (Right side of logo) ---
     const textX = logoX + logoSize + gapBetweenLogoText;
     const textY = blockStartY + 4;
 
@@ -1260,7 +1316,7 @@
     doc.setFont('helvetica', 'bold');
     doc.text(COACHING_INFO.name, textX, textY);
 
-    // Director (Yellow)
+    // Director
     doc.setFontSize(8.5);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(255, 193, 7);
@@ -1420,9 +1476,6 @@
     }
   }
 
-  // ============================================================
-  // DOWNLOAD / PRINT BUTTONS
-  // ============================================================
   downloadBtn.addEventListener('click', function() {
     downloadBtn.disabled = true;
     downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
@@ -1457,7 +1510,7 @@
 
   init();
   console.log('✅ Previous Attendance Page Loaded!');
-  console.log('📌 Centered Logo + Text in PDF');
+  console.log('📌 Circular logo (no square box) + Web header added');
 </script>
 </body>
 </html>
