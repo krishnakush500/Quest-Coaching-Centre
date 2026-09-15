@@ -590,19 +590,14 @@
     phone: '+91 9708442525'
   };
 
-  // ============================================================
-  // 🔥 LOGO BASE64 (Guaranteed to work - no CORS issue)
-  // Yeh image pre-loaded hai taaki PDF me 100% dikhe
-  // ============================================================
   let LOGO_BASE64 = null;
 
-  // Load logo once on page load
   async function preloadLogo() {
     try {
       LOGO_BASE64 = await loadImageAsDataURL(COACHING_INFO.logo);
-      console.log('✅ Logo loaded successfully (Base64 size:', LOGO_BASE64.length, 'chars)');
+      console.log('✅ Logo loaded successfully');
     } catch (err) {
-      console.warn('⚠️ Logo preload failed, will try in PDF:', err);
+      console.warn('⚠️ Logo preload failed:', err);
     }
   }
 
@@ -616,7 +611,6 @@
           canvas.width = img.naturalWidth || 200;
           canvas.height = img.naturalHeight || 200;
           const ctx = canvas.getContext('2d');
-          // White background (for transparent PNGs)
           ctx.fillStyle = '#FFFFFF';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(img, 0, 0);
@@ -697,7 +691,6 @@
     const now = new Date();
     const monthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     monthSelect.value = monthStr;
-    // Preload logo
     preloadLogo();
   }
 
@@ -1145,7 +1138,7 @@
   });
 
   // ============================================================
-  // 🔥 PDF GENERATOR WITH COACHING HEADER
+  // 🔥 PDF GENERATOR - CENTERED LOGO + TEXT
   // ============================================================
   async function generateRealPDF(action = 'download') {
     if (studentsList.length === 0) { showToast('No data!', true); return; }
@@ -1161,75 +1154,130 @@
 
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
+    const centerX = pageWidth / 2;
 
-    // 🔥 Use preloaded logo (guaranteed to work)
+    // Logo
     let logoData = LOGO_BASE64;
     if (!logoData) {
-      // Fallback: try to load again
       try {
         logoData = await loadImageAsDataURL(COACHING_INFO.logo);
         LOGO_BASE64 = logoData;
       } catch (err) {
-        console.warn('Logo load failed in PDF:', err);
+        console.warn('Logo load failed:', err);
       }
     }
 
     // ===== HEADER BANNER =====
+    const headerHeight = 34;
     doc.setFillColor(26, 35, 126);
-    doc.rect(0, 0, pageWidth, 28, 'F');
+    doc.rect(0, 0, pageWidth, headerHeight, 'F');
     
     // Yellow accent stripe
     doc.setFillColor(255, 193, 7);
-    doc.rect(0, 28, pageWidth, 2, 'F');
+    doc.rect(0, headerHeight, pageWidth, 2, 'F');
 
-    // 🔥 Logo (Left side)
+    // ============================================================
+    // 🔥 CENTERED LOGO + TEXT BLOCK
+    // ============================================================
+    
+    // Calculate total block width to center it
     const logoSize = 22;
-    const logoX = 8;
-    const logoY = 3;
+    const gapBetweenLogoText = 6;
+    
+    // Text widths (estimate based on font size)
+    const titleWidth = 68;  // "QUEST COACHING CENTRE" at 15pt bold
+    const textBlockWidth = titleWidth;
+    
+    const totalWidth = logoSize + gapBetweenLogoText + textBlockWidth;
+    const blockStartX = centerX - (totalWidth / 2);
+    const blockStartY = 5;
+
+    // --- LOGO (Left side of centered block) ---
+    const logoX = blockStartX;
+    const logoY = blockStartY + 1;
+    const logoCenterX = logoX + logoSize / 2;
+    const logoCenterY = logoY + logoSize / 2;
 
     // White circle background
     doc.setFillColor(255, 255, 255);
-    doc.circle(logoX + logoSize / 2, logoY + logoSize / 2, logoSize / 2 + 0.5, 'F');
+    doc.circle(logoCenterX, logoCenterY, logoSize / 2, 'F');
 
     if (logoData) {
       try {
-        doc.addImage(logoData, 'JPEG', logoX + 1, logoY + 1, logoSize - 2, logoSize - 2);
+        // Add logo exactly inside circle
+        doc.addImage(
+          logoData,
+          'JPEG',
+          logoX,
+          logoY,
+          logoSize,
+          logoSize,
+          undefined,
+          'FAST'
+        );
+        
+        // 🔥 Cover the corners with white to make it look circular
+        // Draw 4 small white triangles/arcs at corners - or use white circle on top with clip
+        // Simple approach: Draw 4 white rectangles at corners outside the circle
+        const r = logoSize / 2;
+        // We use bezier approximation - simpler: draw 4 white corner pieces
+        doc.setFillColor(255, 255, 255);
+        
+        // Top-left corner
+        doc.triangle(logoX, logoY, logoX + r * 0.3, logoY, logoX, logoY + r * 0.3, 'F');
+        // Top-right corner
+        doc.triangle(logoX + logoSize, logoY, logoX + logoSize - r * 0.3, logoY, logoX + logoSize, logoY + r * 0.3, 'F');
+        // Bottom-left corner
+        doc.triangle(logoX, logoY + logoSize, logoX + r * 0.3, logoY + logoSize, logoX, logoY + logoSize - r * 0.3, 'F');
+        // Bottom-right corner
+        doc.triangle(logoX + logoSize, logoY + logoSize, logoX + logoSize - r * 0.3, logoY + logoSize, logoX + logoSize, logoY + logoSize - r * 0.3, 'F');
+        
       } catch (e) {
-        // Fallback: Q letter
         doc.setTextColor(26, 35, 126);
-        doc.setFontSize(18);
+        doc.setFontSize(16);
         doc.setFont('helvetica', 'bold');
-        doc.text('Q', logoX + logoSize / 2, logoY + logoSize / 2 + 3, { align: 'center' });
+        doc.text('Q', logoCenterX, logoCenterY + 3, { align: 'center' });
       }
     } else {
       doc.setTextColor(26, 35, 126);
-      doc.setFontSize(18);
+      doc.setFontSize(16);
       doc.setFont('helvetica', 'bold');
-      doc.text('Q', logoX + logoSize / 2, logoY + logoSize / 2 + 3, { align: 'center' });
+      doc.text('Q', logoCenterX, logoCenterY + 3, { align: 'center' });
     }
 
-    // 🔥 Coaching Details (right of logo)
-    const textStartX = logoX + logoSize + 6;
-    
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(16);
-    doc.setFont('helvetica', 'bold');
-    doc.text(COACHING_INFO.name, textStartX, 10);
+    // Thin circle border around logo
+    doc.setDrawColor(255, 193, 7);
+    doc.setLineWidth(0.8);
+    doc.circle(logoCenterX, logoCenterY, logoSize / 2, 'S');
 
-    doc.setFontSize(9);
+    // --- TEXT (Right side of centered block) ---
+    const textX = logoX + logoSize + gapBetweenLogoText;
+    const textY = blockStartY + 4;
+
+    // Coaching Name
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(15);
+    doc.setFont('helvetica', 'bold');
+    doc.text(COACHING_INFO.name, textX, textY);
+
+    // Director (Yellow)
+    doc.setFontSize(8.5);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(255, 193, 7);
-    doc.text(`${COACHING_INFO.directorTitle}: ${COACHING_INFO.director}`, textStartX, 16);
+    doc.text(`${COACHING_INFO.directorTitle}: ${COACHING_INFO.director}`, textX, textY + 5.5);
 
-    doc.setFontSize(8);
+    // Address
+    doc.setFontSize(7.5);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(255, 255, 255);
-    doc.text(COACHING_INFO.address, textStartX, 20.5);
-    doc.text(COACHING_INFO.phone, textStartX, 25);
+    doc.text(COACHING_INFO.address, textX, textY + 10.5);
+
+    // Phone
+    doc.text(COACHING_INFO.phone, textX, textY + 14.5);
 
     // ===== REPORT TITLE BANNER =====
     doc.setFillColor(40, 53, 147);
-    doc.rect(0, 30, pageWidth, 11, 'F');
+    doc.rect(0, 36, pageWidth, 11, 'F');
     
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(13);
@@ -1237,13 +1285,13 @@
     doc.text(
       `Monthly Attendance Register - ${monthName} ${currentYear}`,
       pageWidth / 2,
-      37.5,
+      43.5,
       { align: 'center' }
     );
 
     // ===== SUB INFO BAR =====
     doc.setFillColor(240, 245, 255);
-    doc.rect(0, 41, pageWidth, 7, 'F');
+    doc.rect(0, 47, pageWidth, 7, 'F');
     
     doc.setTextColor(40, 53, 147);
     doc.setFontSize(8);
@@ -1251,7 +1299,7 @@
     doc.text(
       `Class: ${currentClass}   |   Session: ${currentSession}   |   Total Students: ${studentsList.length}   |   Editable Days: ${editableDays.size}   |   Locked Days: ${lockedDays.size}`,
       pageWidth / 2,
-      45.5,
+      51.5,
       { align: 'center' }
     );
 
@@ -1287,7 +1335,7 @@
     doc.autoTable({
       head: [headRow],
       body: bodyRows,
-      startY: 50,
+      startY: 56,
       theme: 'grid',
       styles: {
         fontSize: 7,
@@ -1306,7 +1354,7 @@
         cellPadding: 1.5
       },
       columnStyles: columnStyles,
-      margin: { left: 5, right: 5, top: 50, bottom: 15 },
+      margin: { left: 5, right: 5, top: 56, bottom: 15 },
       didParseCell: function(data) {
         if (data.section === 'body' && data.column.index >= 2) {
           const value = data.cell.raw;
@@ -1373,7 +1421,7 @@
   }
 
   // ============================================================
-  // DOWNLOAD BUTTON
+  // DOWNLOAD / PRINT BUTTONS
   // ============================================================
   downloadBtn.addEventListener('click', function() {
     downloadBtn.disabled = true;
@@ -1390,9 +1438,6 @@
     }, 100);
   });
 
-  // ============================================================
-  // PRINT BUTTON
-  // ============================================================
   printBtn.addEventListener('click', function() {
     printBtn.disabled = true;
     printBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing...';
@@ -1412,8 +1457,7 @@
 
   init();
   console.log('✅ Previous Attendance Page Loaded!');
-  console.log('📌 Logo preloaded from index.html URL');
-  console.log('📌 PDF: A4 Landscape with Coaching Header');
+  console.log('📌 Centered Logo + Text in PDF');
 </script>
 </body>
 </html>
