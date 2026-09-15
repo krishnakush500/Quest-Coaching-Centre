@@ -223,27 +223,30 @@
     .holiday-reason-group input::placeholder { color: #f87171; font-weight: 400; }
     .holiday-reason-group i { color: #dc3545; font-size: 0.7rem; }
 
+    /* 🔥 HOLIDAY MESSAGE */
     .holiday-msg {
       background: #fef2f2;
       border: 2px solid #fecaca;
       border-radius: 12px;
-      padding: 12px;
+      padding: 20px;
       text-align: center;
       color: #991b1b;
       margin-bottom: 8px;
       display: none;
     }
-    .holiday-msg i { font-size: 1.5rem; display: block; margin-bottom: 4px; }
-    .holiday-msg h2 { font-size: 1rem; }
+    .holiday-msg i { font-size: 2.5rem; display: block; margin-bottom: 8px; color: #dc3545; }
+    .holiday-msg h2 { font-size: 1.2rem; margin-bottom: 6px; }
+    .holiday-msg p { font-size: 0.85rem; color: #7f1d1d; margin-top: 4px; }
     .holiday-msg .reason-text { 
-      font-size: 0.85rem; 
+      font-size: 1rem; 
       font-weight: 700; 
       color: #dc3545; 
       background: white; 
-      padding: 4px 14px; 
+      padding: 8px 20px; 
       border-radius: 30px; 
       display: inline-block;
-      margin-top: 4px;
+      margin-top: 8px;
+      border: 1px solid #fecaca;
     }
 
     .attendance-done-msg {
@@ -296,7 +299,6 @@
     .save-btn:hover { background: #059669; }
     .save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    /* 🔥 SAVE HOLIDAY BUTTON */
     .save-holiday-btn {
       background: #dc3545;
       border: none;
@@ -583,8 +585,9 @@
       .save-btn { font-size: 0.65rem; padding: 4px 12px; }
       .save-holiday-btn { font-size: 0.65rem; padding: 4px 12px; }
       .refresh-btn { font-size: 0.6rem; padding: 4px 10px; }
-      .holiday-msg { padding: 8px; }
-      .holiday-msg h2 { font-size: 0.85rem; }
+      .holiday-msg { padding: 14px; }
+      .holiday-msg i { font-size: 2rem; }
+      .holiday-msg h2 { font-size: 1rem; }
       .attendance-done-msg { padding: 8px; }
       .attendance-done-msg h2 { font-size: 0.85rem; }
       .loading-card { padding: 20px 28px; min-width: 200px; }
@@ -646,9 +649,11 @@
       </div>
     </div>
 
+    <!-- 🔥 Holiday Message (Dono cases: tick karte waqt + already saved) -->
     <div class="holiday-msg" id="holidayMsg">
       <i class="fas fa-calendar-times"></i>
-      <h2>🎉 Class Holiday!</h2>
+      <h2 id="holidayTitle">🎉 Class Holiday!</h2>
+      <p id="holidaySubtitle">No attendance will be marked today</p>
       <div class="reason-text" id="holidayReasonDisplay">HOLIDAY</div>
     </div>
 
@@ -671,7 +676,6 @@
       <span class="count-item count-pending">⏳ <span class="num" id="pendingCount">0</span></span>
     </div>
 
-    <!-- 🔥 SAVE BUTTONS (Attendance + Holiday) -->
     <div class="save-btn-container" id="saveBtnContainer" style="display:none;">
       <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync"></i></button>
       <button class="save-btn" id="saveAttendanceBtn">
@@ -736,6 +740,8 @@
   const holidayReason = document.getElementById('holidayReason');
   const holidayReasonGroup = document.getElementById('holidayReasonGroup');
   const holidayMsg = document.getElementById('holidayMsg');
+  const holidayTitle = document.getElementById('holidayTitle');
+  const holidaySubtitle = document.getElementById('holidaySubtitle');
   const holidayReasonDisplay = document.getElementById('holidayReasonDisplay');
   const checkingMsg = document.getElementById('checkingMsg');
   const attendanceDoneMsg = document.getElementById('attendanceDoneMsg');
@@ -765,7 +771,8 @@
   let isSaving = false;
   let currentDate = '';
   let isAttendanceDone = false;
-  let holidaySaved = false;
+  let isHolidaySaved = false;
+  let holidayReasonText = '';
 
   function showToast(msg, isError = false) {
     toast.textContent = msg;
@@ -813,6 +820,28 @@
     absentCount.textContent = absent;
     leaveCount.textContent = leave;
     pendingCount.textContent = pending;
+  }
+
+  // 🔥 CHECK IF HOLIDAY SAVED
+  async function checkHolidaySaved(selectedSession, selectedClass, today) {
+    try {
+      const docRef = db.collection('attendance')
+        .doc(selectedSession)
+        .collection('classes')
+        .doc(selectedClass)
+        .collection('holidays')
+        .doc(today);
+      
+      const snap = await docRef.get();
+      if (snap.exists) {
+        const data = snap.data();
+        return { saved: true, reason: data.reason || 'Holiday' };
+      }
+      return { saved: false, reason: '' };
+    } catch (error) {
+      console.warn('Holiday check error:', error);
+      return { saved: false, reason: '' };
+    }
   }
 
   async function fetchAllAttendanceForDate(selectedSession, selectedClass, today) {
@@ -895,20 +924,25 @@
     window.open(`parent-view.html?session=${session}&class=${className}`, '_blank');
   });
 
-  // 🔥 HOLIDAY TOGGLE HANDLER
+  // 🔥 HOLIDAY TOGGLE HANDLER (manual tick)
   function handleClassHoliday() {
     if (classHolidayCheck.checked) {
       holidayReasonGroup.style.display = 'flex';
       holidayMsg.style.display = 'block';
+      holidayTitle.textContent = '🎉 Class Holiday!';
+      holidaySubtitle.textContent = 'No attendance will be marked today';
+      
       tableScroll.style.display = 'none';
       summaryCounter.style.display = 'none';
       attendanceDoneMsg.style.display = 'none';
       checkingMsg.style.display = 'none';
       
-      // 🔥 Show Save Holiday button, hide Save Attendance
       saveBtnContainer.style.display = 'flex';
       saveBtn.style.display = 'none';
       saveHolidayBtn.style.display = 'flex';
+      saveHolidayBtn.disabled = false;
+      saveHolidayBtn.innerHTML = '<i class="fas fa-calendar-times"></i> Save Holiday';
+      saveHolidayBtn.style.background = '#dc3545';
       
       const reason = holidayReason.value.trim() || 'Holiday';
       holidayReasonDisplay.textContent = reason.toUpperCase();
@@ -933,26 +967,55 @@
       saveBtnContainer.style.display = 'none';
       attendanceDoneMsg.style.display = 'none';
       checkingMsg.style.display = 'none';
+      holidayMsg.style.display = 'none';
       loadingOverlay.style.display = 'none';
       return;
     }
 
     loadingOverlay.style.display = 'flex';
-    updateLoading(10, 'Fetching students...');
+    updateLoading(10, 'Checking holiday status...');
     tableScroll.style.display = 'none';
     summaryCounter.style.display = 'none';
     saveBtnContainer.style.display = 'none';
     attendanceDoneMsg.style.display = 'none';
     checkingMsg.style.display = 'none';
+    holidayMsg.style.display = 'none';
 
     const today = getTodayDate();
 
     try {
-      updateLoading(30, 'Loading student data...');
-      
+      // 🔥 STEP 1: Check if holiday is already saved
+      updateLoading(20, 'Checking holiday...');
+      const holidayCheck = await checkHolidaySaved(selectedSession, selectedClass, today);
+
+      if (holidayCheck.saved) {
+        // 🔥 Holiday is already saved - show holiday message, hide list
+        updateLoading(100, 'Holiday found!');
+        setTimeout(() => {
+          loadingOverlay.style.display = 'none';
+          isHolidaySaved = true;
+          holidayReasonText = holidayCheck.reason;
+          
+          holidayMsg.style.display = 'block';
+          holidayTitle.textContent = '🎉 Holiday Already Saved!';
+          holidaySubtitle.textContent = 'No attendance was marked on this day';
+          holidayReasonDisplay.textContent = holidayCheck.reason.toUpperCase();
+          
+          tableScroll.style.display = 'none';
+          summaryCounter.style.display = 'none';
+          saveBtnContainer.style.display = 'none';
+          attendanceDoneMsg.style.display = 'none';
+          
+          showToast(`🎉 Holiday: ${holidayCheck.reason.toUpperCase()}`);
+        }, 300);
+        return;
+      }
+
+      // 🔥 STEP 2: No holiday - load students and check attendance
+      updateLoading(40, 'Loading students...');
       const result = await fetchAllAttendanceForDate(selectedSession, selectedClass, today);
 
-      updateLoading(80, 'Checking attendance status...');
+      updateLoading(85, 'Checking attendance...');
 
       if (result.total === 0) {
         loadingOverlay.style.display = 'none';
@@ -981,6 +1044,7 @@
         loadingOverlay.style.display = 'none';
 
         if (allMarked) {
+          // Attendance complete
           attendanceDoneMsg.style.display = 'block';
           attendanceDoneInfo.textContent = `✅ ${result.markedCount} students marked for ${formatDateDisplay(today)}`;
           tableScroll.style.display = 'none';
@@ -988,6 +1052,7 @@
           saveBtnContainer.style.display = 'none';
           isAttendanceDone = true;
         } else {
+          // Show list
           attendanceDoneMsg.style.display = 'none';
           tableScroll.style.display = 'block';
           summaryCounter.style.display = 'flex';
@@ -1067,7 +1132,6 @@
     });
   }
 
-  // 🔥 SAVE HOLIDAY
   async function saveHoliday() {
     if (isSaving) return;
     
@@ -1078,6 +1142,12 @@
 
     if (!selectedSession || !selectedClass) {
       showToast('Select Session & Class!', true);
+      return;
+    }
+
+    if (!holidayReason.value.trim()) {
+      showToast('⚠️ Please enter holiday reason!', true);
+      holidayReason.focus();
       return;
     }
 
@@ -1101,11 +1171,29 @@
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-      holidaySaved = true;
+      isHolidaySaved = true;
+      holidayReasonText = reason;
       showToast(`🎉 Holiday saved: ${reason.toUpperCase()}`);
       
       saveHolidayBtn.innerHTML = '<i class="fas fa-check"></i> Holiday Saved';
       saveHolidayBtn.style.background = '#10b981';
+      
+      // 🔥 After save, show saved holiday message
+      holidayTitle.textContent = '🎉 Holiday Saved!';
+      holidaySubtitle.textContent = 'No attendance will be marked today';
+      holidayReasonDisplay.textContent = reason.toUpperCase();
+      
+      // Uncheck the checkbox and reset UI
+      setTimeout(() => {
+        classHolidayCheck.checked = false;
+        holidayReasonGroup.style.display = 'none';
+        saveHolidayBtn.style.display = 'none';
+        saveBtn.style.display = 'none';
+        saveBtnContainer.style.display = 'none';
+        holidayMsg.style.display = 'block';
+        holidayTitle.textContent = '🎉 Holiday Already Saved!';
+        holidaySubtitle.textContent = 'No attendance was marked on this day';
+      }, 1500);
       
     } catch (error) {
       console.error('Error saving holiday:', error);
@@ -1221,7 +1309,7 @@
   });
 
   console.log('✅ Attendance System Loaded!');
-  console.log('📌 Holiday Save button added');
+  console.log('📌 Holiday auto-check + attendance done check');
 </script>
 </body>
 </html>
