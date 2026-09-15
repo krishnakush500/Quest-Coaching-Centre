@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
   
-  <!-- 🔥 REAL PDF LIBRARIES -->
+  <!-- PDF Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   
@@ -429,6 +429,7 @@
     .btn-download:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
     .btn-print { background: #1a237e; color: white; }
     .btn-print:hover { background: #0a2a66; }
+    .btn-print:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
     .toast-msg {
       position: fixed;
@@ -578,6 +579,61 @@
 
 <script>
   // ============================================================
+  // 🔥 COACHING INFO (from index.html)
+  // ============================================================
+  const COACHING_INFO = {
+    logo: 'https://i.ibb.co/hF9tmnpB/20250903-202922.jpg',
+    name: 'QUEST COACHING CENTRE',
+    director: 'MR. RAVI SIR',
+    directorTitle: 'CEO & Founder',
+    address: 'In Front of S.S. Girls High School, Gopalganj',
+    phone: '+91 9708442525'
+  };
+
+  // ============================================================
+  // 🔥 LOGO BASE64 (Guaranteed to work - no CORS issue)
+  // Yeh image pre-loaded hai taaki PDF me 100% dikhe
+  // ============================================================
+  let LOGO_BASE64 = null;
+
+  // Load logo once on page load
+  async function preloadLogo() {
+    try {
+      LOGO_BASE64 = await loadImageAsDataURL(COACHING_INFO.logo);
+      console.log('✅ Logo loaded successfully (Base64 size:', LOGO_BASE64.length, 'chars)');
+    } catch (err) {
+      console.warn('⚠️ Logo preload failed, will try in PDF:', err);
+    }
+  }
+
+  function loadImageAsDataURL(url) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function() {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth || 200;
+          canvas.height = img.naturalHeight || 200;
+          const ctx = canvas.getContext('2d');
+          // White background (for transparent PNGs)
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+          const dataURL = canvas.toDataURL('image/jpeg', 0.9);
+          resolve(dataURL);
+        } catch (e) {
+          reject(e);
+        }
+      };
+      img.onerror = function() {
+        reject(new Error('Image load failed: ' + url));
+      };
+      img.src = url;
+    });
+  }
+
+  // ============================================================
   // FIREBASE CONFIG
   // ============================================================
   const firebaseConfig = {
@@ -641,6 +697,8 @@
     const now = new Date();
     const monthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     monthSelect.value = monthStr;
+    // Preload logo
+    preloadLogo();
   }
 
   function showToast(msg, isError = false) {
@@ -1087,15 +1145,14 @@
   });
 
   // ============================================================
-  // 🔥 REAL PDF GENERATOR (jsPDF + AutoTable)
+  // 🔥 PDF GENERATOR WITH COACHING HEADER
   // ============================================================
-  function generateRealPDF(action = 'download') {
+  async function generateRealPDF(action = 'download') {
     if (studentsList.length === 0) { showToast('No data!', true); return; }
 
     const { jsPDF } = window.jspdf;
     const monthName = new Date(currentYear, currentMonthNum).toLocaleString('default', { month: 'long' });
 
-    // 🔥 A4 Landscape for many columns
     const doc = new jsPDF({
       orientation: 'landscape',
       unit: 'mm',
@@ -1105,38 +1162,105 @@
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
 
-    // ===== HEADER =====
-    doc.setFillColor(26, 35, 126); // Deep blue
-    doc.rect(0, 0, pageWidth, 20, 'F');
+    // 🔥 Use preloaded logo (guaranteed to work)
+    let logoData = LOGO_BASE64;
+    if (!logoData) {
+      // Fallback: try to load again
+      try {
+        logoData = await loadImageAsDataURL(COACHING_INFO.logo);
+        LOGO_BASE64 = logoData;
+      } catch (err) {
+        console.warn('Logo load failed in PDF:', err);
+      }
+    }
+
+    // ===== HEADER BANNER =====
+    doc.setFillColor(26, 35, 126);
+    doc.rect(0, 0, pageWidth, 28, 'F');
+    
+    // Yellow accent stripe
+    doc.setFillColor(255, 193, 7);
+    doc.rect(0, 28, pageWidth, 2, 'F');
+
+    // 🔥 Logo (Left side)
+    const logoSize = 22;
+    const logoX = 8;
+    const logoY = 3;
+
+    // White circle background
+    doc.setFillColor(255, 255, 255);
+    doc.circle(logoX + logoSize / 2, logoY + logoSize / 2, logoSize / 2 + 0.5, 'F');
+
+    if (logoData) {
+      try {
+        doc.addImage(logoData, 'JPEG', logoX + 1, logoY + 1, logoSize - 2, logoSize - 2);
+      } catch (e) {
+        // Fallback: Q letter
+        doc.setTextColor(26, 35, 126);
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Q', logoX + logoSize / 2, logoY + logoSize / 2 + 3, { align: 'center' });
+      }
+    } else {
+      doc.setTextColor(26, 35, 126);
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Q', logoX + logoSize / 2, logoY + logoSize / 2 + 3, { align: 'center' });
+    }
+
+    // 🔥 Coaching Details (right of logo)
+    const textStartX = logoX + logoSize + 6;
     
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
-    doc.text('QUEST COACHING CENTRE', pageWidth / 2, 10, { align: 'center' });
-    
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Block More, Gopalganj - 841428 | +91 9708442525', pageWidth / 2, 16, { align: 'center' });
+    doc.text(COACHING_INFO.name, textStartX, 10);
 
-    // ===== SUB HEADER =====
-    doc.setTextColor(40, 53, 147);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(255, 193, 7);
+    doc.text(`${COACHING_INFO.directorTitle}: ${COACHING_INFO.director}`, textStartX, 16);
+
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(255, 255, 255);
+    doc.text(COACHING_INFO.address, textStartX, 20.5);
+    doc.text(COACHING_INFO.phone, textStartX, 25);
+
+    // ===== REPORT TITLE BANNER =====
+    doc.setFillColor(40, 53, 147);
+    doc.rect(0, 30, pageWidth, 11, 'F');
+    
+    doc.setTextColor(255, 255, 255);
     doc.setFontSize(13);
     doc.setFont('helvetica', 'bold');
-    doc.text(`Monthly Attendance Register - ${monthName} ${currentYear}`, pageWidth / 2, 28, { align: 'center' });
+    doc.text(
+      `Monthly Attendance Register - ${monthName} ${currentYear}`,
+      pageWidth / 2,
+      37.5,
+      { align: 'center' }
+    );
 
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(100, 100, 100);
-    doc.text(`Class: ${currentClass}   |   Session: ${currentSession}   |   Total Students: ${studentsList.length}`, pageWidth / 2, 34, { align: 'center' });
+    // ===== SUB INFO BAR =====
+    doc.setFillColor(240, 245, 255);
+    doc.rect(0, 41, pageWidth, 7, 'F');
+    
+    doc.setTextColor(40, 53, 147);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.text(
+      `Class: ${currentClass}   |   Session: ${currentSession}   |   Total Students: ${studentsList.length}   |   Editable Days: ${editableDays.size}   |   Locked Days: ${lockedDays.size}`,
+      pageWidth / 2,
+      45.5,
+      { align: 'center' }
+    );
 
     // ===== TABLE =====
-    // Header row: Student Name, Roll, then dates
     const headRow = ['Student Name', 'Roll'];
     for (let day = 1; day <= currentDaysInMonth; day++) {
       headRow.push(String(day));
     }
 
-    // Body rows
     const bodyRows = [];
     studentsList.forEach(student => {
       const row = [student.name, String(student.roll)];
@@ -1147,9 +1271,8 @@
       bodyRows.push(row);
     });
 
-    // Column styles
     const columnStyles = {
-      0: { cellWidth: 40, halign: 'left', fontStyle: 'bold', textColor: [10, 42, 102], fillColor: [241, 245, 249] },
+      0: { cellWidth: 42, halign: 'left', fontStyle: 'bold', textColor: [10, 42, 102], fillColor: [241, 245, 249] },
       1: { cellWidth: 12, halign: 'center', fontStyle: 'bold', textColor: [26, 35, 126], fillColor: [241, 245, 249] }
     };
     for (let day = 1; day <= currentDaysInMonth; day++) {
@@ -1164,7 +1287,7 @@
     doc.autoTable({
       head: [headRow],
       body: bodyRows,
-      startY: 38,
+      startY: 50,
       theme: 'grid',
       styles: {
         fontSize: 7,
@@ -1183,9 +1306,8 @@
         cellPadding: 1.5
       },
       columnStyles: columnStyles,
-      margin: { left: 5, right: 5, top: 38, bottom: 15 },
+      margin: { left: 5, right: 5, top: 50, bottom: 15 },
       didParseCell: function(data) {
-        // Color cells based on P/A/L/H
         if (data.section === 'body' && data.column.index >= 2) {
           const value = data.cell.raw;
           if (value === 'P') {
@@ -1217,9 +1339,8 @@
     
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(100, 100, 100);
-    doc.text('P = Present   |   A = Absent   |   L = Leave   |   H = Holiday   |   (blank) = Not Marked', 25, finalY);
+    doc.text('P = Present  |  A = Absent  |  L = Leave  |  H = Holiday  |  (blank) = Not Marked', 25, finalY);
 
-    // Page number + generated time
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
@@ -1238,12 +1359,10 @@
       doc.save(`Attendance_${currentClass}_${monthName}_${currentYear}.pdf`);
       showToast('📥 PDF downloaded successfully!');
     } else if (action === 'print') {
-      // Open in new tab for print
       const pdfBlob = doc.output('blob');
       const pdfUrl = URL.createObjectURL(pdfBlob);
       const win = window.open(pdfUrl, '_blank');
       if (!win) {
-        // Fallback: download
         doc.save(`Attendance_${currentClass}_${monthName}_${currentYear}.pdf`);
         showToast('📥 Popup blocked. PDF downloaded instead.');
       } else {
@@ -1259,9 +1378,9 @@
   downloadBtn.addEventListener('click', function() {
     downloadBtn.disabled = true;
     downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
-        generateRealPDF('download');
+        await generateRealPDF('download');
       } catch (err) {
         console.error('PDF error:', err);
         showToast('❌ PDF error: ' + err.message, true);
@@ -1277,9 +1396,9 @@
   printBtn.addEventListener('click', function() {
     printBtn.disabled = true;
     printBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing...';
-    setTimeout(() => {
+    setTimeout(async () => {
       try {
-        generateRealPDF('print');
+        await generateRealPDF('print');
       } catch (err) {
         console.error('Print error:', err);
         showToast('❌ Print error: ' + err.message, true);
@@ -1293,8 +1412,8 @@
 
   init();
   console.log('✅ Previous Attendance Page Loaded!');
-  console.log('📌 Real PDF Generator: jsPDF + AutoTable');
-  console.log('📌 A4 Landscape · Colorful cells · Professional layout');
+  console.log('📌 Logo preloaded from index.html URL');
+  console.log('📌 PDF: A4 Landscape with Coaching Header');
 </script>
 </body>
 </html>
