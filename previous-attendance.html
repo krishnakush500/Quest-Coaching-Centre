@@ -33,7 +33,6 @@
       border: 1px solid rgba(255, 255, 255, 0.6);
     }
 
-    /* 🔥 COACHING HEADER (Web page) */
     .coaching-header {
       display: flex;
       align-items: center;
@@ -548,7 +547,7 @@
 
 <div class="container">
 
-  <!-- 🔥 COACHING HEADER (Web page display) -->
+  <!-- COACHING HEADER (Web page display) -->
   <div class="coaching-header">
     <div class="logo-circle">
       <img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" alt="Quest Coaching Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=&quot;color:#1a237e;font-weight:900;font-size:1.8rem;&quot;>Q</span>';">
@@ -646,9 +645,6 @@
 <div id="toastMsg" class="toast-msg"></div>
 
 <script>
-  // ============================================================
-  // 🔥 COACHING INFO
-  // ============================================================
   const COACHING_INFO = {
     logo: 'https://i.ibb.co/hF9tmnpB/20250903-202922.jpg',
     name: 'QUEST COACHING CENTRE',
@@ -658,11 +654,8 @@
     phone: '+91 9708442525'
   };
 
-  let LOGO_BASE64 = null; // 🔥 Circular-cropped logo
+  let LOGO_BASE64 = null;
 
-  // ============================================================
-  // 🔥 CIRCULAR LOGO CROP (removes square box)
-  // ============================================================
   function loadImageAsCircularDataURL(url) {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -675,16 +668,13 @@
           canvas.height = size;
           const ctx = canvas.getContext('2d');
 
-          // 🔥 Create circular clipping path
           ctx.beginPath();
           ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
           ctx.closePath();
           ctx.clip();
 
-          // Draw image inside circular clip
           ctx.drawImage(img, 0, 0, size, size);
 
-          // Export as PNG (with transparency outside circle)
           const dataURL = canvas.toDataURL('image/png');
           resolve(dataURL);
         } catch (e) {
@@ -707,9 +697,6 @@
     }
   }
 
-  // ============================================================
-  // FIREBASE CONFIG
-  // ============================================================
   const firebaseConfig = {
     apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
     authDomain: "quest-coaching.firebaseapp.com",
@@ -1218,7 +1205,7 @@
   });
 
   // ============================================================
-  // 🔥 PDF GENERATOR - CLEAN CIRCULAR LOGO (No square box)
+  // PDF GENERATOR (Yellow stripe removed)
   // ============================================================
   async function generateRealPDF(action = 'download') {
     if (studentsList.length === 0) { showToast('No data!', true); return; }
@@ -1236,7 +1223,6 @@
     const pageHeight = doc.internal.pageSize.getHeight();
     const centerX = pageWidth / 2;
 
-    // 🔥 Logo - already circular (transparent PNG)
     let logoData = LOGO_BASE64;
     if (!logoData) {
       try {
@@ -1247,14 +1233,10 @@
       }
     }
 
-    // ===== HEADER BANNER =====
+    // ===== HEADER BANNER (No yellow stripe) =====
     const headerHeight = 34;
     doc.setFillColor(26, 35, 126);
     doc.rect(0, 0, pageWidth, headerHeight, 'F');
-    
-    // Yellow accent stripe
-    doc.setFillColor(255, 193, 7);
-    doc.rect(0, headerHeight, pageWidth, 2, 'F');
 
     // ============================================================
     // CENTERED LOGO + TEXT BLOCK
@@ -1268,19 +1250,17 @@
     const blockStartX = centerX - (totalWidth / 2);
     const blockStartY = 5;
 
-    // --- LOGO (Left side) ---
+    // --- LOGO ---
     const logoX = blockStartX;
     const logoY = blockStartY + 1;
     const logoCenterX = logoX + logoSize / 2;
     const logoCenterY = logoY + logoSize / 2;
 
-    // Yellow border circle (behind logo)
     doc.setFillColor(255, 193, 7);
     doc.circle(logoCenterX, logoCenterY, logoSize / 2 + 0.8, 'F');
 
     if (logoData) {
       try {
-        // 🔥 Logo is already circular PNG - transparent outside
         doc.addImage(
           logoData,
           'PNG',
@@ -1306,29 +1286,25 @@
       doc.text('Q', logoCenterX, logoCenterY + 3, { align: 'center' });
     }
 
-    // --- TEXT (Right side of logo) ---
+    // --- TEXT ---
     const textX = logoX + logoSize + gapBetweenLogoText;
     const textY = blockStartY + 4;
 
-    // Coaching Name
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(15);
     doc.setFont('helvetica', 'bold');
     doc.text(COACHING_INFO.name, textX, textY);
 
-    // Director
     doc.setFontSize(8.5);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(255, 193, 7);
     doc.text(`${COACHING_INFO.directorTitle}: ${COACHING_INFO.director}`, textX, textY + 5.5);
 
-    // Address
     doc.setFontSize(7.5);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(255, 255, 255);
     doc.text(COACHING_INFO.address, textX, textY + 10.5);
 
-    // Phone
     doc.text(COACHING_INFO.phone, textX, textY + 14.5);
 
     // ===== REPORT TITLE BANNER =====
@@ -1510,7 +1486,7 @@
 
   init();
   console.log('✅ Previous Attendance Page Loaded!');
-  console.log('📌 Circular logo (no square box) + Web header added');
+  console.log('📌 Yellow stripe removed');
 </script>
 </body>
 </html>
