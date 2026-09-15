@@ -114,6 +114,22 @@
       background: white;
       cursor: pointer;
     }
+    .top-controls .prev-attendance-btn {
+      background: #8b5cf6;
+      border: none;
+      border-radius: 40px;
+      padding: 4px 14px;
+      color: white;
+      font-weight: 600;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 10px rgba(139, 92, 246, 0.2);
+      cursor: pointer;
+      border: 1px solid #a78bfa;
+    }
+    .top-controls .prev-attendance-btn:hover { background: #7c3aed; }
     .top-controls .view-parent-btn {
       margin-left: auto;
       background: #0a2a66;
@@ -131,24 +147,6 @@
       border: 1px solid #3f6ec0;
     }
     .top-controls .view-parent-btn:hover { background: #13458b; }
-
-    /* 🔥 Previous Attendance Button */
-    .top-controls .prev-attendance-btn {
-      background: #8b5cf6;
-      border: none;
-      border-radius: 40px;
-      padding: 4px 14px;
-      color: white;
-      font-weight: 600;
-      font-size: 0.7rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 4px 10px rgba(139, 92, 246, 0.2);
-      cursor: pointer;
-      border: 1px solid #a78bfa;
-    }
-    .top-controls .prev-attendance-btn:hover { background: #7c3aed; }
 
     .class-filter {
       display: flex;
@@ -297,6 +295,25 @@
     }
     .save-btn:hover { background: #059669; }
     .save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* 🔥 SAVE HOLIDAY BUTTON */
+    .save-holiday-btn {
+      background: #dc3545;
+      border: none;
+      padding: 5px 18px;
+      border-radius: 40px;
+      color: white;
+      font-weight: 700;
+      font-size: 0.75rem;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+      cursor: pointer;
+    }
+    .save-holiday-btn:hover { background: #b91c1c; }
+    .save-holiday-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
     .refresh-btn {
       background: #e2e8f0;
       border: none;
@@ -385,10 +402,8 @@
       display: flex;
       align-items: center;
       gap: 4px;
-      cursor: pointer;
       font-size: 0.75rem;
     }
-    .student-name:hover { color: #0033aa; text-decoration: underline; }
     .roll-badge {
       background: #e3edfe;
       padding: 2px 8px;
@@ -502,7 +517,6 @@
       margin-bottom: 8px;
     }
 
-    /* 🔥 LOADING OVERLAY with PERCENTAGE */
     .loading-overlay {
       position: fixed;
       top: 0;
@@ -567,6 +581,7 @@
       .attendance-actions label input[type="radio"] { width: 10px; height: 10px; }
       .remark-input { width: 40px; font-size: 0.55rem; padding: 2px 5px; }
       .save-btn { font-size: 0.65rem; padding: 4px 12px; }
+      .save-holiday-btn { font-size: 0.65rem; padding: 4px 12px; }
       .refresh-btn { font-size: 0.6rem; padding: 4px 10px; }
       .holiday-msg { padding: 8px; }
       .holiday-msg h2 { font-size: 0.85rem; }
@@ -598,7 +613,6 @@
           <option value="2029-30">2029-30</option>
         </select>
       </div>
-      <!-- 🔥 Previous Attendance Button -->
       <button class="prev-attendance-btn" id="prevAttendanceBtn">
         <i class="fas fa-history"></i> Previous
       </button>
@@ -632,27 +646,23 @@
       </div>
     </div>
 
-    <!-- Holiday Message -->
     <div class="holiday-msg" id="holidayMsg">
       <i class="fas fa-calendar-times"></i>
       <h2>🎉 Class Holiday!</h2>
       <div class="reason-text" id="holidayReasonDisplay">HOLIDAY</div>
     </div>
 
-    <!-- Checking Message -->
     <div class="checking-msg" id="checkingMsg">
       <i class="fas fa-spinner"></i>
       <h2>Checking Attendance Status...</h2>
     </div>
 
-    <!-- Attendance Done Message -->
     <div class="attendance-done-msg" id="attendanceDoneMsg">
       <i class="fas fa-check-circle"></i>
       <h2>✅ Attendance Already Done!</h2>
       <p id="attendanceDoneInfo">All students marked for today.</p>
     </div>
 
-    <!-- SUMMARY COUNTER -->
     <div class="summary-counter" id="summaryCounter" style="display:none;">
       <span class="count-item count-total">📌 <span class="num" id="totalCount">0</span></span>
       <span class="count-item count-present">✅ <span class="num" id="presentCount">0</span></span>
@@ -661,16 +671,18 @@
       <span class="count-item count-pending">⏳ <span class="num" id="pendingCount">0</span></span>
     </div>
 
-    <!-- SAVE BUTTON -->
+    <!-- 🔥 SAVE BUTTONS (Attendance + Holiday) -->
     <div class="save-btn-container" id="saveBtnContainer" style="display:none;">
       <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync"></i></button>
       <button class="save-btn" id="saveAttendanceBtn">
         <i class="fas fa-save"></i> Save
       </button>
+      <button class="save-holiday-btn" id="saveHolidayBtn">
+        <i class="fas fa-calendar-times"></i> Save Holiday
+      </button>
     </div>
   </div>
 
-  <!-- SCROLLABLE TABLE -->
   <div class="table-scroll" id="tableScroll" style="display:none;">
     <table id="attendanceTable">
       <thead>
@@ -691,7 +703,6 @@
   </div>
 </div>
 
-<!-- 🔥 LOADING OVERLAY with PERCENTAGE -->
 <div class="loading-overlay" id="loadingOverlay">
   <div class="loading-card">
     <i class="fas fa-spinner"></i>
@@ -703,9 +714,6 @@
 <div id="toastMsg" class="toast-msg"></div>
 
 <script>
-  // ============================================================
-  // FIREBASE CONFIG
-  // ============================================================
   const firebaseConfig = {
     apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
     authDomain: "quest-coaching.firebaseapp.com",
@@ -720,9 +728,6 @@
   const db = firebase.firestore();
   const auth = firebase.auth();
 
-  // ============================================================
-  // DOM REFS
-  // ============================================================
   const tbody = document.getElementById('tableBody');
   const classSelect = document.getElementById('classSelect');
   const sessionSelect = document.getElementById('sessionSelect');
@@ -741,6 +746,7 @@
   const parentViewBtn = document.getElementById('parentViewBtn');
   const prevAttendanceBtn = document.getElementById('prevAttendanceBtn');
   const saveBtn = document.getElementById('saveAttendanceBtn');
+  const saveHolidayBtn = document.getElementById('saveHolidayBtn');
   const refreshBtn = document.getElementById('refreshBtn');
   const toast = document.getElementById('toastMsg');
 
@@ -759,10 +765,8 @@
   let isSaving = false;
   let currentDate = '';
   let isAttendanceDone = false;
+  let holidaySaved = false;
 
-  // ============================================================
-  // HELPER FUNCTIONS
-  // ============================================================
   function showToast(msg, isError = false) {
     toast.textContent = msg;
     toast.style.display = 'block';
@@ -794,9 +798,6 @@
     if (status) loadingStatus.textContent = status;
   }
 
-  // ============================================================
-  // UPDATE SUMMARY
-  // ============================================================
   function updateSummary() {
     const total = students.length;
     let present = 0, absent = 0, leave = 0, pending = 0;
@@ -814,9 +815,6 @@
     pendingCount.textContent = pending;
   }
 
-  // ============================================================
-  // FAST: FETCH ALL ATTENDANCE IN ONE GO
-  // ============================================================
   async function fetchAllAttendanceForDate(selectedSession, selectedClass, today) {
     try {
       let snapshot = await db.collection('admissions')
@@ -884,18 +882,12 @@
     }
   }
 
-  // ============================================================
-  // 🔥 Previous Attendance Button
-  // ============================================================
   prevAttendanceBtn.addEventListener('click', function() {
     const session = sessionSelect.value;
     const className = classSelect.value;
     window.open(`previous-attendance.html?session=${session}&class=${className}`, '_blank');
   });
 
-  // ============================================================
-  // PARENT VIEW
-  // ============================================================
   parentViewBtn.addEventListener('click', function() {
     const session = sessionSelect.value;
     const className = classSelect.value;
@@ -903,30 +895,32 @@
     window.open(`parent-view.html?session=${session}&class=${className}`, '_blank');
   });
 
-  // ============================================================
-  // HANDLE CLASS HOLIDAY
-  // ============================================================
+  // 🔥 HOLIDAY TOGGLE HANDLER
   function handleClassHoliday() {
     if (classHolidayCheck.checked) {
       holidayReasonGroup.style.display = 'flex';
       holidayMsg.style.display = 'block';
       tableScroll.style.display = 'none';
-      saveBtnContainer.style.display = 'none';
       summaryCounter.style.display = 'none';
       attendanceDoneMsg.style.display = 'none';
       checkingMsg.style.display = 'none';
+      
+      // 🔥 Show Save Holiday button, hide Save Attendance
+      saveBtnContainer.style.display = 'flex';
+      saveBtn.style.display = 'none';
+      saveHolidayBtn.style.display = 'flex';
+      
       const reason = holidayReason.value.trim() || 'Holiday';
       holidayReasonDisplay.textContent = reason.toUpperCase();
     } else {
       holidayReasonGroup.style.display = 'none';
       holidayMsg.style.display = 'none';
+      saveBtn.style.display = 'flex';
+      saveHolidayBtn.style.display = 'none';
       handleClassSelect();
     }
   }
 
-  // ============================================================
-  // MAIN: Class Select Handler
-  // ============================================================
   async function handleClassSelect() {
     if (classHolidayCheck.checked) return;
 
@@ -968,6 +962,8 @@
         </td></tr>`;
         summaryCounter.style.display = 'flex';
         saveBtnContainer.style.display = 'flex';
+        saveBtn.style.display = 'flex';
+        saveHolidayBtn.style.display = 'none';
         students = [];
         attendanceData = {};
         updateSummary();
@@ -996,6 +992,8 @@
           tableScroll.style.display = 'block';
           summaryCounter.style.display = 'flex';
           saveBtnContainer.style.display = 'flex';
+          saveBtn.style.display = 'flex';
+          saveHolidayBtn.style.display = 'none';
           isAttendanceDone = false;
           renderTable();
           updateSummary();
@@ -1009,9 +1007,6 @@
     }
   }
 
-  // ============================================================
-  // RENDER TABLE
-  // ============================================================
   function renderTable() {
     if (students.length === 0) {
       tbody.innerHTML = `<tr><td colspan="4" class="no-students-msg">
@@ -1028,7 +1023,7 @@
 
       html += `<tr>
         <td>
-          <div class="student-name" data-roll="${s.roll}" data-name="${s.name}">
+          <div class="student-name">
             <i class="fas fa-user-graduate"></i> ${s.name}
           </div>
         </td>
@@ -1048,10 +1043,8 @@
     tbody.innerHTML = html;
 
     document.querySelectorAll('#attendanceTable tbody tr').forEach(row => {
-      const nameDiv = row.querySelector('.student-name');
-      if (!nameDiv) return;
-      const roll = parseInt(nameDiv.dataset.roll);
-
+      const roll = parseInt(row.querySelector('.roll-badge').textContent);
+      
       const radios = row.querySelectorAll(`input[name="status_${roll}"]`);
       radios.forEach(r => {
         r.addEventListener('change', function() {
@@ -1074,9 +1067,56 @@
     });
   }
 
-  // ============================================================
-  // SAVE ATTENDANCE (No Progress Bar shown after save)
-  // ============================================================
+  // 🔥 SAVE HOLIDAY
+  async function saveHoliday() {
+    if (isSaving) return;
+    
+    const selectedSession = sessionSelect.value;
+    const selectedClass = classSelect.value;
+    const today = getTodayDate();
+    const reason = holidayReason.value.trim() || 'Holiday';
+
+    if (!selectedSession || !selectedClass) {
+      showToast('Select Session & Class!', true);
+      return;
+    }
+
+    isSaving = true;
+    saveHolidayBtn.disabled = true;
+    saveHolidayBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+    try {
+      const holidayDocRef = db.collection('attendance')
+        .doc(selectedSession)
+        .collection('classes')
+        .doc(selectedClass)
+        .collection('holidays')
+        .doc(today);
+      
+      await holidayDocRef.set({
+        reason: reason,
+        date: today,
+        session: selectedSession,
+        class: selectedClass,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      holidaySaved = true;
+      showToast(`🎉 Holiday saved: ${reason.toUpperCase()}`);
+      
+      saveHolidayBtn.innerHTML = '<i class="fas fa-check"></i> Holiday Saved';
+      saveHolidayBtn.style.background = '#10b981';
+      
+    } catch (error) {
+      console.error('Error saving holiday:', error);
+      showToast('❌ Error: ' + error.message, true);
+      saveHolidayBtn.disabled = false;
+      saveHolidayBtn.innerHTML = '<i class="fas fa-calendar-times"></i> Save Holiday';
+    } finally {
+      isSaving = false;
+    }
+  }
+
   async function saveAttendance() {
     if (isSaving) return;
     if (students.length === 0) {
@@ -1099,27 +1139,6 @@
 
     try {
       const batch = db.batch();
-
-      if (classHolidayCheck.checked) {
-        const reason = holidayReason.value.trim() || 'Holiday';
-        const holidayDocRef = db.collection('attendance')
-          .doc(selectedSession)
-          .collection('classes')
-          .doc(selectedClass)
-          .collection('holidays')
-          .doc(today);
-        batch.set(holidayDocRef, {
-          reason: reason, date: today, session: selectedSession,
-          class: selectedClass, timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        await batch.commit();
-        showToast(`🎉 Holiday saved: ${reason}`);
-        isSaving = false;
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save';
-        return;
-      }
-
       let savedCount = 0;
 
       for (const student of students) {
@@ -1161,9 +1180,6 @@
     }
   }
 
-  // ============================================================
-  // INIT & EVENTS
-  // ============================================================
   async function init() {
     updateDateDisplay();
     sessionSelect.value = '2026-27';
@@ -1186,6 +1202,7 @@
   });
 
   saveBtn.addEventListener('click', saveAttendance);
+  saveHolidayBtn.addEventListener('click', saveHoliday);
 
   refreshBtn.addEventListener('click', function() {
     if (!classHolidayCheck.checked) handleClassSelect();
@@ -1204,7 +1221,7 @@
   });
 
   console.log('✅ Attendance System Loaded!');
-  console.log('📌 Download buttons removed | Previous button added');
+  console.log('📌 Holiday Save button added');
 </script>
 </body>
 </html>
