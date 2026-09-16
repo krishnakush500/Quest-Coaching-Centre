@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>📅 Attendance History · Quest Coaching</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0f6ff;
+      min-height: 100vh;
+      padding: 16px 10px 30px;
+    }
+    .container {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 28px;
+      box-shadow: 0 20px 50px rgba(0, 40, 100, 0.12);
+      padding: 20px 14px 24px;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+
+    /* COACHING HEADER */
+    .coaching-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      background: linear-gradient(135deg, #1a237e, #283593);
+      padding: 14px 18px;
+      border-radius: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 20px rgba(26, 35, 126, 0.3);
+      flex-wrap: wrap;
+      position: relative;
+      overflow: hidden;
+    }
+    .coaching-header::before {
+      content: '';
+      position: absolute;
+      top: -50%; right: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(255,193,7,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .coaching-header .logo-circle {
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid #ffc107;
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15), 0 4px 12px rgba(0,0,0,0.2);
+      flex-shrink: 0;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+    .coaching-header .logo-circle img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .coaching-header .coaching-text {
+      text-align: left;
+      color: white;
+      position: relative;
+      z-index: 1;
+    }
+    .coaching-header .coaching-text h2 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin-bottom: 3px;
+    }
+    .coaching-header .coaching-text .director {
+      font-size: 0.75rem;
+      color: #ffc107;
+      font-weight: 700;
+    }
+    .coaching-header .coaching-text .details {
+      font-size: 0.65rem;
+      opacity: 0.95;
+      margin-top: 3px;
+    }
+    .coaching-header .coaching-text .details i {
+      color: #ffc107;
+      margin-right: 4px;
+    }
+    @media (max-width: 600px) {
+      .coaching-header { flex-direction: column; text-align: center; padding: 12px 10px; gap: 8px; }
+      .coaching-header .coaching-text { text-align: center; }
+      .coaching-header .coaching-text h2 { font-size: 0.95rem; }
+      .coaching-header .logo-circle { width: 50px; height: 50px; }
+    }
+
+    /* STUDENT INFO BAR */
+    .student-info-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(135deg, #e8f0fe, #f4f9ff);
+      padding: 14px 18px;
+      border-radius: 16px;
+      margin-bottom: 16px;
+      border: 2px solid #d7e5fc;
+      flex-wrap: wrap;
+    }
+    .student-info-bar .avatar {
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid #0a2a66;
+      box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.3);
+      background: white;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .student-info-bar .avatar img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .student-info-bar .avatar .fallback {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #0a2a66;
+    }
+    .student-info-bar .info {
+      flex: 1;
+      min-width: 0;
+    }
+    .student-info-bar .info .name {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #0a2a66;
+      margin-bottom: 2px;
+      word-wrap: break-word;
+    }
+    .student-info-bar .info .meta {
+      font-size: 0.75rem;
+      color: #475569;
+      font-weight: 600;
+    }
+    .student-info-bar .info .meta i {
+      color: #f59e0b;
+      margin-right: 3px;
+    }
+    @media (max-width: 600px) {
+      .student-info-bar { padding: 12px 14px; }
+      .student-info-bar .avatar { width: 42px; height: 42px; }
+      .student-info-bar .info .name { font-size: 0.95rem; }
+      .student-info-bar .info .meta { font-size: 0.68rem; }
+    }
+
+    /* LEGEND */
+    .legend-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 12px;
+      background: #f8fafc;
+      padding: 10px 14px;
+      border-radius: 40px;
+      margin-bottom: 16px;
+      border: 2px solid #e2e8f0;
+      justify-content: center;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #475569;
+    }
+    .legend-dot {
+      width: 12px; height: 12px;
+      border-radius: 4px;
+      border: 2px solid;
+    }
+    .legend-dot.P { background: #a7f3d0; border-color: #10b981; }
+    .legend-dot.A { background: #fecaca; border-color: #dc3545; }
+    .legend-dot.L { background: #fde68a; border-color: #f59e0b; }
+    .legend-dot.H { background: #c7d2fe; border-color: #6366f1; }
+
+    /* MONTHS SCROLL */
+    .months-scroll {
+      max-height: 72vh;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .months-scroll::-webkit-scrollbar { width: 5px; }
+    .months-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+    .months-scroll::-webkit-scrollbar-thumb { background: #8b5cf6; border-radius: 10px; }
+    .months-scroll::-webkit-scrollbar-thumb:hover { background: #7c3aed; }
+
+    /* MONTH CARD */
+    .month-card {
+      background: white;
+      border-radius: 16px;
+      padding: 12px 10px;
+      margin-bottom: 12px;
+      border: 2px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 40, 100, 0.05);
+    }
+    .month-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 2px dashed #e2e8f0;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .month-title {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #0a2a66;
+      letter-spacing: 0.3px;
+    }
+    .month-summary {
+      font-size: 0.6rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #e8f0fe, #dbeafe);
+      color: #1e40af;
+      padding: 3px 10px;
+      border-radius: 40px;
+      border: 1px solid #b8cff0;
+      letter-spacing: 0.2px;
+    }
+
+    /* CALENDAR GRID */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+    }
+    .day-header {
+      font-size: 0.55rem;
+      font-weight: 800;
+      color: #64748b;
+      text-align: center;
+      padding: 4px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+      background: #f8fafc;
+      border-radius: 5px;
+    }
+    .day-cell {
+      aspect-ratio: 1 / 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: #475569;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      position: relative;
+      transition: all 0.15s;
+    }
+    .day-cell.empty {
+      background: transparent;
+      border: none;
+    }
+    .day-cell .day-num {
+      font-size: 0.7rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .day-cell .day-status {
+      font-size: 0.5rem;
+      font-weight: 900;
+      margin-top: 1px;
+      letter-spacing: 0.2px;
+      line-height: 1;
+    }
+    /* COLORFUL CELLS */
+    .day-cell.P { 
+      background: linear-gradient(135deg, #a7f3d0, #6ee7b7); 
+      color: #065f46; 
+      border-color: #10b981;
+      box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+    }
+    .day-cell.A { 
+      background: linear-gradient(135deg, #fecaca, #fca5a5); 
+      color: #991b1b; 
+      border-color: #dc3545;
+      box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+    }
+    .day-cell.L { 
+      background: linear-gradient(135deg, #fde68a, #fcd34d); 
+      color: #92400e; 
+      border-color: #f59e0b;
+      box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
+    }
+    .day-cell.H { 
+      background: linear-gradient(135deg, #c7d2fe, #a5b4fc); 
+      color: #3730a3; 
+      border-color: #6366f1;
+      box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
+    }
+    .day-cell.weekend {
+      background: #f1f5f9;
+      color: #94a3b8;
+      border-color: #e2e8f0;
+    }
+    .day-cell.today {
+      box-shadow: 0 0 0 2px #8b5cf6, 0 4px 10px rgba(139, 92, 246, 0.3);
+      transform: scale(1.05);
+      z-index: 2;
+    }
+
+    /* Loading & Error */
+    .loading-msg {
+      text-align: center;
+      padding: 50px 20px;
+      color: #1f4b9e;
+      font-weight: 600;
+    }
+    .loading-msg i {
+      font-size: 2.5rem;
+      color: #8b5cf6;
+      animation: spin 1s linear infinite;
+      display: block;
+      margin-bottom: 12px;
+    }
+    .empty-msg {
+      text-align: center;
+      padding: 50px 20px;
+      color: #64748b;
+      font-weight: 600;
+    }
+    .empty-msg i {
+      font-size: 3rem;
+      color: #cbd5e1;
+      display: block;
+      margin-bottom: 12px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* TOAST */
+    .toast-msg {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a237e;
+      color: white;
+      padding: 10px 24px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      z-index: 9999;
+      display: none;
+      max-width: 90%;
+      text-align: center;
+    }
+
+    /* CLOSE BUTTON */
+    .close-btn {
+      display: flex;
+      margin: 18px auto 0;
+      background: linear-gradient(135deg, #0a2a66, #1f4b9e);
+      color: white;
+      border: none;
+      border-radius: 40px;
+      padding: 10px 28px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 16px rgba(10, 42, 102, 0.25);
+    }
+    .close-btn:hover { transform: translateY(-2px); }
+
+    @media (max-width: 600px) {
+      .container { padding: 14px 10px 20px; border-radius: 20px; }
+      .calendar-grid { gap: 2px; }
+      .day-cell { border-radius: 5px; }
+      .day-cell .day-num { font-size: 0.65rem; }
+      .day-cell .day-status { font-size: 0.45rem; }
+      .day-header { font-size: 0.5rem; padding: 3px 0; }
+      .month-card { padding: 10px 8px; }
+      .month-title { font-size: 0.8rem; }
+      .month-summary { font-size: 0.55rem; padding: 2px 8px; }
+      .legend-item { font-size: 0.6rem; }
+      .legend-dot { width: 10px; height: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- COACHING HEADER -->
+  <div class="coaching-header">
+    <div class="logo-circle">
+      <img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" alt="Quest Coaching Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=&quot;color:#1a237e;font-weight:900;font-size:1.5rem;&quot;>Q</span>';">
+    </div>
+    <div class="coaching-text">
+      <h2>QUEST COACHING CENTRE</h2>
+      <div class="director">CEO & Founder: MR. RAVI SIR</div>
+      <div class="details">
+        <i class="fas fa-map-marker-alt"></i>Gopalganj &nbsp;|&nbsp;
+        <i class="fas fa-phone"></i>+91 9708442525
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDENT INFO BAR -->
+  <div class="student-info-bar" id="studentInfoBar">
+    <div class="avatar" id="studentAvatar">
+      <img id="studentAvatarImg" src="" alt="Photo" style="display:none;">
+      <div class="fallback" id="studentAvatarFallback">S</div>
+    </div>
+    <div class="info">
+      <div class="name" id="studentNameDisplay">--</div>
+      <div class="meta" id="studentMetaDisplay"><i class="fas fa-id-card"></i> --</div>
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend-box">
+    <div class="legend-item"><div class="legend-dot P"></div> Present</div>
+    <div class="legend-item"><div class="legend-dot A"></div> Absent</div>
+    <div class="legend-item"><div class="legend-dot L"></div> Leave</div>
+    <div class="legend-item"><div class="legend-dot H"></div> Holiday</div>
+  </div>
+
+  <!-- MONTHS SCROLL -->
+  <div class="months-scroll" id="monthsScroll">
+    <div class="loading-msg">
+      <i class="fas fa-spinner"></i>
+      Loading attendance history...
+    </div>
+  </div>
+
+  <!-- CLOSE -->
+  <button class="close-btn" onclick="window.close()">
+    <i class="fas fa-times"></i> Close
+  </button>
+</div>
+
+<div id="toastMsg" class="toast-msg"></div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
+    authDomain: "quest-coaching.firebaseapp.com",
+    databaseURL: "https://quest-coaching-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "quest-coaching",
+    storageBucket: "quest-coaching.firebasestorage.app",
+    messagingSenderId: "131948734089",
+    appId: "1:131948734089:web:f4ba25110c8b1298360858"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const monthsScroll = document.getElementById('monthsScroll');
+  const toast = document.getElementById('toastMsg');
+  const studentNameDisplay = document.getElementById('studentNameDisplay');
+  const studentMetaDisplay = document.getElementById('studentMetaDisplay');
+  const studentAvatarImg = document.getElementById('studentAvatarImg');
+  const studentAvatarFallback = document.getElementById('studentAvatarFallback');
+
+  function showToast(msg, isError = false) {
+    toast.textContent = msg;
+    toast.style.display = 'block';
+    toast.style.background = isError ? '#dc3545' : '#1a237e';
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => { toast.style.display = 'none'; }, 4000);
+  }
+
+  function getUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      session: params.get('session') || '2026-27',
+      class: params.get('class') || '',
+      name: params.get('name') || '',
+      roll: params.get('roll') || ''
+    };
+  }
+
+  // 🔥 FETCH STUDENT PHOTO
+  async function fetchStudentPhoto(className, session, studentName) {
+    try {
+      let snapshot = await db.collection('admissions')
+        .where('studentName', '==', studentName)
+        .where('classApplying', '==', className)
+        .limit(1)
+        .get();
+
+      if (snapshot.empty) {
+        snapshot = await db.collection('admissions')
+          .where('name', '==', studentName)
+          .where('class', '==', className)
+          .limit(1)
+          .get();
+      }
+
+      if (!snapshot.empty) {
+        const data = snapshot.docs[0].data();
+        return data.photoUrl || data.photo || '';
+      }
+      return '';
+    } catch (error) {
+      console.warn('Photo fetch error:', error);
+      return '';
+    }
+  }
+
+  // 🔥 BUILD MONTH CARD
+  function buildMonthCard(monthKey, daysData) {
+    const [year, month] = monthKey.split('-');
+    const monthNum = parseInt(month) - 1;
+    const monthName = new Date(year, monthNum).toLocaleString('default', { month: 'long' });
+    const daysInMonth = new Date(parseInt(year), monthNum + 1, 0).getDate();
+    const firstDayOfWeek = new Date(parseInt(year), monthNum, 1).getDay();
+
+    let presentCount = 0, absentCount = 0, leaveCount = 0, holidayCount = 0;
+    Object.values(daysData).forEach(s => {
+      if (s === 'P') presentCount++;
+      else if (s === 'A') absentCount++;
+      else if (s === 'L') leaveCount++;
+      else if (s === 'H') holidayCount++;
+    });
+
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+    let gridHtml = '';
+    ['S', 'M', 'T', 'W', 'T', 'F', 'S'].forEach(d => {
+      gridHtml += `<div class="day-header">${d}</div>`;
+    });
+
+    for (let i = 0; i < firstDayOfWeek; i++) {
+      gridHtml += `<div class="day-cell empty"></div>`;
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${year}-${String(monthNum + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const status = daysData[day] || '';
+      const isToday = dateStr === todayStr;
+      const isWeekend = new Date(parseInt(year), monthNum, day).getDay() === 0;
+
+      let classes = 'day-cell';
+      if (status) classes += ` ${status}`;
+      else if (isWeekend) classes += ' weekend';
+      if (isToday) classes += ' today';
+
+      gridHtml += `<div class="${classes}">
+        <span class="day-num">${day}</span>
+        ${status ? `<span class="day-status">${status}</span>` : ''}
+      </div>`;
+    }
+
+    return `
+      <div class="month-card">
+        <div class="month-title-row">
+          <div class="month-title">${monthName} ${year}</div>
+          <div class="month-summary">✅ ${presentCount} · ❌ ${absentCount} · 🟡 ${leaveCount}</div>
+        </div>
+        <div class="calendar-grid">${gridHtml}</div>
+      </div>
+    `;
+  }
+
+  // 🔥 MAIN LOAD
+  async function loadCalendar() {
+    const { session, class: className, name: studentName, roll } = getUrlParams();
+
+    if (!studentName || !className) {
+      monthsScroll.innerHTML = `
+        <div class="empty-msg">
+          <i class="fas fa-exclamation-circle"></i>
+          Missing student information. Please search from parent view.
+        </div>`;
+      return;
+    }
+
+    // Show student info
+    studentNameDisplay.textContent = studentName;
+    studentMetaDisplay.innerHTML = `<i class="fas fa-id-card"></i> Roll No: ${roll} | Class: ${className} | Session: ${session}`;
+    studentAvatarFallback.textContent = studentName.charAt(0).toUpperCase();
+
+    // Fetch photo
+    const photoUrl = await fetchStudentPhoto(className, session, studentName);
+    if (photoUrl) {
+      studentAvatarImg.onload = function() {
+        studentAvatarImg.style.display = 'block';
+        studentAvatarFallback.style.display = 'none';
+      };
+      studentAvatarImg.onerror = function() {
+        studentAvatarImg.style.display = 'none';
+        studentAvatarFallback.style.display = 'flex';
+      };
+      studentAvatarImg.crossOrigin = 'anonymous';
+      studentAvatarImg.src = photoUrl;
+    }
+
+    try {
+      // Fetch all attendance
+      const snapshot = await db.collection('attendance')
+        .doc(session)
+        .collection('classes')
+        .doc(className)
+        .collection('students')
+        .doc(studentName)
+        .collection('attendance')
+        .get();
+
+      if (snapshot.empty) {
+        monthsScroll.innerHTML = `
+          <div class="empty-msg">
+            <i class="fas fa-calendar-times"></i>
+            No attendance records found for this student.
+          </div>`;
+        return;
+      }
+
+      // Group by month
+      const monthMap = {};
+      snapshot.forEach(doc => {
+        const dateParts = doc.id.split('-');
+        if (dateParts.length === 3) {
+          const year = dateParts[0];
+          const month = dateParts[1];
+          const day = parseInt(dateParts[2]);
+          const monthKey = `${year}-${month}`;
+          
+          if (!monthMap[monthKey]) monthMap[monthKey] = {};
+          
+          const data = doc.data();
+          const status = data.status || '';
+          let cell = '';
+          if (status === 'present') cell = 'P';
+          else if (status === 'absent') cell = 'A';
+          else if (status === 'leave') cell = 'L';
+          else if (status === 'holiday') cell = 'H';
+          
+          if (cell) monthMap[monthKey][day] = cell;
+        }
+      });
+
+      // Sort descending (latest first)
+      const sortedMonths = Object.keys(monthMap).sort((a, b) => b.localeCompare(a));
+
+      let html = '';
+      sortedMonths.forEach(monthKey => {
+        html += buildMonthCard(monthKey, monthMap[monthKey]);
+      });
+
+      monthsScroll.innerHTML = html;
+      setTimeout(() => { monthsScroll.scrollTop = 0; }, 100);
+
+    } catch (error) {
+      console.error('Calendar error:', error);
+      monthsScroll.innerHTML = `
+        <div class="empty-msg">
+          <i class="fas fa-exclamation-triangle" style="color:#dc3545;"></i>
+          Error: ${error.message}
+        </div>`;
+    }
+  }
+
+  window.addEventListener('load', loadCalendar);
+  console.log('✅ Student Calendar Loaded!');
+</script>
+</body>
+</html>
