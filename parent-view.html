@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
   <title>👨‍👩‍👧 Parent View · Quest Coaching</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
   
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -102,6 +102,12 @@
       margin-right: 5px;
       font-size: 0.72rem;
     }
+    @media (max-width: 600px) {
+      .coaching-header { flex-direction: column; text-align: center; padding: 16px 14px; gap: 10px; }
+      .coaching-header .coaching-text { text-align: center; }
+      .coaching-header .coaching-text h2 { font-size: 1.15rem; }
+      .coaching-header .logo-circle { width: 68px; height: 68px; }
+    }
 
     /* SEARCH */
     .search-section {
@@ -173,7 +179,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* STUDENT PROFILE */
     .student-profile {
       display: flex;
       align-items: center;
@@ -221,7 +226,6 @@
     }
     .student-roll i { color: #f59e0b; margin-right: 4px; }
 
-    /* ATTENDANCE ROW */
     .attendance-row {
       display: flex;
       align-items: center;
@@ -260,10 +264,9 @@
     .status-present { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; border: 2px solid #10b981; }
     .status-absent { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b; border: 2px solid #dc3545; }
     .status-leave { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; border: 2px solid #f59e0b; }
-    .status-holiday { background: linear-gradient(135deg, #fecaca, #fca5a5); color: #991b1b; border: 2px solid #dc3545; }
+    .status-holiday { background: linear-gradient(135deg, #c7d2fe, #a5b4fc); color: #3730a3; border: 2px solid #6366f1; }
     .status-notmarked { background: linear-gradient(135deg, #f1f5f9, #e2e8f0); color: #64748b; border: 2px solid #94a3b8; }
 
-    /* 🔥 DETAILS BUTTON */
     .details-btn {
       background: linear-gradient(135deg, #8b5cf6, #7c3aed);
       border: none;
@@ -281,7 +284,6 @@
     }
     .details-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(139, 92, 246, 0.4); }
 
-    /* FEE DETAILS */
     .fee-details {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -319,7 +321,6 @@
     .fee-item.fee-due.paid-full { border-color: #10b981; background: linear-gradient(135deg, #ecfdf5, #d1fae5); }
     .fee-item.fee-due.paid-full .label, .fee-item.fee-due.paid-full .value { color: #065f46; }
 
-    /* REMARK BOX */
     .remark-box {
       background: linear-gradient(135deg, #fffbeb, #fef3c7);
       padding: 14px 20px;
@@ -335,198 +336,6 @@
     }
     .remark-box i { color: #f59e0b; font-size: 1.1rem; flex-shrink: 0; }
 
-    /* 🔥 MONTH CALENDAR SECTION */
-    .calendar-section {
-      display: none;
-      margin-top: 24px;
-      animation: fadeIn 0.4s ease;
-    }
-    .calendar-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: linear-gradient(135deg, #1a237e, #283593);
-      padding: 14px 20px;
-      border-radius: 16px;
-      margin-bottom: 16px;
-      color: white;
-      box-shadow: 0 8px 20px rgba(26, 35, 126, 0.25);
-    }
-    .calendar-header .title {
-      font-weight: 800;
-      font-size: 1rem;
-      letter-spacing: 0.4px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .calendar-header .title i { color: #ffc107; }
-    .calendar-header .close-btn {
-      background: rgba(255, 255, 255, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 40px;
-      padding: 5px 14px;
-      color: white;
-      font-weight: 600;
-      font-size: 0.75rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .calendar-header .close-btn:hover { background: rgba(255, 255, 255, 0.25); }
-
-    /* 🔥 SCROLLABLE MONTHS */
-    .months-scroll {
-      max-height: 520px;
-      overflow-y: auto;
-      padding-right: 8px;
-    }
-    .months-scroll::-webkit-scrollbar { width: 6px; }
-    .months-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-    .months-scroll::-webkit-scrollbar-thumb { background: #8b5cf6; border-radius: 10px; }
-    .months-scroll::-webkit-scrollbar-thumb:hover { background: #7c3aed; }
-
-    /* MONTH CARD */
-    .month-card {
-      background: white;
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 16px;
-      border: 2px solid #e2e8f0;
-      box-shadow: 0 4px 12px rgba(0, 40, 100, 0.05);
-    }
-    .month-title-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-      padding-bottom: 10px;
-      border-bottom: 2px dashed #e2e8f0;
-    }
-    .month-title {
-      font-size: 1rem;
-      font-weight: 800;
-      color: #0a2a66;
-      letter-spacing: 0.3px;
-    }
-    .month-summary {
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: #64748b;
-      background: #f1f5f9;
-      padding: 4px 12px;
-      border-radius: 40px;
-    }
-
-    /* CALENDAR GRID */
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 6px;
-    }
-    .day-header {
-      font-size: 0.65rem;
-      font-weight: 800;
-      color: #64748b;
-      text-align: center;
-      padding: 6px 0;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .day-cell {
-      aspect-ratio: 1 / 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      border-radius: 10px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #475569;
-      background: #f8fafc;
-      border: 2px solid transparent;
-      position: relative;
-      cursor: default;
-      transition: all 0.15s;
-    }
-    .day-cell.empty {
-      background: transparent;
-      border: none;
-    }
-    .day-cell .day-num {
-      font-size: 0.85rem;
-      font-weight: 800;
-    }
-    .day-cell .day-status {
-      font-size: 0.55rem;
-      font-weight: 900;
-      margin-top: 1px;
-      letter-spacing: 0.3px;
-    }
-    /* Colors */
-    .day-cell.P { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; border-color: #10b981; }
-    .day-cell.A { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b; border-color: #dc3545; }
-    .day-cell.L { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; border-color: #f59e0b; }
-    .day-cell.H { background: linear-gradient(135deg, #fecaca, #fca5a5); color: #991b1b; border-color: #dc3545; }
-    .day-cell.today { 
-      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.4);
-      transform: scale(1.05);
-    }
-    .day-cell.weekend {
-      background: #f1f5f9;
-      color: #94a3b8;
-    }
-    .day-cell.weekend.P, .day-cell.weekend.A, .day-cell.weekend.L, .day-cell.weekend.H {
-      /* status colors override weekend */
-    }
-    .day-cell.today .day-num::after {
-      content: '';
-    }
-
-    /* LEGEND */
-    .calendar-legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px 14px;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 2px dashed #e2e8f0;
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: #475569;
-    }
-    .calendar-legend .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .calendar-legend .legend-dot {
-      width: 14px; height: 14px;
-      border-radius: 4px;
-      border: 2px solid;
-    }
-    .legend-dot.P { background: #a7f3d0; border-color: #10b981; }
-    .legend-dot.A { background: #fecaca; border-color: #dc3545; }
-    .legend-dot.L { background: #fde68a; border-color: #f59e0b; }
-    .legend-dot.H { background: #fca5a5; border-color: #dc3545; }
-
-    /* LOADING */
-    .calendar-loading {
-      text-align: center;
-      padding: 30px 20px;
-      color: #1f4b9e;
-      font-weight: 600;
-    }
-    .calendar-loading i {
-      font-size: 2rem;
-      color: #8b5cf6;
-      animation: spin 1s linear infinite;
-      display: block;
-      margin-bottom: 10px;
-    }
-
-    /* Not Found */
     .not-found {
       text-align: center;
       padding: 50px 20px;
@@ -593,9 +402,6 @@
       .search-section input { width: 100%; }
       .search-section button { width: 100%; justify-content: center; }
       .result-card { padding: 22px 16px; }
-      .coaching-header { flex-direction: column; text-align: center; padding: 16px 14px; }
-      .coaching-header .coaching-text { text-align: center; }
-      .coaching-header .coaching-text h2 { font-size: 1.15rem; }
       .student-photo-circle { width: 65px; height: 65px; }
       .student-photo-circle .photo-fallback { font-size: 1.6rem; }
       .student-name { font-size: 1.15rem; }
@@ -606,12 +412,6 @@
       .fee-details .fee-item .value { font-size: 1.1rem; }
       .attendance-row { flex-direction: column; align-items: stretch; text-align: center; }
       .details-btn { justify-content: center; }
-      .calendar-grid { gap: 3px; }
-      .day-cell { font-size: 0.65rem; border-radius: 8px; }
-      .day-cell .day-num { font-size: 0.75rem; }
-      .day-cell .day-status { font-size: 0.5rem; }
-      .day-header { font-size: 0.55rem; padding: 4px 0; }
-      .month-card { padding: 12px; }
     }
   </style>
 </head>
@@ -619,7 +419,6 @@
 
 <div class="container">
 
-  <!-- COACHING HEADER -->
   <div class="coaching-header" id="coachingHeader">
     <div class="logo-circle">
       <img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" alt="Quest Coaching Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=&quot;color:#1a237e;font-weight:900;font-size:1.8rem;&quot;>Q</span>';">
@@ -634,7 +433,6 @@
     </div>
   </div>
 
-  <!-- SEARCH -->
   <div class="search-section">
     <label><i class="fas fa-id-badge"></i> Roll No.</label>
     <input type="number" id="rollInput" placeholder="Enter Roll Number" autofocus>
@@ -652,7 +450,6 @@
     <p id="notFoundMsg">Please check the Roll Number and try again.</p>
   </div>
 
-  <!-- RESULT CARD -->
   <div class="result-card" id="resultCard">
     <div class="student-profile">
       <div class="student-photo-circle" id="studentPhotoCircle">
@@ -665,7 +462,6 @@
       </div>
     </div>
 
-    <!-- 🔥 TODAY ATTENDANCE + DETAILS BUTTON -->
     <div class="attendance-row">
       <div>
         <div class="today-label">Today's Attendance</div>
@@ -694,30 +490,6 @@
 
     <div class="remark-box" id="remarkBox">
       <i class="fas fa-comment-dots"></i> <span id="remarkText">No remarks</span>
-    </div>
-
-    <!-- 🔥 CALENDAR SECTION -->
-    <div class="calendar-section" id="calendarSection">
-      <div class="calendar-header">
-        <div class="title">
-          <i class="fas fa-calendar-check"></i> Attendance History
-        </div>
-        <button class="close-btn" id="closeCalendarBtn">
-          <i class="fas fa-times"></i> Close
-        </button>
-      </div>
-      <div class="months-scroll" id="monthsScroll">
-        <div class="calendar-loading">
-          <i class="fas fa-spinner"></i>
-          Loading monthly attendance...
-        </div>
-      </div>
-      <div class="calendar-legend">
-        <div class="legend-item"><div class="legend-dot P"></div> Present</div>
-        <div class="legend-item"><div class="legend-dot A"></div> Absent</div>
-        <div class="legend-item"><div class="legend-dot L"></div> Leave</div>
-        <div class="legend-item"><div class="legend-dot H"></div> Holiday</div>
-      </div>
     </div>
   </div>
 
@@ -758,11 +530,7 @@
   const toast = document.getElementById('toastMsg');
   const coachingHeader = document.getElementById('coachingHeader');
   const detailsBtn = document.getElementById('detailsBtn');
-  const calendarSection = document.getElementById('calendarSection');
-  const closeCalendarBtn = document.getElementById('closeCalendarBtn');
-  const monthsScroll = document.getElementById('monthsScroll');
 
-  const studentPhotoCircle = document.getElementById('studentPhotoCircle');
   const studentPhotoImg = document.getElementById('studentPhotoImg');
   const photoFallback = document.getElementById('photoFallback');
 
@@ -814,7 +582,6 @@
     }
   }
 
-  // 🔥 SEARCH STUDENT
   async function searchStudent() {
     const roll = parseInt(rollInput.value.trim());
     if (!roll || isNaN(roll)) {
@@ -833,7 +600,6 @@
     resultCard.style.display = 'none';
     notFound.style.display = 'none';
     coachingHeader.style.display = 'none';
-    calendarSection.style.display = 'none';
     searchBtn.disabled = true;
     searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
 
@@ -869,7 +635,6 @@
       const studentRollVal = studentData.rollNumber || studentData.rollNo || roll;
       const photoUrl = studentData.photoUrl || studentData.photo || '';
 
-      // Save for calendar use
       currentStudent = {
         name: studentNameVal,
         className: studentClass,
@@ -877,7 +642,6 @@
         session: session
       };
 
-      // 🔥 TODAY'S ATTENDANCE
       const today = new Date().toISOString().split('T')[0];
       
       const attendanceRef = db.collection('attendance')
@@ -952,151 +716,19 @@
     }
   }
 
-  // 🔥 LOAD CALENDAR (All months scrollable)
-  async function loadCalendar() {
+  // 🔥 DETAILS BUTTON - Opens new page
+  detailsBtn.addEventListener('click', function() {
     if (!currentStudent) {
       showToast('Please search a student first!', true);
       return;
     }
-
-    calendarSection.style.display = 'block';
-    monthsScroll.innerHTML = `<div class="calendar-loading"><i class="fas fa-spinner"></i> Loading monthly attendance...</div>`;
-
-    try {
-      // 🔥 Fetch ALL attendance for this student
-      const snapshot = await db.collection('attendance')
-        .doc(currentStudent.session)
-        .collection('classes')
-        .doc(currentStudent.className)
-        .collection('students')
-        .doc(currentStudent.name)
-        .collection('attendance')
-        .get();
-
-      if (snapshot.empty) {
-        monthsScroll.innerHTML = `
-          <div style="text-align:center; padding:40px 20px; color:#64748b;">
-            <i class="fas fa-calendar-times" style="font-size:2.5rem; color:#cbd5e1; display:block; margin-bottom:12px;"></i>
-            No attendance records found for this student.
-          </div>`;
-        return;
-      }
-
-      // 🔥 Group by month
-      const monthMap = {}; // "2026-09" → { day: status }
-      snapshot.forEach(doc => {
-        const dateParts = doc.id.split('-');
-        if (dateParts.length === 3) {
-          const year = dateParts[0];
-          const month = dateParts[1];
-          const day = parseInt(dateParts[2]);
-          const monthKey = `${year}-${month}`;
-          
-          if (!monthMap[monthKey]) monthMap[monthKey] = {};
-          
-          const data = doc.data();
-          const status = data.status || '';
-          let cell = '';
-          if (status === 'present') cell = 'P';
-          else if (status === 'absent') cell = 'A';
-          else if (status === 'leave') cell = 'L';
-          else if (status === 'holiday') cell = 'H';
-          
-          if (cell) monthMap[monthKey][day] = cell;
-        }
-      });
-
-      // 🔥 Sort months descending (latest first)
-      const sortedMonths = Object.keys(monthMap).sort((a, b) => b.localeCompare(a));
-
-      // 🔥 Render all months
-      let html = '';
-      sortedMonths.forEach(monthKey => {
-        html += buildMonthCard(monthKey, monthMap[monthKey]);
-      });
-
-      monthsScroll.innerHTML = html;
-
-      // 🔥 Scroll to top (latest month visible first)
-      setTimeout(() => { monthsScroll.scrollTop = 0; }, 100);
-
-    } catch (error) {
-      console.error('Calendar error:', error);
-      monthsScroll.innerHTML = `
-        <div style="text-align:center; padding:40px 20px; color:#dc3545;">
-          <i class="fas fa-exclamation-circle" style="font-size:2rem; display:block; margin-bottom:10px;"></i>
-          Error: ${error.message}
-        </div>`;
-    }
-  }
-
-  // 🔥 BUILD MONTH CARD
-  function buildMonthCard(monthKey, daysData) {
-    const [year, month] = monthKey.split('-');
-    const monthNum = parseInt(month) - 1;
-    const monthName = new Date(year, monthNum).toLocaleString('default', { month: 'long' });
-    const daysInMonth = new Date(parseInt(year), monthNum + 1, 0).getDate();
-    const firstDayOfWeek = new Date(parseInt(year), monthNum, 1).getDay(); // 0=Sun, 6=Sat
-
-    // Count stats
-    let presentCount = 0, absentCount = 0, leaveCount = 0, holidayCount = 0;
-    Object.values(daysData).forEach(s => {
-      if (s === 'P') presentCount++;
-      else if (s === 'A') absentCount++;
-      else if (s === 'L') leaveCount++;
-      else if (s === 'H') holidayCount++;
+    const params = new URLSearchParams({
+      session: currentStudent.session,
+      class: currentStudent.className,
+      name: currentStudent.name,
+      roll: currentStudent.roll
     });
-
-    // Today check
-    const today = new Date();
-    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-
-    let gridHtml = '';
-    // Day headers
-    ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(d => {
-      gridHtml += `<div class="day-header">${d}</div>`;
-    });
-
-    // Empty cells before 1st
-    for (let i = 0; i < firstDayOfWeek; i++) {
-      gridHtml += `<div class="day-cell empty"></div>`;
-    }
-
-    // Day cells
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dateStr = `${year}-${String(monthNum + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-      const status = daysData[day] || '';
-      const isToday = dateStr === todayStr;
-      const isWeekend = new Date(parseInt(year), monthNum, day).getDay() === 0;
-
-      let classes = 'day-cell';
-      if (status) classes += ` ${status}`;
-      else if (isWeekend) classes += ' weekend';
-      if (isToday) classes += ' today';
-
-      const statusText = status ? status : '';
-      
-      gridHtml += `<div class="${classes}">
-        <span class="day-num">${day}</span>
-        ${statusText ? `<span class="day-status">${statusText}</span>` : ''}
-      </div>`;
-    }
-
-    return `
-      <div class="month-card">
-        <div class="month-title-row">
-          <div class="month-title">${monthName} ${year}</div>
-          <div class="month-summary">✅ ${presentCount} · ❌ ${absentCount} · 🟡 ${leaveCount}</div>
-        </div>
-        <div class="calendar-grid">${gridHtml}</div>
-      </div>
-    `;
-  }
-
-  // 🔥 EVENTS
-  detailsBtn.addEventListener('click', loadCalendar);
-  closeCalendarBtn.addEventListener('click', function() {
-    calendarSection.style.display = 'none';
+    window.open(`student-calendar.html?${params.toString()}`, '_blank');
   });
 
   searchBtn.addEventListener('click', searchStudent);
@@ -1108,7 +740,7 @@
     rollInput.focus();
   });
 
-  console.log('✅ Parent View Loaded with Calendar!');
+  console.log('✅ Parent View Loaded!');
 </script>
 </body>
 </html>
