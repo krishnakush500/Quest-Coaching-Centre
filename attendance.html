@@ -952,34 +952,44 @@
   prevAttendanceBtn.addEventListener('click', function() {
     const session = sessionSelect.value;
     const className = classSelect.value;
-    window.open(`previous-attendance.html?session=${session}&class=${className}`, '_blank');
-  });
-
-  parentViewBtn.addEventListener('click', function() {
-    const session = sessionSelect.value;
-    const className = classSelect.value;
-    if (!className) { showToast('Select class first!', true); return; }
-    window.open(`parent-view.html?session=${session}&class=${className}`, '_blank');
+    let url = `previous-attendance.html?session=${encodeURIComponent(session)}`;
+    if (className) url += `&class=${encodeURIComponent(className)}`;
+    window.open(url, '_blank');
   });
 
   // ============================================================
-  // 🔥 SHARE PARENT VIEW LINK ON WHATSAPP
+  // 🔥 PARENT VIEW — Class optional (no need to select class)
+  // ============================================================
+  parentViewBtn.addEventListener('click', function() {
+    const session = sessionSelect.value;
+    const className = classSelect.value;
+
+    // ✅ Class optional — agar select nahi hai to bhi chalega
+    let url = `parent-view.html?session=${encodeURIComponent(session)}`;
+    if (className) {
+      url += `&class=${encodeURIComponent(className)}`;
+    }
+    window.open(url, '_blank');
+  });
+
+  // ============================================================
+  // 🔥 SHARE PARENT VIEW LINK — Class optional
   // ============================================================
   shareParentBtn.addEventListener('click', async function() {
     const session = sessionSelect.value;
     const className = classSelect.value;
 
-    if (!className) {
-      showToast('⚠️ Please select a class first!', true);
-      classSelect.focus();
-      return;
+    // ✅ Build parent view URL (class optional)
+    const baseUrl = window.location.href.replace(/[^/]*$/, '');
+    let parentUrl = `${baseUrl}parent-view.html?session=${encodeURIComponent(session)}`;
+    if (className) {
+      parentUrl += `&class=${encodeURIComponent(className)}`;
     }
 
-    // Build parent view URL
-    const baseUrl = window.location.href.replace(/[^/]*$/, '');
-    const parentUrl = `${baseUrl}parent-view.html?session=${encodeURIComponent(session)}&class=${encodeURIComponent(className)}`;
+    const classLine = className 
+      ? `\n🏫 *Class:* ${className}` 
+      : '\n🏫 *Class:* अपनी क्लास चुनें';
 
-    // ✅ Short instruction message in Hindi + English
     const message = 
 `🏫 *QUEST COACHING CENTRE*
 📍 Gopalganj | 📞 +91 9708442525
@@ -990,14 +1000,14 @@
 
 📋 *कैसे देखें:*
 1️⃣ नीचे दिए link पर click करें
-2️⃣ अपने बच्चे का *Roll Number* डालें
-3️⃣ *Check* button दबाएं — पूरी details दिख जाएगी
+2️⃣ अपने बच्चे की *Class* चुनें
+3️⃣ अपने बच्चे का *Roll Number* डालें
+4️⃣ *Check* button दबाएं — पूरी details दिख जाएगी
 
 🔗 *Parent View Link:*
 ${parentUrl}
 
-📅 *Session:* ${session}
-🏫 *Class:* ${className}
+📅 *Session:* ${session}${classLine}
 
 _धन्यवाद 🙏_
 *QUEST COACHING CENTRE*`;
@@ -1006,7 +1016,7 @@ _धन्यवाद 🙏_
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Quest Coaching - Parent View (${className})`,
+          title: `Quest Coaching - Parent View`,
           text: message,
           url: parentUrl
         });
