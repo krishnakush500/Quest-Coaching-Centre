@@ -10,136 +10,141 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <style>
         *{ margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Roboto,sans-serif; }
-        body{ background:#f0f5fa; padding:24px 16px; display:flex; flex-direction:column; align-items:center; }
+        body{ background:#f0f5fa; padding:20px 16px; display:flex; flex-direction:column; align-items:center; min-height:100vh; }
         
-        /* ✅ FIXED: Form card size same rahega har class ke liye */
+        /* ✅ FIXED HEIGHT FORM CARD — Same size for all classes */
         .form-card{ 
             background:white; 
-            max-width:950px; 
+            max-width:1100px; 
             width:100%; 
-            margin:20px auto; 
-            border-radius:48px; 
-            padding:36px 30px; 
-            box-shadow:0 25px 40px -15px #1e3b5b; 
-            min-height: 980px;
+            margin:10px auto; 
+            border-radius:32px; 
+            padding:28px 32px; 
+            box-shadow:0 20px 40px -15px #1e3b5b; 
+            min-height: 780px;
             display: flex;
             flex-direction: column;
         }
         
-        #dynamicFeeSection {
-            flex: 1;
+        h2{ display:flex; align-items:center; gap:12px; color:#174873; margin-bottom:20px; font-size:1.6rem; padding-bottom:12px; border-bottom:2px solid #e8f0fa; }
+        
+        /* ✅ 2-COLUMN GRID LAYOUT for laptop */
+        .form-grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 20px;
+            margin-bottom: 14px;
+        }
+        .form-grid-2col .full-width {
+            grid-column: span 2;
         }
         
-        h2{ display:flex; align-items:center; gap:12px; color:#174873; margin-bottom:28px; font-size:1.9rem; }
-        .field{ margin-bottom:22px; }
-        label{ font-weight:600; display:flex; align-items:center; gap:6px; margin-bottom:10px; color:#1b4a77; font-size:1.05rem; }
-        input, select{ width:100%; padding:14px 20px; font-size:1rem; background:#f3f8ff; border:1px solid #b8ceec; border-radius:60px; outline:none; transition: all 0.2s ease; }
+        .field{ margin-bottom:14px; }
+        label{ font-weight:600; display:flex; align-items:center; gap:6px; margin-bottom:8px; color:#1b4a77; font-size:0.92rem; }
+        input, select{ width:100%; padding:11px 18px; font-size:0.95rem; background:#f3f8ff; border:1px solid #b8ceec; border-radius:60px; outline:none; transition: all 0.2s ease; }
         input:focus, select:focus{ border-color:#1b5e9e; background:white; box-shadow:0 0 0 3px rgba(27,94,158,0.1); }
-        .row2{ display:flex; gap:15px; flex-wrap:wrap; }
-        .row2 .field{ flex:1 1 200px; }
+        
+        .row2{ display:grid; grid-template-columns:1fr 1fr; gap:15px; }
         
         /* Student Preview Styles */
         .student-preview {
             background: #f0f7ff;
-            border-radius: 16px;
-            padding: 15px 20px;
-            margin-bottom: 20px;
+            border-radius: 14px;
+            padding: 12px 18px;
+            margin-bottom: 14px;
             border: 1px solid #c1d6f0;
             display: none;
         }
-        .student-preview.show {
-            display: block;
-        }
+        .student-preview.show { display: block; }
         .preview-row {
             display: flex;
             justify-content: space-between;
-            padding: 6px 0;
+            padding: 4px 0;
             border-bottom: 1px dashed #c1d6f0;
+            font-size: 0.9rem;
         }
-        .preview-row:last-child {
-            border-bottom: none;
-        }
-        .preview-row strong {
-            color: #1b4a77;
-        }
+        .preview-row:last-child { border-bottom: none; }
+        .preview-row strong { color: #1b4a77; }
         .preview-loading {
             text-align: center;
-            padding: 10px;
+            padding: 8px;
             color: #1b4f9b;
             font-weight: 600;
+            font-size: 0.9rem;
         }
         
-        .fees-section{ background:#f8fbfe; border-radius:32px; padding:18px 20px; margin:20px 0 12px 0; border:1px solid #d9e6f5; }
-        .section-title{ font-size:1.25rem; font-weight:800; color:#174873; margin-bottom:16px; display:flex; align-items:center; gap:8px; border-left:4px solid #1b4f9b; padding-left:14px; }
-        .subjects-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(210px,1fr)); gap:12px 20px; margin-bottom:20px; }
-        .subject-item{ display:flex; align-items:center; gap:12px; background:white; padding:8px 16px; border-radius:50px; border:1px solid #cde1f0; transition:0.1s; cursor:pointer; }
+        /* ✅ Fees Section — compact for laptop */
+        .fees-section{ background:#f8fbfe; border-radius:24px; padding:16px 18px; margin:10px 0; border:1px solid #d9e6f5; }
+        .section-title{ font-size:1.05rem; font-weight:800; color:#174873; margin-bottom:12px; display:flex; align-items:center; gap:8px; border-left:4px solid #1b4f9b; padding-left:12px; }
+        
+        /* ✅ Subjects Grid — 3 columns on laptop */
+        .subjects-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px 14px; margin-bottom:14px; }
+        .subject-item{ display:flex; align-items:center; gap:10px; background:white; padding:6px 14px; border-radius:50px; border:1px solid #cde1f0; transition:0.1s; cursor:pointer; }
         .subject-item:hover{ background:#eef4fc; border-color:#9bb7d4; }
-        .subject-item input{ width:20px; height:20px; margin:0; cursor:pointer; accent-color:#1b4f9b; }
-        .subject-item label{ margin:0; font-weight:500; font-size:0.95rem; color:#1e3a5f; cursor:pointer; flex:1; }
-        .subject-price{ font-weight:700; color:#0f5c3e; background:#e2f0e8; padding:2px 10px; border-radius:40px; font-size:0.8rem; }
-        .extra-charges{ display:flex; flex-wrap:wrap; gap:15px; margin-top:8px; border-top:1px dashed #c2d6ea; padding-top:18px; }
-        .extra-item{ background:#fef7e0; border-radius:40px; padding:6px 20px 6px 16px; display:flex; align-items:center; gap:10px; border:1px solid #ffe2a4; }
-        .extra-item input{ width:18px; height:18px; margin:0; cursor:pointer; }
-        .extra-item label{ margin:0; font-weight:600; font-size:0.9rem; color:#7a5c00; }
-        .total-box{ background:#e6f0fa; border-radius:50px; padding:16px 24px; margin:20px 0 10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
-        .total-label{ font-weight:800; font-size:1.3rem; color:#0a3a60; }
-        .total-amount{ font-size:2rem; font-weight:800; color:#1b4f9b; background:white; padding:5px 20px; border-radius:60px; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
-        .checkbox-fees-box{ background:#eef3fc; border-radius:28px; padding:20px; margin:15px 0; }
-        .fee-checkbox-item{ display:flex; align-items:center; gap:15px; background:white; padding:12px 20px; border-radius:50px; margin-bottom:10px; border:1px solid #cde1f0; }
-        .fee-checkbox-item input{ width:20px; height:20px; cursor:pointer; accent-color:#1b4f9b; }
-        .fee-checkbox-item label{ margin:0; font-weight:500; font-size:1rem; cursor:pointer; flex:1; }
-        .fee-price{ font-weight:700; color:#0f5c3e; background:#e2f0e8; padding:2px 12px; border-radius:40px; font-size:0.85rem; }
-        .discount-box{ background:#fff3cd; border-radius:50px; padding:12px 20px; margin-top:15px; border:1px solid #ffe2a4; }
+        .subject-item input{ width:18px; height:18px; margin:0; cursor:pointer; accent-color:#1b4f9b; }
+        .subject-item label{ margin:0; font-weight:500; font-size:0.88rem; color:#1e3a5f; cursor:pointer; flex:1; }
+        .subject-price{ font-weight:700; color:#0f5c3e; background:#e2f0e8; padding:2px 8px; border-radius:40px; font-size:0.75rem; }
+        
+        /* ✅ Extra Charges — 3 columns */
+        .extra-charges{ display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-top:6px; border-top:1px dashed #c2d6ea; padding-top:14px; }
+        .extra-item{ background:#fef7e0; border-radius:40px; padding:6px 16px 6px 14px; display:flex; align-items:center; gap:8px; border:1px solid #ffe2a4; font-size:0.85rem; }
+        .extra-item input{ width:17px; height:17px; margin:0; cursor:pointer; }
+        .extra-item label{ margin:0; font-weight:600; font-size:0.82rem; color:#7a5c00; }
+        
+        .total-box{ background:#e6f0fa; border-radius:50px; padding:12px 22px; margin:14px 0 10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+        .total-label{ font-weight:800; font-size:1.1rem; color:#0a3a60; }
+        .total-amount{ font-size:1.6rem; font-weight:800; color:#1b4f9b; background:white; padding:4px 18px; border-radius:60px; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
+        
+        /* ✅ Checkbox Fees Box */
+        .checkbox-fees-box{ background:#eef3fc; border-radius:24px; padding:18px; margin:10px 0; }
+        .fee-checkbox-item{ display:flex; align-items:center; gap:14px; background:white; padding:10px 18px; border-radius:50px; margin-bottom:8px; border:1px solid #cde1f0; }
+        .fee-checkbox-item input{ width:18px; height:18px; cursor:pointer; accent-color:#1b4f9b; }
+        .fee-checkbox-item label{ margin:0; font-weight:500; font-size:0.92rem; cursor:pointer; flex:1; }
+        .fee-price{ font-weight:700; color:#0f5c3e; background:#e2f0e8; padding:2px 12px; border-radius:40px; font-size:0.82rem; }
+        
+        .discount-box{ background:#fff3cd; border-radius:50px; padding:10px 18px; margin-top:12px; border:1px solid #ffe2a4; }
         .due-highlight{ background:#eef2f5; color:#b44; font-weight:700; cursor:default; border-color:#d4e0ec; }
-        .btn-submit{ background:#1b4f9b; border:none; color:white; font-size:1.3rem; font-weight:700; padding:18px; width:100%; border-radius:60px; display:flex; align-items:center; justify-content:center; gap:12px; margin-top:18px; cursor:pointer; box-shadow:0 15px 20px -8px #123a60; transition:0.2s; }
+        
+        .btn-submit{ background:#1b4f9b; border:none; color:white; font-size:1.15rem; font-weight:700; padding:15px; width:100%; border-radius:60px; display:flex; align-items:center; justify-content:center; gap:12px; margin-top:14px; cursor:pointer; box-shadow:0 15px 20px -8px #123a60; transition:0.2s; }
         .btn-submit:hover{ background:#0f3d73; transform:translateY(-2px); }
         .btn-submit:disabled{ opacity:0.6; cursor:not-allowed; transform:none; }
-        .info-note{ text-align:center; margin-top:20px; color:#2c577c; }
+        
+        .info-note{ text-align:center; margin-top:14px; color:#2c577c; font-size:0.9rem; }
         a{ color:#1b4f9b; font-weight:600; text-decoration:none; border-bottom:1px dotted #1b4f9b; }
-        .loading{ text-align:center; padding:14px; background:#eef2f8; border-radius:50px; margin-top:12px; font-weight:500; display:none; }
-        .error-msg{ color:#c0392b; background:#fdecea; border-radius:40px; padding:10px 16px; margin-top:12px; text-align:center; display:none; }
-        .success-toast{ position:fixed; bottom:25px; left:50%; transform:translateX(-50%); background:#1e6f3f; color:white; padding:12px 28px; border-radius:60px; font-weight:600; z-index:1000; opacity:0; transition:opacity 0.2s; pointer-events:none; }
-        .class-warning{ background:#fff3cd; border-left:4px solid #ffc107; padding:10px 15px; border-radius:12px; margin-bottom:15px; font-size:0.85rem; color:#856404; display:none; }
-        hr{ margin:10px 0; }
+        .loading{ text-align:center; padding:12px; background:#eef2f8; border-radius:50px; margin-top:10px; font-weight:500; display:none; font-size:0.9rem; }
+        .error-msg{ color:#c0392b; background:#fdecea; border-radius:40px; padding:10px 16px; margin-top:10px; text-align:center; display:none; font-size:0.9rem; }
+        .success-toast{ position:fixed; bottom:25px; left:50%; transform:translateX(-50%); background:#1e6f3f; color:white; padding:12px 28px; border-radius:60px; font-weight:600; z-index:1000; opacity:0; transition:opacity 0.2s; pointer-events:none; font-size:0.9rem; }
+        .class-warning{ background:#fff3cd; border-left:4px solid #ffc107; padding:10px 15px; border-radius:12px; margin-bottom:12px; font-size:0.85rem; color:#856404; display:none; }
         
         /* Auth Loading Screen */
         .auth-loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 10000;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; display: flex; justify-content: center; align-items: center;
+            flex-direction: column; z-index: 10000;
         }
         .auth-loading .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #1b4f9b;
-            border-radius: 50%;
+            width: 50px; height: 50px; border: 4px solid #f3f3f3;
+            border-top: 4px solid #1b4f9b; border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .main-content {
-            display: none;
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .main-content { display: none; }
         
-        @media (max-width:650px){ 
-            .form-card{ 
-                padding:24px 18px; 
-                min-height: auto;
-            } 
-            .subjects-grid{ 
-                grid-template-columns:1fr; 
-            } 
+        /* ✅ RESPONSIVE — Mobile pe single column */
+        @media (max-width: 850px) {
+            .form-card { padding: 22px 18px; min-height: auto; border-radius: 24px; }
+            .form-grid-2col { grid-template-columns: 1fr; gap: 10px; }
+            .form-grid-2col .full-width { grid-column: span 1; }
+            .row2 { grid-template-columns: 1fr; }
+            .subjects-grid { grid-template-columns: repeat(2, 1fr); }
+            .extra-charges { grid-template-columns: repeat(2, 1fr); }
+            h2 { font-size: 1.4rem; }
+        }
+        @media (max-width: 550px) {
+            .subjects-grid { grid-template-columns: 1fr; }
+            .extra-charges { grid-template-columns: 1fr; }
+            .total-amount { font-size: 1.3rem; }
+            .btn-submit { font-size: 1rem; padding: 13px; }
         }
     </style>
 </head>
@@ -155,32 +160,34 @@
     <div class="form-card">
         <h2>📋 Add New Student</h2>
         
-        <!-- Roll Number Field -->
-        <div class="field">
-            <label>🔢 Roll Number</label>
-            <input type="text" id="rollNumber" placeholder="e.g. 24" required>
+        <!-- ✅ 2-COLUMN GRID: Roll + Name + Father + Phone -->
+        <div class="form-grid-2col">
+            <div class="field">
+                <label>🔢 Roll Number</label>
+                <input type="text" id="rollNumber" placeholder="e.g. 24" required>
+            </div>
+            <div class="field">
+                <label>🧑 Student Name</label>
+                <input type="text" id="studentName" placeholder="Full name" required>
+            </div>
+            <div class="field">
+                <label>👨 Father Name</label>
+                <input type="text" id="fatherName" placeholder="Father's name" required>
+            </div>
+            <div class="field">
+                <label>📞 Phone Number</label>
+                <input type="tel" id="phoneNumber" placeholder="e.g. 9876543210" pattern="[0-9]{10}" title="Please enter 10 digit mobile number">
+            </div>
         </div>
 
-        <!-- Student Preview - Automatically shows when roll number is entered -->
+        <!-- Student Preview -->
         <div id="studentPreview" class="student-preview">
             <div id="studentPreviewContent">
                 <div class="preview-loading">⏳ Searching student...</div>
             </div>
         </div>
 
-        <!-- Other Fields (Auto-filled or Manually filled) -->
-        <div class="field">
-            <label>🧑 Student Name</label>
-            <input type="text" id="studentName" placeholder="Full name" required>
-        </div>
-        <div class="field">
-            <label>👨 Father Name</label>
-            <input type="text" id="fatherName" placeholder="Father's name" required>
-        </div>
-        <div class="field">
-            <label>📞 Phone Number</label>
-            <input type="tel" id="phoneNumber" placeholder="e.g. 9876543210" pattern="[0-9]{10}" title="Please enter 10 digit mobile number">
-        </div>
+        <!-- Session + Class -->
         <div class="row2">
             <div class="field">
                 <label>📅 Session</label>
@@ -206,7 +213,7 @@
 
         <div id="classWarning" class="class-warning">⚠️ For Class 11 & 12, fee will be calculated based on selected subjects & charges below.</div>
 
-        <div id="dynamicFeeSection"></div>
+        <div id="dynamicFeeSection" style="flex:1;"></div>
 
         <button class="btn-submit" id="addStudentBtn">➕ Add Student & Save to Firebase</button>
         <div class="info-note">↩ <a href="dashboard.html">Back to dashboard</a></div>
@@ -327,7 +334,7 @@
     }
 
     // ============================================================
-    // 🔥 MAIN FEATURE: Auto-fetch student details on roll number input
+    // 🔥 SEARCH FEATURE: Auto-fetch student details on roll number
     // Searches BOTH admissions & fees collections
     // Auto-fills: Student Name, Father Name, Phone Number, Class, Session
     // ============================================================
@@ -336,7 +343,6 @@
         const previewDiv = document.getElementById('studentPreview');
         const contentDiv = document.getElementById('studentPreviewContent');
 
-        // Agar roll empty hai to sab clear kar do
         if (roll.length < 1) {
             previewDiv.classList.remove('show');
             document.getElementById('studentName').value = '';
@@ -345,7 +351,6 @@
             return;
         }
 
-        // Show loading
         previewDiv.classList.add('show');
         contentDiv.innerHTML = `<div class="preview-loading">⏳ Searching student...</div>`;
 
@@ -353,7 +358,7 @@
             let student = null;
             let sourceCollection = '';
 
-            // ✅ STEP 1: Pehle admissions collection mein dhundho (full data hota hai)
+            // STEP 1: Search in admissions collection first
             try {
                 let snap2 = await admissionsCollection.where('rollNumber', '==', roll).get();
                 if (!snap2.empty) {
@@ -366,7 +371,7 @@
                 console.warn('Admissions query error:', e);
             }
 
-            // ✅ STEP 2: Agar admissions mein nahi mila, to fees collection mein dhundho
+            // STEP 2: If not found, search in fees collection
             if (!student) {
                 try {
                     let snap = await feesCollection.where('roll_number', '==', roll).get();
@@ -382,18 +387,15 @@
             }
 
             if (student) {
-                // ✅ Dono collections ke field names handle karo
                 let name = '', father = '', phone = '', className = '', sessionVal = '';
 
                 if (sourceCollection === 'admissions') {
-                    // Admissions collection (camelCase fields)
                     name       = student.studentName || '';
                     father     = student.fatherName || '';
                     phone      = student.parentMobile || student.studentMobile || '';
                     className  = student.classApplying || '';
                     sessionVal = student.session || '';
                 } else {
-                    // Fees collection (snake_case fields)
                     name       = student.student_name || '';
                     father     = student.father_name || '';
                     phone      = student.phone_number || '';
@@ -401,12 +403,12 @@
                     sessionVal = student.session || '';
                 }
 
-                // ✅ Auto-fill form fields
+                // Auto-fill form fields
                 document.getElementById('studentName').value = name;
                 document.getElementById('fatherName').value = father;
                 document.getElementById('phoneNumber').value = phone;
 
-                // ✅ Auto-select class (normalize "10th" -> "Class 10")
+                // Auto-select class
                 if (className) {
                     let normalizedClass = className;
                     const match = className.match(/(\d+)/);
@@ -422,11 +424,10 @@
                             break;
                         }
                     }
-                    // Trigger change to update fee section
                     classSelectEl.dispatchEvent(new Event('change'));
                 }
 
-                // ✅ Auto-select session
+                // Auto-select session
                 if (sessionVal) {
                     const sessionEl = document.getElementById('sessionSelect');
                     for (let i = 0; i < sessionEl.options.length; i++) {
@@ -437,19 +438,15 @@
                     }
                 }
 
-                // ✅ Show student preview
+                // Show preview
                 contentDiv.innerHTML = `
-                    <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
-                        <div style="flex:1;">
-                            <div class="preview-row"><strong>👤 Name:</strong> ${name || 'N/A'}</div>
-                            <div class="preview-row"><strong>👨 Father:</strong> ${father || 'N/A'}</div>
-                            <div class="preview-row"><strong>🏫 Class:</strong> ${className || 'N/A'}</div>
-                            <div class="preview-row"><strong>📞 Phone:</strong> ${phone || 'N/A'}</div>
-                            <div class="preview-row"><strong>📅 Session:</strong> ${sessionVal || 'N/A'}</div>
-                            <div class="preview-row" style="color:#16a34a; font-size:0.85rem; border-bottom:none;">
-                                <strong>✅ Found in:</strong> ${sourceCollection} collection
-                            </div>
-                        </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px 20px;">
+                        <div class="preview-row"><strong>👤 Name:</strong> <span>${name || 'N/A'}</span></div>
+                        <div class="preview-row"><strong>👨 Father:</strong> <span>${father || 'N/A'}</span></div>
+                        <div class="preview-row"><strong>🏫 Class:</strong> <span>${className || 'N/A'}</span></div>
+                        <div class="preview-row"><strong>📞 Phone:</strong> <span>${phone || 'N/A'}</span></div>
+                        <div class="preview-row" style="border-bottom:none;"><strong>📅 Session:</strong> <span>${sessionVal || 'N/A'}</span></div>
+                        <div class="preview-row" style="border-bottom:none; color:#16a34a;"><strong>✅ Found in:</strong> <span>${sourceCollection}</span></div>
                     </div>
                 `;
                 previewDiv.classList.add('show');
@@ -551,13 +548,15 @@
                     <span class="total-amount" id="checkboxTotalAmount">0</span>
                 </div>
                 
-                <div class="field" style="margin-top:15px;">
-                    <label>💵 Received Amount (₹)</label>
-                    <input type="number" id="receivedAmountCheckbox" value="0" min="0" step="1">
-                </div>
-                <div class="field">
-                    <label>⏳ Due Amount (Auto)</label>
-                    <input type="number" id="dueAmountCheckbox" class="due-highlight" readonly value="0">
+                <div class="row2" style="margin-top:15px;">
+                    <div class="field">
+                        <label>💵 Received Amount (₹)</label>
+                        <input type="number" id="receivedAmountCheckbox" value="0" min="0" step="1">
+                    </div>
+                    <div class="field">
+                        <label>⏳ Due Amount (Auto)</label>
+                        <input type="number" id="dueAmountCheckbox" class="due-highlight" readonly value="0">
+                    </div>
                 </div>
             </div>
         `;
@@ -600,13 +599,15 @@
                     <span class="total-label">💰 Total Fees (Auto-Calculated):</span>
                     <span class="total-amount" id="advancedTotalAmount">0</span>
                 </div>
-                <div class="field" style="margin-top:5px;">
-                    <label>💵 Received Amount (₹)</label>
-                    <input type="number" id="receivedAmountAdvanced" value="0" min="0" step="1">
-                </div>
-                <div class="field">
-                    <label>⏳ Due Amount (Auto)</label>
-                    <input type="number" id="dueAmountAdvanced" class="due-highlight" readonly value="0">
+                <div class="row2" style="margin-top:5px;">
+                    <div class="field">
+                        <label>💵 Received Amount (₹)</label>
+                        <input type="number" id="receivedAmountAdvanced" value="0" min="0" step="1">
+                    </div>
+                    <div class="field">
+                        <label>⏳ Due Amount (Auto)</label>
+                        <input type="number" id="dueAmountAdvanced" class="due-highlight" readonly value="0">
+                    </div>
                 </div>
             </div>
         `;
@@ -755,7 +756,6 @@
         fatherInput.value = '';
         phoneInput.value = '';
         
-        // Hide preview
         document.getElementById('studentPreview').classList.remove('show');
         
         if (currentMode === 'advanced') {
