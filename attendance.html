@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-  <title>📋 Attendance · Quest Coaching</title>
+  <title>👨‍👩‍👧 Parent View · Quest Coaching</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -17,701 +19,582 @@
       font-family: 'Inter', sans-serif;
       background: #f0f6ff;
       min-height: 100vh;
-      padding: 0;
+      padding: 10px 6px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
     .container {
-      max-width: 1200px;
+      max-width: 900px;
       width: 100%;
       background: #ffffff;
-      border-radius: 32px 32px 28px 28px;
+      border-radius: 20px;
       box-shadow: 0 20px 50px rgba(0, 40, 100, 0.12);
-      padding: 0;
+      padding: 16px 14px 20px;
       border: 1px solid rgba(255, 255, 255, 0.6);
-      height: 100vh;
-      max-height: 100vh;
-      display: flex;
-      flex-direction: column;
+    }
+
+    .coaching-header {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: linear-gradient(135deg, #1a237e, #283593);
+      padding: 12px 14px;
+      border-radius: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 20px rgba(26, 35, 126, 0.28);
+      flex-wrap: wrap;
+      position: relative;
       overflow: hidden;
     }
-
-    .fixed-header {
-      padding: 10px 14px 0 14px;
+    .coaching-header::before {
+      content: '';
+      position: absolute;
+      top: -50%; right: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(255,193,7,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .coaching-header .logo-circle {
+      width: 54px; height: 54px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid #ffc107;
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
       flex-shrink: 0;
       background: white;
-      border-radius: 32px 32px 0 0;
-    }
-
-    .header {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      border-bottom: 1.5px solid #e6effa;
-      padding-bottom: 8px;
-    }
-    .header h1 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      background: linear-gradient(145deg, #0a2a66, #1f4b9e);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
       display: flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
     }
-    .header h1 i {
-      background: #1f4b9e;
-      -webkit-text-fill-color: white;
-      padding: 4px 8px;
-      border-radius: 40px;
-      font-size: 0.9rem;
-      box-shadow: 0 4px 10px rgba(20, 60, 150, 0.2);
+    .coaching-header .logo-circle img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
     }
-    .header .date-display {
-      background: #eef5fe;
-      padding: 4px 12px;
-      border-radius: 40px;
-      font-weight: 600;
-      color: #0a2a66;
-      border: 1px solid #c7daf5;
-      font-size: 0.7rem;
-    }
-    .header .date-display i { margin-right: 4px; }
-
-    .top-controls {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 6px 10px;
-      background: #f4f9ff;
-      padding: 6px 12px;
-      border-radius: 40px;
-      margin-bottom: 8px;
-      border: 1px solid #d7e5fc;
-    }
-    .top-controls .session-group {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .top-controls .session-group label {
-      font-weight: 600;
-      color: #0f3b7a;
-      font-size: 0.7rem;
-    }
-    .top-controls .session-group select {
-      border: 1px solid #b8cff0;
-      border-radius: 30px;
-      padding: 4px 10px;
-      font-weight: 500;
-      color: #0a2a66;
-      font-size: 0.75rem;
-      outline: none;
-      background: white;
-      cursor: pointer;
-    }
-    .top-controls .prev-attendance-btn {
-      background: #8b5cf6;
-      border: none;
-      border-radius: 40px;
-      padding: 4px 14px;
-      color: white;
-      font-weight: 600;
-      font-size: 0.7rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 4px 10px rgba(139, 92, 246, 0.2);
-      cursor: pointer;
-      border: 1px solid #a78bfa;
-    }
-    .top-controls .prev-attendance-btn:hover { background: #7c3aed; }
-    .top-controls .view-parent-btn {
-      margin-left: auto;
-      background: #0a2a66;
-      border: none;
-      border-radius: 40px;
-      padding: 4px 14px;
-      color: white;
-      font-weight: 600;
-      font-size: 0.7rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 4px 10px rgba(10, 42, 102, 0.2);
-      cursor: pointer;
-      border: 1px solid #3f6ec0;
-    }
-    .top-controls .view-parent-btn:hover { background: #13458b; }
-
-    .class-filter {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 6px 10px;
-      background: #f4f9ff;
-      padding: 6px 12px;
-      border-radius: 40px;
-      margin-bottom: 8px;
-      border: 1px solid #d7e5fc;
-    }
-    .class-filter label {
-      font-weight: 600;
-      color: #0f3b7a;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.7rem;
-    }
-    .class-filter select {
-      background: white;
-      border: 1px solid #b8cff0;
-      border-radius: 30px;
-      padding: 4px 12px 4px 10px;
-      font-weight: 500;
-      color: #0a2a66;
-      font-size: 0.75rem;
-      outline: none;
-      cursor: pointer;
-      min-width: 100px;
-    }
-
-    .class-holiday-group {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      background: #fee2e2;
-      padding: 2px 10px 2px 8px;
-      border-radius: 30px;
-      border: 1px solid #fecaca;
-    }
-    .class-holiday-group input[type="checkbox"] {
-      width: 14px;
-      height: 14px;
-      accent-color: #dc3545;
-      cursor: pointer;
-    }
-    .class-holiday-group label {
-      font-weight: 600;
-      color: #991b1b;
-      font-size: 0.7rem;
-      cursor: pointer;
-    }
-    .holiday-reason-group {
-      display: none;
-      align-items: center;
-      gap: 4px;
-      background: #fff5f5;
-      padding: 2px 10px 2px 8px;
-      border-radius: 30px;
-      border: 2px solid #dc3545;
-    }
-    .holiday-reason-group input {
-      border: none;
-      background: transparent;
-      padding: 3px 6px;
-      font-size: 0.7rem;
-      color: #991b1b;
-      font-weight: 600;
-      width: 100px;
-      outline: none;
-    }
-    .holiday-reason-group input::placeholder { color: #f87171; font-weight: 400; }
-    .holiday-reason-group i { color: #dc3545; font-size: 0.7rem; }
-
-    .holiday-msg {
-      background: #fef2f2;
-      border: 2px solid #fecaca;
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      color: #991b1b;
-      margin-bottom: 8px;
-      display: none;
-    }
-    .holiday-msg i { font-size: 2.5rem; display: block; margin-bottom: 8px; color: #dc3545; }
-    .holiday-msg h2 { font-size: 1.2rem; margin-bottom: 6px; }
-    .holiday-msg p { font-size: 0.85rem; color: #7f1d1d; margin-top: 4px; }
-    .holiday-msg .reason-text { 
-      font-size: 1rem; 
-      font-weight: 700; 
-      color: #dc3545; 
-      background: white; 
-      padding: 8px 20px; 
-      border-radius: 30px; 
-      display: inline-block;
-      margin-top: 8px;
-      border: 1px solid #fecaca;
-    }
-
-    .attendance-done-msg {
-      background: #d1fae5;
-      border: 2px solid #10b981;
-      border-radius: 12px;
-      padding: 12px;
-      text-align: center;
-      color: #065f46;
-      margin-bottom: 8px;
-      display: none;
-    }
-    .attendance-done-msg i { font-size: 1.5rem; display: block; margin-bottom: 4px; color: #10b981; }
-    .attendance-done-msg h2 { font-size: 1rem; }
-
-    .checking-msg {
-      background: #e0f2fe;
-      border: 2px solid #0ea5e9;
-      border-radius: 12px;
-      padding: 12px;
-      text-align: center;
-      color: #0369a1;
-      margin-bottom: 8px;
-      display: none;
-    }
-    .checking-msg i { font-size: 1.5rem; display: block; margin-bottom: 4px; color: #0ea5e9; animation: spin 1s linear infinite; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    .save-btn-container {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 6px;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-    .save-btn {
-      background: #10b981;
-      border: none;
-      padding: 5px 16px;
-      border-radius: 40px;
-      color: white;
-      font-weight: 700;
-      font-size: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-      cursor: pointer;
-    }
-    .save-btn:hover { background: #059669; }
-    .save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    .save-holiday-btn {
-      background: #dc3545;
-      border: none;
-      padding: 5px 18px;
-      border-radius: 40px;
-      color: white;
-      font-weight: 700;
-      font-size: 0.75rem;
-      display: none;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-      cursor: pointer;
-    }
-    .save-holiday-btn:hover { background: #b91c1c; }
-    .save-holiday-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    .refresh-btn {
-      background: #e2e8f0;
-      border: none;
-      padding: 5px 12px;
-      border-radius: 40px;
-      color: #1a237e;
-      font-weight: 600;
-      font-size: 0.7rem;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      cursor: pointer;
-    }
-    .refresh-btn:hover { background: #cbd5e1; }
-
-    .summary-counter {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px 10px;
-      background: #f8fafc;
-      padding: 4px 12px;
-      border-radius: 40px;
-      margin-bottom: 6px;
-      border: 1px solid #e2e8f0;
-      font-size: 0.65rem;
-      font-weight: 600;
-    }
-    .summary-counter .count-item {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-    }
-    .summary-counter .count-item .num {
-      font-weight: 700;
-      font-size: 0.8rem;
-    }
-    .count-total { color: #1a237e; }
-    .count-present { color: #10b981; }
-    .count-absent { color: #dc3545; }
-    .count-leave { color: #2563eb; }
-    .count-pending { color: #f59e0b; }
-
-    .table-scroll {
-      flex: 1;
-      overflow-y: auto;
-      padding: 0 8px 8px 8px;
-      margin: 0 6px 6px 6px;
-      border-radius: 16px;
-      background: #fafcff;
-      border: 1px solid #e2e8f0;
-    }
-    .table-scroll::-webkit-scrollbar { width: 4px; }
-    .table-scroll::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-    .table-scroll::-webkit-scrollbar-thumb { background: #b8cff0; border-radius: 10px; }
-    .table-scroll::-webkit-scrollbar-thumb:hover { background: #1f4b9e; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.75rem;
-      min-width: 500px;
-    }
-    th {
+    .coaching-header .coaching-text {
       text-align: left;
-      padding: 8px 6px 6px 6px;
-      font-weight: 600;
-      color: #0a2a66;
-      background: #e7f0fe;
-      border-bottom: 1.5px solid #bdd2f0;
-      position: sticky;
-      top: 0;
-      z-index: 5;
-      font-size: 0.7rem;
+      color: white;
+      position: relative;
+      z-index: 1;
     }
-    td {
-      padding: 6px 6px;
-      border-bottom: 1px solid #e2ecfc;
-      vertical-align: middle;
-      background: white;
+    .coaching-header .coaching-text h2 {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      margin-bottom: 2px;
     }
-    tr:last-child td { border-bottom: none; }
-
-    .student-name {
-      font-weight: 600;
-      color: #0a2a66;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.75rem;
+    .coaching-header .coaching-text .director {
+      font-size: 0.68rem;
+      color: #ffc107;
+      font-weight: 700;
+      margin-bottom: 2px;
     }
-    .roll-badge {
-      background: #e3edfe;
-      padding: 2px 8px;
-      border-radius: 30px;
-      font-weight: 500;
+    .coaching-header .coaching-text .details {
       font-size: 0.6rem;
-      color: #0a2a66;
-      display: inline-block;
+      opacity: 0.95;
+      line-height: 1.4;
+    }
+    .coaching-header .coaching-text .details i {
+      color: #ffc107;
+      margin-right: 3px;
+      font-size: 0.58rem;
     }
 
-    .attendance-actions {
+    .search-section {
+      background: linear-gradient(135deg, #e8f0fe, #f4f9ff);
+      padding: 14px 16px;
+      border-radius: 16px;
       display: flex;
       flex-wrap: wrap;
-      gap: 3px 6px;
       align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      border: 2px solid #d7e5fc;
+      box-shadow: 0 4px 12px rgba(26, 80, 180, 0.06);
     }
-    .attendance-actions label {
+    .search-section label {
+      font-weight: 700;
+      color: #0a2a66;
+      font-size: 0.8rem;
       display: flex;
       align-items: center;
-      gap: 2px;
+      gap: 5px;
+    }
+    .search-section label i { color: #f59e0b; font-size: 0.95rem; }
+    .search-section input {
+      border: 2px solid #b8cff0;
+      border-radius: 40px;
+      padding: 9px 16px;
       font-weight: 600;
-      font-size: 0.65rem;
-      cursor: pointer;
-      padding: 2px 6px 2px 4px;
-      border-radius: 30px;
-      border: 2px solid transparent;
-      transition: all 0.15s;
-    }
-    .attendance-actions label input[type="radio"] {
-      width: 12px;
-      height: 12px;
-      cursor: pointer;
-      margin: 0;
-    }
-    .attendance-actions label.present-option {
-      background: #ecfdf5;
-      border-color: #d1fae5;
-      color: #065f46;
-    }
-    .attendance-actions label.present-option:has(input:checked) {
-      background: #10b981;
-      border-color: #10b981;
-      color: white;
-    }
-    .attendance-actions label.present-option:has(input:checked) input[type="radio"] { accent-color: white; }
-    .attendance-actions label.absent-option {
-      background: #fef2f2;
-      border-color: #fee2e2;
-      color: #991b1b;
-    }
-    .attendance-actions label.absent-option:has(input:checked) {
-      background: #dc3545;
-      border-color: #dc3545;
-      color: white;
-    }
-    .attendance-actions label.absent-option:has(input:checked) input[type="radio"] { accent-color: white; }
-    .attendance-actions label.leave-option {
-      background: #eff6ff;
-      border-color: #dbeafe;
-      color: #1e40af;
-    }
-    .attendance-actions label.leave-option:has(input:checked) {
-      background: #2563eb;
-      border-color: #2563eb;
-      color: white;
-    }
-    .attendance-actions label.leave-option:has(input:checked) input[type="radio"] { accent-color: white; }
-
-    .remark-input {
-      border: 1px solid #c8dbf7;
-      border-radius: 30px;
-      padding: 3px 8px;
-      font-size: 0.65rem;
+      font-size: 0.85rem;
+      width: 160px;
+      outline: none;
       background: white;
-      width: 60px;
       color: #0a2a66;
     }
-    .remark-input:focus {
+    .search-section input:focus {
       border-color: #0a2a66;
-      outline: none;
-      box-shadow: 0 0 0 2px rgba(10, 42, 102, 0.1);
+      box-shadow: 0 0 0 3px rgba(10, 42, 102, 0.12);
+    }
+    .search-section button {
+      background: linear-gradient(135deg, #0a2a66, #1f4b9e);
+      border: none;
+      border-radius: 60px;
+      padding: 9px 22px;
+      color: white;
+      font-weight: 700;
+      font-size: 0.82rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(10, 42, 102, 0.25);
+      cursor: pointer;
+    }
+    .search-section button:hover { transform: translateY(-1px); }
+    .search-section button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .result-card {
+      background: linear-gradient(135deg, #f8fafc, #f4f9ff);
+      border-radius: 16px;
+      padding: 16px 14px;
+      border: 2px solid #e2e8f0;
+      display: none;
+      animation: fadeIn 0.4s ease;
+      box-shadow: 0 6px 18px rgba(0, 40, 100, 0.06);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .student-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 2px dashed #e2e8f0;
+    }
+    .student-photo-circle {
+      width: 58px; height: 58px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2.5px solid #0a2a66;
+      box-shadow: 0 0 0 2.5px rgba(255, 193, 7, 0.3);
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #e8f0fe, #dbeafe);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .student-photo-circle img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .student-photo-circle .photo-fallback {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #0a2a66;
+      text-transform: uppercase;
+    }
+    .student-info { flex: 1; min-width: 0; }
+    .student-name {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #0a2a66;
+      margin-bottom: 3px;
+      word-wrap: break-word;
+    }
+    .student-roll {
+      color: #475569;
+      font-size: 0.68rem;
+      font-weight: 500;
+      word-wrap: break-word;
+      line-height: 1.4;
+    }
+    .student-roll i { color: #f59e0b; margin-right: 3px; }
+
+    .attendance-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding: 10px 14px;
+      background: white;
+      border-radius: 12px;
+      border: 2px solid #e2e8f0;
+      box-shadow: 0 3px 10px rgba(0, 40, 100, 0.04);
+    }
+    .attendance-row .today-label {
+      font-size: 0.58rem;
+      color: #64748b;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 2px;
+    }
+    .attendance-row .today-date {
+      font-size: 0.72rem;
+      color: #0a2a66;
+      font-weight: 700;
+    }
+    .attendance-row .status-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 60px;
+      font-weight: 800;
+      font-size: 0.75rem;
+      letter-spacing: 0.3px;
+    }
+    .status-present { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; border: 1.5px solid #10b981; }
+    .status-absent { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b; border: 1.5px solid #dc3545; }
+    .status-leave { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; border: 1.5px solid #f59e0b; }
+    .status-holiday { background: linear-gradient(135deg, #c7d2fe, #a5b4fc); color: #3730a3; border: 1.5px solid #6366f1; }
+    .status-notmarked { background: linear-gradient(135deg, #f1f5f9, #e2e8f0); color: #64748b; border: 1.5px solid #94a3b8; }
+
+    .action-buttons-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .details-btn {
+      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+      border: none;
+      border-radius: 60px;
+      padding: 8px 18px;
+      color: white;
+      font-weight: 700;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
+      cursor: pointer;
+      transition: all 0.2s;
+      flex: 1;
+      justify-content: center;
+    }
+    .details-btn:hover { transform: translateY(-2px); }
+
+    .download-pdf-btn {
+      background: linear-gradient(135deg, #dc3545, #b91c1c);
+      border: none;
+      border-radius: 60px;
+      padding: 8px 18px;
+      color: white;
+      font-weight: 700;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(220, 53, 69, 0.3);
+      cursor: pointer;
+      transition: all 0.2s;
+      flex: 1;
+      justify-content: center;
+    }
+    .download-pdf-btn:hover { transform: translateY(-2px); }
+    .download-pdf-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .fee-details {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .fee-details .fee-item {
+      background: white;
+      padding: 10px 8px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 3px 10px rgba(0, 40, 100, 0.05);
+      border: 2px solid #e2e8f0;
+    }
+    .fee-details .fee-item .label {
+      font-size: 0.58rem;
+      color: #64748b;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-bottom: 4px;
+      white-space: nowrap;
+    }
+    .fee-details .fee-item .label i { margin-right: 3px; }
+    .fee-details .fee-item .value {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #0a2a66;
+    }
+    .fee-item.fee-monthly { border-color: #3b82f6; background: linear-gradient(135deg, #eff6ff, #dbeafe); }
+    .fee-item.fee-monthly .label, .fee-item.fee-monthly .value { color: #1e40af; }
+    .fee-item.fee-paid { border-color: #10b981; background: linear-gradient(135deg, #ecfdf5, #d1fae5); }
+    .fee-item.fee-paid .label, .fee-item.fee-paid .value { color: #065f46; }
+    .fee-item.fee-due { border-color: #dc3545; background: linear-gradient(135deg, #fef2f2, #fee2e2); }
+    .fee-item.fee-due .label, .fee-item.fee-due .value { color: #991b1b; }
+    .fee-item.fee-due.paid-full { border-color: #10b981; background: linear-gradient(135deg, #ecfdf5, #d1fae5); }
+    .fee-item.fee-due.paid-full .label, .fee-item.fee-due.paid-full .value { color: #065f46; }
+
+    .remark-box {
+      background: linear-gradient(135deg, #fffbeb, #fef3c7);
+      padding: 10px 14px;
+      border-radius: 12px;
+      margin-top: 10px;
+      font-size: 0.75rem;
+      color: #92400e;
+      font-weight: 600;
+      border: 2px solid #fde68a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .remark-box i { color: #f59e0b; font-size: 0.95rem; flex-shrink: 0; }
+
+    .not-found {
+      text-align: center;
+      padding: 30px 16px;
+      color: #64748b;
+      display: none;
+      background: linear-gradient(135deg, #fef2f2, #fef2f2);
+      border-radius: 16px;
+      border: 2px dashed #fecaca;
+    }
+    .not-found i { font-size: 2.5rem; color: #f87171; display: block; margin-bottom: 10px; }
+    .not-found h3 { color: #991b1b; font-size: 1rem; margin-bottom: 6px; }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 12px;
+      color: #1f4b9e;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.75rem;
+      padding: 6px 14px;
+      border-radius: 30px;
+    }
+    .back-link:hover { background: #e8f0fe; }
+
+    .loading-spinner {
+      text-align: center;
+      padding: 20px 16px;
+      display: none;
+      background: linear-gradient(135deg, #e8f0fe, #f4f9ff);
+      border-radius: 16px;
+      border: 2px solid #d7e5fc;
+    }
+    .loading-spinner i {
+      font-size: 1.8rem;
+      color: #1f4b9e;
+      animation: spin 1s linear infinite;
+    }
+    .loading-spinner p { margin-top: 8px; color: #1f4b9e; font-weight: 600; font-size: 0.8rem; }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     .toast-msg {
       position: fixed;
-      bottom: 20px;
+      bottom: 16px;
       left: 50%;
       transform: translateX(-50%);
       background: #1a237e;
       color: white;
-      padding: 8px 20px;
-      border-radius: 40px;
+      padding: 10px 22px;
+      border-radius: 60px;
       font-weight: 600;
-      font-size: 0.8rem;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      font-size: 0.75rem;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
       z-index: 9999;
       display: none;
       max-width: 90%;
       text-align: center;
     }
-    .no-students-msg {
-      text-align: center;
-      padding: 30px 20px;
-      color: #666;
-      font-size: 0.8rem;
-    }
-    .no-students-msg i {
-      font-size: 2rem;
-      color: #cbd5e1;
-      display: block;
-      margin-bottom: 8px;
+
+    @media (max-width: 480px) {
+      body { padding: 6px 3px 14px; }
+      .container { padding: 12px 10px 16px; border-radius: 16px; max-width: 100%; }
+      .coaching-header { padding: 10px 12px; gap: 10px; border-radius: 12px; margin-bottom: 12px; }
+      .coaching-header .logo-circle { width: 46px; height: 46px; }
+      .coaching-header .coaching-text h2 { font-size: 0.9rem; }
+      .coaching-header .coaching-text .director { font-size: 0.62rem; }
+      .coaching-header .coaching-text .details { font-size: 0.55rem; }
+      .search-section { padding: 12px; border-radius: 14px; gap: 8px; flex-direction: column; align-items: stretch; margin-bottom: 12px; }
+      .search-section label { font-size: 0.75rem; justify-content: center; }
+      .search-section input { width: 100%; padding: 10px 16px; font-size: 0.85rem; text-align: center; }
+      .search-section button { width: 100%; justify-content: center; padding: 10px 20px; font-size: 0.82rem; }
+      .result-card { padding: 14px 12px; border-radius: 14px; }
+      .student-photo-circle { width: 52px; height: 52px; border-width: 2px; }
+      .student-photo-circle .photo-fallback { font-size: 1.35rem; }
+      .student-name { font-size: 0.95rem; }
+      .student-roll { font-size: 0.62rem; }
+      .attendance-row { padding: 10px 12px; gap: 6px; border-radius: 10px; }
+      .attendance-row .status-badge { font-size: 0.72rem; padding: 6px 14px; }
+      .attendance-row .today-date { font-size: 0.68rem; }
+      .action-buttons-row { gap: 6px; }
+      .details-btn, .download-pdf-btn { font-size: 0.7rem; padding: 8px 14px; }
+      .fee-details { gap: 6px; }
+      .fee-details .fee-item { padding: 8px 6px; border-radius: 10px; }
+      .fee-details .fee-item .label { font-size: 0.52rem; }
+      .fee-details .fee-item .value { font-size: 0.85rem; }
+      .remark-box { padding: 8px 12px; font-size: 0.68rem; border-radius: 10px; }
     }
 
-    .loading-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255,255,255,0.95);
-      z-index: 9999;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
-    .loading-card {
-      background: white;
-      padding: 30px 45px;
-      border-radius: 24px;
-      text-align: center;
-      min-width: 280px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-    }
-    .loading-card i {
-      font-size: 2.2rem;
-      color: #1b4f9b;
-      animation: spin 1s linear infinite;
-      display: block;
-      margin-bottom: 12px;
-    }
-    .loading-card p { color: #334155; font-size: 0.9rem; }
-    .loading-percent {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #1a237e;
-      margin-top: 8px;
-    }
-
-    @media (max-width: 720px) {
-      .fixed-header { padding: 6px 10px 0 10px; }
-      .header h1 { font-size: 0.95rem; }
-      .header h1 i { font-size: 0.75rem; padding: 3px 6px; }
-      .header .date-display { font-size: 0.6rem; padding: 3px 10px; }
-      .top-controls { padding: 4px 10px; gap: 4px 8px; }
-      .top-controls .session-group select { font-size: 0.65rem; padding: 3px 8px; }
-      .top-controls .view-parent-btn { font-size: 0.6rem; padding: 3px 10px; }
-      .top-controls .prev-attendance-btn { font-size: 0.6rem; padding: 3px 10px; }
-      .class-filter { padding: 4px 10px; gap: 4px 8px; }
-      .class-filter select { font-size: 0.65rem; padding: 3px 8px; min-width: 80px; }
-      .class-holiday-group label { font-size: 0.6rem; }
-      .holiday-reason-group input { font-size: 0.6rem; width: 70px; }
-      .summary-counter { font-size: 0.55rem; padding: 3px 10px; gap: 3px 8px; }
-      .summary-counter .count-item .num { font-size: 0.7rem; }
-      .table-scroll { padding: 0 4px 4px 4px; margin: 0 4px 4px 4px; }
-      table { font-size: 0.65rem; min-width: 400px; }
-      th { font-size: 0.6rem; padding: 5px 4px; }
-      td { padding: 4px 4px; }
-      .student-name { font-size: 0.65rem; }
-      .roll-badge { font-size: 0.5rem; padding: 1px 6px; }
-      .attendance-actions label { font-size: 0.55rem; padding: 1px 4px 1px 3px; }
-      .attendance-actions label input[type="radio"] { width: 10px; height: 10px; }
-      .remark-input { width: 40px; font-size: 0.55rem; padding: 2px 5px; }
-      .save-btn, .save-holiday-btn { font-size: 0.65rem; padding: 4px 12px; }
-      .refresh-btn { font-size: 0.6rem; padding: 4px 10px; }
-      .holiday-msg { padding: 14px; }
-      .holiday-msg i { font-size: 2rem; }
-      .holiday-msg h2 { font-size: 1rem; }
-      .attendance-done-msg { padding: 8px; }
-      .attendance-done-msg h2 { font-size: 0.85rem; }
-      .loading-card { padding: 20px 28px; min-width: 200px; }
-      .loading-percent { font-size: 1.5rem; }
+    @media (max-width: 360px) {
+      .container { padding: 10px 8px 12px; }
+      .coaching-header .coaching-text h2 { font-size: 0.82rem; }
+      .student-name { font-size: 0.88rem; }
+      .fee-details .fee-item .value { font-size: 0.78rem; }
     }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <div class="fixed-header">
-    <div class="header">
-      <h1><i class="fas fa-clipboard-check"></i> Attendance</h1>
-      <div class="date-display">
-        <i class="fas fa-calendar-day"></i> <span id="todayDate">Loading...</span>
+
+  <div class="coaching-header" id="coachingHeader">
+    <div class="logo-circle">
+      <img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" alt="Quest Coaching Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=&quot;color:#1a237e;font-weight:900;font-size:1.4rem;&quot;>Q</span>';">
+    </div>
+    <div class="coaching-text">
+      <h2>QUEST COACHING CENTRE</h2>
+      <div class="director">CEO & Founder: MR. RAVI SIR</div>
+      <div class="details">
+        <i class="fas fa-map-marker-alt"></i>Gopalganj &nbsp;|&nbsp;
+        <i class="fas fa-phone"></i>+91 9708442525
       </div>
-    </div>
-
-    <div class="top-controls">
-      <div class="session-group">
-        <label>Session:</label>
-        <select id="sessionSelect">
-          <option value="2026-27" selected>2026-27</option>
-          <option value="2027-28">2027-28</option>
-          <option value="2028-29">2028-29</option>
-          <option value="2029-30">2029-30</option>
-        </select>
-      </div>
-      <button class="prev-attendance-btn" id="prevAttendanceBtn">
-        <i class="fas fa-history"></i> Previous
-      </button>
-      <button class="view-parent-btn" id="parentViewBtn">
-        <i class="fas fa-eye"></i> Parent
-      </button>
-    </div>
-
-    <div class="class-filter" id="classFilterRow">
-      <label><i class="fas fa-users"></i> Class</label>
-      <select id="classSelect">
-        <option value="">-- Select --</option>
-        <option value="6th">6th</option><option value="7th">7th</option>
-        <option value="8th">8th</option><option value="9th">9th</option>
-        <option value="10th">10th</option>
-        <option value="11th (Science)">11th (Science)</option>
-        <option value="11th (Commerce)">11th (Commerce)</option>
-        <option value="11th (Arts)">11th (Arts)</option>
-        <option value="12th (Science)">12th (Science)</option>
-        <option value="12th (Commerce)">12th (Commerce)</option>
-        <option value="12th (Arts)">12th (Arts)</option>
-      </select>
-
-      <div class="class-holiday-group">
-        <input type="checkbox" id="classHolidayCheck">
-        <label for="classHolidayCheck"><i class="fas fa-calendar-times"></i> Holiday</label>
-      </div>
-      <div class="holiday-reason-group" id="holidayReasonGroup">
-        <i class="fas fa-pen"></i>
-        <input type="text" id="holidayReason" placeholder="Reason...">
-      </div>
-    </div>
-
-    <div class="holiday-msg" id="holidayMsg">
-      <i class="fas fa-calendar-times"></i>
-      <h2 id="holidayTitle">🎉 Class Holiday!</h2>
-      <p id="holidaySubtitle">No attendance will be marked today</p>
-      <div class="reason-text" id="holidayReasonDisplay">HOLIDAY</div>
-    </div>
-
-    <div class="checking-msg" id="checkingMsg">
-      <i class="fas fa-spinner"></i>
-      <h2>Checking Attendance Status...</h2>
-    </div>
-
-    <div class="attendance-done-msg" id="attendanceDoneMsg">
-      <i class="fas fa-check-circle"></i>
-      <h2>✅ Attendance Already Done!</h2>
-      <p id="attendanceDoneInfo">All students marked for today.</p>
-    </div>
-
-    <div class="summary-counter" id="summaryCounter" style="display:none;">
-      <span class="count-item count-total">📌 <span class="num" id="totalCount">0</span></span>
-      <span class="count-item count-present">✅ <span class="num" id="presentCount">0</span></span>
-      <span class="count-item count-absent">❌ <span class="num" id="absentCount">0</span></span>
-      <span class="count-item count-leave">🟡 <span class="num" id="leaveCount">0</span></span>
-      <span class="count-item count-pending">⏳ <span class="num" id="pendingCount">0</span></span>
-    </div>
-
-    <div class="save-btn-container" id="saveBtnContainer" style="display:none;">
-      <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync"></i></button>
-      <button class="save-btn" id="saveAttendanceBtn">
-        <i class="fas fa-save"></i> Save
-      </button>
-      <button class="save-holiday-btn" id="saveHolidayBtn">
-        <i class="fas fa-calendar-times"></i> Save Holiday
-      </button>
     </div>
   </div>
 
-  <div class="table-scroll" id="tableScroll" style="display:none;">
-    <table id="attendanceTable">
-      <thead>
-        <tr>
-          <th style="width:35%;">Student</th>
-          <th style="width:12%;">Roll</th>
-          <th style="width:33%;">Status</th>
-          <th style="width:20%;">Remarks</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody">
-        <tr><td colspan="4" style="text-align:center;padding:25px;color:#1f4b9e;font-size:0.8rem;">
-          <i class="fas fa-spinner fa-spin" style="font-size:1.5rem;display:block;margin-bottom:6px;"></i>
-          Loading...
-        </td></tr>
-      </tbody>
-    </table>
+  <div class="search-section">
+    <label><i class="fas fa-id-badge"></i> Roll No.</label>
+    <input type="number" id="rollInput" placeholder="Enter Roll Number" autofocus>
+    <button id="searchBtn"><i class="fas fa-search"></i> Check Attendance</button>
   </div>
-</div>
 
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="loading-card">
+  <div class="loading-spinner" id="loadingSpinner">
     <i class="fas fa-spinner"></i>
-    <p id="loadingStatus">Loading students...</p>
-    <div class="loading-percent" id="loadingPercent">0%</div>
+    <p>Searching student records...</p>
   </div>
+
+  <div class="not-found" id="notFound">
+    <i class="fas fa-user-slash"></i>
+    <h3>Student Not Found</h3>
+    <p id="notFoundMsg">Please check the Roll Number and try again.</p>
+  </div>
+
+  <div class="result-card" id="resultCard">
+    <div class="student-profile">
+      <div class="student-photo-circle" id="studentPhotoCircle">
+        <img id="studentPhotoImg" src="" alt="Student Photo" style="display:none;">
+        <div class="photo-fallback" id="photoFallback" style="display:none;">S</div>
+      </div>
+      <div class="student-info">
+        <div class="student-name" id="studentName">--</div>
+        <div class="student-roll" id="studentRoll"><i class="fas fa-id-card"></i> --</div>
+      </div>
+    </div>
+
+    <div class="attendance-row">
+      <div>
+        <div class="today-label">Today's Attendance</div>
+        <div class="today-date" id="todayDateDisplay">--</div>
+      </div>
+      <div class="status-badge" id="statusBadge">⏳ Not Marked</div>
+    </div>
+
+    <div class="action-buttons-row">
+      <button class="details-btn" id="detailsBtn">
+        <i class="fas fa-calendar-alt"></i> Details
+      </button>
+      <button class="download-pdf-btn" id="downloadPdfBtn">
+        <i class="fas fa-file-pdf"></i> Download PDF
+      </button>
+    </div>
+    
+    <div class="fee-details">
+      <div class="fee-item fee-monthly">
+        <div class="label"><i class="fas fa-money-bill-wave"></i> Monthly</div>
+        <div class="value" id="monthlyFeeDisplay">₹--</div>
+      </div>
+      <div class="fee-item fee-paid">
+        <div class="label"><i class="fas fa-check-circle"></i> Paid</div>
+        <div class="value" id="paidFeeDisplay">₹--</div>
+      </div>
+      <div class="fee-item fee-due" id="dueFeeItem">
+        <div class="label"><i class="fas fa-exclamation-triangle"></i> Due</div>
+        <div class="value" id="dueFeeDisplay">₹--</div>
+      </div>
+    </div>
+
+    <div class="remark-box" id="remarkBox">
+      <i class="fas fa-comment-dots"></i> <span id="remarkText">No remarks</span>
+    </div>
+  </div>
+
+  <a class="back-link" onclick="window.close()"><i class="fas fa-arrow-left"></i> Close</a>
 </div>
 
 <div id="toastMsg" class="toast-msg"></div>
 
 <script>
+  const COACHING_INFO = {
+    logo: 'https://i.ibb.co/hF9tmnpB/20250903-202922.jpg',
+    name: 'QUEST COACHING CENTRE',
+    director: 'MR. RAVI SIR',
+    directorTitle: 'CEO & Founder',
+    address: 'In Front of S.S. Girls High School, Gopalganj',
+    phone: '+91 9708442525'
+  };
+
+  let LOGO_BASE64 = null;
+
+  function loadImageAsCircularDataURL(url) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function() {
+        try {
+          const size = Math.min(img.naturalWidth || 300, img.naturalHeight || 300);
+          const canvas = document.createElement('canvas');
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext('2d');
+          ctx.beginPath();
+          ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.clip();
+          ctx.drawImage(img, 0, 0, size, size);
+          const dataURL = canvas.toDataURL('image/png');
+          resolve(dataURL);
+        } catch (e) {
+          reject(e);
+        }
+      };
+      img.onerror = function() {
+        reject(new Error('Image load failed: ' + url));
+      };
+      img.src = url;
+    });
+  }
+
+  async function preloadLogo() {
+    try {
+      LOGO_BASE64 = await loadImageAsCircularDataURL(COACHING_INFO.logo);
+      console.log('✅ Logo loaded');
+    } catch (err) {
+      console.warn('⚠️ Logo preload failed:', err);
+    }
+  }
+
   const firebaseConfig = {
     apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
     authDomain: "quest-coaching.firebaseapp.com",
@@ -724,632 +607,791 @@
 
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
-  const auth = firebase.auth();
 
-  const tbody = document.getElementById('tableBody');
-  const classSelect = document.getElementById('classSelect');
-  const sessionSelect = document.getElementById('sessionSelect');
-  const dateDisplay = document.getElementById('todayDate');
-  const classHolidayCheck = document.getElementById('classHolidayCheck');
-  const holidayReason = document.getElementById('holidayReason');
-  const holidayReasonGroup = document.getElementById('holidayReasonGroup');
-  const holidayMsg = document.getElementById('holidayMsg');
-  const holidayTitle = document.getElementById('holidayTitle');
-  const holidaySubtitle = document.getElementById('holidaySubtitle');
-  const holidayReasonDisplay = document.getElementById('holidayReasonDisplay');
-  const checkingMsg = document.getElementById('checkingMsg');
-  const attendanceDoneMsg = document.getElementById('attendanceDoneMsg');
-  const attendanceDoneInfo = document.getElementById('attendanceDoneInfo');
-  const tableScroll = document.getElementById('tableScroll');
-  const summaryCounter = document.getElementById('summaryCounter');
-  const saveBtnContainer = document.getElementById('saveBtnContainer');
-  const parentViewBtn = document.getElementById('parentViewBtn');
-  const prevAttendanceBtn = document.getElementById('prevAttendanceBtn');
-  const saveBtn = document.getElementById('saveAttendanceBtn');
-  const saveHolidayBtn = document.getElementById('saveHolidayBtn');
-  const refreshBtn = document.getElementById('refreshBtn');
+  const rollInput = document.getElementById('rollInput');
+  const searchBtn = document.getElementById('searchBtn');
+  const loadingSpinner = document.getElementById('loadingSpinner');
+  const resultCard = document.getElementById('resultCard');
+  const notFound = document.getElementById('notFound');
+  const notFoundMsg = document.getElementById('notFoundMsg');
+  const studentName = document.getElementById('studentName');
+  const studentRoll = document.getElementById('studentRoll');
+  const statusBadge = document.getElementById('statusBadge');
+  const todayDateDisplay = document.getElementById('todayDateDisplay');
+  const monthlyFeeDisplay = document.getElementById('monthlyFeeDisplay');
+  const paidFeeDisplay = document.getElementById('paidFeeDisplay');
+  const dueFeeDisplay = document.getElementById('dueFeeDisplay');
+  const dueFeeItem = document.getElementById('dueFeeItem');
+  const remarkText = document.getElementById('remarkText');
+  const remarkBox = document.getElementById('remarkBox');
   const toast = document.getElementById('toastMsg');
+  const coachingHeader = document.getElementById('coachingHeader');
+  const detailsBtn = document.getElementById('detailsBtn');
+  const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 
-  const loadingOverlay = document.getElementById('loadingOverlay');
-  const loadingStatus = document.getElementById('loadingStatus');
-  const loadingPercent = document.getElementById('loadingPercent');
+  const studentPhotoImg = document.getElementById('studentPhotoImg');
+  const photoFallback = document.getElementById('photoFallback');
 
-  const totalCount = document.getElementById('totalCount');
-  const presentCount = document.getElementById('presentCount');
-  const absentCount = document.getElementById('absentCount');
-  const leaveCount = document.getElementById('leaveCount');
-  const pendingCount = document.getElementById('pendingCount');
-
-  let students = [];
-  let attendanceData = {};
-  let isSaving = false;
-  let currentDate = '';
-  let isHolidaySaved = false;
+  let currentStudent = null;
 
   function showToast(msg, isError = false) {
     toast.textContent = msg;
     toast.style.display = 'block';
     toast.style.background = isError ? '#dc3545' : '#1a237e';
     clearTimeout(toast._timer);
-    toast._timer = setTimeout(() => { toast.style.display = 'none'; }, 3000);
-  }
-
-  function getTodayDate() {
-    const today = new Date();
-    const y = today.getFullYear();
-    const m = String(today.getMonth() + 1).padStart(2, '0');
-    const d = String(today.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
+    toast._timer = setTimeout(() => { toast.style.display = 'none'; }, 4000);
   }
 
   function formatDateDisplay(dateStr) {
+    if (!dateStr) return '--';
     const d = new Date(dateStr);
-    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
-  function updateDateDisplay() {
-    currentDate = getTodayDate();
-    dateDisplay.textContent = formatDateDisplay(currentDate);
+  function getUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      session: params.get('session') || '2026-27',
+      class: params.get('class') || ''
+    };
   }
 
-  function updateLoading(percent, status) {
-    loadingPercent.textContent = percent + '%';
-    if (status) loadingStatus.textContent = status;
-  }
-
-  function updateSummary() {
-    const total = students.length;
-    let present = 0, absent = 0, leave = 0, pending = 0;
-    students.forEach(s => {
-      const rec = attendanceData[s.roll] || { status: '', remark: '' };
-      if (rec.status === 'present') present++;
-      else if (rec.status === 'absent') absent++;
-      else if (rec.status === 'leave') leave++;
-      else pending++;
-    });
-    totalCount.textContent = total;
-    presentCount.textContent = present;
-    absentCount.textContent = absent;
-    leaveCount.textContent = leave;
-    pendingCount.textContent = pending;
-  }
-
-  // 🔥 CHECK IF HOLIDAY IS ALREADY SAVED (in students section)
-  async function checkHolidaySaved(selectedSession, selectedClass, today) {
-    try {
-      let studentSnapshot = await db.collection('admissions')
-        .where('classApplying', '==', selectedClass)
-        .where('session', '==', selectedSession)
-        .limit(1)
-        .get();
-
-      if (studentSnapshot.empty) {
-        studentSnapshot = await db.collection('admissions')
-          .where('class', '==', selectedClass)
-          .where('session', '==', selectedSession)
-          .limit(1)
-          .get();
-      }
-
-      if (studentSnapshot.empty) return { saved: false, reason: '' };
-
-      const firstStudent = studentSnapshot.docs[0].data();
-      const studentName = firstStudent.studentName || firstStudent.name || 'Unknown';
-
-      const docRef = db.collection('attendance')
-        .doc(selectedSession)
-        .collection('classes')
-        .doc(selectedClass)
-        .collection('students')
-        .doc(studentName)
-        .collection('attendance')
-        .doc(today);
-
-      const snap = await docRef.get();
-      if (snap.exists) {
-        const data = snap.data();
-        if (data.status === 'holiday') {
-          return { saved: true, reason: data.holidayReason || data.remark || 'Holiday' };
-        }
-      }
-      return { saved: false, reason: '' };
-    } catch (error) {
-      console.warn('Holiday check error:', error);
-      return { saved: false, reason: '' };
+  function loadStudentPhoto(photoUrl, studentNameVal) {
+    studentPhotoImg.style.display = 'none';
+    studentPhotoImg.src = '';
+    photoFallback.style.display = 'none';
+    
+    if (photoUrl && photoUrl.trim() !== '') {
+      studentPhotoImg.onload = function() {
+        studentPhotoImg.style.display = 'block';
+        photoFallback.style.display = 'none';
+      };
+      studentPhotoImg.onerror = function() {
+        studentPhotoImg.style.display = 'none';
+        photoFallback.style.display = 'flex';
+        photoFallback.textContent = (studentNameVal || 'S').charAt(0).toUpperCase();
+      };
+      studentPhotoImg.crossOrigin = 'anonymous';
+      studentPhotoImg.src = photoUrl;
+    } else {
+      studentPhotoImg.style.display = 'none';
+      photoFallback.style.display = 'flex';
+      photoFallback.textContent = (studentNameVal || 'S').charAt(0).toUpperCase();
     }
   }
 
-  async function fetchAllAttendanceForDate(selectedSession, selectedClass, today) {
+  // ============================================================
+  // 🔥 MAIN SEARCH FUNCTION
+  // Searches admissions + attendance + fees collections
+  // ============================================================
+  async function searchStudent() {
+    const roll = parseInt(rollInput.value.trim());
+    if (!roll || isNaN(roll)) {
+      showToast('Please enter a valid Roll Number!', true);
+      return;
+    }
+
+    const { session, class: className } = getUrlParams();
+    
+    if (!className) {
+      showToast('Please select a class from attendance page first!', true);
+      return;
+    }
+
+    loadingSpinner.style.display = 'block';
+    resultCard.style.display = 'none';
+    notFound.style.display = 'none';
+    coachingHeader.style.display = 'none';
+    searchBtn.disabled = true;
+    searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+
     try {
-      let snapshot = await db.collection('admissions')
-        .where('classApplying', '==', selectedClass)
-        .where('session', '==', selectedSession)
+      let studentData = null;
+      let studentDocId = null;
+
+      // ============================================================
+      // STEP 1: Search student in admissions collection
+      // ============================================================
+      const snapshot = await db.collection('admissions')
+        .where('rollNumber', '==', String(roll))
+        .where('classApplying', '==', className)
         .get();
 
       if (snapshot.empty) {
-        snapshot = await db.collection('admissions')
-          .where('class', '==', selectedClass)
-          .where('session', '==', selectedSession)
+        const snapshot2 = await db.collection('admissions')
+          .where('rollNumber', '==', String(roll))
+          .where('class', '==', className)
           .get();
-      }
-
-      if (snapshot.empty) return { students: [], attendance: {}, markedCount: 0, total: 0 };
-
-      const studentsList = [];
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        studentsList.push({
-          id: doc.id,
-          roll: data.rollNumber || data.rollNo || parseInt(doc.id.slice(-3)) || 0,
-          name: data.studentName || data.name || 'Unknown',
-          class: data.classApplying || data.class || selectedClass
-        });
-      });
-      studentsList.sort((a, b) => a.roll - b.roll);
-
-      const attendancePromises = studentsList.map(student => {
-        const docRef = db.collection('attendance')
-          .doc(selectedSession)
-          .collection('classes')
-          .doc(selectedClass)
-          .collection('students')
-          .doc(student.name)
-          .collection('attendance')
-          .doc(today);
-        return docRef.get();
-      });
-
-      const attendanceSnaps = await Promise.all(attendancePromises);
-
-      const attendanceMap = {};
-      let markedCount = 0;
-
-      studentsList.forEach((student, index) => {
-        const snap = attendanceSnaps[index];
-        if (snap.exists) {
-          const data = snap.data();
-          attendanceMap[student.roll] = {
-            status: data.status || '',
-            remark: data.remark || ''
-          };
-          markedCount++;
-        } else {
-          attendanceMap[student.roll] = { status: '', remark: '' };
+        
+        if (snapshot2.empty) {
+          loadingSpinner.style.display = 'none';
+          notFound.style.display = 'block';
+          notFoundMsg.textContent = `Roll No. ${roll} not found in ${className} class.`;
+          searchBtn.disabled = false;
+          searchBtn.innerHTML = '<i class="fas fa-search"></i> Check Attendance';
+          return;
         }
-      });
-
-      return { students: studentsList, attendance: attendanceMap, markedCount, total: studentsList.length };
-
-    } catch (error) {
-      console.error('fetchAllAttendance error:', error);
-      return { students: [], attendance: {}, markedCount: 0, total: 0 };
-    }
-  }
-
-  prevAttendanceBtn.addEventListener('click', function() {
-    const session = sessionSelect.value;
-    const className = classSelect.value;
-    window.open(`previous-attendance.html?session=${session}&class=${className}`, '_blank');
-  });
-
-  parentViewBtn.addEventListener('click', function() {
-    const session = sessionSelect.value;
-    const className = classSelect.value;
-    if (!className) { showToast('Select class first!', true); return; }
-    window.open(`parent-view.html?session=${session}&class=${className}`, '_blank');
-  });
-
-  function handleClassHoliday() {
-    if (classHolidayCheck.checked) {
-      holidayReasonGroup.style.display = 'flex';
-      holidayMsg.style.display = 'block';
-      holidayTitle.textContent = '🎉 Class Holiday!';
-      holidaySubtitle.textContent = 'No attendance will be marked today';
-      
-      tableScroll.style.display = 'none';
-      summaryCounter.style.display = 'none';
-      attendanceDoneMsg.style.display = 'none';
-      checkingMsg.style.display = 'none';
-      
-      saveBtnContainer.style.display = 'flex';
-      saveBtn.style.display = 'none';
-      saveHolidayBtn.style.display = 'flex';
-      saveHolidayBtn.disabled = false;
-      saveHolidayBtn.innerHTML = '<i class="fas fa-calendar-times"></i> Save Holiday';
-      saveHolidayBtn.style.background = '#dc3545';
-      
-      const reason = holidayReason.value.trim() || 'Holiday';
-      holidayReasonDisplay.textContent = reason.toUpperCase();
-    } else {
-      holidayReasonGroup.style.display = 'none';
-      holidayMsg.style.display = 'none';
-      saveBtn.style.display = 'flex';
-      saveHolidayBtn.style.display = 'none';
-      handleClassSelect();
-    }
-  }
-
-  async function handleClassSelect() {
-    if (classHolidayCheck.checked) return;
-
-    const selectedClass = classSelect.value;
-    const selectedSession = sessionSelect.value;
-
-    if (!selectedClass || !selectedSession) {
-      tableScroll.style.display = 'none';
-      summaryCounter.style.display = 'none';
-      saveBtnContainer.style.display = 'none';
-      attendanceDoneMsg.style.display = 'none';
-      checkingMsg.style.display = 'none';
-      holidayMsg.style.display = 'none';
-      loadingOverlay.style.display = 'none';
-      return;
-    }
-
-    loadingOverlay.style.display = 'flex';
-    updateLoading(10, 'Checking holiday status...');
-    tableScroll.style.display = 'none';
-    summaryCounter.style.display = 'none';
-    saveBtnContainer.style.display = 'none';
-    attendanceDoneMsg.style.display = 'none';
-    checkingMsg.style.display = 'none';
-    holidayMsg.style.display = 'none';
-
-    const today = getTodayDate();
-
-    try {
-      // Step 1: Check if holiday
-      updateLoading(20, 'Checking holiday...');
-      const holidayCheck = await checkHolidaySaved(selectedSession, selectedClass, today);
-
-      if (holidayCheck.saved) {
-        updateLoading(100, 'Holiday found!');
-        setTimeout(() => {
-          loadingOverlay.style.display = 'none';
-          isHolidaySaved = true;
-          
-          holidayMsg.style.display = 'block';
-          holidayTitle.textContent = '🎉 Holiday Already Saved!';
-          holidaySubtitle.textContent = 'No attendance was marked on this day';
-          holidayReasonDisplay.textContent = holidayCheck.reason.toUpperCase();
-          
-          tableScroll.style.display = 'none';
-          summaryCounter.style.display = 'none';
-          saveBtnContainer.style.display = 'none';
-          attendanceDoneMsg.style.display = 'none';
-          
-          showToast(`🎉 Holiday: ${holidayCheck.reason.toUpperCase()}`);
-        }, 300);
-        return;
+        studentData = snapshot2.docs[0].data();
+        studentDocId = snapshot2.docs[0].id;
+      } else {
+        studentData = snapshot.docs[0].data();
+        studentDocId = snapshot.docs[0].id;
       }
 
-      // Step 2: Load students
-      updateLoading(40, 'Loading students...');
-      const result = await fetchAllAttendanceForDate(selectedSession, selectedClass, today);
+      const studentNameVal = studentData.studentName || studentData.name || 'Unknown';
+      const studentClass = studentData.classApplying || studentData.class || className;
+      const studentRollVal = studentData.rollNumber || studentData.rollNo || roll;
+      const photoUrl = studentData.photoUrl || studentData.photo || '';
+      const fatherName = studentData.fatherName || studentData.father || 'N/A';
 
-      updateLoading(85, 'Checking attendance...');
+      currentStudent = {
+        id: studentDocId,
+        name: studentNameVal,
+        className: studentClass,
+        roll: studentRollVal,
+        session: session,
+        fatherName: fatherName,
+        photoUrl: photoUrl
+      };
 
-      if (result.total === 0) {
-        loadingOverlay.style.display = 'none';
-        tableScroll.style.display = 'block';
-        tbody.innerHTML = `<tr><td colspan="4" class="no-students-msg">
-          <i class="fas fa-users"></i> No students in <strong>${selectedClass}</strong>
-        </td></tr>`;
-        summaryCounter.style.display = 'flex';
-        saveBtnContainer.style.display = 'flex';
-        saveBtn.style.display = 'flex';
-        saveHolidayBtn.style.display = 'none';
-        students = [];
-        attendanceData = {};
-        updateSummary();
-        return;
+      // ============================================================
+      // STEP 2: Fetch TODAY'S ATTENDANCE
+      // ============================================================
+      const today = new Date().toISOString().split('T')[0];
+      
+      const attendanceRef = db.collection('attendance')
+        .doc(session)
+        .collection('classes')
+        .doc(studentClass)
+        .collection('students')
+        .doc(studentNameVal)
+        .collection('attendance')
+        .doc(today);
+
+      const attendanceSnap = await attendanceRef.get();
+
+      let status = 'notmarked';
+      let remark = '';
+
+      if (attendanceSnap.exists) {
+        const attData = attendanceSnap.data();
+        status = attData.status || 'notmarked';
+        remark = attData.remark || '';
       }
 
-      students = result.students;
-      attendanceData = result.attendance;
+      // ============================================================
+      // 🔥 STEP 3: Fetch FEES data from 'fees' collection
+      // ============================================================
+      let monthlyFee = 0;
+      let paidFee = 0;
+      let dueFee = 0;
+      let feeRemark = '';
 
-      updateLoading(100, 'Done!');
+      try {
+        const feesSnap = await db.collection('fees')
+          .where('roll_number', '==', String(roll))
+          .get();
 
-      const allMarked = result.markedCount === result.total && result.total > 0;
+        if (!feesSnap.empty) {
+          let totalFee = 0;
+          let totalReceived = 0;
+          let totalDue = 0;
 
-      setTimeout(() => {
-        loadingOverlay.style.display = 'none';
+          feesSnap.forEach(doc => {
+            const feeData = doc.data();
+            
+            const docTotal = feeData.total_amount || feeData.totalFee || feeData.monthlyFee || 0;
+            const docReceived = feeData.received_amount || feeData.paidFee || feeData.paid_amount || 0;
+            const docDue = feeData.due_amount || feeData.dueFee || Math.max(0, docTotal - docReceived);
 
-        if (allMarked) {
-          attendanceDoneMsg.style.display = 'block';
-          attendanceDoneInfo.textContent = `✅ ${result.markedCount} students marked for ${formatDateDisplay(today)}`;
-          tableScroll.style.display = 'none';
-          summaryCounter.style.display = 'none';
-          saveBtnContainer.style.display = 'none';
-        } else {
-          attendanceDoneMsg.style.display = 'none';
-          tableScroll.style.display = 'block';
-          summaryCounter.style.display = 'flex';
-          saveBtnContainer.style.display = 'flex';
-          saveBtn.style.display = 'flex';
-          saveHolidayBtn.style.display = 'none';
-          renderTable();
-          updateSummary();
-        }
-      }, 200);
+            totalFee += Number(docTotal) || 0;
+            totalReceived += Number(docReceived) || 0;
+            totalDue += Number(docDue) || 0;
 
-    } catch (error) {
-      console.error('Error:', error);
-      loadingOverlay.style.display = 'none';
-      showToast('Error loading: ' + error.message, true);
-    }
-  }
+            if (feeData.fee_breakdown && feeData.fee_breakdown.tuition) {
+              monthlyFee = feeData.fee_breakdown.tuition;
+            } else if (feeData.fee_breakdown && feeData.fee_breakdown.subtotal) {
+              monthlyFee = feeData.fee_breakdown.subtotal;
+            } else if (feeData.monthlyFee) {
+              monthlyFee = feeData.monthlyFee;
+            }
+            
+            if (feeData.note) feeRemark = feeData.note;
+            if (feeData.remark) feeRemark = feeData.remark;
+          });
 
-  function renderTable() {
-    if (students.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="4" class="no-students-msg">
-        <i class="fas fa-users"></i> No students found.
-      </td></tr>`;
-      return;
-    }
-
-    let html = '';
-    students.forEach((s) => {
-      const rec = attendanceData[s.roll] || { status: '', remark: '' };
-      const status = rec.status || '';
-      const remark = rec.remark || '';
-
-      html += `<tr>
-        <td>
-          <div class="student-name">
-            <i class="fas fa-user-graduate"></i> ${s.name}
-          </div>
-        </td>
-        <td><span class="roll-badge">${s.roll}</span></td>
-        <td>
-          <div class="attendance-actions">
-            <label class="present-option"><input type="radio" name="status_${s.roll}" value="present" ${status==='present'?'checked':''}> P</label>
-            <label class="absent-option"><input type="radio" name="status_${s.roll}" value="absent" ${status==='absent'?'checked':''}> A</label>
-            <label class="leave-option"><input type="radio" name="status_${s.roll}" value="leave" ${status==='leave'?'checked':''}> L</label>
-          </div>
-        </td>
-        <td>
-          <input class="remark-input" type="text" placeholder="..." value="${remark}" data-roll="${s.roll}">
-        </td>
-      </tr>`;
-    });
-    tbody.innerHTML = html;
-
-    document.querySelectorAll('#attendanceTable tbody tr').forEach(row => {
-      const roll = parseInt(row.querySelector('.roll-badge').textContent);
-      
-      const radios = row.querySelectorAll(`input[name="status_${roll}"]`);
-      radios.forEach(r => {
-        r.addEventListener('change', function() {
-          if (this.checked) {
-            attendanceData[roll] = attendanceData[roll] || {};
-            attendanceData[roll].status = this.value;
-            updateSummary();
+          if (!monthlyFee || monthlyFee === 0) {
+            const classNum = studentClass.match(/\d+/);
+            if (classNum) {
+              const cls = parseInt(classNum[0]);
+              if (cls === 10) monthlyFee = 7200;
+              else if (cls === 11 || cls === 12) monthlyFee = 6000;
+              else monthlyFee = 6000;
+            }
           }
-        });
-      });
 
-      const remarkInput = row.querySelector('.remark-input');
-      if (remarkInput) {
-        remarkInput.addEventListener('input', function() {
-          const r = parseInt(this.dataset.roll);
-          attendanceData[r] = attendanceData[r] || {};
-          attendanceData[r].remark = this.value;
-        });
+          paidFee = totalReceived;
+          dueFee = totalDue;
+
+        } else {
+          const classNum = studentClass.match(/\d+/);
+          if (classNum) {
+            const cls = parseInt(classNum[0]);
+            if (cls === 10) monthlyFee = 7200;
+            else if (cls === 11 || cls === 12) monthlyFee = 6000;
+            else monthlyFee = 6000;
+          }
+          paidFee = 0;
+          dueFee = monthlyFee;
+        }
+      } catch (feeErr) {
+        console.warn('Fees fetch error:', feeErr);
+        const classNum = studentClass.match(/\d+/);
+        if (classNum) {
+          const cls = parseInt(classNum[0]);
+          monthlyFee = (cls === 10) ? 7200 : 6000;
+        }
+        dueFee = monthlyFee;
       }
-    });
+
+      // ============================================================
+      // STEP 4: Display everything
+      // ============================================================
+      loadingSpinner.style.display = 'none';
+      coachingHeader.style.display = 'flex';
+      resultCard.style.display = 'block';
+      notFound.style.display = 'none';
+
+      loadStudentPhoto(photoUrl, studentNameVal);
+
+      studentName.textContent = studentNameVal;
+      studentRoll.innerHTML = `<i class="fas fa-id-card"></i> Roll: ${studentRollVal} | Class: ${studentClass}`;
+      todayDateDisplay.textContent = formatDateDisplay(today);
+
+      const statusMap = {
+        present: { label: '✅ Present', class: 'status-present' },
+        absent: { label: '❌ Absent', class: 'status-absent' },
+        leave: { label: '🟡 Leave', class: 'status-leave' },
+        holiday: { label: '🎉 Holiday', class: 'status-holiday' },
+        notmarked: { label: '⏳ Not Marked', class: 'status-notmarked' }
+      };
+      const statusInfo = statusMap[status] || statusMap.notmarked;
+      statusBadge.textContent = statusInfo.label;
+      statusBadge.className = `status-badge ${statusInfo.class}`;
+
+      // ✅ Fees display
+      monthlyFeeDisplay.textContent = `₹${monthlyFee || 0}`;
+      paidFeeDisplay.textContent = `₹${paidFee || 0}`;
+      const finalDue = dueFee || Math.max(0, monthlyFee - paidFee);
+      
+      if (finalDue <= 0) {
+        dueFeeDisplay.textContent = '✅ Paid';
+        dueFeeItem.classList.add('paid-full');
+      } else {
+        dueFeeDisplay.textContent = `₹${finalDue}`;
+        dueFeeItem.classList.remove('paid-full');
+      }
+
+      // ============================================================
+      // 🔥 FIX: Holiday ke case mein remark mat dikhao
+      // ============================================================
+      let displayRemark = 'No remarks';
+
+      if (status === 'holiday') {
+        // Holiday hai — remark skip karo (chahe remark field mein kuch bhi ho)
+        displayRemark = 'No remarks';
+      } else if (remark && remark.trim() !== '' && remark.trim().toLowerCase() !== 'holiday') {
+        // Normal attendance remark (holiday word bhi skip karo)
+        displayRemark = remark;
+      } else if (feeRemark && feeRemark.trim() !== '') {
+        // Fee remark fallback
+        displayRemark = feeRemark;
+      }
+
+      remarkText.textContent = displayRemark;
+
+      // Holiday ke case mein poori remark box hide kar do
+      if (status === 'holiday') {
+        remarkBox.style.display = 'none';
+      } else {
+        remarkBox.style.display = 'flex';
+      }
+
+    } catch (error) {
+      console.error('Error searching student:', error);
+      loadingSpinner.style.display = 'none';
+      showToast('Error searching: ' + error.message, true);
+    } finally {
+      searchBtn.disabled = false;
+      searchBtn.innerHTML = '<i class="fas fa-search"></i> Check Attendance';
+    }
   }
 
-  // 🔥 SAVE HOLIDAY - stores in EVERY student's attendance
-  async function saveHoliday() {
-    if (isSaving) return;
-    
-    const selectedSession = sessionSelect.value;
-    const selectedClass = classSelect.value;
-    const today = getTodayDate();
-    const reason = holidayReason.value.trim() || 'Holiday';
+  detailsBtn.addEventListener('click', function() {
+    if (!currentStudent) {
+      showToast('Please search a student first!', true);
+      return;
+    }
+    const params = new URLSearchParams({
+      session: currentStudent.session,
+      class: currentStudent.className,
+      name: currentStudent.name,
+      roll: currentStudent.roll
+    });
+    window.open(`student-calendar.html?${params.toString()}`, '_blank');
+  });
 
-    if (!selectedSession || !selectedClass) {
-      showToast('Select Session & Class!', true);
+  // ============================================================
+  // 🔥 DOWNLOAD PDF - Calendar Style Layout
+  // ============================================================
+  async function downloadSingleStudentPDF() {
+    if (!currentStudent) {
+      showToast('Please search a student first!', true);
       return;
     }
 
-    if (!holidayReason.value.trim()) {
-      showToast('⚠️ Please enter holiday reason!', true);
-      holidayReason.focus();
-      return;
-    }
-
-    isSaving = true;
-    saveHolidayBtn.disabled = true;
-    saveHolidayBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    downloadPdfBtn.disabled = true;
+    downloadPdfBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
 
     try {
-      // Get all students
-      let studentSnapshot = await db.collection('admissions')
-        .where('classApplying', '==', selectedClass)
-        .where('session', '==', selectedSession)
+      const { jsPDF } = window.jspdf;
+      
+      const doc = new jsPDF({ 
+        orientation: 'portrait', 
+        unit: 'mm', 
+        format: 'a4' 
+      });
+
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonthNum = now.getMonth();
+      const monthName = now.toLocaleString('default', { month: 'long' });
+      const currentDaysInMonth = new Date(currentYear, currentMonthNum + 1, 0).getDate();
+
+      let logoData = LOGO_BASE64;
+      if (!logoData) {
+        try {
+          logoData = await loadImageAsCircularDataURL(COACHING_INFO.logo);
+          LOGO_BASE64 = logoData;
+        } catch (err) {
+          console.warn('Logo load failed:', err);
+        }
+      }
+
+      // Fetch attendance
+      const attendanceSnapshot = await db.collection('attendance')
+        .doc(currentStudent.session)
+        .collection('classes')
+        .doc(currentStudent.className)
+        .collection('students')
+        .doc(currentStudent.name)
+        .collection('attendance')
         .get();
 
-      if (studentSnapshot.empty) {
-        studentSnapshot = await db.collection('admissions')
-          .where('class', '==', selectedClass)
-          .where('session', '==', selectedSession)
-          .get();
-      }
+      const studentMap = {};
+      const holidayReasons = {};
 
-      if (studentSnapshot.empty) {
-        showToast('❌ No students found!', true);
-        saveHolidayBtn.disabled = false;
-        saveHolidayBtn.innerHTML = '<i class="fas fa-calendar-times"></i> Save Holiday';
-        isSaving = false;
-        return;
-      }
-
-      // 🔥 SAVE TO EACH STUDENT'S ATTENDANCE
-      const batch = db.batch();
-      let savedCount = 0;
-
-      studentSnapshot.forEach(doc => {
-        const data = doc.data();
-        const studentName = data.studentName || data.name || 'Unknown';
-        const roll = data.rollNumber || data.rollNo || 0;
-
-        const docRef = db.collection('attendance')
-          .doc(selectedSession)
-          .collection('classes')
-          .doc(selectedClass)
-          .collection('students')
-          .doc(studentName)
-          .collection('attendance')
-          .doc(today);
-
-        batch.set(docRef, {
-          status: 'holiday',
-          holidayReason: reason,
-          remark: reason,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-          roll: roll,
-          date: today,
-          session: selectedSession,
-          class: selectedClass,
-          isHoliday: true
-        });
-        savedCount++;
+      attendanceSnapshot.forEach(doc => {
+        const dateParts = doc.id.split('-');
+        if (dateParts.length === 3) {
+          const docYear = parseInt(dateParts[0]);
+          const docMonth = parseInt(dateParts[1]) - 1;
+          const docDay = parseInt(dateParts[2]);
+          
+          if (docYear === currentYear && docMonth === currentMonthNum) {
+            const data = doc.data();
+            const status = data.status || '';
+            let cell = '';
+            if (status === 'present') cell = 'P';
+            else if (status === 'absent') cell = 'A';
+            else if (status === 'leave') cell = 'L';
+            else if (status === 'holiday') {
+              cell = 'H';
+              holidayReasons[docDay] = data.holidayReason || data.remark || 'Holiday';
+            }
+            studentMap[docDay] = cell;
+          }
+        }
       });
 
-      await batch.commit();
-
-      isHolidaySaved = true;
-      showToast(`🎉 Holiday saved for ${savedCount} students!`);
-      
-      saveHolidayBtn.innerHTML = '<i class="fas fa-check"></i> Saved';
-      saveHolidayBtn.style.background = '#10b981';
-      
-      holidayTitle.textContent = '🎉 Holiday Saved!';
-      holidaySubtitle.textContent = `Applied to all ${savedCount} students`;
-      holidayReasonDisplay.textContent = reason.toUpperCase();
-      
-      setTimeout(() => {
-        classHolidayCheck.checked = false;
-        holidayReasonGroup.style.display = 'none';
-        saveHolidayBtn.style.display = 'none';
-        saveBtn.style.display = 'none';
-        saveBtnContainer.style.display = 'none';
-        holidayMsg.style.display = 'block';
-        holidayTitle.textContent = '🎉 Holiday Already Saved!';
-        holidaySubtitle.textContent = 'No attendance was marked on this day';
-      }, 1500);
-      
-    } catch (error) {
-      console.error('Error saving holiday:', error);
-      showToast('❌ Error: ' + error.message, true);
-      saveHolidayBtn.disabled = false;
-      saveHolidayBtn.innerHTML = '<i class="fas fa-calendar-times"></i> Save Holiday';
-    } finally {
-      isSaving = false;
-    }
-  }
-
-  async function saveAttendance() {
-    if (isSaving) return;
-    if (students.length === 0) {
-      showToast('No students to save!', true);
-      return;
-    }
-
-    const selectedSession = sessionSelect.value;
-    const selectedClass = classSelect.value;
-    const today = getTodayDate();
-
-    isSaving = true;
-    saveBtn.disabled = true;
-    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-
-    try {
-      const batch = db.batch();
-      let savedCount = 0;
-
-      for (const student of students) {
-        const rec = attendanceData[student.roll] || { status: '', remark: '' };
-        
-        const docRef = db.collection('attendance')
-          .doc(selectedSession)
-          .collection('classes')
-          .doc(selectedClass)
-          .collection('students')
-          .doc(student.name)
-          .collection('attendance')
-          .doc(today);
-
-        batch.set(docRef, {
-          status: rec.status || '',
-          remark: rec.remark || '',
-          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-          roll: student.roll,
-          date: today,
-          session: selectedSession,
-          class: selectedClass
-        });
-        savedCount++;
+      // Student photo
+      let studentPhotoData = null;
+      if (currentStudent.photoUrl) {
+        try {
+          studentPhotoData = await loadImageAsCircularDataURL(currentStudent.photoUrl);
+        } catch (e) {
+          console.warn('Student photo load failed');
+        }
       }
 
-      await batch.commit();
-      showToast(`✅ Attendance saved for ${savedCount} students!`);
-      setTimeout(() => handleClassSelect(), 500);
+      // ============================================================
+      // 1) HEADER - CENTERED
+      // ============================================================
+      const headerHeight = 32;
+      doc.setFillColor(26, 35, 126);
+      doc.rect(0, 0, pageWidth, headerHeight, 'F');
+
+      doc.setFillColor(255, 193, 7);
+      doc.rect(0, headerHeight, pageWidth, 1, 'F');
+
+      const logoSize = 20;
+      const gap = 5;
+      const titleWidth = 65;
+      const totalWidth = logoSize + gap + titleWidth;
+      const blockStartX = pageWidth / 2 - totalWidth / 2;
+      const blockStartY = 4;
+
+      const logoX = blockStartX;
+      const logoY = blockStartY + 1;
+      const logoCenterX = logoX + logoSize / 2;
+      const logoCenterY = logoY + logoSize / 2;
+
+      doc.setFillColor(255, 193, 7);
+      doc.circle(logoCenterX, logoCenterY, logoSize / 2 + 0.7, 'F');
+
+      if (logoData) {
+        try {
+          doc.addImage(logoData, 'PNG', logoX, logoY, logoSize, logoSize, undefined, 'FAST');
+        } catch (e) {
+          doc.setTextColor(26, 35, 126);
+          doc.setFontSize(14);
+          doc.setFont('helvetica', 'bold');
+          doc.text('Q', logoCenterX, logoCenterY + 2.5, { align: 'center' });
+        }
+      }
+
+      const textX = logoX + logoSize + gap;
+      const textY = blockStartY + 4;
+
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(13);
+      doc.setFont('helvetica', 'bold');
+      doc.text(COACHING_INFO.name, textX, textY);
+
+      doc.setFontSize(7.5);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(255, 193, 7);
+      doc.text(`${COACHING_INFO.directorTitle}: ${COACHING_INFO.director}`, textX, textY + 5);
+
+      doc.setFontSize(6.5);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(255, 255, 255);
+      doc.text(COACHING_INFO.address, textX, textY + 9.5);
+      doc.text(COACHING_INFO.phone, textX, textY + 13);
+
+      // ============================================================
+      // 2) STUDENT DETAILS AREA
+      // ============================================================
+      const detailsY = headerHeight + 4;
+      const detailsHeight = 32;
+
+      doc.setFillColor(248, 250, 252);
+      doc.roundedRect(10, detailsY, pageWidth - 20, detailsHeight, 2, 2, 'F');
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(0.5);
+      doc.roundedRect(10, detailsY, pageWidth - 20, detailsHeight, 2, 2, 'S');
+
+      const photoSize = 22;
+      const photoX = 15;
+      const photoY = detailsY + 5;
+      const photoCenterX = photoX + photoSize / 2;
+      const photoCenterY = photoY + photoSize / 2;
+
+      doc.setFillColor(255, 193, 7);
+      doc.circle(photoCenterX, photoCenterY, photoSize / 2 + 0.8, 'F');
+
+      if (studentPhotoData) {
+        try {
+          doc.addImage(studentPhotoData, 'PNG', photoX, photoY, photoSize, photoSize, undefined, 'FAST');
+        } catch (e) {
+          doc.setFillColor(232, 240, 254);
+          doc.circle(photoCenterX, photoCenterY, photoSize / 2, 'F');
+          doc.setTextColor(10, 42, 102);
+          doc.setFontSize(14);
+          doc.setFont('helvetica', 'bold');
+          doc.text(currentStudent.name.charAt(0).toUpperCase(), photoCenterX, photoCenterY + 3, { align: 'center' });
+        }
+      } else {
+        doc.setFillColor(232, 240, 254);
+        doc.circle(photoCenterX, photoCenterY, photoSize / 2, 'F');
+        doc.setTextColor(10, 42, 102);
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text(currentStudent.name.charAt(0).toUpperCase(), photoCenterX, photoCenterY + 3, { align: 'center' });
+      }
+
+      const infoX = photoX + photoSize + 5;
+      const infoY = detailsY + 7;
+
+      doc.setTextColor(10, 42, 102);
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.text(currentStudent.name, infoX, infoY);
+
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(71, 85, 105);
+      doc.text(`Roll No: ${currentStudent.roll}   |   Class: ${currentStudent.className}   |   Session: ${currentStudent.session}`, infoX, infoY + 5);
+      doc.text(`Father's Name: ${currentStudent.fatherName || 'N/A'}`, infoX, infoY + 10);
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(99, 102, 241);
+      doc.setFontSize(9);
+      doc.text(`Month: ${monthName} ${currentYear}`, infoX, infoY + 16);
+
+      // ============================================================
+      // 3) CALENDAR-STYLE ATTENDANCE AREA
+      // ============================================================
+      const calendarY = detailsY + detailsHeight + 6;
+      
+      doc.setFillColor(40, 53, 147);
+      doc.rect(10, calendarY, pageWidth - 20, 8, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.text('📅 ATTENDANCE CALENDAR', pageWidth / 2, calendarY + 5.5, { align: 'center' });
+
+      const gridStartY = calendarY + 10;
+      const gridLeft = 10;
+      const gridWidth = pageWidth - 20;
+      const colWidth = gridWidth / 7;
+      const rowHeight = 12;
+
+      const dayHeaders = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+      
+      doc.setFillColor(26, 35, 126);
+      doc.rect(gridLeft, gridStartY, gridWidth, 7, 'F');
+      
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'bold');
+      
+      dayHeaders.forEach((dh, idx) => {
+        const x = gridLeft + idx * colWidth + colWidth / 2;
+        doc.text(dh, x, gridStartY + 4.5, { align: 'center' });
+      });
+
+      const firstDayOfWeek = new Date(currentYear, currentMonthNum, 1).getDay();
+      const totalRows = Math.ceil((firstDayOfWeek + currentDaysInMonth) / 7);
+      
+      for (let row = 0; row < totalRows; row++) {
+        const rowY = gridStartY + 7 + row * rowHeight;
+        
+        for (let col = 0; col < 7; col++) {
+          const cellX = gridLeft + col * colWidth;
+          const dayIndex = row * 7 + col;
+          const dayNum = dayIndex - firstDayOfWeek + 1;
+          
+          doc.setDrawColor(203, 213, 225);
+          doc.setLineWidth(0.2);
+          doc.rect(cellX, rowY, colWidth, rowHeight);
+          
+          if (dayNum >= 1 && dayNum <= currentDaysInMonth) {
+            const status = studentMap[dayNum] || '';
+            const dateObj = new Date(currentYear, currentMonthNum, dayNum);
+            const isSunday = dateObj.getDay() === 0;
+            
+            if (status === 'P') {
+              doc.setFillColor(209, 250, 229);
+              doc.rect(cellX + 0.2, rowY + 0.2, colWidth - 0.4, rowHeight - 0.4, 'F');
+            } else if (status === 'A') {
+              doc.setFillColor(254, 226, 226);
+              doc.rect(cellX + 0.2, rowY + 0.2, colWidth - 0.4, rowHeight - 0.4, 'F');
+            } else if (status === 'L') {
+              doc.setFillColor(254, 243, 199);
+              doc.rect(cellX + 0.2, rowY + 0.2, colWidth - 0.4, rowHeight - 0.4, 'F');
+            } else if (status === 'H') {
+              doc.setFillColor(224, 231, 255);
+              doc.rect(cellX + 0.2, rowY + 0.2, colWidth - 0.4, rowHeight - 0.4, 'F');
+            } else if (isSunday) {
+              doc.setFillColor(248, 250, 252);
+              doc.rect(cellX + 0.2, rowY + 0.2, colWidth - 0.4, rowHeight - 0.4, 'F');
+            }
+            
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(71, 85, 105);
+            doc.text(String(dayNum), cellX + 1.5, rowY + 3.5);
+            
+            if (status) {
+              doc.setFontSize(10);
+              doc.setFont('helvetica', 'bold');
+              
+              if (status === 'P') doc.setTextColor(6, 95, 70);
+              else if (status === 'A') doc.setTextColor(153, 27, 27);
+              else if (status === 'L') doc.setTextColor(146, 64, 14);
+              else if (status === 'H') doc.setTextColor(55, 48, 163);
+              
+              doc.text(status, cellX + colWidth / 2, rowY + rowHeight / 2 + 3, { align: 'center' });
+            }
+          } else {
+            doc.setFillColor(250, 250, 250);
+            doc.rect(cellX + 0.2, rowY + 0.2, colWidth - 0.4, rowHeight - 0.4, 'F');
+          }
+        }
+      }
+
+      // ============================================================
+      // 4) SUMMARY AREA
+      // ============================================================
+      let presentCount = 0, absentCount = 0, leaveCount = 0, holidayCount = 0;
+      Object.values(studentMap).forEach(s => {
+        if (s === 'P') presentCount++;
+        else if (s === 'A') absentCount++;
+        else if (s === 'L') leaveCount++;
+        else if (s === 'H') holidayCount++;
+      });
+
+      const summaryY = gridStartY + 7 + totalRows * rowHeight + 6;
+
+      doc.setFillColor(40, 53, 147);
+      doc.rect(10, summaryY, pageWidth - 20, 8, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.text('📊 MONTHLY SUMMARY', pageWidth / 2, summaryY + 5.5, { align: 'center' });
+
+      const boxY = summaryY + 10;
+      const boxWidth = (pageWidth - 20 - 9) / 4;
+      const boxHeight = 18;
+      const gap3 = 3;
+
+      const pX = 10;
+      doc.setFillColor(209, 250, 229);
+      doc.roundedRect(pX, boxY, boxWidth, boxHeight, 2, 2, 'F');
+      doc.setDrawColor(16, 185, 129);
+      doc.setLineWidth(0.5);
+      doc.roundedRect(pX, boxY, boxWidth, boxHeight, 2, 2, 'S');
+      doc.setTextColor(6, 95, 70);
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'bold');
+      doc.text('PRESENT', pX + boxWidth / 2, boxY + 6, { align: 'center' });
+      doc.setFontSize(14);
+      doc.text(String(presentCount), pX + boxWidth / 2, boxY + 15, { align: 'center' });
+
+      const aX = pX + boxWidth + gap3;
+      doc.setFillColor(254, 226, 226);
+      doc.roundedRect(aX, boxY, boxWidth, boxHeight, 2, 2, 'F');
+      doc.setDrawColor(220, 53, 69);
+      doc.roundedRect(aX, boxY, boxWidth, boxHeight, 2, 2, 'S');
+      doc.setTextColor(153, 27, 27);
+      doc.setFontSize(7);
+      doc.text('ABSENT', aX + boxWidth / 2, boxY + 6, { align: 'center' });
+      doc.setFontSize(14);
+      doc.text(String(absentCount), aX + boxWidth / 2, boxY + 15, { align: 'center' });
+
+      const lX = aX + boxWidth + gap3;
+      doc.setFillColor(254, 243, 199);
+      doc.roundedRect(lX, boxY, boxWidth, boxHeight, 2, 2, 'F');
+      doc.setDrawColor(245, 158, 11);
+      doc.roundedRect(lX, boxY, boxWidth, boxHeight, 2, 2, 'S');
+      doc.setTextColor(146, 64, 14);
+      doc.setFontSize(7);
+      doc.text('LEAVE', lX + boxWidth / 2, boxY + 6, { align: 'center' });
+      doc.setFontSize(14);
+      doc.text(String(leaveCount), lX + boxWidth / 2, boxY + 15, { align: 'center' });
+
+      const hX = lX + boxWidth + gap3;
+      doc.setFillColor(224, 231, 255);
+      doc.roundedRect(hX, boxY, boxWidth, boxHeight, 2, 2, 'F');
+      doc.setDrawColor(99, 102, 241);
+      doc.roundedRect(hX, boxY, boxWidth, boxHeight, 2, 2, 'S');
+      doc.setTextColor(55, 48, 163);
+      doc.setFontSize(7);
+      doc.text('HOLIDAY', hX + boxWidth / 2, boxY + 6, { align: 'center' });
+      doc.setFontSize(14);
+      doc.text(String(holidayCount), hX + boxWidth / 2, boxY + 15, { align: 'center' });
+
+      // ============================================================
+      // 5) HOLIDAYS LIST (if any)
+      // ============================================================
+      const holidayDays = Object.keys(holidayReasons).sort((a, b) => parseInt(a) - parseInt(b));
+
+      if (holidayDays.length > 0) {
+        const holidayListY = boxY + boxHeight + 5;
+        const holidayText = holidayDays.map(d => `${d} - ${holidayReasons[d]}`).join('  |  ');
+        
+        doc.setFillColor(224, 231, 255);
+        const lines = doc.splitTextToSize(holidayText, pageWidth - 40);
+        const boxH = 6 + lines.length * 4;
+
+        doc.roundedRect(10, holidayListY, pageWidth - 20, boxH, 2, 2, 'F');
+        doc.setDrawColor(99, 102, 241);
+        doc.setLineWidth(0.5);
+        doc.roundedRect(10, holidayListY, pageWidth - 20, boxH, 2, 2, 'S');
+        
+        doc.setTextColor(55, 48, 163);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.text('🎉 Holidays:', 13, holidayListY + 4.5);
+        
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7);
+        let lineY = holidayListY + 4.5;
+        lines.forEach(line => {
+          doc.text(line, 34, lineY);
+          lineY += 4;
+        });
+      }
+
+      // ============================================================
+      // 6) FOOTER
+      // ============================================================
+      const footerY = pageHeight - 10;
+      
+      doc.setDrawColor(180, 180, 180);
+      doc.setLineWidth(0.3);
+      doc.line(8, footerY - 3, pageWidth - 8, footerY - 3);
+
+      doc.setFontSize(6.5);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(40, 53, 147);
+      doc.text('Legend:', 10, footerY);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 100, 100);
+      doc.text('P = Present  |  A = Absent  |  L = Leave  |  H = Holiday  |  (blank) = Not Marked', 24, footerY);
+
+      doc.setFontSize(6);
+      doc.setTextColor(150, 150, 150);
+      doc.text(
+        `Generated: ${new Date().toLocaleString('en-IN')}`,
+        pageWidth - 10,
+        footerY + 4,
+        { align: 'right' }
+      );
+
+      doc.setFillColor(255, 193, 7);
+      doc.rect(0, pageHeight - 3, pageWidth, 3, 'F');
+
+      doc.save(`Attendance_${currentStudent.name}_${monthName}_${currentYear}.pdf`);
+      showToast('📥 PDF downloaded successfully!');
 
     } catch (error) {
-      console.error('Error:', error);
+      console.error('PDF error:', error);
       showToast('❌ Error: ' + error.message, true);
     } finally {
-      isSaving = false;
-      saveBtn.disabled = false;
-      saveBtn.innerHTML = '<i class="fas fa-save"></i> Save';
+      downloadPdfBtn.disabled = false;
+      downloadPdfBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Download PDF';
     }
   }
 
-  async function init() {
-    updateDateDisplay();
-    sessionSelect.value = '2026-27';
-    await handleClassSelect();
-  }
+  downloadPdfBtn.addEventListener('click', downloadSingleStudentPDF);
 
-  classSelect.addEventListener('change', function() {
-    if (!classHolidayCheck.checked) handleClassSelect();
+  searchBtn.addEventListener('click', searchStudent);
+  rollInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') searchStudent();
   });
 
-  sessionSelect.addEventListener('change', function() {
-    if (!classHolidayCheck.checked) handleClassSelect();
+  window.addEventListener('load', function() {
+    rollInput.focus();
+    preloadLogo();
   });
 
-  classHolidayCheck.addEventListener('change', handleClassHoliday);
-
-  holidayReason.addEventListener('input', function() {
-    const reason = this.value.trim() || 'Holiday';
-    holidayReasonDisplay.textContent = reason.toUpperCase();
-  });
-
-  saveBtn.addEventListener('click', saveAttendance);
-  saveHolidayBtn.addEventListener('click', saveHoliday);
-
-  refreshBtn.addEventListener('click', function() {
-    if (!classHolidayCheck.checked) handleClassSelect();
-    showToast('🔄 Refreshed!');
-  });
-
-  setInterval(updateDateDisplay, 60000);
-
-  auth.onAuthStateChanged((user) => {
-    if (!user) {
-      showToast('⚠️ Please login!', true);
-      setTimeout(() => window.location.href = 'index.html', 2000);
-      return;
-    }
-    init();
-  });
-
-  console.log('✅ Attendance System Loaded!');
-  console.log('📌 Holiday saved to students section');
+  console.log('✅ Parent View Loaded with Fees + Holiday Fix!');
 </script>
 </body>
 </html>
