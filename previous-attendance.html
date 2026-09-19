@@ -1324,9 +1324,9 @@
   });
 
   // ============================================================
-  // 🔥 HELPER: Draw Header on a PDF page
+  // 🔥 HEADER on every page (NO roll range)
   // ============================================================
-  function drawHeaderOnPage(doc, pageWidth, logoData, pageNum, totalPages, rollRange) {
+  function drawHeaderOnPage(doc, pageWidth, logoData, pageNum, totalPages) {
     const centerX = pageWidth / 2;
     const monthName = new Date(currentYear, currentMonthNum).toLocaleString('default', { month: 'long' });
 
@@ -1406,34 +1406,26 @@
       { align: 'center' }
     );
 
-    // ===== SUB INFO BAR (with page number + roll range) =====
+    // ===== SUB INFO BAR =====
     doc.setFillColor(240, 245, 255);
-    doc.rect(0, 45.5, pageWidth, 10, 'F');
+    doc.rect(0, 45.5, pageWidth, 8, 'F');
     
     doc.setTextColor(40, 53, 147);
-    doc.setFontSize(7.5);
+    doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     
-    let infoLine = `Class: ${currentClass}   |   Session: ${currentSession}   |   Total Students: ${studentsList.length}   |   Page ${pageNum} of ${totalPages}`;
-    doc.text(infoLine, pageWidth / 2, 49.5, { align: 'center' });
+    doc.text(
+      `Class: ${currentClass}   |   Session: ${currentSession}   |   Total Students: ${studentsList.length}   |   Page ${pageNum} of ${totalPages}`,
+      pageWidth / 2,
+      50.5,
+      { align: 'center' }
+    );
 
-    // 🔥 Roll range line
-    if (rollRange && rollRange.start && rollRange.end) {
-      doc.setFontSize(7);
-      doc.setTextColor(220, 38, 38);
-      doc.text(
-        `Roll Numbers on this page: ${rollRange.start} to ${rollRange.end}  (${rollRange.count} students)`,
-        pageWidth / 2,
-        53.5,
-        { align: 'center' }
-      );
-    }
-
-    return 57; // Table start Y
+    return 55;
   }
 
   // ============================================================
-  // 🔥 HELPER: Draw Footer on a PDF page
+  // 🔥 FOOTER on every page
   // ============================================================
   function drawFooterOnPage(doc, pageWidth, pageHeight, pageNum, totalPages) {
     const footerY = pageHeight - 8;
@@ -1481,7 +1473,7 @@
   }
 
   // ============================================================
-  // 🔥 PDF GENERATOR - Header on EVERY page
+  // 🔥 PDF GENERATOR - Header every page + Holidays on last page
   // ============================================================
   async function generateRealPDF(action = 'download') {
     if (studentsList.length === 0) { showToast('No data!', true); return; }
@@ -1538,13 +1530,10 @@
       };
     }
 
-    // 🔥 Store page roll ranges
-    const pageRollRanges = {};
-
     doc.autoTable({
       head: [headRow],
       body: bodyRows,
-      startY: 57,
+      startY: 55,
       theme: 'grid',
       styles: {
         fontSize: 7,
@@ -1563,31 +1552,15 @@
         cellPadding: 1.5
       },
       columnStyles: columnStyles,
-      margin: { left: 5, right: 5, top: 57, bottom: 15 },
-      // 🔥 Custom header/footer for EVERY page
+      margin: { left: 5, right: 5, top: 55, bottom: 15 },
       didDrawPage: function(data) {
-        // Current page
         const currentPageNum = doc.internal.getCurrentPageInfo().pageNumber;
-
-        // Roll range for this page
-        const pageData = data.table.body;
-        let rollRange = null;
-        if (pageData.length > 0) {
-          rollRange = {
-            start: pageData[0].cells[1].text,
-            end: pageData[pageData.length - 1].cells[1].text,
-            count: pageData.length
-          };
-          pageRollRanges[currentPageNum] = rollRange;
-        }
-
-        // Total pages
         const totalPages = doc.internal.getNumberOfPages();
 
-        // 🔥 Draw header (with logo + coaching details + page info)
-        drawHeaderOnPage(doc, pageWidth, logoData, currentPageNum, totalPages, rollRange);
+        // 🔥 Header on EVERY page (no roll range)
+        drawHeaderOnPage(doc, pageWidth, logoData, currentPageNum, totalPages);
 
-        // 🔥 Draw footer
+        // 🔥 Footer on EVERY page
         drawFooterOnPage(doc, pageWidth, pageHeight, currentPageNum, totalPages);
       },
       didParseCell: function(data) {
@@ -1611,6 +1584,53 @@
         }
       }
     });
+
+    // ============================================================
+    // 🔥 HOLIDAY REASONS ON LAST PAGE
+    // ============================================================
+    const holidayDays = Object.keys(holidayReasons).sort((a, b) => parseInt(a) - parseInt(b));
+    
+    if (holidayDays.length > 0) {
+      const lastPageNum = doc.internal.getNumberOfPages();
+      doc.setPage(lastPageNum);
+      
+      const finalY = doc.lastAutoTable.finalY + 8;
+      
+      // Build holiday text
+      let holidayText = holidayDays.map(d => `${d} - ${holidayReasons[d]}`).join('   |   ');
+      
+      // Estimate box height
+      const maxWidth = pageWidth - 34;
+      doc.setFontSize(8);
+      const lines = doc.splitTextToSize(holidayText, maxWidth);
+      const boxHeight = 8 + lines.length * 5;
+
+      // 🔥 Holiday Box
+      doc.setFillColor(224, 231, 255); // Light purple
+      doc.roundedRect(10, finalY, pageWidth - 20, boxHeight, 3, 3, 'F');
+      
+      // Border
+      doc.setDrawColor(99, 102, 241);
+      doc.setLineWidth(0.5);
+      doc.roundedRect(10, finalY, pageWidth - 20, boxHeight, 3, 3, 'S');
+      
+      // Title
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(55, 48, 163);
+      doc.text('🎉 HOLIDAYS THIS MONTH:', 14, finalY + 5);
+      
+      // Holiday list
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(55, 48, 163);
+      
+      let lineY = finalY + 10;
+      lines.forEach(line => {
+        doc.text(line, 14, lineY);
+        lineY += 5;
+      });
+    }
 
     // ===== OUTPUT =====
     if (action === 'download') {
@@ -1664,7 +1684,7 @@
 
   init();
   console.log('✅ Previous Attendance Page Loaded!');
-  console.log('📌 PDF: Full header on EVERY page + Roll range info');
+  console.log('📌 PDF: Header on every page + Holidays on last page');
 </script>
 </body>
 </html>
