@@ -602,7 +602,6 @@
 
 <div class="container">
 
-  <!-- COACHING HEADER -->
   <div class="coaching-header">
     <div class="logo-circle">
       <img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" alt="Quest Coaching Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=&quot;color:#1a237e;font-weight:900;font-size:1.8rem;&quot;>Q</span>';">
@@ -673,7 +672,6 @@
     <div class="sub-info" id="monthTitleSub">Class: -- | Session: --</div>
   </div>
 
-  <!-- 🔥 HOLIDAY REASONS LIST -->
   <div class="holiday-list" id="holidayList">
     <div class="holiday-list-title">
       <i class="fas fa-calendar-times"></i> Holidays This Month
@@ -815,7 +813,7 @@
   let currentDaysInMonth = 0;
   let studentsList = [];
   let attendanceMatrix = {};
-  let holidayReasons = {}; // 🔥 { day: "Sunday" }
+  let holidayReasons = {};
   let originalMatrix = {};
   let isEditMode = false;
   let changedCells = new Set();
@@ -937,7 +935,7 @@
       updateProgress(30, `Found ${studentsList.length} students. Fetching attendance...`);
 
       attendanceMatrix = {};
-      holidayReasons = {}; // 🔥 Reset
+      holidayReasons = {};
 
       const studentPromises = studentsList.map(async (student) => {
         try {
@@ -951,7 +949,7 @@
             .get();
 
           const studentMap = {};
-          const studentHolidayReasons = {}; // 🔥
+          const studentHolidayReasons = {};
 
           attendanceSnapshot.forEach(doc => {
             const dateParts = doc.id.split('-');
@@ -969,7 +967,6 @@
                 else if (status === 'leave') cell = 'L';
                 else if (status === 'holiday') {
                   cell = 'H';
-                  // 🔥 Capture holiday reason
                   studentHolidayReasons[docDay] = data.holidayReason || data.remark || 'Holiday';
                 }
                 studentMap[docDay] = cell;
@@ -1001,7 +998,6 @@
       results.forEach(r => {
         attendanceMatrix[r.roll] = r.data;
         
-        // 🔥 Capture holiday reasons from any student
         if (r.holidayReasons) {
           Object.keys(r.holidayReasons).forEach(day => {
             if (!holidayReasons[day]) {
@@ -1079,7 +1075,6 @@
         else if (cell === 'H') { 
           cellClass = 'cell-H'; 
           totalHCount++;
-          // 🔥 Add tooltip with reason
           if (holidayReasons[day]) {
             cellTitle = ` title="🎉 Holiday: ${holidayReasons[day]}"`;
           }
@@ -1108,7 +1103,6 @@
     totalL.textContent = totalLCount;
     totalH.textContent = totalHCount;
 
-    // 🔥 Render holiday list
     renderHolidayList();
 
     if (isEditMode) {
@@ -1116,7 +1110,6 @@
     }
   }
 
-  // 🔥 RENDER HOLIDAY LIST
   function renderHolidayList() {
     const holidays = Object.keys(holidayReasons).sort((a, b) => parseInt(a) - parseInt(b));
     
@@ -1306,7 +1299,6 @@
             class: currentClass
           };
           
-          // 🔥 If holiday, preserve/add holidayReason
           if (status === 'holiday') {
             updateData.holidayReason = holidayReasons[day] || 'Holiday';
             updateData.remark = holidayReasons[day] || 'Holiday';
@@ -1340,7 +1332,7 @@
   });
 
   // ============================================================
-  // PDF GENERATOR
+  // 🔥 PDF GENERATOR - Header on EVERY page
   // ============================================================
   async function generateRealPDF(action = 'download') {
     if (studentsList.length === 0) { showToast('No data!', true); return; }
@@ -1368,93 +1360,7 @@
       }
     }
 
-    // HEADER BANNER
-    const headerHeight = 34;
-    doc.setFillColor(26, 35, 126);
-    doc.rect(0, 0, pageWidth, headerHeight, 'F');
-
-    // CENTERED LOGO + TEXT
-    const logoSize = 22;
-    const gapBetweenLogoText = 6;
-    const titleWidth = 68;
-    const totalWidth = logoSize + gapBetweenLogoText + titleWidth;
-    const blockStartX = centerX - (totalWidth / 2);
-    const blockStartY = 5;
-
-    const logoX = blockStartX;
-    const logoY = blockStartY + 1;
-    const logoCenterX = logoX + logoSize / 2;
-    const logoCenterY = logoY + logoSize / 2;
-
-    doc.setFillColor(255, 193, 7);
-    doc.circle(logoCenterX, logoCenterY, logoSize / 2 + 0.8, 'F');
-
-    if (logoData) {
-      try {
-        doc.addImage(logoData, 'PNG', logoX, logoY, logoSize, logoSize, undefined, 'FAST');
-      } catch (e) {
-        doc.setTextColor(26, 35, 126);
-        doc.setFontSize(16);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Q', logoCenterX, logoCenterY + 3, { align: 'center' });
-      }
-    } else {
-      doc.setFillColor(255, 255, 255);
-      doc.circle(logoCenterX, logoCenterY, logoSize / 2, 'F');
-      doc.setTextColor(26, 35, 126);
-      doc.setFontSize(16);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Q', logoCenterX, logoCenterY + 3, { align: 'center' });
-    }
-
-    const textX = logoX + logoSize + gapBetweenLogoText;
-    const textY = blockStartY + 4;
-
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(15);
-    doc.setFont('helvetica', 'bold');
-    doc.text(COACHING_INFO.name, textX, textY);
-
-    doc.setFontSize(8.5);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(255, 193, 7);
-    doc.text(`${COACHING_INFO.directorTitle}: ${COACHING_INFO.director}`, textX, textY + 5.5);
-
-    doc.setFontSize(7.5);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(255, 255, 255);
-    doc.text(COACHING_INFO.address, textX, textY + 10.5);
-    doc.text(COACHING_INFO.phone, textX, textY + 14.5);
-
-    // REPORT TITLE BANNER
-    doc.setFillColor(40, 53, 147);
-    doc.rect(0, 36, pageWidth, 11, 'F');
-    
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(13);
-    doc.setFont('helvetica', 'bold');
-    doc.text(
-      `Monthly Attendance Register - ${monthName} ${currentYear}`,
-      pageWidth / 2,
-      43.5,
-      { align: 'center' }
-    );
-
-    // SUB INFO BAR
-    doc.setFillColor(240, 245, 255);
-    doc.rect(0, 47, pageWidth, 7, 'F');
-    
-    doc.setTextColor(40, 53, 147);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    doc.text(
-      `Class: ${currentClass}   |   Session: ${currentSession}   |   Total Students: ${studentsList.length}   |   Editable Days: ${editableDays.size}   |   Locked Days: ${lockedDays.size}`,
-      pageWidth / 2,
-      51.5,
-      { align: 'center' }
-    );
-
-    // TABLE
+    // TABLE DATA
     const headRow = ['Student Name', 'Roll'];
     for (let day = 1; day <= currentDaysInMonth; day++) {
       headRow.push(String(day));
@@ -1483,6 +1389,7 @@
       };
     }
 
+    // 🔥 AutoTable with didDrawPage hook
     doc.autoTable({
       head: [headRow],
       body: bodyRows,
@@ -1505,7 +1412,7 @@
         cellPadding: 1.5
       },
       columnStyles: columnStyles,
-      margin: { left: 5, right: 5, top: 56, bottom: 15 },
+      margin: { left: 5, right: 5, top: 56, bottom: 20 },
       didParseCell: function(data) {
         if (data.section === 'body' && data.column.index >= 2) {
           const value = data.cell.raw;
@@ -1525,48 +1432,157 @@
             data.cell.styles.fillColor = [250, 250, 250];
           }
         }
+      },
+      // 🔥🔥🔥 THE MAGIC: HEADER ON EVERY PAGE
+      didDrawPage: function(data) {
+        const pageNum = doc.internal.getCurrentPageInfo().pageNumber;
+        
+        // ============================================================
+        // HEADER BANNER
+        // ============================================================
+        const headerHeight = 34;
+        doc.setFillColor(26, 35, 126);
+        doc.rect(0, 0, pageWidth, headerHeight, 'F');
+
+        const logoSize = 22;
+        const gapBetweenLogoText = 6;
+        const titleWidth = 68;
+        const totalWidth = logoSize + gapBetweenLogoText + titleWidth;
+        const blockStartX = centerX - (totalWidth / 2);
+        const blockStartY = 5;
+
+        const logoX = blockStartX;
+        const logoY = blockStartY + 1;
+        const logoCenterX = logoX + logoSize / 2;
+        const logoCenterY = logoY + logoSize / 2;
+
+        doc.setFillColor(255, 193, 7);
+        doc.circle(logoCenterX, logoCenterY, logoSize / 2 + 0.8, 'F');
+
+        if (logoData) {
+          try {
+            doc.addImage(logoData, 'PNG', logoX, logoY, logoSize, logoSize, undefined, 'FAST');
+          } catch (e) {
+            doc.setTextColor(26, 35, 126);
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Q', logoCenterX, logoCenterY + 3, { align: 'center' });
+          }
+        } else {
+          doc.setFillColor(255, 255, 255);
+          doc.circle(logoCenterX, logoCenterY, logoSize / 2, 'F');
+          doc.setTextColor(26, 35, 126);
+          doc.setFontSize(16);
+          doc.setFont('helvetica', 'bold');
+          doc.text('Q', logoCenterX, logoCenterY + 3, { align: 'center' });
+        }
+
+        const textX = logoX + logoSize + gapBetweenLogoText;
+        const textY = blockStartY + 4;
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(15);
+        doc.setFont('helvetica', 'bold');
+        doc.text(COACHING_INFO.name, textX, textY);
+
+        doc.setFontSize(8.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(255, 193, 7);
+        doc.text(`${COACHING_INFO.directorTitle}: ${COACHING_INFO.director}`, textX, textY + 5.5);
+
+        doc.setFontSize(7.5);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(255, 255, 255);
+        doc.text(COACHING_INFO.address, textX, textY + 10.5);
+        doc.text(COACHING_INFO.phone, textX, textY + 14.5);
+
+        // REPORT TITLE BANNER
+        doc.setFillColor(40, 53, 147);
+        doc.rect(0, 36, pageWidth, 11, 'F');
+        
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text(
+          `Monthly Attendance Register - ${monthName} ${currentYear}`,
+          pageWidth / 2,
+          43.5,
+          { align: 'center' }
+        );
+
+        // SUB INFO BAR with Roll Range
+        doc.setFillColor(240, 245, 255);
+        doc.rect(0, 47, pageWidth, 7, 'F');
+        
+        doc.setTextColor(40, 53, 147);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        
+        // Roll range for this page
+        let rollRangeText = '';
+        if (data.table && data.table.body && data.table.body.length > 0) {
+          const firstRow = data.table.body[0];
+          const lastRow = data.table.body[data.table.body.length - 1];
+          const firstRoll = firstRow?.cells?.[1]?.raw || '';
+          const lastRoll = lastRow?.cells?.[1]?.raw || '';
+          
+          if (firstRoll === lastRoll) {
+            rollRangeText = `Roll: ${firstRoll}`;
+          } else {
+            rollRangeText = `Roll: ${firstRoll} - ${lastRoll} (${data.table.body.length} students)`;
+          }
+        }
+        
+        doc.text(
+          `Class: ${currentClass}   |   Session: ${currentSession}   |   Total: ${studentsList.length}   |   ${rollRangeText}`,
+          pageWidth / 2,
+          51.5,
+          { align: 'center' }
+        );
+
+        // ============================================================
+        // FOOTER
+        // ============================================================
+        const totalPages = doc.internal.getNumberOfPages();
+        const holidayDays = Object.keys(holidayReasons).sort((a, b) => parseInt(a) - parseInt(b));
+        
+        let footerY = pageHeight - 12;
+        
+        // Legend
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(40, 53, 147);
+        doc.text('Legend:', 8, footerY);
+        
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(100, 100, 100);
+        doc.text('P = Present  |  A = Absent  |  L = Leave  |  H = Holiday  |  (blank) = Not Marked', 25, footerY);
+        
+        // Holidays (if any)
+        if (holidayDays.length > 0 && pageNum === 1) {
+          footerY += 4;
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(79, 70, 229);
+          doc.text('Holidays:', 8, footerY);
+          
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(55, 48, 163);
+          let holidayText = holidayDays.map(d => `${d}: ${holidayReasons[d]}`).join('  |  ');
+          if (holidayText.length > 180) holidayText = holidayText.substring(0, 180) + '...';
+          doc.text(holidayText, 25, footerY);
+        }
+        
+        // Page number
+        doc.setFontSize(7);
+        doc.setTextColor(150, 150, 150);
+        doc.text(
+          `Page ${pageNum} of ${totalPages}  |  Generated: ${new Date().toLocaleString()}`,
+          pageWidth / 2,
+          pageHeight - 4,
+          { align: 'center' }
+        );
       }
     });
-
-    // FOOTER
-    const finalY = doc.lastAutoTable.finalY + 5;
-    
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(40, 53, 147);
-    doc.text('Legend:', 8, finalY);
-    
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(100, 100, 100);
-    doc.text('P = Present  |  A = Absent  |  L = Leave  |  H = Holiday  |  (blank) = Not Marked', 25, finalY);
-
-    // 🔥 HOLIDAY REASONS IN PDF
-    const holidayDays = Object.keys(holidayReasons).sort((a, b) => parseInt(a) - parseInt(b));
-    if (holidayDays.length > 0) {
-      const holidayY = finalY + 5;
-      doc.setFontSize(7);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(79, 70, 229);
-      doc.text('Holidays:', 8, holidayY);
-      
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(55, 48, 163);
-      let holidayText = holidayDays.map(d => `${d}: ${holidayReasons[d]}`).join('  |  ');
-      doc.text(holidayText, 25, holidayY);
-    }
-
-    const pageCount = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(7);
-      doc.setTextColor(150, 150, 150);
-      doc.text(
-        `Page ${i} of ${pageCount}  |  Generated: ${new Date().toLocaleString()}`,
-        pageWidth / 2,
-        pageHeight - 5,
-        { align: 'center' }
-      );
-    }
 
     // OUTPUT
     if (action === 'download') {
@@ -1619,7 +1635,7 @@
   loadBtn.addEventListener('click', loadMonthlyAttendance);
 
   init();
-  console.log('✅ Previous Attendance Page Loaded with Holiday Reasons!');
+  console.log('✅ Previous Attendance Page Loaded with Multi-page Header!');
 </script>
 </body>
 </html>
