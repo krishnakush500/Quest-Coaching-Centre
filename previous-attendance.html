@@ -1324,22 +1324,19 @@
   });
 
   // ============================================================
-  // 🔥 HEADER on every page (NO roll range)
+  // 🔥 HEADER on every page
   // ============================================================
   function drawHeaderOnPage(doc, pageWidth, logoData, pageNum, totalPages) {
     const centerX = pageWidth / 2;
     const monthName = new Date(currentYear, currentMonthNum).toLocaleString('default', { month: 'long' });
 
-    // ===== HEADER BANNER =====
     const headerHeight = 34;
     doc.setFillColor(26, 35, 126);
     doc.rect(0, 0, pageWidth, headerHeight, 'F');
 
-    // Yellow stripe
     doc.setFillColor(255, 193, 7);
     doc.rect(0, headerHeight, pageWidth, 1.2, 'F');
 
-    // ===== LOGO + TEXT (CENTERED) =====
     const logoSize = 22;
     const gapBetweenLogoText = 6;
     const titleWidth = 68;
@@ -1392,7 +1389,6 @@
     doc.text(COACHING_INFO.address, textX, textY + 10.5);
     doc.text(COACHING_INFO.phone, textX, textY + 14.5);
 
-    // ===== REPORT TITLE BANNER =====
     doc.setFillColor(40, 53, 147);
     doc.rect(0, 35.5, pageWidth, 10, 'F');
     
@@ -1406,7 +1402,6 @@
       { align: 'center' }
     );
 
-    // ===== SUB INFO BAR =====
     doc.setFillColor(240, 245, 255);
     doc.rect(0, 45.5, pageWidth, 8, 'F');
     
@@ -1430,12 +1425,10 @@
   function drawFooterOnPage(doc, pageWidth, pageHeight, pageNum, totalPages) {
     const footerY = pageHeight - 8;
 
-    // Divider line
     doc.setDrawColor(180, 180, 180);
     doc.setLineWidth(0.3);
     doc.line(8, footerY - 4, pageWidth - 8, footerY - 4);
 
-    // Legend
     doc.setFontSize(6.5);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(40, 53, 147);
@@ -1445,7 +1438,6 @@
     doc.setTextColor(100, 100, 100);
     doc.text('P = Present  |  A = Absent  |  L = Leave  |  H = Holiday  |  (blank) = Not Marked', 22, footerY - 1);
 
-    // Page number
     doc.setFontSize(7);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(40, 53, 147);
@@ -1456,7 +1448,6 @@
       { align: 'center' }
     );
 
-    // Generated time
     doc.setFontSize(6);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(150, 150, 150);
@@ -1467,13 +1458,12 @@
       { align: 'right' }
     );
 
-    // Yellow bottom stripe
     doc.setFillColor(255, 193, 7);
     doc.rect(0, pageHeight - 2.5, pageWidth, 2.5, 'F');
   }
 
   // ============================================================
-  // 🔥 PDF GENERATOR - Header every page + Holidays on last page
+  // 🔥 PDF GENERATOR - Header every page + Holidays right below last row
   // ============================================================
   async function generateRealPDF(action = 'download') {
     if (studentsList.length === 0) { showToast('No data!', true); return; }
@@ -1530,6 +1520,10 @@
       };
     }
 
+    // 🔥 Holiday list prepare
+    const holidayDays = Object.keys(holidayReasons).sort((a, b) => parseInt(a) - parseInt(b));
+    const hasHolidays = holidayDays.length > 0;
+
     doc.autoTable({
       head: [headRow],
       body: bodyRows,
@@ -1552,12 +1546,12 @@
         cellPadding: 1.5
       },
       columnStyles: columnStyles,
-      margin: { left: 5, right: 5, top: 55, bottom: 15 },
+      margin: { left: 5, right: 5, top: 55, bottom: 25 },
       didDrawPage: function(data) {
         const currentPageNum = doc.internal.getCurrentPageInfo().pageNumber;
         const totalPages = doc.internal.getNumberOfPages();
 
-        // 🔥 Header on EVERY page (no roll range)
+        // 🔥 Header on EVERY page
         drawHeaderOnPage(doc, pageWidth, logoData, currentPageNum, totalPages);
 
         // 🔥 Footer on EVERY page
@@ -1586,46 +1580,52 @@
     });
 
     // ============================================================
-    // 🔥 HOLIDAY REASONS ON LAST PAGE
+    // 🔥 HOLIDAYS RIGHT BELOW LAST ROW (same page)
     // ============================================================
-    const holidayDays = Object.keys(holidayReasons).sort((a, b) => parseInt(a) - parseInt(b));
-    
-    if (holidayDays.length > 0) {
+    if (hasHolidays) {
       const lastPageNum = doc.internal.getNumberOfPages();
       doc.setPage(lastPageNum);
-      
-      const finalY = doc.lastAutoTable.finalY + 8;
-      
+
+      // Get Y position where table ended
+      let tableEndY = doc.lastAutoTable.finalY + 6;
+
       // Build holiday text
       let holidayText = holidayDays.map(d => `${d} - ${holidayReasons[d]}`).join('   |   ');
-      
-      // Estimate box height
-      const maxWidth = pageWidth - 34;
+
+      // Calculate text lines
       doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      const maxWidth = pageWidth - 34;
       const lines = doc.splitTextToSize(holidayText, maxWidth);
       const boxHeight = 8 + lines.length * 5;
 
+      // 🔥 Check if box fits on same page; if not, add new page
+      if (tableEndY + boxHeight > pageHeight - 20) {
+        doc.addPage();
+        const newPageNum = doc.internal.getNumberOfPages();
+        drawHeaderOnPage(doc, pageWidth, logoData, newPageNum, newPageNum);
+        drawFooterOnPage(doc, pageWidth, pageHeight, newPageNum, newPageNum);
+        tableEndY = 60;
+      }
+
       // 🔥 Holiday Box
-      doc.setFillColor(224, 231, 255); // Light purple
-      doc.roundedRect(10, finalY, pageWidth - 20, boxHeight, 3, 3, 'F');
+      doc.setFillColor(224, 231, 255);
+      doc.roundedRect(10, tableEndY, pageWidth - 20, boxHeight, 3, 3, 'F');
       
-      // Border
       doc.setDrawColor(99, 102, 241);
       doc.setLineWidth(0.5);
-      doc.roundedRect(10, finalY, pageWidth - 20, boxHeight, 3, 3, 'S');
+      doc.roundedRect(10, tableEndY, pageWidth - 20, boxHeight, 3, 3, 'S');
       
-      // Title
       doc.setFontSize(9);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(55, 48, 163);
-      doc.text('🎉 HOLIDAYS THIS MONTH:', 14, finalY + 5);
+      doc.text('🎉 HOLIDAYS THIS MONTH:', 14, tableEndY + 5);
       
-      // Holiday list
       doc.setFontSize(8);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(55, 48, 163);
       
-      let lineY = finalY + 10;
+      let lineY = tableEndY + 10;
       lines.forEach(line => {
         doc.text(line, 14, lineY);
         lineY += 5;
@@ -1684,7 +1684,7 @@
 
   init();
   console.log('✅ Previous Attendance Page Loaded!');
-  console.log('📌 PDF: Header on every page + Holidays on last page');
+  console.log('📌 PDF: Header on every page + Holidays right below last row');
 </script>
 </body>
 </html>
