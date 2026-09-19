@@ -679,6 +679,10 @@
     }
   }
 
+  // ============================================================
+  // 🔥 MAIN SEARCH FUNCTION
+  // Searches admissions + attendance + fees collections
+  // ============================================================
   async function searchStudent() {
     const roll = parseInt(rollInput.value.trim());
     if (!roll || isNaN(roll)) {
@@ -702,7 +706,11 @@
 
     try {
       let studentData = null;
+      let studentDocId = null;
 
+      // ============================================================
+      // STEP 1: Search student in admissions collection
+      // ============================================================
       const snapshot = await db.collection('admissions')
         .where('rollNumber', '==', String(roll))
         .where('classApplying', '==', className)
@@ -723,8 +731,10 @@
           return;
         }
         studentData = snapshot2.docs[0].data();
+        studentDocId = snapshot2.docs[0].id;
       } else {
         studentData = snapshot.docs[0].data();
+        studentDocId = snapshot.docs[0].id;
       }
 
       const studentNameVal = studentData.studentName || studentData.name || 'Unknown';
@@ -734,6 +744,7 @@
       const fatherName = studentData.fatherName || studentData.father || 'N/A';
 
       currentStudent = {
+        id: studentDocId,
         name: studentNameVal,
         className: studentClass,
         roll: studentRollVal,
@@ -742,6 +753,9 @@
         photoUrl: photoUrl
       };
 
+      // ============================================================
+      // STEP 2: Fetch TODAY'S ATTENDANCE
+      // ============================================================
       const today = new Date().toISOString().split('T')[0];
       
       const attendanceRef = db.collection('attendance')
@@ -757,19 +771,96 @@
 
       let status = 'notmarked';
       let remark = '';
-      let monthlyFee = 0;
-      let paidFee = 0;
-      let dueFee = 0;
 
       if (attendanceSnap.exists) {
         const attData = attendanceSnap.data();
         status = attData.status || 'notmarked';
         remark = attData.remark || '';
-        monthlyFee = attData.monthlyFee || 0;
-        paidFee = attData.paidFee || 0;
-        dueFee = attData.dueFee || (monthlyFee - paidFee);
       }
 
+      // ============================================================
+      // 🔥 STEP 3: Fetch FEES data from 'fees' collection
+      // ============================================================
+      let monthlyFee = 0;
+      let paidFee = 0;
+      let dueFee = 0;
+      let totalFee = 0;
+      let totalReceived = 0;
+      let totalDue = 0;
+      let feeRemark = '';
+
+      try {
+        // Fees collection mein roll_number se search karo
+        const feesSnap = await db.collection('fees')
+          .where('roll_number', '==', String(roll))
+          .get();
+
+        if (!feesSnap.empty) {
+          // Saare matching docs ka sum karo
+          feesSnap.forEach(doc => {
+            const feeData = doc.data();
+            
+            const docTotal = feeData.total_amount || feeData.totalFee || feeData.monthlyFee || 0;
+            const docReceived = feeData.received_amount || feeData.paidFee || feeData.paid_amount || 0;
+            const docDue = feeData.due_amount || feeData.dueFee || Math.max(0, docTotal - docReceived);
+
+            totalFee += Number(docTotal) || 0;
+            totalReceived += Number(docReceived) || 0;
+            totalDue += Number(docDue) || 0;
+
+            // Monthly fee (tuition) from breakdown
+            if (feeData.fee_breakdown && feeData.fee_breakdown.tuition) {
+              monthlyFee = feeData.fee_breakdown.tuition;
+            } else if (feeData.fee_breakdown && feeData.fee_breakdown.subtotal) {
+              monthlyFee = feeData.fee_breakdown.subtotal;
+            } else if (feeData.monthlyFee) {
+              monthlyFee = feeData.monthlyFee;
+            }
+            
+            if (feeData.note) feeRemark = feeData.note;
+            if (feeData.remark) feeRemark = feeData.remark;
+          });
+
+          // Agar monthly fee nahi mila to class ke hisaab se default
+          if (!monthlyFee || monthlyFee === 0) {
+            const classNum = studentClass.match(/\d+/);
+            if (classNum) {
+              const cls = parseInt(classNum[0]);
+              if (cls === 10) monthlyFee = 7200;
+              else if (cls === 11 || cls === 12) monthlyFee = 6000;
+              else monthlyFee = 6000;
+            }
+          }
+
+          paidFee = totalReceived;
+          dueFee = totalDue;
+
+        } else {
+          // Agar fees collection mein nahi mila, to default calculate karo
+          const classNum = studentClass.match(/\d+/);
+          if (classNum) {
+            const cls = parseInt(classNum[0]);
+            if (cls === 10) monthlyFee = 7200;
+            else if (cls === 11 || cls === 12) monthlyFee = 6000;
+            else monthlyFee = 6000;
+          }
+          paidFee = 0;
+          dueFee = monthlyFee;
+        }
+      } catch (feeErr) {
+        console.warn('Fees fetch error:', feeErr);
+        // Fallback: class ke hisaab se monthly fee
+        const classNum = studentClass.match(/\d+/);
+        if (classNum) {
+          const cls = parseInt(classNum[0]);
+          monthlyFee = (cls === 10) ? 7200 : 6000;
+        }
+        dueFee = monthlyFee;
+      }
+
+      // ============================================================
+      // STEP 4: Display everything
+      // ============================================================
       loadingSpinner.style.display = 'none';
       coachingHeader.style.display = 'flex';
       resultCard.style.display = 'block';
@@ -792,19 +883,20 @@
       statusBadge.textContent = statusInfo.label;
       statusBadge.className = `status-badge ${statusInfo.class}`;
 
+      // ✅ Fees display
       monthlyFeeDisplay.textContent = `₹${monthlyFee || 0}`;
       paidFeeDisplay.textContent = `₹${paidFee || 0}`;
-      const due = dueFee || (monthlyFee - paidFee);
+      const finalDue = dueFee || Math.max(0, monthlyFee - paidFee);
       
-      if (due <= 0) {
+      if (finalDue <= 0) {
         dueFeeDisplay.textContent = '✅ Paid';
         dueFeeItem.classList.add('paid-full');
       } else {
-        dueFeeDisplay.textContent = `₹${due}`;
+        dueFeeDisplay.textContent = `₹${finalDue}`;
         dueFeeItem.classList.remove('paid-full');
       }
 
-      remarkText.textContent = remark || 'No remarks';
+      remarkText.textContent = remark || feeRemark || 'No remarks';
 
     } catch (error) {
       console.error('Error searching student:', error);
@@ -917,7 +1009,7 @@
       }
 
       // ============================================================
-      // 1) HEADER - CENTERED (same as previous-attendance)
+      // 1) HEADER - CENTERED
       // ============================================================
       const headerHeight = 32;
       doc.setFillColor(26, 35, 126);
@@ -926,7 +1018,6 @@
       doc.setFillColor(255, 193, 7);
       doc.rect(0, headerHeight, pageWidth, 1, 'F');
 
-      // Centered logo + text
       const logoSize = 20;
       const gap = 5;
       const titleWidth = 65;
@@ -984,7 +1075,6 @@
       doc.setLineWidth(0.5);
       doc.roundedRect(10, detailsY, pageWidth - 20, detailsHeight, 2, 2, 'S');
 
-      // Student photo circle (left)
       const photoSize = 22;
       const photoX = 15;
       const photoY = detailsY + 5;
@@ -1014,7 +1104,6 @@
         doc.text(currentStudent.name.charAt(0).toUpperCase(), photoCenterX, photoCenterY + 3, { align: 'center' });
       }
 
-      // Student info (right of photo)
       const infoX = photoX + photoSize + 5;
       const infoY = detailsY + 7;
 
@@ -1039,7 +1128,6 @@
       // ============================================================
       const calendarY = detailsY + detailsHeight + 6;
       
-      // Title
       doc.setFillColor(40, 53, 147);
       doc.rect(10, calendarY, pageWidth - 20, 8, 'F');
       doc.setTextColor(255, 255, 255);
@@ -1047,14 +1135,12 @@
       doc.setFont('helvetica', 'bold');
       doc.text('📅 ATTENDANCE CALENDAR', pageWidth / 2, calendarY + 5.5, { align: 'center' });
 
-      // Calendar grid
       const gridStartY = calendarY + 10;
       const gridLeft = 10;
       const gridWidth = pageWidth - 20;
       const colWidth = gridWidth / 7;
       const rowHeight = 12;
 
-      // Day headers (S M T W T F S)
       const dayHeaders = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
       
       doc.setFillColor(26, 35, 126);
@@ -1069,10 +1155,7 @@
         doc.text(dh, x, gridStartY + 4.5, { align: 'center' });
       });
 
-      // Calculate first day of month
       const firstDayOfWeek = new Date(currentYear, currentMonthNum, 1).getDay();
-      
-      // Draw days
       const totalRows = Math.ceil((firstDayOfWeek + currentDaysInMonth) / 7);
       
       for (let row = 0; row < totalRows; row++) {
@@ -1083,7 +1166,6 @@
           const dayIndex = row * 7 + col;
           const dayNum = dayIndex - firstDayOfWeek + 1;
           
-          // Draw cell border
           doc.setDrawColor(203, 213, 225);
           doc.setLineWidth(0.2);
           doc.rect(cellX, rowY, colWidth, rowHeight);
@@ -1093,7 +1175,6 @@
             const dateObj = new Date(currentYear, currentMonthNum, dayNum);
             const isSunday = dateObj.getDay() === 0;
             
-            // Cell background color
             if (status === 'P') {
               doc.setFillColor(209, 250, 229);
               doc.rect(cellX + 0.2, rowY + 0.2, colWidth - 0.4, rowHeight - 0.4, 'F');
@@ -1111,13 +1192,11 @@
               doc.rect(cellX + 0.2, rowY + 0.2, colWidth - 0.4, rowHeight - 0.4, 'F');
             }
             
-            // Day number (top-left)
             doc.setFontSize(7);
             doc.setFont('helvetica', 'bold');
             doc.setTextColor(71, 85, 105);
             doc.text(String(dayNum), cellX + 1.5, rowY + 3.5);
             
-            // Status letter (center)
             if (status) {
               doc.setFontSize(10);
               doc.setFont('helvetica', 'bold');
@@ -1130,7 +1209,6 @@
               doc.text(status, cellX + colWidth / 2, rowY + rowHeight / 2 + 3, { align: 'center' });
             }
           } else {
-            // Empty cell
             doc.setFillColor(250, 250, 250);
             doc.rect(cellX + 0.2, rowY + 0.2, colWidth - 0.4, rowHeight - 0.4, 'F');
           }
@@ -1150,7 +1228,6 @@
 
       const summaryY = gridStartY + 7 + totalRows * rowHeight + 6;
 
-      // Summary title
       doc.setFillColor(40, 53, 147);
       doc.rect(10, summaryY, pageWidth - 20, 8, 'F');
       doc.setTextColor(255, 255, 255);
@@ -1158,13 +1235,11 @@
       doc.setFont('helvetica', 'bold');
       doc.text('📊 MONTHLY SUMMARY', pageWidth / 2, summaryY + 5.5, { align: 'center' });
 
-      // Summary boxes
       const boxY = summaryY + 10;
-      const boxWidth = (pageWidth - 20 - 9) / 4; // 4 boxes with 3 gaps of 3mm
+      const boxWidth = (pageWidth - 20 - 9) / 4;
       const boxHeight = 18;
       const gap3 = 3;
 
-      // Present box
       const pX = 10;
       doc.setFillColor(209, 250, 229);
       doc.roundedRect(pX, boxY, boxWidth, boxHeight, 2, 2, 'F');
@@ -1178,7 +1253,6 @@
       doc.setFontSize(14);
       doc.text(String(presentCount), pX + boxWidth / 2, boxY + 15, { align: 'center' });
 
-      // Absent box
       const aX = pX + boxWidth + gap3;
       doc.setFillColor(254, 226, 226);
       doc.roundedRect(aX, boxY, boxWidth, boxHeight, 2, 2, 'F');
@@ -1190,7 +1264,6 @@
       doc.setFontSize(14);
       doc.text(String(absentCount), aX + boxWidth / 2, boxY + 15, { align: 'center' });
 
-      // Leave box
       const lX = aX + boxWidth + gap3;
       doc.setFillColor(254, 243, 199);
       doc.roundedRect(lX, boxY, boxWidth, boxHeight, 2, 2, 'F');
@@ -1202,7 +1275,6 @@
       doc.setFontSize(14);
       doc.text(String(leaveCount), lX + boxWidth / 2, boxY + 15, { align: 'center' });
 
-      // Holiday box
       const hX = lX + boxWidth + gap3;
       doc.setFillColor(224, 231, 255);
       doc.roundedRect(hX, boxY, boxWidth, boxHeight, 2, 2, 'F');
@@ -1276,11 +1348,9 @@
         { align: 'right' }
       );
 
-      // Yellow stripe
       doc.setFillColor(255, 193, 7);
       doc.rect(0, pageHeight - 3, pageWidth, 3, 'F');
 
-      // Save
       doc.save(`Attendance_${currentStudent.name}_${monthName}_${currentYear}.pdf`);
       showToast('📥 PDF downloaded successfully!');
 
@@ -1305,7 +1375,7 @@
     preloadLogo();
   });
 
-  console.log('✅ Parent View Loaded!');
+  console.log('✅ Parent View Loaded with Fees Integration!');
 </script>
 </body>
 </html>
