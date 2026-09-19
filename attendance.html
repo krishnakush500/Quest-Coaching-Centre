@@ -148,6 +148,25 @@
     }
     .top-controls .view-parent-btn:hover { background: #13458b; }
 
+    /* 🔥 SHARE BUTTON */
+    .top-controls .share-parent-btn {
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      border: none;
+      border-radius: 40px;
+      padding: 4px 14px;
+      color: white;
+      font-weight: 600;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+      cursor: pointer;
+      border: 1px solid #128C7E;
+    }
+    .top-controls .share-parent-btn:hover { background: linear-gradient(135deg, #128C7E, #075E54); }
+    .top-controls .share-parent-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
     .class-filter {
       display: flex;
       flex-wrap: wrap;
@@ -563,6 +582,7 @@
       .top-controls .session-group select { font-size: 0.65rem; padding: 3px 8px; }
       .top-controls .view-parent-btn { font-size: 0.6rem; padding: 3px 10px; }
       .top-controls .prev-attendance-btn { font-size: 0.6rem; padding: 3px 10px; }
+      .top-controls .share-parent-btn { font-size: 0.6rem; padding: 3px 10px; }
       .class-filter { padding: 4px 10px; gap: 4px 8px; }
       .class-filter select { font-size: 0.65rem; padding: 3px 8px; min-width: 80px; }
       .class-holiday-group label { font-size: 0.6rem; }
@@ -616,6 +636,9 @@
       </button>
       <button class="view-parent-btn" id="parentViewBtn">
         <i class="fas fa-eye"></i> Parent
+      </button>
+      <button class="share-parent-btn" id="shareParentBtn">
+        <i class="fas fa-share-alt"></i> Share
       </button>
     </div>
 
@@ -744,6 +767,7 @@
   const summaryCounter = document.getElementById('summaryCounter');
   const saveBtnContainer = document.getElementById('saveBtnContainer');
   const parentViewBtn = document.getElementById('parentViewBtn');
+  const shareParentBtn = document.getElementById('shareParentBtn');
   const prevAttendanceBtn = document.getElementById('prevAttendanceBtn');
   const saveBtn = document.getElementById('saveAttendanceBtn');
   const saveHolidayBtn = document.getElementById('saveHolidayBtn');
@@ -814,7 +838,6 @@
     pendingCount.textContent = pending;
   }
 
-  // 🔥 CHECK IF HOLIDAY IS ALREADY SAVED (in students section)
   async function checkHolidaySaved(selectedSession, selectedClass, today) {
     try {
       let studentSnapshot = await db.collection('admissions')
@@ -939,6 +962,68 @@
     window.open(`parent-view.html?session=${session}&class=${className}`, '_blank');
   });
 
+  // ============================================================
+  // 🔥 SHARE PARENT VIEW LINK ON WHATSAPP
+  // ============================================================
+  shareParentBtn.addEventListener('click', async function() {
+    const session = sessionSelect.value;
+    const className = classSelect.value;
+
+    if (!className) {
+      showToast('⚠️ Please select a class first!', true);
+      classSelect.focus();
+      return;
+    }
+
+    // Build parent view URL
+    const baseUrl = window.location.href.replace(/[^/]*$/, '');
+    const parentUrl = `${baseUrl}parent-view.html?session=${encodeURIComponent(session)}&class=${encodeURIComponent(className)}`;
+
+    // ✅ Short instruction message in Hindi + English
+    const message = 
+`🏫 *QUEST COACHING CENTRE*
+📍 Gopalganj | 📞 +91 9708442525
+
+नमस्ते अभिभावक 🙏
+
+आप अपने बच्चे की *Attendance*, *Fees* और *Daily Status* अब घर बैठे देख सकते हैं।
+
+📋 *कैसे देखें:*
+1️⃣ नीचे दिए link पर click करें
+2️⃣ अपने बच्चे का *Roll Number* डालें
+3️⃣ *Check* button दबाएं — पूरी details दिख जाएगी
+
+🔗 *Parent View Link:*
+${parentUrl}
+
+📅 *Session:* ${session}
+🏫 *Class:* ${className}
+
+_धन्यवाद 🙏_
+*QUEST COACHING CENTRE*`;
+
+    // ✅ Try Web Share API first (mobile native share sheet)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Quest Coaching - Parent View (${className})`,
+          text: message,
+          url: parentUrl
+        });
+        showToast('✅ Shared successfully!');
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+        console.warn('Web Share failed:', err);
+      }
+    }
+
+    // ✅ Fallback: WhatsApp direct link
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+    showToast('📤 Opening WhatsApp...');
+  });
+
   function handleClassHoliday() {
     if (classHolidayCheck.checked) {
       holidayReasonGroup.style.display = 'flex';
@@ -998,7 +1083,6 @@
     const today = getTodayDate();
 
     try {
-      // Step 1: Check if holiday
       updateLoading(20, 'Checking holiday...');
       const holidayCheck = await checkHolidaySaved(selectedSession, selectedClass, today);
 
@@ -1023,7 +1107,6 @@
         return;
       }
 
-      // Step 2: Load students
       updateLoading(40, 'Loading students...');
       const result = await fetchAllAttendanceForDate(selectedSession, selectedClass, today);
 
@@ -1140,7 +1223,6 @@
     });
   }
 
-  // 🔥 SAVE HOLIDAY - stores in EVERY student's attendance
   async function saveHoliday() {
     if (isSaving) return;
     
@@ -1165,7 +1247,6 @@
     saveHolidayBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
     try {
-      // Get all students
       let studentSnapshot = await db.collection('admissions')
         .where('classApplying', '==', selectedClass)
         .where('session', '==', selectedSession)
@@ -1186,7 +1267,6 @@
         return;
       }
 
-      // 🔥 SAVE TO EACH STUDENT'S ATTENDANCE
       const batch = db.batch();
       let savedCount = 0;
 
@@ -1348,8 +1428,7 @@
     init();
   });
 
-  console.log('✅ Attendance System Loaded!');
-  console.log('📌 Holiday saved to students section');
+  console.log('✅ Attendance System Loaded with Share Feature!');
 </script>
 </body>
 </html>
