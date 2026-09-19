@@ -104,9 +104,6 @@
       font-size: 0.58rem;
     }
 
-    /* ============================================================
-       🔥 SEARCH SECTION with Class + Session + Roll
-    ============================================================ */
     .search-section {
       background: linear-gradient(135deg, #e8f0fe, #f4f9ff);
       padding: 14px 16px;
@@ -575,9 +572,10 @@
       </button>
     </div>
     
+    <!-- 🔥 FEE DETAILS: Monthly → Course Fee -->
     <div class="fee-details">
       <div class="fee-item fee-monthly">
-        <div class="label"><i class="fas fa-money-bill-wave"></i> Monthly</div>
+        <div class="label"><i class="fas fa-money-bill-wave"></i> Course Fee</div>
         <div class="value" id="monthlyFeeDisplay">₹--</div>
       </div>
       <div class="fee-item fee-paid">
@@ -938,7 +936,7 @@
       statusBadge.textContent = statusInfo.label;
       statusBadge.className = `status-badge ${statusInfo.class}`;
 
-      // ✅ Fees display
+      // ✅ Fees display (Course Fee instead of Monthly)
       monthlyFeeDisplay.textContent = `₹${monthlyFee || 0}`;
       paidFeeDisplay.textContent = `₹${paidFee || 0}`;
       const finalDue = dueFee || Math.max(0, monthlyFee - paidFee);
@@ -1436,7 +1434,6 @@
     
     if (urlParams.session) {
       sessionSelect.value = urlParams.session;
-      // Agar option exist nahi karta to add kar do
       if (!sessionSelect.value) {
         const opt = document.createElement('option');
         opt.value = urlParams.session;
@@ -1447,7 +1444,6 @@
     }
     
     if (urlParams.class) {
-      // Match with dropdown options
       let found = false;
       for (let i = 0; i < classSelect.options.length; i++) {
         if (classSelect.options[i].value === urlParams.class) {
@@ -1457,7 +1453,6 @@
         }
       }
       if (!found) {
-        // Agar class URL mein hai lekin dropdown mein nahi, to add kar do
         const opt = document.createElement('option');
         opt.value = urlParams.class;
         opt.textContent = urlParams.class;
@@ -1469,7 +1464,7 @@
     rollInput.focus();
     preloadLogo();
     
-    console.log('✅ Parent View Loaded with Class Selector');
+    console.log('✅ Parent View Loaded with Course Fee');
   });
 
 </script>
