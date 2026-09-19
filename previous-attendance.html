@@ -298,6 +298,60 @@
       letter-spacing: 0.5px;
     }
 
+    /* 🔥 HOLIDAY LIST */
+    .holiday-list {
+      display: none;
+      background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+      border: 2px solid #6366f1;
+      border-radius: 14px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+    }
+    .holiday-list-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #3730a3;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .holiday-list-title i {
+      color: #4f46e5;
+    }
+    .holiday-list-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+    }
+    .holiday-item {
+      background: white;
+      padding: 5px 14px;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #3730a3;
+      border: 1px solid #a5b4fc;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15);
+    }
+    .holiday-item .day-num {
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 0.65rem;
+      font-weight: 800;
+    }
+    @media (max-width: 720px) {
+      .holiday-list { padding: 10px 12px; }
+      .holiday-list-title { font-size: 0.75rem; }
+      .holiday-item { font-size: 0.65rem; padding: 4px 10px; }
+      .holiday-item .day-num { font-size: 0.58rem; padding: 1px 6px; }
+    }
+
     .edit-hint {
       display: none;
       background: #fef3c7;
@@ -396,7 +450,7 @@
     .cell-P { background: #d1fae5 !important; color: #065f46 !important; font-weight: 800 !important; }
     .cell-A { background: #fee2e2 !important; color: #991b1b !important; font-weight: 800 !important; }
     .cell-L { background: #fef3c7 !important; color: #92400e !important; font-weight: 800 !important; }
-    .cell-H { background: #e0e7ff !important; color: #3730a3 !important; font-weight: 800 !important; }
+    .cell-H { background: #e0e7ff !important; color: #3730a3 !important; font-weight: 800 !important; cursor: help !important; }
     .cell-empty { background: #fafafa !important; color: transparent !important; }
 
     .register-table td.locked-cell {
@@ -453,6 +507,7 @@
     .stat-present { color: #10b981; }
     .stat-absent { color: #dc3545; }
     .stat-leave { color: #f59e0b; }
+    .stat-holiday { color: #6366f1; }
 
     .action-buttons {
       display: none;
@@ -547,7 +602,7 @@
 
 <div class="container">
 
-  <!-- COACHING HEADER (Web page display) -->
+  <!-- COACHING HEADER -->
   <div class="coaching-header">
     <div class="logo-circle">
       <img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" alt="Quest Coaching Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=&quot;color:#1a237e;font-weight:900;font-size:1.8rem;&quot;>Q</span>';">
@@ -618,6 +673,14 @@
     <div class="sub-info" id="monthTitleSub">Class: -- | Session: --</div>
   </div>
 
+  <!-- 🔥 HOLIDAY REASONS LIST -->
+  <div class="holiday-list" id="holidayList">
+    <div class="holiday-list-title">
+      <i class="fas fa-calendar-times"></i> Holidays This Month
+    </div>
+    <div class="holiday-list-items" id="holidayListItems"></div>
+  </div>
+
   <div class="register-wrapper" id="registerWrapper">
     <table class="register-table" id="registerTable">
       <thead id="registerHead"></thead>
@@ -630,6 +693,7 @@
     <span class="stat stat-present">✅ Total P: <span class="num" id="totalP">0</span></span>
     <span class="stat stat-absent">❌ Total A: <span class="num" id="totalA">0</span></span>
     <span class="stat stat-leave">🟡 Total L: <span class="num" id="totalL">0</span></span>
+    <span class="stat stat-holiday">🎉 Total H: <span class="num" id="totalH">0</span></span>
   </div>
 
   <div class="action-buttons" id="actionButtons">
@@ -721,6 +785,8 @@
   const monthTitle = document.getElementById('monthTitle');
   const monthTitleText = document.getElementById('monthTitleText');
   const monthTitleSub = document.getElementById('monthTitleSub');
+  const holidayList = document.getElementById('holidayList');
+  const holidayListItems = document.getElementById('holidayListItems');
   const registerWrapper = document.getElementById('registerWrapper');
   const registerHead = document.getElementById('registerHead');
   const registerBody = document.getElementById('registerBody');
@@ -729,6 +795,7 @@
   const totalP = document.getElementById('totalP');
   const totalA = document.getElementById('totalA');
   const totalL = document.getElementById('totalL');
+  const totalH = document.getElementById('totalH');
   const actionButtons = document.getElementById('actionButtons');
   const downloadBtn = document.getElementById('downloadBtn');
   const printBtn = document.getElementById('printBtn');
@@ -748,6 +815,7 @@
   let currentDaysInMonth = 0;
   let studentsList = [];
   let attendanceMatrix = {};
+  let holidayReasons = {}; // 🔥 { day: "Sunday" }
   let originalMatrix = {};
   let isEditMode = false;
   let changedCells = new Set();
@@ -828,6 +896,7 @@
     summaryRow.style.display = 'none';
     actionButtons.style.display = 'none';
     monthTitle.style.display = 'none';
+    holidayList.style.display = 'none';
     emptyState.style.display = 'none';
     loadBtn.disabled = true;
     exitEditMode(false);
@@ -868,7 +937,8 @@
       updateProgress(30, `Found ${studentsList.length} students. Fetching attendance...`);
 
       attendanceMatrix = {};
-      
+      holidayReasons = {}; // 🔥 Reset
+
       const studentPromises = studentsList.map(async (student) => {
         try {
           const attendanceSnapshot = await db.collection('attendance')
@@ -881,6 +951,8 @@
             .get();
 
           const studentMap = {};
+          const studentHolidayReasons = {}; // 🔥
+
           attendanceSnapshot.forEach(doc => {
             const dateParts = doc.id.split('-');
             if (dateParts.length === 3) {
@@ -895,16 +967,24 @@
                 if (status === 'present') cell = 'P';
                 else if (status === 'absent') cell = 'A';
                 else if (status === 'leave') cell = 'L';
-                else if (status === 'holiday') cell = 'H';
+                else if (status === 'holiday') {
+                  cell = 'H';
+                  // 🔥 Capture holiday reason
+                  studentHolidayReasons[docDay] = data.holidayReason || data.remark || 'Holiday';
+                }
                 studentMap[docDay] = cell;
               }
             }
           });
           
-          return { roll: student.roll, data: studentMap };
+          return { 
+            roll: student.roll, 
+            data: studentMap,
+            holidayReasons: studentHolidayReasons
+          };
         } catch (err) {
           console.warn(`Error loading ${student.name}:`, err);
-          return { roll: student.roll, data: {} };
+          return { roll: student.roll, data: {}, holidayReasons: {} };
         }
       });
 
@@ -920,6 +1000,15 @@
 
       results.forEach(r => {
         attendanceMatrix[r.roll] = r.data;
+        
+        // 🔥 Capture holiday reasons from any student
+        if (r.holidayReasons) {
+          Object.keys(r.holidayReasons).forEach(day => {
+            if (!holidayReasons[day]) {
+              holidayReasons[day] = r.holidayReasons[day];
+            }
+          });
+        }
       });
 
       computeEditableDays();
@@ -972,7 +1061,7 @@
     registerHead.innerHTML = headHtml;
 
     let bodyHtml = '';
-    let totalPCount = 0, totalACount = 0, totalLCount = 0;
+    let totalPCount = 0, totalACount = 0, totalLCount = 0, totalHCount = 0;
 
     studentsList.forEach(student => {
       bodyHtml += `<tr>`;
@@ -982,10 +1071,19 @@
       for (let day = 1; day <= currentDaysInMonth; day++) {
         const cell = (attendanceMatrix[student.roll] && attendanceMatrix[student.roll][day]) || '';
         let cellClass = 'cell-empty';
+        let cellTitle = '';
+        
         if (cell === 'P') { cellClass = 'cell-P'; totalPCount++; }
         else if (cell === 'A') { cellClass = 'cell-A'; totalACount++; }
         else if (cell === 'L') { cellClass = 'cell-L'; totalLCount++; }
-        else if (cell === 'H') { cellClass = 'cell-H'; }
+        else if (cell === 'H') { 
+          cellClass = 'cell-H'; 
+          totalHCount++;
+          // 🔥 Add tooltip with reason
+          if (holidayReasons[day]) {
+            cellTitle = ` title="🎉 Holiday: ${holidayReasons[day]}"`;
+          }
+        }
         
         const changed = changedCells.has(`${student.roll}_${day}`) ? 'changed' : '';
         
@@ -998,7 +1096,7 @@
           }
         }
         
-        bodyHtml += `<td class="${cellClass} ${editClass} ${changed}" data-roll="${student.roll}" data-day="${day}">${cell}</td>`;
+        bodyHtml += `<td class="${cellClass} ${editClass} ${changed}" data-roll="${student.roll}" data-day="${day}"${cellTitle}>${cell}</td>`;
       }
       bodyHtml += `</tr>`;
     });
@@ -1008,10 +1106,36 @@
     totalP.textContent = totalPCount;
     totalA.textContent = totalACount;
     totalL.textContent = totalLCount;
+    totalH.textContent = totalHCount;
+
+    // 🔥 Render holiday list
+    renderHolidayList();
 
     if (isEditMode) {
       attachCellClickHandlers();
     }
+  }
+
+  // 🔥 RENDER HOLIDAY LIST
+  function renderHolidayList() {
+    const holidays = Object.keys(holidayReasons).sort((a, b) => parseInt(a) - parseInt(b));
+    
+    if (holidays.length === 0) {
+      holidayList.style.display = 'none';
+      return;
+    }
+    
+    holidayList.style.display = 'block';
+    
+    let html = '';
+    holidays.forEach(day => {
+      html += `<div class="holiday-item">
+        <span class="day-num">${day}</span>
+        <span>${holidayReasons[day]}</span>
+      </div>`;
+    });
+    
+    holidayListItems.innerHTML = html;
   }
 
   function attachCellClickHandlers() {
@@ -1075,18 +1199,20 @@
   }
 
   function updateSummaryCounts() {
-    let totalPCount = 0, totalACount = 0, totalLCount = 0;
+    let totalPCount = 0, totalACount = 0, totalLCount = 0, totalHCount = 0;
     studentsList.forEach(student => {
       for (let day = 1; day <= currentDaysInMonth; day++) {
         const cell = (attendanceMatrix[student.roll] && attendanceMatrix[student.roll][day]) || '';
         if (cell === 'P') totalPCount++;
         else if (cell === 'A') totalACount++;
         else if (cell === 'L') totalLCount++;
+        else if (cell === 'H') totalHCount++;
       }
     });
     totalP.textContent = totalPCount;
     totalA.textContent = totalACount;
     totalL.textContent = totalLCount;
+    totalH.textContent = totalHCount;
   }
 
   function enterEditMode() {
@@ -1170,7 +1296,7 @@
         if (status === '') {
           batch.delete(docRef);
         } else {
-          batch.set(docRef, {
+          const updateData = {
             status: status,
             remark: '',
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1178,7 +1304,16 @@
             date: dateStr,
             session: currentSession,
             class: currentClass
-          });
+          };
+          
+          // 🔥 If holiday, preserve/add holidayReason
+          if (status === 'holiday') {
+            updateData.holidayReason = holidayReasons[day] || 'Holiday';
+            updateData.remark = holidayReasons[day] || 'Holiday';
+            updateData.isHoliday = true;
+          }
+          
+          batch.set(docRef, updateData);
         }
         savedCount++;
       });
@@ -1205,7 +1340,7 @@
   });
 
   // ============================================================
-  // PDF GENERATOR (Yellow stripe removed)
+  // PDF GENERATOR
   // ============================================================
   async function generateRealPDF(action = 'download') {
     if (studentsList.length === 0) { showToast('No data!', true); return; }
@@ -1233,24 +1368,19 @@
       }
     }
 
-    // ===== HEADER BANNER (No yellow stripe) =====
+    // HEADER BANNER
     const headerHeight = 34;
     doc.setFillColor(26, 35, 126);
     doc.rect(0, 0, pageWidth, headerHeight, 'F');
 
-    // ============================================================
-    // CENTERED LOGO + TEXT BLOCK
-    // ============================================================
+    // CENTERED LOGO + TEXT
     const logoSize = 22;
     const gapBetweenLogoText = 6;
     const titleWidth = 68;
-    const textBlockWidth = titleWidth;
-    
-    const totalWidth = logoSize + gapBetweenLogoText + textBlockWidth;
+    const totalWidth = logoSize + gapBetweenLogoText + titleWidth;
     const blockStartX = centerX - (totalWidth / 2);
     const blockStartY = 5;
 
-    // --- LOGO ---
     const logoX = blockStartX;
     const logoY = blockStartY + 1;
     const logoCenterX = logoX + logoSize / 2;
@@ -1261,16 +1391,7 @@
 
     if (logoData) {
       try {
-        doc.addImage(
-          logoData,
-          'PNG',
-          logoX,
-          logoY,
-          logoSize,
-          logoSize,
-          undefined,
-          'FAST'
-        );
+        doc.addImage(logoData, 'PNG', logoX, logoY, logoSize, logoSize, undefined, 'FAST');
       } catch (e) {
         doc.setTextColor(26, 35, 126);
         doc.setFontSize(16);
@@ -1286,7 +1407,6 @@
       doc.text('Q', logoCenterX, logoCenterY + 3, { align: 'center' });
     }
 
-    // --- TEXT ---
     const textX = logoX + logoSize + gapBetweenLogoText;
     const textY = blockStartY + 4;
 
@@ -1304,10 +1424,9 @@
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(255, 255, 255);
     doc.text(COACHING_INFO.address, textX, textY + 10.5);
-
     doc.text(COACHING_INFO.phone, textX, textY + 14.5);
 
-    // ===== REPORT TITLE BANNER =====
+    // REPORT TITLE BANNER
     doc.setFillColor(40, 53, 147);
     doc.rect(0, 36, pageWidth, 11, 'F');
     
@@ -1321,7 +1440,7 @@
       { align: 'center' }
     );
 
-    // ===== SUB INFO BAR =====
+    // SUB INFO BAR
     doc.setFillColor(240, 245, 255);
     doc.rect(0, 47, pageWidth, 7, 'F');
     
@@ -1335,7 +1454,7 @@
       { align: 'center' }
     );
 
-    // ===== TABLE =====
+    // TABLE
     const headRow = ['Student Name', 'Roll'];
     for (let day = 1; day <= currentDaysInMonth; day++) {
       headRow.push(String(day));
@@ -1409,7 +1528,7 @@
       }
     });
 
-    // ===== FOOTER =====
+    // FOOTER
     const finalY = doc.lastAutoTable.finalY + 5;
     
     doc.setFontSize(7);
@@ -1420,6 +1539,21 @@
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(100, 100, 100);
     doc.text('P = Present  |  A = Absent  |  L = Leave  |  H = Holiday  |  (blank) = Not Marked', 25, finalY);
+
+    // 🔥 HOLIDAY REASONS IN PDF
+    const holidayDays = Object.keys(holidayReasons).sort((a, b) => parseInt(a) - parseInt(b));
+    if (holidayDays.length > 0) {
+      const holidayY = finalY + 5;
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(79, 70, 229);
+      doc.text('Holidays:', 8, holidayY);
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(55, 48, 163);
+      let holidayText = holidayDays.map(d => `${d}: ${holidayReasons[d]}`).join('  |  ');
+      doc.text(holidayText, 25, holidayY);
+    }
 
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
@@ -1434,7 +1568,7 @@
       );
     }
 
-    // ===== OUTPUT =====
+    // OUTPUT
     if (action === 'download') {
       doc.save(`Attendance_${currentClass}_${monthName}_${currentYear}.pdf`);
       showToast('📥 PDF downloaded successfully!');
@@ -1485,8 +1619,7 @@
   loadBtn.addEventListener('click', loadMonthlyAttendance);
 
   init();
-  console.log('✅ Previous Attendance Page Loaded!');
-  console.log('📌 Yellow stripe removed');
+  console.log('✅ Previous Attendance Page Loaded with Holiday Reasons!');
 </script>
 </body>
 </html>
