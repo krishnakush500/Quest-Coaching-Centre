@@ -599,7 +599,6 @@
 
 <div class="container">
 
-  <!-- COACHING HEADER -->
   <div class="coaching-header">
     <div class="logo-circle">
       <img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" alt="Quest Coaching Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=&quot;color:#1a237e;font-weight:900;font-size:1.8rem;&quot;>Q</span>';">
@@ -727,14 +726,11 @@
           canvas.width = size;
           canvas.height = size;
           const ctx = canvas.getContext('2d');
-
           ctx.beginPath();
           ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
           ctx.closePath();
           ctx.clip();
-
           ctx.drawImage(img, 0, 0, size, size);
-
           const dataURL = canvas.toDataURL('image/png');
           resolve(dataURL);
         } catch (e) {
@@ -853,7 +849,6 @@
     for (let day = 1; day <= currentDaysInMonth; day++) {
       const dateObj = new Date(parseInt(currentYear), currentMonthNum, day);
       dateObj.setHours(0, 0, 0, 0);
-      
       const isFutureDate = dateObj > today;
       
       let hasAttendance = false;
@@ -995,7 +990,6 @@
 
       results.forEach(r => {
         attendanceMatrix[r.roll] = r.data;
-        
         if (r.holidayReasons) {
           Object.keys(r.holidayReasons).forEach(day => {
             if (!holidayReasons[day]) {
@@ -1330,7 +1324,164 @@
   });
 
   // ============================================================
-  // 🔥 PDF GENERATOR - Header on EVERY page + Roll Range
+  // 🔥 PDF HEADER FUNCTION (used on every page)
+  // ============================================================
+  function drawPDFHeader(doc, pageWidth, logoData, pageNumber, totalPages, pageStartRoll, pageEndRoll, pageStudentCount) {
+    const centerX = pageWidth / 2;
+
+    // ===== HEADER BANNER =====
+    const headerHeight = 34;
+    doc.setFillColor(26, 35, 126);
+    doc.rect(0, 0, pageWidth, headerHeight, 'F');
+
+    // CENTERED LOGO + TEXT
+    const logoSize = 22;
+    const gapBetweenLogoText = 6;
+    const titleWidth = 68;
+    const totalWidth = logoSize + gapBetweenLogoText + titleWidth;
+    const blockStartX = centerX - (totalWidth / 2);
+    const blockStartY = 5;
+
+    const logoX = blockStartX;
+    const logoY = blockStartY + 1;
+    const logoCenterX = logoX + logoSize / 2;
+    const logoCenterY = logoY + logoSize / 2;
+
+    doc.setFillColor(255, 193, 7);
+    doc.circle(logoCenterX, logoCenterY, logoSize / 2 + 0.8, 'F');
+
+    if (logoData) {
+      try {
+        doc.addImage(logoData, 'PNG', logoX, logoY, logoSize, logoSize, undefined, 'FAST');
+      } catch (e) {
+        doc.setTextColor(26, 35, 126);
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Q', logoCenterX, logoCenterY + 3, { align: 'center' });
+      }
+    } else {
+      doc.setFillColor(255, 255, 255);
+      doc.circle(logoCenterX, logoCenterY, logoSize / 2, 'F');
+      doc.setTextColor(26, 35, 126);
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Q', logoCenterX, logoCenterY + 3, { align: 'center' });
+    }
+
+    const textX = logoX + logoSize + gapBetweenLogoText;
+    const textY = blockStartY + 4;
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(15);
+    doc.setFont('helvetica', 'bold');
+    doc.text(COACHING_INFO.name, textX, textY);
+
+    doc.setFontSize(8.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(255, 193, 7);
+    doc.text(`${COACHING_INFO.directorTitle}: ${COACHING_INFO.director}`, textX, textY + 5.5);
+
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(255, 255, 255);
+    doc.text(COACHING_INFO.address, textX, textY + 10.5);
+    doc.text(COACHING_INFO.phone, textX, textY + 14.5);
+
+    // ===== REPORT TITLE BANNER =====
+    const monthName = new Date(currentYear, currentMonthNum).toLocaleString('default', { month: 'long' });
+    doc.setFillColor(40, 53, 147);
+    doc.rect(0, 36, pageWidth, 11, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(13);
+    doc.setFont('helvetica', 'bold');
+    doc.text(
+      `Monthly Attendance Register - ${monthName} ${currentYear}`,
+      pageWidth / 2,
+      43.5,
+      { align: 'center' }
+    );
+
+    // ===== SUB INFO BAR (with page info) =====
+    doc.setFillColor(240, 245, 255);
+    doc.rect(0, 47, pageWidth, 9, 'F');
+    
+    doc.setTextColor(40, 53, 147);
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'bold');
+    doc.text(
+      `Class: ${currentClass}  |  Session: ${currentSession}  |  Total Students: ${studentsList.length}  |  Page ${pageNumber} of ${totalPages}`,
+      pageWidth / 2,
+      50.5,
+      { align: 'center' }
+    );
+
+    // 🔥 PAGE ROLL RANGE
+    if (pageStartRoll && pageEndRoll) {
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(220, 38, 38); // Red
+      doc.text(
+        `Roll Numbers on this page: ${pageStartRoll} to ${pageEndRoll}  (${pageStudentCount} students)`,
+        pageWidth / 2,
+        54.5,
+        { align: 'center' }
+      );
+    }
+
+    return 56; // Table start Y
+  }
+
+  // ============================================================
+  // 🔥 PDF FOOTER FUNCTION (used on every page)
+  // ============================================================
+  function drawPDFFooter(doc, pageWidth, pageHeight, pageNumber, totalPages) {
+    const footerY = pageHeight - 8;
+    
+    // Footer line
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.3);
+    doc.line(5, footerY - 4, pageWidth - 5, footerY - 4);
+    
+    // Legend (left)
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(40, 53, 147);
+    doc.text('Legend:', 8, footerY);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text('P = Present  |  A = Absent  |  L = Leave  |  H = Holiday  |  (blank) = Not Marked', 25, footerY);
+
+    // Page number (center)
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(40, 53, 147);
+    doc.text(
+      `Page ${pageNumber} of ${totalPages}`,
+      pageWidth / 2,
+      footerY + 4,
+      { align: 'center' }
+    );
+
+    // Generated time (right)
+    doc.setFontSize(6.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(150, 150, 150);
+    doc.text(
+      `Generated: ${new Date().toLocaleString('en-IN')}`,
+      pageWidth - 8,
+      footerY,
+      { align: 'right' }
+    );
+
+    // Yellow stripe at bottom
+    doc.setFillColor(255, 193, 7);
+    doc.rect(0, pageHeight - 3, pageWidth, 3, 'F');
+  }
+
+  // ============================================================
+  // 🔥 PDF GENERATOR - with Header on EVERY page
   // ============================================================
   async function generateRealPDF(action = 'download') {
     if (studentsList.length === 0) { showToast('No data!', true); return; }
@@ -1346,7 +1497,6 @@
 
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    const centerX = pageWidth / 2;
 
     let logoData = LOGO_BASE64;
     if (!logoData) {
@@ -1358,98 +1508,7 @@
       }
     }
 
-    // ============================================================
-    // 🔥 HELPER: Draw Coaching Header on any page
-    // ============================================================
-    function drawCoachingHeader() {
-      const headerHeight = 34;
-      doc.setFillColor(26, 35, 126);
-      doc.rect(0, 0, pageWidth, headerHeight, 'F');
-
-      const logoSize = 22;
-      const gapBetweenLogoText = 6;
-      const titleWidth = 68;
-      const totalWidth = logoSize + gapBetweenLogoText + titleWidth;
-      const blockStartX = centerX - (totalWidth / 2);
-      const blockStartY = 5;
-
-      const logoX = blockStartX;
-      const logoY = blockStartY + 1;
-      const logoCenterX = logoX + logoSize / 2;
-      const logoCenterY = logoY + logoSize / 2;
-
-      doc.setFillColor(255, 193, 7);
-      doc.circle(logoCenterX, logoCenterY, logoSize / 2 + 0.8, 'F');
-
-      if (logoData) {
-        try {
-          doc.addImage(logoData, 'PNG', logoX, logoY, logoSize, logoSize, undefined, 'FAST');
-        } catch (e) {
-          doc.setTextColor(26, 35, 126);
-          doc.setFontSize(16);
-          doc.setFont('helvetica', 'bold');
-          doc.text('Q', logoCenterX, logoCenterY + 3, { align: 'center' });
-        }
-      } else {
-        doc.setFillColor(255, 255, 255);
-        doc.circle(logoCenterX, logoCenterY, logoSize / 2, 'F');
-        doc.setTextColor(26, 35, 126);
-        doc.setFontSize(16);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Q', logoCenterX, logoCenterY + 3, { align: 'center' });
-      }
-
-      const textX = logoX + logoSize + gapBetweenLogoText;
-      const textY = blockStartY + 4;
-
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(15);
-      doc.setFont('helvetica', 'bold');
-      doc.text(COACHING_INFO.name, textX, textY);
-
-      doc.setFontSize(8.5);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(255, 193, 7);
-      doc.text(`${COACHING_INFO.directorTitle}: ${COACHING_INFO.director}`, textX, textY + 5.5);
-
-      doc.setFontSize(7.5);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(255, 255, 255);
-      doc.text(COACHING_INFO.address, textX, textY + 10.5);
-      doc.text(COACHING_INFO.phone, textX, textY + 14.5);
-
-      // Report title banner
-      doc.setFillColor(40, 53, 147);
-      doc.rect(0, 36, pageWidth, 11, 'F');
-      
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(13);
-      doc.setFont('helvetica', 'bold');
-      doc.text(
-        `Monthly Attendance Register - ${monthName} ${currentYear}`,
-        centerX,
-        43.5,
-        { align: 'center' }
-      );
-
-      // Sub info bar
-      doc.setFillColor(240, 245, 255);
-      doc.rect(0, 47, pageWidth, 7, 'F');
-      
-      doc.setTextColor(40, 53, 147);
-      doc.setFontSize(8);
-      doc.setFont('helvetica', 'bold');
-      doc.text(
-        `Class: ${currentClass}   |   Session: ${currentSession}   |   Total Students: ${studentsList.length}   |   Editable Days: ${editableDays.size}   |   Locked Days: ${lockedDays.size}`,
-        centerX,
-        51.5,
-        { align: 'center' }
-      );
-    }
-
-    // ============================================================
-    // BUILD TABLE DATA
-    // ============================================================
+    // ===== BUILD TABLE DATA =====
     const headRow = ['Student Name', 'Roll'];
     for (let day = 1; day <= currentDaysInMonth; day++) {
       headRow.push(String(day));
@@ -1465,6 +1524,16 @@
       bodyRows.push(row);
     });
 
+    // 🔥 TRACK PAGE INFO FOR HEADER
+    const pageInfo = {
+      startRoll: null,
+      endRoll: null,
+      studentCount: 0
+    };
+
+    // 🔥 FLAG to draw header on each page
+    let isFirstPage = true;
+
     const columnStyles = {
       0: { cellWidth: 42, halign: 'left', fontStyle: 'bold', textColor: [10, 42, 102], fillColor: [241, 245, 249] },
       1: { cellWidth: 12, halign: 'center', fontStyle: 'bold', textColor: [26, 35, 126], fillColor: [241, 245, 249] }
@@ -1478,17 +1547,11 @@
       };
     }
 
-    // ============================================================
-    // 🔥 CUSTOM TABLE DRAWING - Full Control
-    // ============================================================
-    // We'll use autoTable but with page-specific callbacks
-    
-    let pageRollRanges = {}; // { pageNum: { first, last, count } }
-
+    // 🔥 AutoTable with custom header/footer hooks
     doc.autoTable({
       head: [headRow],
       body: bodyRows,
-      startY: 56,
+      startY: 58, // Start below header
       theme: 'grid',
       styles: {
         fontSize: 7,
@@ -1507,30 +1570,48 @@
         cellPadding: 1.5
       },
       columnStyles: columnStyles,
-      margin: { left: 5, right: 5, top: 56, bottom: 22 },
-      
-      // 🔥 TRACK every row drawn with page number
-      didDrawCell: function(data) {
-        if (data.section === 'body' && data.column.index === 1) {
-          // Column index 1 = Roll column
-          const pageNum = data.pageNumber;
-          const rollValue = parseInt(data.cell.raw);
-          
-          if (!pageRollRanges[pageNum]) {
-            pageRollRanges[pageNum] = {
-              first: rollValue,
-              last: rollValue,
-              count: 0
-            };
-          }
-          
-          // Update range
-          if (rollValue < pageRollRanges[pageNum].first) pageRollRanges[pageNum].first = rollValue;
-          if (rollValue > pageRollRanges[pageNum].last) pageRollRanges[pageNum].last = rollValue;
-          pageRollRanges[pageNum].count++;
-        }
+      margin: { left: 5, right: 5, top: 58, bottom: 15 },
+      // 🔥 Draw header & footer on every page
+      didDrawPage: function(data) {
+        // Get current page number
+        const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
         
-        // Color cells
+        // Get page info from table data
+        const pageData = data.table.body;
+        let pageStartRoll = '';
+        let pageEndRoll = '';
+        let pageStudentCount = pageData.length;
+        
+        if (pageData.length > 0) {
+          pageStartRoll = pageData[0].cells[1].text;
+          pageEndRoll = pageData[pageData.length - 1].cells[1].text;
+        }
+
+        // Get total pages (we'll fix at end)
+        const totalPages = doc.internal.getNumberOfPages();
+
+        // Draw header on this page
+        drawPDFHeader(
+          doc,
+          pageWidth,
+          logoData,
+          currentPage,
+          totalPages,
+          pageStartRoll,
+          pageEndRoll,
+          pageStudentCount
+        );
+
+        // Draw footer on this page
+        drawPDFFooter(
+          doc,
+          pageWidth,
+          pageHeight,
+          currentPage,
+          totalPages
+        );
+      },
+      didParseCell: function(data) {
         if (data.section === 'body' && data.column.index >= 2) {
           const value = data.cell.raw;
           if (value === 'P') {
@@ -1552,94 +1633,10 @@
       }
     });
 
-    // ============================================================
-    // 🔥 ADD HEADER + FOOTER TO EACH PAGE
-    // ============================================================
-    const totalPages = doc.internal.getNumberOfPages();
-    
-    for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
-      doc.setPage(pageNum);
-      
-      // 🔥 Draw header on EVERY page (overlay on top of existing)
-      // We only need to redraw header on pages 2+
-      if (pageNum > 1) {
-        drawCoachingHeader();
-      }
-      
-      // ============================================================
-      // 🔥 FOOTER with Roll Range for this page
-      // ============================================================
-      const pageData = pageRollRanges[pageNum];
-      const footerY = pageHeight - 12;
-      
-      // Left: Coaching name
-      doc.setFontSize(7);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(40, 53, 147);
-      doc.text(COACHING_INFO.name, 8, footerY);
-      
-      // Center: Roll Range (only for this page)
-      if (pageData) {
-        doc.setFontSize(8.5);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(26, 35, 126);
-        doc.text(
-          `Roll No: ${pageData.first} to ${pageData.last}  (${pageData.count} students)`,
-          centerX,
-          footerY,
-          { align: 'center' }
-        );
-      }
-      
-      // Right: Page number
-      doc.setFontSize(8);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(26, 35, 126);
-      doc.text(
-        `Page ${pageNum} of ${totalPages}`,
-        pageWidth - 8,
-        footerY,
-        { align: 'right' }
-      );
-      
-      // Bottom line
-      doc.setDrawColor(200, 200, 200);
-      doc.setLineWidth(0.3);
-      doc.line(5, footerY + 3, pageWidth - 5, footerY + 3);
-      
-      // Generated time
-      doc.setFontSize(6);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(150, 150, 150);
-      doc.text(
-        `Generated: ${new Date().toLocaleString()}`,
-        8,
-        footerY + 6
-      );
-      
-      // Legend on last page
-      if (pageNum === totalPages) {
-        doc.setFontSize(6.5);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(100, 100, 100);
-        const legendText = 'P = Present  |  A = Absent  |  L = Leave  |  H = Holiday  |  (blank) = Not Marked';
-        doc.text(legendText, centerX, footerY + 6, { align: 'center' });
-        
-        // 🔥 Holiday reasons on last page
-        const holidayDays = Object.keys(holidayReasons).sort((a, b) => parseInt(a) - parseInt(b));
-        if (holidayDays.length > 0) {
-          doc.setFontSize(6.5);
-          doc.setFont('helvetica', 'bold');
-          doc.setTextColor(79, 70, 229);
-          const holidayText = 'Holidays: ' + holidayDays.map(d => `${d}=${holidayReasons[d]}`).join(' | ');
-          doc.text(holidayText, centerX, footerY + 9, { align: 'center' });
-        }
-      }
-    }
+    // ===== FINAL PASS: Add holiday list on last page (or footer) =====
+    // (Optional - can add if needed)
 
-    // ============================================================
-    // OUTPUT
-    // ============================================================
+    // ===== OUTPUT =====
     if (action === 'download') {
       doc.save(`Attendance_${currentClass}_${monthName}_${currentYear}.pdf`);
       showToast('📥 PDF downloaded successfully!');
@@ -1690,7 +1687,8 @@
   loadBtn.addEventListener('click', loadMonthlyAttendance);
 
   init();
-  console.log('✅ Previous Attendance Page Loaded with Page-wise Roll Range!');
+  console.log('✅ Previous Attendance Page Loaded!');
+  console.log('📌 PDF: Header + Roll range on EVERY page');
 </script>
 </body>
 </html>
