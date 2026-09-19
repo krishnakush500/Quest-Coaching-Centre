@@ -964,7 +964,6 @@
     const session = sessionSelect.value;
     const className = classSelect.value;
 
-    // ✅ Class optional — agar select nahi hai to bhi chalega
     let url = `parent-view.html?session=${encodeURIComponent(session)}`;
     if (className) {
       url += `&class=${encodeURIComponent(className)}`;
@@ -973,7 +972,7 @@
   });
 
   // ============================================================
-  // 🔥 SHARE PARENT VIEW LINK — Class optional
+  // 🔥 SHARE PARENT VIEW LINK — Short Hindi + English Mixed
   // ============================================================
   shareParentBtn.addEventListener('click', async function() {
     const session = sessionSelect.value;
@@ -986,30 +985,22 @@
       parentUrl += `&class=${encodeURIComponent(className)}`;
     }
 
-    const classLine = className 
-      ? `\n🏫 *Class:* ${className}` 
-      : '\n🏫 *Class:* अपनी क्लास चुनें';
-
+    // ✅ Short Hindi + English MIXED message (single text)
     const message = 
 `🏫 *QUEST COACHING CENTRE*
-📍 Gopalganj | 📞 +91 9708442525
 
-नमस्ते अभिभावक 🙏
+प्रिय अभिभावक 🙏 / Dear Parent 🙏
 
-आप अपने बच्चे की *Attendance*, *Fees* और *Daily Status* अब घर बैठे देख सकते हैं।
+📋 *Attendance, Fees & Daily Status* देखें / Check:
 
-📋 *कैसे देखें:*
-1️⃣ नीचे दिए link पर click करें
-2️⃣ अपने बच्चे की *Class* चुनें
-3️⃣ अपने बच्चे का *Roll Number* डालें
-4️⃣ *Check* button दबाएं — पूरी details दिख जाएगी
+1️⃣ Link खोलें / Open link
+2️⃣ Class चुनें / Select Class
+3️⃣ Roll No. डालें / Enter Roll No.
+4️⃣ Check दबाएं / Tap Check
 
-🔗 *Parent View Link:*
-${parentUrl}
+🔗 ${parentUrl}
 
-📅 *Session:* ${session}${classLine}
-
-_धन्यवाद 🙏_
+_धन्यवाद / Thank You_ 🙏
 *QUEST COACHING CENTRE*`;
 
     // ✅ Try Web Share API first (mobile native share sheet)
