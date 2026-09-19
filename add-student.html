@@ -302,20 +302,20 @@
 
     // ============================================================
     // 🔥 MAIN FEATURE: Auto-fetch student details on roll number input
+    // Searches BOTH admissions & fees collections
+    // Auto-fills: Student Name, Father Name, Phone Number, Class, Session
     // ============================================================
     document.getElementById('rollNumber')?.addEventListener('input', async function() {
         const roll = this.value.trim();
         const previewDiv = document.getElementById('studentPreview');
         const contentDiv = document.getElementById('studentPreviewContent');
 
-        if (roll.length < 2) {
+        // Agar roll empty hai to sab clear kar do
+        if (roll.length < 1) {
             previewDiv.classList.remove('show');
-            // Clear the fields if roll is empty
-            if (roll.length === 0) {
-                document.getElementById('studentName').value = '';
-                document.getElementById('fatherName').value = '';
-                document.getElementById('phoneNumber').value = '';
-            }
+            document.getElementById('studentName').value = '';
+            document.getElementById('fatherName').value = '';
+            document.getElementById('phoneNumber').value = '';
             return;
         }
 
@@ -324,53 +324,105 @@
         contentDiv.innerHTML = `<div class="preview-loading">⏳ Searching student...</div>`;
 
         try {
-            // Search in fees collection first
             let student = null;
-            let snap = await feesCollection.where('roll_number', '==', roll).get();
-            
-            if (!snap.empty) {
-                snap.forEach(doc => {
-                    student = { id: doc.id, ...doc.data() };
-                });
-            } else {
-                // If not found in fees, search in admissions collection
+            let sourceCollection = '';
+
+            // ✅ STEP 1: Pehle admissions collection mein dhundho (full data hota hai)
+            try {
                 let snap2 = await admissionsCollection.where('rollNumber', '==', roll).get();
                 if (!snap2.empty) {
                     snap2.forEach(doc => {
                         student = { id: doc.id, ...doc.data() };
+                        sourceCollection = 'admissions';
                     });
+                }
+            } catch (e) {
+                console.warn('Admissions query error:', e);
+            }
+
+            // ✅ STEP 2: Agar admissions mein nahi mila, to fees collection mein dhundho
+            if (!student) {
+                try {
+                    let snap = await feesCollection.where('roll_number', '==', roll).get();
+                    if (!snap.empty) {
+                        snap.forEach(doc => {
+                            student = { id: doc.id, ...doc.data() };
+                            sourceCollection = 'fees';
+                        });
+                    }
+                } catch (e) {
+                    console.warn('Fees query error:', e);
                 }
             }
 
             if (student) {
-                // Auto-fill the form fields
-                document.getElementById('studentName').value = student.student_name || student.studentName || '';
-                document.getElementById('fatherName').value = student.father_name || student.fatherName || '';
-                document.getElementById('phoneNumber').value = student.phone_number || student.phoneNumber || '';
-                
-                // Auto-select class if available
-                if (student.class) {
-                    const classSelect = document.getElementById('classSelect');
-                    const options = classSelect.options;
-                    for (let i = 0; i < options.length; i++) {
-                        if (options[i].value === student.class) {
-                            classSelect.selectedIndex = i;
+                // ✅ Dono collections ke field names handle karo
+                let name = '', father = '', phone = '', className = '', sessionVal = '';
+
+                if (sourceCollection === 'admissions') {
+                    // Admissions collection (camelCase fields)
+                    name       = student.studentName || '';
+                    father     = student.fatherName || '';
+                    phone      = student.parentMobile || student.studentMobile || '';
+                    className  = student.classApplying || '';
+                    sessionVal = student.session || '';
+                } else {
+                    // Fees collection (snake_case fields)
+                    name       = student.student_name || '';
+                    father     = student.father_name || '';
+                    phone      = student.phone_number || '';
+                    className  = student.class || '';
+                    sessionVal = student.session || '';
+                }
+
+                // ✅ Auto-fill form fields
+                document.getElementById('studentName').value = name;
+                document.getElementById('fatherName').value = father;
+                document.getElementById('phoneNumber').value = phone;
+
+                // ✅ Auto-select class (normalize "10th" -> "Class 10")
+                if (className) {
+                    let normalizedClass = className;
+                    const match = className.match(/(\d+)/);
+                    if (match) {
+                        normalizedClass = 'Class ' + match[1];
+                    }
+                    
+                    const classSelectEl = document.getElementById('classSelect');
+                    for (let i = 0; i < classSelectEl.options.length; i++) {
+                        if (classSelectEl.options[i].value === normalizedClass || 
+                            classSelectEl.options[i].value === className) {
+                            classSelectEl.selectedIndex = i;
                             break;
                         }
                     }
-                    // Trigger class change to update fee section
-                    classSelect.dispatchEvent(new Event('change'));
+                    // Trigger change to update fee section
+                    classSelectEl.dispatchEvent(new Event('change'));
                 }
 
-                // Show student preview
+                // ✅ Auto-select session
+                if (sessionVal) {
+                    const sessionEl = document.getElementById('sessionSelect');
+                    for (let i = 0; i < sessionEl.options.length; i++) {
+                        if (sessionEl.options[i].value === sessionVal) {
+                            sessionEl.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+
+                // ✅ Show student preview
                 contentDiv.innerHTML = `
                     <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
                         <div style="flex:1;">
-                            <div class="preview-row"><strong>👤 Name:</strong> ${student.student_name || student.studentName || 'N/A'}</div>
-                            <div class="preview-row"><strong>👨 Father:</strong> ${student.father_name || student.fatherName || 'N/A'}</div>
-                            <div class="preview-row"><strong>🏫 Class:</strong> ${student.class || 'N/A'}</div>
-                            <div class="preview-row"><strong>📞 Phone:</strong> ${student.phone_number || student.phoneNumber || 'N/A'}</div>
-                            <div class="preview-row"><strong>📅 Session:</strong> ${student.session || 'N/A'}</div>
+                            <div class="preview-row"><strong>👤 Name:</strong> ${name || 'N/A'}</div>
+                            <div class="preview-row"><strong>👨 Father:</strong> ${father || 'N/A'}</div>
+                            <div class="preview-row"><strong>🏫 Class:</strong> ${className || 'N/A'}</div>
+                            <div class="preview-row"><strong>📞 Phone:</strong> ${phone || 'N/A'}</div>
+                            <div class="preview-row"><strong>📅 Session:</strong> ${sessionVal || 'N/A'}</div>
+                            <div class="preview-row" style="color:#16a34a; font-size:0.85rem; border-bottom:none;">
+                                <strong>✅ Found in:</strong> ${sourceCollection} collection
+                            </div>
                         </div>
                     </div>
                 `;
@@ -378,12 +430,10 @@
             } else {
                 contentDiv.innerHTML = `<div style="color:#dc2626; padding:10px;">❌ No student found with Roll Number: <strong>${roll}</strong></div>`;
                 previewDiv.classList.add('show');
-                
-                // Don't clear fields if not found, user might want to add new student
             }
         } catch (error) {
             console.error("Error fetching student:", error);
-            contentDiv.innerHTML = `<div style="color:#dc2626; padding:10px;">❌ Error fetching student details: ${error.message}</div>`;
+            contentDiv.innerHTML = `<div style="color:#dc2626; padding:10px;">❌ Error: ${error.message}</div>`;
             previewDiv.classList.add('show');
         }
     });
