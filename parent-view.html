@@ -104,6 +104,9 @@
       font-size: 0.58rem;
     }
 
+    /* ============================================================
+       🔥 SEARCH SECTION with Class + Session + Roll
+    ============================================================ */
     .search-section {
       background: linear-gradient(135deg, #e8f0fe, #f4f9ff);
       padding: 14px 16px;
@@ -117,22 +120,45 @@
       border: 2px solid #d7e5fc;
       box-shadow: 0 4px 12px rgba(26, 80, 180, 0.06);
     }
-    .search-section label {
-      font-weight: 700;
-      color: #0a2a66;
-      font-size: 0.8rem;
+    .search-section .filter-group {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 6px;
+      background: white;
+      padding: 4px 12px 4px 10px;
+      border-radius: 40px;
+      border: 2px solid #b8cff0;
     }
-    .search-section label i { color: #f59e0b; font-size: 0.95rem; }
+    .search-section .filter-group label {
+      font-weight: 700;
+      color: #0a2a66;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .search-section .filter-group label i { color: #f59e0b; font-size: 0.85rem; }
+    .search-section .filter-group select {
+      border: none;
+      background: transparent;
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: #0a2a66;
+      outline: none;
+      cursor: pointer;
+      padding: 4px 4px;
+      min-width: 110px;
+    }
+    .search-section .filter-group select option { color: #0a2a66; }
+    
     .search-section input {
       border: 2px solid #b8cff0;
       border-radius: 40px;
       padding: 9px 16px;
       font-weight: 600;
       font-size: 0.85rem;
-      width: 160px;
+      width: 150px;
       outline: none;
       background: white;
       color: #0a2a66;
@@ -419,7 +445,7 @@
       text-align: center;
     }
 
-    @media (max-width: 480px) {
+    @media (max-width: 600px) {
       body { padding: 6px 3px 14px; }
       .container { padding: 12px 10px 16px; border-radius: 16px; max-width: 100%; }
       .coaching-header { padding: 10px 12px; gap: 10px; border-radius: 12px; margin-bottom: 12px; }
@@ -428,7 +454,8 @@
       .coaching-header .coaching-text .director { font-size: 0.62rem; }
       .coaching-header .coaching-text .details { font-size: 0.55rem; }
       .search-section { padding: 12px; border-radius: 14px; gap: 8px; flex-direction: column; align-items: stretch; margin-bottom: 12px; }
-      .search-section label { font-size: 0.75rem; justify-content: center; }
+      .search-section .filter-group { width: 100%; justify-content: space-between; }
+      .search-section .filter-group select { flex: 1; text-align: right; }
       .search-section input { width: 100%; padding: 10px 16px; font-size: 0.85rem; text-align: center; }
       .search-section button { width: 100%; justify-content: center; padding: 10px 20px; font-size: 0.82rem; }
       .result-card { padding: 14px 12px; border-radius: 14px; }
@@ -474,10 +501,38 @@
     </div>
   </div>
 
+  <!-- 🔥 SEARCH SECTION with Session + Class + Roll -->
   <div class="search-section">
-    <label><i class="fas fa-id-badge"></i> Roll No.</label>
-    <input type="number" id="rollInput" placeholder="Enter Roll Number" autofocus>
-    <button id="searchBtn"><i class="fas fa-search"></i> Check Attendance</button>
+    <div class="filter-group">
+      <label><i class="fas fa-calendar-alt"></i> Session</label>
+      <select id="sessionSelect">
+        <option value="2026-27" selected>2026-27</option>
+        <option value="2027-28">2027-28</option>
+        <option value="2028-29">2028-29</option>
+        <option value="2029-30">2029-30</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label><i class="fas fa-users"></i> Class</label>
+      <select id="classSelect">
+        <option value="">-- Select --</option>
+        <option value="6th">6th</option>
+        <option value="7th">7th</option>
+        <option value="8th">8th</option>
+        <option value="9th">9th</option>
+        <option value="10th">10th</option>
+        <option value="11th (Science)">11th (Science)</option>
+        <option value="11th (Commerce)">11th (Commerce)</option>
+        <option value="11th (Arts)">11th (Arts)</option>
+        <option value="12th (Science)">12th (Science)</option>
+        <option value="12th (Commerce)">12th (Commerce)</option>
+        <option value="12th (Arts)">12th (Arts)</option>
+      </select>
+    </div>
+
+    <input type="number" id="rollInput" placeholder="Roll Number" autofocus>
+    <button id="searchBtn"><i class="fas fa-search"></i> Check</button>
   </div>
 
   <div class="loading-spinner" id="loadingSpinner">
@@ -610,6 +665,8 @@
 
   const rollInput = document.getElementById('rollInput');
   const searchBtn = document.getElementById('searchBtn');
+  const classSelect = document.getElementById('classSelect');
+  const sessionSelect = document.getElementById('sessionSelect');
   const loadingSpinner = document.getElementById('loadingSpinner');
   const resultCard = document.getElementById('resultCard');
   const notFound = document.getElementById('notFound');
@@ -623,6 +680,7 @@
   const dueFeeDisplay = document.getElementById('dueFeeDisplay');
   const dueFeeItem = document.getElementById('dueFeeItem');
   const remarkText = document.getElementById('remarkText');
+  const remarkBox = document.getElementById('remarkBox');
   const toast = document.getElementById('toastMsg');
   const coachingHeader = document.getElementById('coachingHeader');
   const detailsBtn = document.getElementById('detailsBtn');
@@ -650,7 +708,7 @@
   function getUrlParams() {
     const params = new URLSearchParams(window.location.search);
     return {
-      session: params.get('session') || '2026-27',
+      session: params.get('session') || '',
       class: params.get('class') || ''
     };
   }
@@ -681,7 +739,7 @@
 
   // ============================================================
   // 🔥 MAIN SEARCH FUNCTION
-  // Searches admissions + attendance + fees collections
+  // Uses class + session from dropdowns (URL fallback)
   // ============================================================
   async function searchStudent() {
     const roll = parseInt(rollInput.value.trim());
@@ -690,10 +748,12 @@
       return;
     }
 
-    const { session, class: className } = getUrlParams();
-    
+    const className = classSelect.value;
+    const session = sessionSelect.value;
+
     if (!className) {
-      showToast('Please select a class from attendance page first!', true);
+      showToast('Please select a Class!', true);
+      classSelect.focus();
       return;
     }
 
@@ -727,7 +787,7 @@
           notFound.style.display = 'block';
           notFoundMsg.textContent = `Roll No. ${roll} not found in ${className} class.`;
           searchBtn.disabled = false;
-          searchBtn.innerHTML = '<i class="fas fa-search"></i> Check Attendance';
+          searchBtn.innerHTML = '<i class="fas fa-search"></i> Check';
           return;
         }
         studentData = snapshot2.docs[0].data();
@@ -784,19 +844,18 @@
       let monthlyFee = 0;
       let paidFee = 0;
       let dueFee = 0;
-      let totalFee = 0;
-      let totalReceived = 0;
-      let totalDue = 0;
       let feeRemark = '';
 
       try {
-        // Fees collection mein roll_number se search karo
         const feesSnap = await db.collection('fees')
           .where('roll_number', '==', String(roll))
           .get();
 
         if (!feesSnap.empty) {
-          // Saare matching docs ka sum karo
+          let totalFee = 0;
+          let totalReceived = 0;
+          let totalDue = 0;
+
           feesSnap.forEach(doc => {
             const feeData = doc.data();
             
@@ -808,7 +867,6 @@
             totalReceived += Number(docReceived) || 0;
             totalDue += Number(docDue) || 0;
 
-            // Monthly fee (tuition) from breakdown
             if (feeData.fee_breakdown && feeData.fee_breakdown.tuition) {
               monthlyFee = feeData.fee_breakdown.tuition;
             } else if (feeData.fee_breakdown && feeData.fee_breakdown.subtotal) {
@@ -821,7 +879,6 @@
             if (feeData.remark) feeRemark = feeData.remark;
           });
 
-          // Agar monthly fee nahi mila to class ke hisaab se default
           if (!monthlyFee || monthlyFee === 0) {
             const classNum = studentClass.match(/\d+/);
             if (classNum) {
@@ -836,7 +893,6 @@
           dueFee = totalDue;
 
         } else {
-          // Agar fees collection mein nahi mila, to default calculate karo
           const classNum = studentClass.match(/\d+/);
           if (classNum) {
             const cls = parseInt(classNum[0]);
@@ -849,7 +905,6 @@
         }
       } catch (feeErr) {
         console.warn('Fees fetch error:', feeErr);
-        // Fallback: class ke hisaab se monthly fee
         const classNum = studentClass.match(/\d+/);
         if (classNum) {
           const cls = parseInt(classNum[0]);
@@ -896,7 +951,27 @@
         dueFeeItem.classList.remove('paid-full');
       }
 
-      remarkText.textContent = remark || feeRemark || 'No remarks';
+      // ============================================================
+      // 🔥 FIX: Holiday ke case mein remark mat dikhao
+      // ============================================================
+      let displayRemark = 'No remarks';
+
+      if (status === 'holiday') {
+        displayRemark = 'No remarks';
+      } else if (remark && remark.trim() !== '' && remark.trim().toLowerCase() !== 'holiday') {
+        displayRemark = remark;
+      } else if (feeRemark && feeRemark.trim() !== '') {
+        displayRemark = feeRemark;
+      }
+
+      remarkText.textContent = displayRemark;
+
+      // Holiday ke case mein remark box hide
+      if (status === 'holiday') {
+        remarkBox.style.display = 'none';
+      } else {
+        remarkBox.style.display = 'flex';
+      }
 
     } catch (error) {
       console.error('Error searching student:', error);
@@ -904,7 +979,7 @@
       showToast('Error searching: ' + error.message, true);
     } finally {
       searchBtn.disabled = false;
-      searchBtn.innerHTML = '<i class="fas fa-search"></i> Check Attendance';
+      searchBtn.innerHTML = '<i class="fas fa-search"></i> Check';
     }
   }
 
@@ -962,7 +1037,6 @@
         }
       }
 
-      // Fetch attendance
       const attendanceSnapshot = await db.collection('attendance')
         .doc(currentStudent.session)
         .collection('classes')
@@ -998,7 +1072,6 @@
         }
       });
 
-      // Student photo
       let studentPhotoData = null;
       if (currentStudent.photoUrl) {
         try {
@@ -1008,9 +1081,7 @@
         }
       }
 
-      // ============================================================
-      // 1) HEADER - CENTERED
-      // ============================================================
+      // HEADER
       const headerHeight = 32;
       doc.setFillColor(26, 35, 126);
       doc.rect(0, 0, pageWidth, headerHeight, 'F');
@@ -1063,9 +1134,7 @@
       doc.text(COACHING_INFO.address, textX, textY + 9.5);
       doc.text(COACHING_INFO.phone, textX, textY + 13);
 
-      // ============================================================
-      // 2) STUDENT DETAILS AREA
-      // ============================================================
+      // STUDENT DETAILS
       const detailsY = headerHeight + 4;
       const detailsHeight = 32;
 
@@ -1123,9 +1192,7 @@
       doc.setFontSize(9);
       doc.text(`Month: ${monthName} ${currentYear}`, infoX, infoY + 16);
 
-      // ============================================================
-      // 3) CALENDAR-STYLE ATTENDANCE AREA
-      // ============================================================
+      // CALENDAR
       const calendarY = detailsY + detailsHeight + 6;
       
       doc.setFillColor(40, 53, 147);
@@ -1215,9 +1282,7 @@
         }
       }
 
-      // ============================================================
-      // 4) SUMMARY AREA
-      // ============================================================
+      // SUMMARY
       let presentCount = 0, absentCount = 0, leaveCount = 0, holidayCount = 0;
       Object.values(studentMap).forEach(s => {
         if (s === 'P') presentCount++;
@@ -1286,11 +1351,8 @@
       doc.setFontSize(14);
       doc.text(String(holidayCount), hX + boxWidth / 2, boxY + 15, { align: 'center' });
 
-      // ============================================================
-      // 5) HOLIDAYS LIST (if any)
-      // ============================================================
+      // HOLIDAYS LIST
       const holidayDays = Object.keys(holidayReasons).sort((a, b) => parseInt(a) - parseInt(b));
-      let holidaysEndY = boxY + boxHeight;
 
       if (holidayDays.length > 0) {
         const holidayListY = boxY + boxHeight + 5;
@@ -1317,13 +1379,9 @@
           doc.text(line, 34, lineY);
           lineY += 4;
         });
-
-        holidaysEndY = holidayListY + boxH;
       }
 
-      // ============================================================
-      // 6) FOOTER
-      // ============================================================
+      // FOOTER
       const footerY = pageHeight - 10;
       
       doc.setDrawColor(180, 180, 180);
@@ -1370,12 +1428,50 @@
     if (e.key === 'Enter') searchStudent();
   });
 
+  // ============================================================
+  // 🔥 INIT: Auto-select class & session from URL if available
+  // ============================================================
   window.addEventListener('load', function() {
+    const urlParams = getUrlParams();
+    
+    if (urlParams.session) {
+      sessionSelect.value = urlParams.session;
+      // Agar option exist nahi karta to add kar do
+      if (!sessionSelect.value) {
+        const opt = document.createElement('option');
+        opt.value = urlParams.session;
+        opt.textContent = urlParams.session;
+        opt.selected = true;
+        sessionSelect.appendChild(opt);
+      }
+    }
+    
+    if (urlParams.class) {
+      // Match with dropdown options
+      let found = false;
+      for (let i = 0; i < classSelect.options.length; i++) {
+        if (classSelect.options[i].value === urlParams.class) {
+          classSelect.selectedIndex = i;
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        // Agar class URL mein hai lekin dropdown mein nahi, to add kar do
+        const opt = document.createElement('option');
+        opt.value = urlParams.class;
+        opt.textContent = urlParams.class;
+        opt.selected = true;
+        classSelect.appendChild(opt);
+      }
+    }
+    
     rollInput.focus();
     preloadLogo();
+    
+    console.log('✅ Parent View Loaded with Class Selector');
   });
 
-  console.log('✅ Parent View Loaded with Fees Integration!');
 </script>
 </body>
 </html>
