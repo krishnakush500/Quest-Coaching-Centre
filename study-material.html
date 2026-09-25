@@ -380,7 +380,8 @@ main{flex:1 0 auto;padding-bottom:26px}
 <script>
 /* ============================================================
    QUEST COACHING — STUDY MATERIAL PORTAL
-   Single collection: study_materials (nested structure)
+   Nested structure:
+   study_materials/{classId}/subjects/{subjectId}/chapters/{chapterId}
    ============================================================ */
 
 const firebaseConfig = {
@@ -396,9 +397,10 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-/* 🆕 SINGLE COLLECTION */
+/* 🆕 NESTED COLLECTIONS */
 const SM_COLLECTION = 'study_materials';
-const SM_DOC_ID = 'quest_study_material';
+const SUB_SUBCOLLECTION = 'subjects';
+const CH_SUBCOLLECTION = 'chapters';
 
 const $  = (sel, root = document) => root.querySelector(sel);
 const app = $('#app');
@@ -425,7 +427,7 @@ const skeletonChapters = (n = 5) =>
   Array.from({ length: n }, () => '<div class="sk sk-chapter"></div>').join('');
 
 /* ============================================================
-   DATA SOURCE — Single collection read
+   🆕 DATA SOURCE — nested subcollections
    ============================================================ */
 const DataSource = {
   _cache: null,
@@ -433,12 +435,53 @@ const DataSource = {
   async _load() {
     if (this._cache) return this._cache;
     try {
-      const snap = await db.collection(SM_COLLECTION).doc(SM_DOC_ID).get();
-      if (snap.exists) {
-        this._cache = snap.data().classes || [];
-      } else {
-        this._cache = [];
+      const classesSnap = await db.collection(SM_COLLECTION)
+        .orderBy('display_order').get();
+
+      const classes = [];
+      for (const classDoc of classesSnap.docs) {
+        const classData = classDoc.data();
+        const cls = {
+          id: classDoc.id,
+          name: classData.name || classDoc.id,
+          display_order: classData.display_order || 0,
+          subjects: []
+        };
+
+        // Load subjects subcollection
+        const subjectsSnap = await db.collection(SM_COLLECTION).doc(classDoc.id)
+          .collection(SUB_SUBCOLLECTION)
+          .orderBy('display_order')
+          .get();
+
+        for (const subjectDoc of subjectsSnap.docs) {
+          const subjectData = subjectDoc.data();
+          const subj = {
+            id: subjectDoc.id,
+            name: subjectData.name || subjectDoc.id,
+            icon: subjectData.icon || '📘',
+            display_order: subjectData.display_order || 0,
+            chapters: []
+          };
+
+          // Load chapters sub-subcollection
+          const chaptersSnap = await db.collection(SM_COLLECTION).doc(classDoc.id)
+            .collection(SUB_SUBCOLLECTION).doc(subjectDoc.id)
+            .collection(CH_SUBCOLLECTION)
+            .orderBy('display_order')
+            .get();
+
+          chaptersSnap.forEach(chDoc => {
+            subj.chapters.push({ id: chDoc.id, ...chDoc.data() });
+          });
+
+          cls.subjects.push(subj);
+        }
+
+        classes.push(cls);
       }
+
+      this._cache = classes;
     } catch (err) {
       console.warn('study_materials fetch failed:', err.message);
       this._cache = [];
@@ -520,7 +563,6 @@ const DataSource = {
    PDF RESOLUTION — Supabase URL stored in Firestore
    ============================================================ */
 function resolvePdfUrl(chapter) {
-  // Supabase public URL stored directly in Firestore's pdf_path field
   if (chapter.pdf_path && /^https?:\/\//i.test(chapter.pdf_path)) return chapter.pdf_path;
   return null;
 }
@@ -917,8 +959,7 @@ document.addEventListener('click', e => {
 
 async function handleDownload(chapterId) {
   try {
-    const route = parseRoute();
-    // Find chapter in the loaded tree (fallback: search all)
+    // Find chapter in loaded tree
     let chapter = null;
     const classes = await DataSource.getClasses();
     outer:
