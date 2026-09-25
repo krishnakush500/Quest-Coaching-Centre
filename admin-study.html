@@ -372,7 +372,7 @@
   <div class="seed-banner" id="seedBanner" style="display:none;">
     <div class="ico"><i class="fas fa-magic"></i></div>
     <div class="txt">
-      <strong>Firestore khali hai!</strong>
+      <strong>Study material khali hai!</strong>
       <span>Ek click me saare classes (6th–12th tak) aur subjects auto-add karne ke liye button dabayein.</span>
     </div>
     <button class="btn-gold" onclick="autoSeed()" id="seedBtn">
@@ -616,24 +616,21 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 /* ============================================================
-   SUPABASE INIT — PDF storage only
-   Bucket: study_material (LOWERCASE — exact!)
+   SUPABASE INIT — PDF storage
    ============================================================ */
 const SUPABASE_URL = 'https://zjwvxqjmccqhyxsaeggw.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_6a_9nxKSSLUZMmSGleyycg_kQ4a4BtI';
-const PDF_BUCKET = 'study_material';  // ✅ lowercase — Supabase me jo hai
+const PDF_BUCKET = 'study_material';
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const COL_CLASSES  = 'study_classes';
-const COL_SUBJECTS = 'study_subjects';
-const COL_CHAPTERS = 'study_chapters';
-
 /* ============================================================
-   SEED DATA — Class names EXACTLY match admission form
-   6th, 7th, 8th, 9th, 10th,
-   11th (Science), 11th (Commerce), 11th (Arts),
-   12th (Science), 12th (Commerce), 12th (Arts)
+   🆕 SINGLE COLLECTION: study_materials
+   Ek hi document me sab kuch nested hai
+   ============================================================ */
+const SM_COLLECTION = 'study_materials';
+const SM_DOC_ID = 'quest_study_material';  // yahi ek document hai/* ============================================================
+   SEED DATA (admission form wale class names)
    ============================================================ */
 const SEED_CLASSES = [
   { name: '6th', display_order: 1 },
@@ -649,7 +646,6 @@ const SEED_CLASSES = [
   { name: '12th (Arts)', display_order: 11 }
 ];
 
-/* Subjects per class */
 const SEED_SUBJECTS = {
   '6th': [
     { name: 'Mathematics', icon: '📘', display_order: 1 },
@@ -726,7 +722,6 @@ const SEED_SUBJECTS = {
   ]
 };
 
-/* Sample chapters — only for Class 10 & 12 (Science/Commerce/Arts) */
 const SEED_CHAPTERS = {
   '10th|Mathematics': ['Real Numbers','Polynomials','Pair of Linear Equations in Two Variables','Quadratic Equations','Arithmetic Progressions','Triangles','Coordinate Geometry','Introduction to Trigonometry','Some Applications of Trigonometry','Circles','Areas Related to Circles','Surface Areas and Volumes','Statistics','Probability'],
   '10th|Science': ['Chemical Reactions and Equations','Acids, Bases and Salts','Metals and Non-metals','Carbon and its Compounds','Life Processes','Control and Coordination','How do Organisms Reproduce?','Heredity and Evolution','Light – Reflection and Refraction','The Human Eye and the Colourful World','Electricity','Magnetic Effects of Electric Current','Our Environment','Sustainable Management of Natural Resources'],
@@ -751,12 +746,38 @@ const SEED_NEW = new Set([
    STATE
    ============================================================ */
 const state = {
-  classes: [],
-  subjects: [],
-  chapters: [],
-  editing: { class:null, subject:null, chapter:null },
+  classes: [],  // [{ id, name, display_order, subjects: [{ id, name, icon, display_order, chapters: [...] }] }]
+  editing: { class:null, subject:null, chapter:null, parentClassId:null, parentSubjectId:null },
   selectedPdfFile: null
 };
+
+/* Flatten helpers */
+function getAllSubjects() {
+  const list = [];
+  state.classes.forEach(c => {
+    (c.subjects || []).forEach(s => list.push({ ...s, class_id: c.id, class_name: c.name }));
+  });
+  return list;
+}
+
+function getAllChapters() {
+  const list = [];
+  state.classes.forEach(c => {
+    (c.subjects || []).forEach(s => {
+      (s.chapters || []).forEach(ch => list.push({
+        ...ch, subject_id: s.id, subject_name: s.name,
+        class_id: c.id, class_name: c.name
+      }));
+    });
+  });
+  return list;
+}
+
+function findClass(id) { return state.classes.find(c => c.id === id); }
+function findSubject(classId, subjectId) {
+  const c = findClass(classId);
+  return c ? (c.subjects || []).find(s => s.id === subjectId) : null;
+}
 
 /* ============================================================
    HELPERS
@@ -784,9 +805,7 @@ function updateLoader(text, sub='') {
   $('loaderSub').textContent = sub;
 }
 
-function sortByOrder(arr) {
-  return [...arr].sort((a,b) => (a.display_order||0) - (b.display_order||0));
-}
+const uid = () => 'id_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 
 /* ============================================================
    AUTH CHECK
@@ -802,22 +821,22 @@ auth.onAuthStateChanged((user) => {
 });
 
 /* ============================================================
-   LOAD DATA
+   LOAD DATA — read single document
    ============================================================ */
 async function loadAll() {
   showLoader('Loading…');
   try {
-    const [cSnap, sSnap, chSnap] = await Promise.all([
-      db.collection(COL_CLASSES).get(),
-      db.collection(COL_SUBJECTS).get(),
-      db.collection(COL_CHAPTERS).get()
-    ]);
+    const docRef = db.collection(SM_COLLECTION).doc(SM_DOC_ID);
+    const snap = await docRef.get();
 
-    state.classes = sortByOrder(cSnap.docs.map(d => ({ id:d.id, ...d.data() })));
-    state.subjects = sortByOrder(sSnap.docs.map(d => ({ id:d.id, ...d.data() })));
-    state.chapters = sortByOrder(chSnap.docs.map(d => ({ id:d.id, ...d.data() })));
-
-    $('seedBanner').style.display = state.classes.length === 0 ? 'flex' : 'none';
+    if (snap.exists) {
+      const data = snap.data();
+      state.classes = data.classes || [];
+      $('seedBanner').style.display = state.classes.length === 0 ? 'flex' : 'none';
+    } else {
+      state.classes = [];
+      $('seedBanner').style.display = 'flex';
+    }
 
     renderAll();
     refreshFilters();
@@ -830,6 +849,17 @@ async function loadAll() {
 }
 
 /* ============================================================
+   SAVE DATA — write single document
+   ============================================================ */
+async function saveAll() {
+  const docRef = db.collection(SM_COLLECTION).doc(SM_DOC_ID);
+  await docRef.set({
+    classes: state.classes,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+}
+
+/* ============================================================
    AUTO SEED
    ============================================================ */
 window.autoSeed = async function() {
@@ -838,56 +868,59 @@ window.autoSeed = async function() {
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Seeding…';
 
-  showLoader('Seeding demo data…', 'Please wait, this may take 20-30 seconds');
+  showLoader('Seeding demo data…', 'Please wait 10-15 seconds');
   try {
-    /* 1. Classes */
-    const classIdMap = {};
+    /* Build nested structure */
+    const classesData = [];
+
     for (const cls of SEED_CLASSES) {
-      const ref = await db.collection(COL_CLASSES).add({
-        name: cls.name, display_order: cls.display_order,
-        created_at: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      classIdMap[cls.name] = ref.id;
-    }
+      const classId = uid();
+      const subjectsData = [];
 
-    /* 2. Subjects */
-    const subjectIdMap = {};
-    for (const [className, subs] of Object.entries(SEED_SUBJECTS)) {
-      const classId = classIdMap[className];
-      if (!classId) continue;
+      const subs = SEED_SUBJECTS[cls.name] || [];
       for (const sub of subs) {
-        const ref = await db.collection(COL_SUBJECTS).add({
-          class_id: classId, name: sub.name, icon: sub.icon,
-          display_order: sub.display_order,
-          created_at: firebase.firestore.FieldValue.serverTimestamp()
+        const subjectId = uid();
+        const chaptersData = [];
+
+        const chapKey = `${cls.name}|${sub.name}`;
+        const chapList = SEED_CHAPTERS[chapKey] || [];
+        chapList.forEach((chName, i) => {
+          const isNew = SEED_NEW.has(`${cls.name}|${sub.name}|${chName}`);
+          chaptersData.push({
+            id: uid(),
+            chapter_number: i + 1,
+            name: chName,
+            display_order: i + 1,
+            pdf_path: null,
+            is_new: isNew,
+            is_published: true
+          });
         });
-        subjectIdMap[`${className}|${sub.name}`] = ref.id;
+
+        subjectsData.push({
+          id: subjectId,
+          name: sub.name,
+          icon: sub.icon,
+          display_order: sub.display_order,
+          chapters: chaptersData
+        });
       }
+
+      classesData.push({
+        id: classId,
+        name: cls.name,
+        display_order: cls.display_order,
+        subjects: subjectsData
+      });
     }
 
-    /* 3. Chapters */
-    for (const [key, chapters] of Object.entries(SEED_CHAPTERS)) {
-      const subjectId = subjectIdMap[key];
-      if (!subjectId) continue;
-      const [className, subjectName] = key.split('|');
-      for (let i = 0; i < chapters.length; i++) {
-        const chName = chapters[i];
-        const isNew = SEED_NEW.has(`${className}|${subjectName}|${chName}`);
-        await db.collection(COL_CHAPTERS).add({
-          subject_id: subjectId,
-          chapter_number: i + 1,
-          name: chName,
-          display_order: i + 1,
-          pdf_path: null,
-          is_new: isNew,
-          is_published: true,
-          created_at: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      }
-    }
+    state.classes = classesData;
+    await saveAll();
 
     toast('✅ Seed complete!');
-    await loadAll();
+    renderAll();
+    refreshFilters();
+    $('seedBanner').style.display = 'none';
   } catch (err) {
     console.error(err);
     toast('Seed failed: ' + err.message, true);
@@ -909,12 +942,15 @@ function renderAll() {
 }
 
 function updateCounts() {
+  const allSubs = getAllSubjects();
+  const allChs = getAllChapters();
+
   $('tabCountClasses').textContent = state.classes.length;
-  $('tabCountSubjects').textContent = state.subjects.length;
-  $('tabCountChapters').textContent = state.chapters.length;
+  $('tabCountSubjects').textContent = allSubs.length;
+  $('tabCountChapters').textContent = allChs.length;
   $('classesCount').textContent = state.classes.length;
-  $('subjectsCount').textContent = state.subjects.length;
-  $('chaptersCount').textContent = state.chapters.length;
+  $('subjectsCount').textContent = allSubs.length;
+  $('chaptersCount').textContent = allChs.length;
 }
 
 function renderClasses() {
@@ -934,7 +970,7 @@ function renderClasses() {
         <h4>${esc(c.name)}</h4>
         <div class="meta">
           <span>Order: ${c.display_order||0}</span>
-          <span class="badge-soft badge-pub">${state.subjects.filter(s=>s.class_id===c.id).length} subjects</span>
+          <span class="badge-soft badge-pub">${(c.subjects||[]).length} subjects</span>
         </div>
       </div>
       <div class="sm-item-actions">
@@ -947,7 +983,8 @@ function renderClasses() {
 
 function renderSubjects() {
   const filter = $('subjectClassFilter')?.value || '';
-  const list = filter ? state.subjects.filter(s => s.class_id === filter) : state.subjects;
+  let list = getAllSubjects();
+  if (filter) list = list.filter(s => s.class_id === filter);
   const box = $('subjectsList');
 
   if (!list.length) {
@@ -958,40 +995,32 @@ function renderSubjects() {
     </div>`;
     return;
   }
-  box.innerHTML = list.map(s => {
-    const cls = state.classes.find(c => c.id === s.class_id);
-    const chCount = state.chapters.filter(ch => ch.subject_id === s.id).length;
-    return `
-      <div class="sm-item">
-        <div class="sm-item-icon" style="font-size:1.4rem;">${esc(s.icon || '📘')}</div>
-        <div class="sm-item-body">
-          <h4>${esc(s.name)}</h4>
-          <div class="meta">
-            <span><i class="fas fa-school"></i> ${esc(cls ? cls.name : '—')}</span>
-            <span>Order: ${s.display_order||0}</span>
-            <span class="badge-soft badge-pdf">${chCount} chapters</span>
-          </div>
-        </div>
-        <div class="sm-item-actions">
-          <button class="btn-outline-soft" onclick="editSubject('${s.id}')"><i class="fas fa-pen"></i> Edit</button>
-          <button class="btn-danger-soft" onclick="deleteSubject('${s.id}')"><i class="fas fa-trash"></i> Delete</button>
+  box.innerHTML = list.map(s => `
+    <div class="sm-item">
+      <div class="sm-item-icon" style="font-size:1.4rem;">${esc(s.icon || '📘')}</div>
+      <div class="sm-item-body">
+        <h4>${esc(s.name)}</h4>
+        <div class="meta">
+          <span><i class="fas fa-school"></i> ${esc(s.class_name)}</span>
+          <span>Order: ${s.display_order||0}</span>
+          <span class="badge-soft badge-pdf">${(s.chapters||[]).length} chapters</span>
         </div>
       </div>
-    `;
-  }).join('');
+      <div class="sm-item-actions">
+        <button class="btn-outline-soft" onclick="editSubject('${s.class_id}', '${s.id}')"><i class="fas fa-pen"></i> Edit</button>
+        <button class="btn-danger-soft" onclick="deleteSubject('${s.class_id}', '${s.id}')"><i class="fas fa-trash"></i> Delete</button>
+      </div>
+    </div>
+  `).join('');
 }
 
 function renderChapters() {
   const classFilter = $('chapterClassFilter')?.value || '';
   const subjectFilter = $('chapterSubjectFilter')?.value || '';
 
-  let list = [...state.chapters];
-  if (classFilter) {
-    const subjectIdsInClass = state.subjects.filter(s => s.class_id === classFilter).map(s => s.id);
-    list = list.filter(ch => subjectIdsInClass.includes(ch.subject_id));
-  }
+  let list = getAllChapters();
+  if (classFilter) list = list.filter(ch => ch.class_id === classFilter);
   if (subjectFilter) list = list.filter(ch => ch.subject_id === subjectFilter);
-  list = sortByOrder(list);
 
   const box = $('chaptersList');
   if (!list.length) {
@@ -1003,8 +1032,6 @@ function renderChapters() {
     return;
   }
   box.innerHTML = list.map(ch => {
-    const subj = state.subjects.find(s => s.id === ch.subject_id);
-    const cls = subj ? state.classes.find(c => c.id === subj.class_id) : null;
     const hasPdf = !!ch.pdf_path;
     return `
       <div class="sm-item">
@@ -1012,16 +1039,16 @@ function renderChapters() {
         <div class="sm-item-body">
           <h4>${esc(ch.name)}</h4>
           <div class="meta">
-            <span><i class="fas fa-school"></i> ${esc(cls ? cls.name : '—')}</span>
-            <span><i class="fas fa-book"></i> ${esc(subj ? subj.name : '—')}</span>
+            <span><i class="fas fa-school"></i> ${esc(ch.class_name)}</span>
+            <span><i class="fas fa-book"></i> ${esc(ch.subject_name)}</span>
             ${ch.is_new ? '<span class="badge-soft badge-new">NEW</span>' : ''}
             ${ch.is_published === false ? '<span class="badge-soft badge-draft">Draft</span>' : '<span class="badge-soft badge-pub">Live</span>'}
             ${hasPdf ? '<span class="badge-soft badge-pdf"><i class="fas fa-file-pdf"></i> PDF</span>' : '<span class="badge-soft badge-nopdf">No PDF</span>'}
           </div>
         </div>
         <div class="sm-item-actions">
-          <button class="btn-outline-soft" onclick="editChapter('${ch.id}')"><i class="fas fa-pen"></i> Edit</button>
-          <button class="btn-danger-soft" onclick="deleteChapter('${ch.id}')"><i class="fas fa-trash"></i> Delete</button>
+          <button class="btn-outline-soft" onclick="editChapter('${ch.class_id}', '${ch.subject_id}', '${ch.id}')"><i class="fas fa-pen"></i> Edit</button>
+          <button class="btn-danger-soft" onclick="deleteChapter('${ch.class_id}', '${ch.subject_id}', '${ch.id}')"><i class="fas fa-trash"></i> Delete</button>
         </div>
       </div>
     `;
@@ -1054,10 +1081,10 @@ function updateChapterSubjectFilter() {
   const ss = $('chapterSubjectFilter');
   if (!ss) return;
   const cur = ss.value;
-  let subs = state.subjects;
+  let subs = getAllSubjects();
   if (classFilter) subs = subs.filter(s => s.class_id === classFilter);
   ss.innerHTML = '<option value="">All Subjects</option>' +
-    subs.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
+    subs.map(s => `<option value="${s.id}">${esc(s.class_name)} · ${esc(s.name)}</option>`).join('');
   ss.value = cur;
 }
 
@@ -1091,8 +1118,9 @@ window.openClassModal = function() {
   $('classFormOrder').value = state.classes.length + 1;
   classModal.show();
 };
+
 window.editClass = function(id) {
-  const c = state.classes.find(x => x.id === id);
+  const c = findClass(id);
   if (!c) return;
   state.editing.class = c;
   $('classModalTitle').textContent = 'Edit Class';
@@ -1100,48 +1128,66 @@ window.editClass = function(id) {
   $('classFormOrder').value = c.display_order || 0;
   classModal.show();
 };
+
 window.saveClass = async function() {
   const name = $('classFormName').value.trim();
   const order = parseInt($('classFormOrder').value, 10) || 0;
   if (!name) return toast('Class name required', true);
+
   showLoader('Saving class…');
   try {
     if (state.editing.class) {
-      await db.collection(COL_CLASSES).doc(state.editing.class.id).update({ name, display_order: order });
-      toast('Class updated ✓');
+      state.editing.class.name = name;
+      state.editing.class.display_order = order;
     } else {
-      await db.collection(COL_CLASSES).add({ name, display_order: order, created_at: firebase.firestore.FieldValue.serverTimestamp() });
-      toast('Class added ✓');
+      state.classes.push({
+        id: uid(),
+        name, display_order: order,
+        subjects: []
+      });
     }
+    await saveAll();
     classModal.hide();
-    await loadAll();
-  } catch (err) { toast('Save failed: ' + err.message, true); }
-  finally { hideLoader(); }
+    toast(state.editing.class ? 'Class updated ✓' : 'Class added ✓');
+    renderAll();
+    refreshFilters();
+  } catch (err) {
+    toast('Save failed: ' + err.message, true);
+  } finally {
+    hideLoader();
+  }
 };
+
 window.deleteClass = async function(id) {
-  const cls = state.classes.find(c => c.id === id);
+  const cls = findClass(id);
   if (!cls) return;
-  const subCount = state.subjects.filter(s => s.class_id === id).length;
-  if (!confirm(subCount ? `Delete "${cls.name}" + ${subCount} subject(s) + all chapters?` : `Delete "${cls.name}"?`)) return;
+  const subCount = (cls.subjects || []).length;
+  if (!confirm(subCount ? `Delete "${cls.name}" + ${subCount} subject(s)?` : `Delete "${cls.name}"?`)) return;
+
   showLoader('Deleting…');
   try {
-    const subjectIds = state.subjects.filter(s => s.class_id === id).map(s => s.id);
-    const chaptersToDelete = state.chapters.filter(c => subjectIds.includes(c.subject_id));
-    for (const ch of chaptersToDelete) {
-      if (ch.pdf_path) await deletePdfFromSupabase(ch.pdf_path);
+    // Delete PDFs from Supabase
+    for (const s of (cls.subjects || [])) {
+      for (const ch of (s.chapters || [])) {
+        if (ch.pdf_path) await deletePdfFromSupabase(ch.pdf_path);
+      }
     }
-    await Promise.all(chaptersToDelete.map(c => db.collection(COL_CHAPTERS).doc(c.id).delete()));
-    await Promise.all(subjectIds.map(sid => db.collection(COL_SUBJECTS).doc(sid).delete()));
-    await db.collection(COL_CLASSES).doc(id).delete();
-    toast('Deleted ✓');
-    await loadAll();
-  } catch (err) { toast('Delete failed: ' + err.message, true); }
-  finally { hideLoader(); }
+    state.classes = state.classes.filter(c => c.id !== id);
+    await saveAll();
+    toast('Class deleted ✓');
+    renderAll();
+    refreshFilters();
+  } catch (err) {
+    toast('Delete failed: ' + err.message, true);
+  } finally {
+    hideLoader();
+  }
 };
 
 /* SUBJECT CRUD */
 window.openSubjectModal = function(presetClassId) {
   state.editing.subject = null;
+  state.editing.parentClassId = null;
   $('subjectModalTitle').textContent = 'Add Subject';
   if (!state.classes.length) return toast('Add a class first!', true);
   $('subjectFormClass').innerHTML = state.classes.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
@@ -1151,61 +1197,96 @@ window.openSubjectModal = function(presetClassId) {
   $('subjectFormOrder').value = 1;
   subjectModal.show();
 };
-window.editSubject = function(id) {
-  const s = state.subjects.find(x => x.id === id);
+
+window.editSubject = function(classId, subjectId) {
+  const s = findSubject(classId, subjectId);
   if (!s) return;
   state.editing.subject = s;
+  state.editing.parentClassId = classId;
   $('subjectModalTitle').textContent = 'Edit Subject';
   $('subjectFormClass').innerHTML = state.classes.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
-  $('subjectFormClass').value = s.class_id;
+  $('subjectFormClass').value = classId;
   $('subjectFormName').value = s.name || '';
   $('subjectFormIcon').value = s.icon || '📘';
   $('subjectFormOrder').value = s.display_order || 0;
   subjectModal.show();
 };
+
 window.saveSubject = async function() {
-  const class_id = $('subjectFormClass').value;
+  const newClassId = $('subjectFormClass').value;
   const name = $('subjectFormName').value.trim();
   const icon = $('subjectFormIcon').value.trim() || '📘';
   const order = parseInt($('subjectFormOrder').value, 10) || 0;
-  if (!class_id) return toast('Select a class', true);
+  if (!newClassId) return toast('Select a class', true);
   if (!name) return toast('Subject name required', true);
+
   showLoader('Saving subject…');
   try {
     if (state.editing.subject) {
-      await db.collection(COL_SUBJECTS).doc(state.editing.subject.id).update({ class_id, name, icon, display_order: order });
-      toast('Subject updated ✓');
+      // If class changed, move it
+      const oldClassId = state.editing.parentClassId;
+      if (oldClassId !== newClassId) {
+        const oldCls = findClass(oldClassId);
+        oldCls.subjects = oldCls.subjects.filter(s => s.id !== state.editing.subject.id);
+        const newCls = findClass(newClassId);
+        state.editing.subject.name = name;
+        state.editing.subject.icon = icon;
+        state.editing.subject.display_order = order;
+        newCls.subjects = newCls.subjects || [];
+        newCls.subjects.push(state.editing.subject);
+      } else {
+        state.editing.subject.name = name;
+        state.editing.subject.icon = icon;
+        state.editing.subject.display_order = order;
+      }
     } else {
-      await db.collection(COL_SUBJECTS).add({ class_id, name, icon, display_order: order, created_at: firebase.firestore.FieldValue.serverTimestamp() });
-      toast('Subject added ✓');
+      const cls = findClass(newClassId);
+      cls.subjects = cls.subjects || [];
+      cls.subjects.push({
+        id: uid(),
+        name, icon, display_order: order,
+        chapters: []
+      });
     }
+    await saveAll();
     subjectModal.hide();
-    await loadAll();
-  } catch (err) { toast('Save failed: ' + err.message, true); }
-  finally { hideLoader(); }
+    toast(state.editing.subject ? 'Subject updated ✓' : 'Subject added ✓');
+    renderAll();
+    refreshFilters();
+  } catch (err) {
+    toast('Save failed: ' + err.message, true);
+  } finally {
+    hideLoader();
+  }
 };
-window.deleteSubject = async function(id) {
-  const subj = state.subjects.find(s => s.id === id);
-  if (!subj) return;
-  const chCount = state.chapters.filter(c => c.subject_id === id).length;
-  if (!confirm(chCount ? `Delete "${subj.name}" + ${chCount} chapter(s)?` : `Delete "${subj.name}"?`)) return;
+
+window.deleteSubject = async function(classId, subjectId) {
+  const cls = findClass(classId);
+  if (!cls) return;
+  const s = findSubject(classId, subjectId);
+  if (!s) return;
+  const chCount = (s.chapters || []).length;
+  if (!confirm(chCount ? `Delete "${s.name}" + ${chCount} chapter(s)?` : `Delete "${s.name}"?`)) return;
+
   showLoader('Deleting…');
   try {
-    const chaptersToDelete = state.chapters.filter(c => c.subject_id === id);
-    for (const ch of chaptersToDelete) {
+    for (const ch of (s.chapters || [])) {
       if (ch.pdf_path) await deletePdfFromSupabase(ch.pdf_path);
     }
-    await Promise.all(chaptersToDelete.map(c => db.collection(COL_CHAPTERS).doc(c.id).delete()));
-    await db.collection(COL_SUBJECTS).doc(id).delete();
-    toast('Deleted ✓');
-    await loadAll();
-  } catch (err) { toast('Delete failed: ' + err.message, true); }
-  finally { hideLoader(); }
+    cls.subjects = cls.subjects.filter(x => x.id !== subjectId);
+    await saveAll();
+    toast('Subject deleted ✓');
+    renderAll();
+    refreshFilters();
+  } catch (err) {
+    toast('Delete failed: ' + err.message, true);
+  } finally {
+    hideLoader();
+  }
 };
 
 /* ============================================================
    SUPABASE PDF UPLOAD / DELETE
-   Bucket: study_material (lowercase)
    ============================================================ */
 function extractSupabasePath(pdfUrl) {
   if (!pdfUrl || typeof pdfUrl !== 'string') return null;
@@ -1257,10 +1338,13 @@ async function deletePdfFromSupabase(pdfUrlOrPath) {
   }
 }
 
-/* CHAPTER CRUD */
+/* ============================================================
+   CHAPTER CRUD
+   ============================================================ */
 function refreshChapterFormSubjects() {
   const classId = $('chapterFormClass').value;
-  const subs = state.subjects.filter(s => s.class_id === classId);
+  const cls = findClass(classId);
+  const subs = cls ? (cls.subjects || []) : [];
   $('chapterFormSubject').innerHTML = subs.length
     ? subs.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('')
     : '<option value="">No subjects</option>';
@@ -1268,9 +1352,11 @@ function refreshChapterFormSubjects() {
 
 window.openChapterModal = function() {
   state.editing.chapter = null;
+  state.editing.parentClassId = null;
+  state.editing.parentSubjectId = null;
   state.selectedPdfFile = null;
+
   if (!state.classes.length) return toast('Add a class first!', true);
-  if (!state.subjects.length) return toast('Add a subject first!', true);
 
   $('chapterModalTitle').textContent = 'Add Chapter';
   $('chapterFormClass').innerHTML = state.classes.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
@@ -1290,20 +1376,22 @@ window.openChapterModal = function() {
   chapterModal.show();
 };
 
-window.editChapter = function(id) {
-  const ch = state.chapters.find(c => c.id === id);
+window.editChapter = function(classId, subjectId, chapterId) {
+  const s = findSubject(classId, subjectId);
+  if (!s) return;
+  const ch = (s.chapters || []).find(c => c.id === chapterId);
   if (!ch) return;
-  const subj = state.subjects.find(s => s.id === ch.subject_id);
-  if (!subj) return toast('Subject missing', true);
 
   state.editing.chapter = ch;
+  state.editing.parentClassId = classId;
+  state.editing.parentSubjectId = subjectId;
   state.selectedPdfFile = null;
 
   $('chapterModalTitle').textContent = 'Edit Chapter';
   $('chapterFormClass').innerHTML = state.classes.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
-  $('chapterFormClass').value = subj.class_id;
+  $('chapterFormClass').value = classId;
   refreshChapterFormSubjects();
-  $('chapterFormSubject').value = ch.subject_id;
+  $('chapterFormSubject').value = subjectId;
 
   $('chapterFormNumber').value = ch.chapter_number || 1;
   $('chapterFormName').value = ch.name || '';
@@ -1328,7 +1416,6 @@ document.addEventListener('change', (e) => {
   if (e.target && e.target.id === 'chapterFormClass') refreshChapterFormSubjects();
 });
 
-/* Upload UI */
 document.addEventListener('DOMContentLoaded', () => {
   $('uploadDrop').addEventListener('click', () => $('chapterFormPdf').click());
   $('chapterFormPdf').addEventListener('change', (e) => {
@@ -1354,14 +1441,15 @@ window.clearPdfSelection = function() {
 };
 
 window.saveChapter = async function() {
-  const subject_id = $('chapterFormSubject').value;
+  const targetClassId = $('chapterFormClass').value;
+  const targetSubjectId = $('chapterFormSubject').value;
   const number = parseInt($('chapterFormNumber').value, 10) || 1;
   const name = $('chapterFormName').value.trim();
   const order = parseInt($('chapterFormOrder').value, 10) || 0;
   const is_new = $('chapterFormIsNew').checked;
   const is_published = $('chapterFormIsPublished').checked;
 
-  if (!subject_id) return toast('Select a subject', true);
+  if (!targetSubjectId) return toast('Select a subject', true);
   if (!name) return toast('Chapter name required', true);
 
   const saveBtn = $('saveChapterBtn');
@@ -1370,7 +1458,6 @@ window.saveChapter = async function() {
   let pdf_path = state.editing.chapter?.pdf_path || null;
 
   try {
-    /* 🆕 Upload to Supabase Storage */
     if (state.selectedPdfFile) {
       showLoader('Uploading PDF to Supabase…', 'Please wait, don\'t close this window');
       $('uploadProgress').classList.add('show');
@@ -1382,35 +1469,51 @@ window.saveChapter = async function() {
 
       $('uploadPercent').textContent = '80%';
       $('uploadFill').style.width = '80%';
-      $('uploadStatus').textContent = 'Upload complete!';
 
-      // Delete old PDF if replacing
       if (state.editing.chapter?.pdf_path) {
         updateLoader('Removing old PDF…');
         await deletePdfFromSupabase(state.editing.chapter.pdf_path);
       }
-
       pdf_path = newUrl;
     }
 
-    updateLoader('Saving chapter to Firestore…');
+    updateLoader('Saving chapter…');
     $('uploadPercent').textContent = '95%';
     $('uploadFill').style.width = '95%';
 
+    const newSubject = findSubject(targetClassId, targetSubjectId);
+    if (!newSubject) throw new Error('Target subject not found');
+
     if (state.editing.chapter) {
-      await db.collection(COL_CHAPTERS).doc(state.editing.chapter.id).update({
-        subject_id, chapter_number: number, name, display_order: order,
-        is_new, is_published, pdf_path
-      });
+      // If moved to another subject
+      if (state.editing.parentSubjectId !== targetSubjectId) {
+        const oldSubj = findSubject(state.editing.parentClassId, state.editing.parentSubjectId);
+        if (oldSubj) oldSubj.chapters = (oldSubj.chapters || []).filter(c => c.id !== state.editing.chapter.id);
+        newSubject.chapters = newSubject.chapters || [];
+        Object.assign(state.editing.chapter, {
+          chapter_number: number, name, display_order: order,
+          is_new, is_published, pdf_path
+        });
+        newSubject.chapters.push(state.editing.chapter);
+      } else {
+        Object.assign(state.editing.chapter, {
+          chapter_number: number, name, display_order: order,
+          is_new, is_published, pdf_path
+        });
+      }
       toast('Chapter updated ✓');
     } else {
-      await db.collection(COL_CHAPTERS).add({
-        subject_id, chapter_number: number, name, display_order: order,
-        is_new, is_published, pdf_path,
-        created_at: firebase.firestore.FieldValue.serverTimestamp()
+      newSubject.chapters = newSubject.chapters || [];
+      newSubject.chapters.push({
+        id: uid(),
+        chapter_number: number,
+        name, display_order: order,
+        pdf_path, is_new, is_published
       });
       toast('Chapter added ✓');
     }
+
+    await saveAll();
 
     $('uploadPercent').textContent = '100%';
     $('uploadFill').style.width = '100%';
@@ -1418,7 +1521,8 @@ window.saveChapter = async function() {
     setTimeout(() => {
       chapterModal.hide();
       state.selectedPdfFile = null;
-      loadAll();
+      renderAll();
+      refreshFilters();
     }, 400);
   } catch (err) {
     console.error('Save chapter error:', err);
@@ -1430,17 +1534,21 @@ window.saveChapter = async function() {
   }
 };
 
-window.deleteChapter = async function(id) {
-  const ch = state.chapters.find(c => c.id === id);
+window.deleteChapter = async function(classId, subjectId, chapterId) {
+  const s = findSubject(classId, subjectId);
+  if (!s) return;
+  const ch = (s.chapters || []).find(c => c.id === chapterId);
   if (!ch) return;
   if (!confirm(`Delete chapter "${ch.name}"?`)) return;
 
   showLoader('Deleting…');
   try {
     if (ch.pdf_path) await deletePdfFromSupabase(ch.pdf_path);
-    await db.collection(COL_CHAPTERS).doc(id).delete();
+    s.chapters = (s.chapters || []).filter(c => c.id !== chapterId);
+    await saveAll();
     toast('Chapter deleted ✓');
-    await loadAll();
+    renderAll();
+    refreshFilters();
   } catch (err) {
     toast('Delete failed: ' + err.message, true);
   } finally {
