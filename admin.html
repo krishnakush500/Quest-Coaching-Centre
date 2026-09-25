@@ -80,6 +80,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             border: 1px solid #f0f0f0;
             cursor: pointer;
+            position: relative;
         }
         .admin-card:hover {
             transform: translateY(-6px);
@@ -102,8 +103,10 @@
         .card-3 .card-icon { background: #fee2e2; color: #dc3545; }
         .card-4 .card-icon { background: #e0f2fe; color: #0ea5e9; }
         .card-5 .card-icon { background: #f3e8ff; color: #8b5cf6; }
-        /* NEW: Attendance Card Color */
+        /* Attendance Card Color */
         .card-6 .card-icon { background: #fef3c7; color: #d97706; }
+        /* 🆕 Study Material Card Color — Royal Blue + Gold theme */
+        .card-7 .card-icon { background: linear-gradient(135deg, #ffd257, #f7b500); color: #0d2b6b; }
         
         .card-title {
             font-size: 1.1rem;
@@ -137,6 +140,29 @@
         .card-4:hover .card-btn { background: #0ea5e9; }
         .card-5:hover .card-btn { background: #8b5cf6; }
         .card-6:hover .card-btn { background: #d97706; }
+        /* 🆕 Study Material hover */
+        .card-7:hover .card-btn { background: #0d2b6b; color: #ffd257; }
+        .card-7:hover .card-icon { box-shadow: 0 8px 20px rgba(247,181,0,0.4); }
+
+        /* 🆕 NEW badge for Study Material card */
+        .card-new-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #e0245e;
+            color: #fff;
+            font-size: 0.6rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(224,36,94,0.35);
+            animation: newPulse 2s ease-in-out infinite;
+        }
+        @keyframes newPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
         
         /* Logout Button */
         .logout-btn {
@@ -214,6 +240,7 @@
             .card-title { font-size: 0.75rem; }
             .card-desc { display: none; }
             .card-btn { padding: 4px 10px; font-size: 0.6rem; }
+            .card-new-badge { font-size: 0.5rem; padding: 2px 6px; top: 8px; right: 8px; }
         }
     </style>
 </head>
@@ -278,11 +305,20 @@
             <button class="card-btn">Open →</button>
         </div>
 
-        <!-- 🔥 NEW CARD 6: Attendance Management -->
+        <!-- Card 6: Attendance Management -->
         <div class="admin-card card-6" id="attendanceCard">
             <div class="card-icon"><i class="fas fa-clipboard-check"></i></div>
             <h3 class="card-title">📋 Attendance</h3>
             <p class="card-desc">Mark & manage daily attendance</p>
+            <button class="card-btn">Open →</button>
+        </div>
+
+        <!-- 🆕 Card 7: STUDY MATERIAL (NEW) -->
+        <div class="admin-card card-7" id="studyMaterialCard">
+            <span class="card-new-badge">NEW</span>
+            <div class="card-icon"><i class="fas fa-book-open"></i></div>
+            <h3 class="card-title">📚 Study Material</h3>
+            <p class="card-desc">Manage classes, subjects, chapters & PDFs</p>
             <button class="card-btn">Open →</button>
         </div>
     </div>
@@ -316,6 +352,11 @@
                     <div class="help-step"><strong>💻 Online Test</strong><div class="simple-instruction">Create and publish online tests for students</div></div>
                     <div class="help-step"><strong>🎫 Admit Card Generator</strong><div class="simple-instruction">Generate professional admit cards (enter exam details & roll number)</div></div>
                     <div class="help-step"><strong>📋 Attendance Management</strong><div class="simple-instruction">Mark daily attendance (Present/Absent/Leave), view reports, download PDF</div></div>
+                    <!-- 🆕 Study Material help -->
+                    <div class="help-step" style="border-left-color:#f7b500;background:#fffbea;">
+                        <strong>📚 Study Material</strong>
+                        <div class="simple-instruction">Add classes, subjects & chapters. Upload PDFs from your device → Students can view & download them instantly from the Study Material portal.</div>
+                    </div>
                 </div>
                 <div id="hindiInstructions" style="display:none;">
                     <div class="help-step"><strong>📊 रिजल्ट प्रबंधन</strong><div class="simple-instruction">"Manage Results" पर क्लिक करें → रिजल्ट बनाएं, एडिट करें, प्रकाशित करें</div></div>
@@ -324,6 +365,11 @@
                     <div class="help-step"><strong>💻 ऑनलाइन टेस्ट</strong><div class="simple-instruction">ऑनलाइन टेस्ट बनाएं और प्रकाशित करें</div></div>
                     <div class="help-step"><strong>🎫 एडमिट कार्ड</strong><div class="simple-instruction">परीक्षा विवरण और रोल नंबर भरकर एडमिट कार्ड बनाएं</div></div>
                     <div class="help-step"><strong>📋 अटेंडेंस प्रबंधन</strong><div class="simple-instruction">दैनिक अटेंडेंस (Present/Absent/Leave) मार्क करें, रिपोर्ट देखें, PDF डाउनलोड करें</div></div>
+                    <!-- 🆕 Study Material help (Hindi) -->
+                    <div class="help-step" style="border-left-color:#f7b500;background:#fffbea;">
+                        <strong>📚 स्टडी मटेरियल</strong>
+                        <div class="simple-instruction">क्लास, सब्जेक्ट और चैप्टर जोड़ें। अपने डिवाइस से PDF अपलोड करें → छात्र तुरंत स्टडी मटेरियल पोर्टल से देख और डाउनलोड कर सकते हैं।</div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -371,7 +417,8 @@
     const feeCard = document.getElementById('feeCard');
     const onlineTestCard = document.getElementById('onlineTestCard');
     const admitCardCard = document.getElementById('admitCardCard');
-    const attendanceCard = document.getElementById('attendanceCard'); // NEW
+    const attendanceCard = document.getElementById('attendanceCard');
+    const studyMaterialCard = document.getElementById('studyMaterialCard'); // 🆕
 
     // Authentication & Fetch Coaching Details
     onAuthStateChanged(auth, async (user) => {
@@ -384,7 +431,7 @@
         const userEmail = user.email;
         welcomeMsg.innerHTML = `Welcome, ${userEmail.split('@')[0]} 👋`;
         
-        // Fetch coaching details from Firestore (assuming a document 'coachingInfo' exists)
+        // Fetch coaching details from Firestore
         try {
             const coachingDoc = await getDoc(doc(db, "settings", "coaching"));
             if (coachingDoc.exists()) {
@@ -418,10 +465,13 @@
     admitCardCard.addEventListener('click', () => {
         window.location.href = 'admit-card.html';
     });
-
-    // 🔥 NEW: Attendance Card Navigation
     attendanceCard.addEventListener('click', () => {
         window.location.href = 'attendance.html';
+    });
+
+    // 🆕 Study Material Card Navigation
+    studyMaterialCard.addEventListener('click', () => {
+        window.open('admin-study.html', '_blank');
     });
 
     // Logout
