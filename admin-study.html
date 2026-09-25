@@ -625,11 +625,12 @@ const PDF_BUCKET = 'study_material';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* ============================================================
-   🆕 SINGLE COLLECTION: study_materials
-   Ek hi document me sab kuch nested hai
+   SINGLE COLLECTION — study_materials
    ============================================================ */
 const SM_COLLECTION = 'study_materials';
-const SM_DOC_ID = 'quest_study_material';  // yahi ek document hai/* ============================================================
+const SM_DOC_ID = 'quest_study_material';
+
+/* ============================================================
    SEED DATA (admission form wale class names)
    ============================================================ */
 const SEED_CLASSES = [
@@ -746,12 +747,11 @@ const SEED_NEW = new Set([
    STATE
    ============================================================ */
 const state = {
-  classes: [],  // [{ id, name, display_order, subjects: [{ id, name, icon, display_order, chapters: [...] }] }]
+  classes: [],
   editing: { class:null, subject:null, chapter:null, parentClassId:null, parentSubjectId:null },
   selectedPdfFile: null
 };
 
-/* Flatten helpers */
 function getAllSubjects() {
   const list = [];
   state.classes.forEach(c => {
@@ -779,9 +779,6 @@ function findSubject(classId, subjectId) {
   return c ? (c.subjects || []).find(s => s.id === subjectId) : null;
 }
 
-/* ============================================================
-   HELPERS
-   ============================================================ */
 const $ = (id) => document.getElementById(id);
 const esc = (s='') => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -821,7 +818,7 @@ auth.onAuthStateChanged((user) => {
 });
 
 /* ============================================================
-   LOAD DATA — read single document
+   LOAD DATA
    ============================================================ */
 async function loadAll() {
   showLoader('Loading…');
@@ -848,9 +845,6 @@ async function loadAll() {
   }
 }
 
-/* ============================================================
-   SAVE DATA — write single document
-   ============================================================ */
 async function saveAll() {
   const docRef = db.collection(SM_COLLECTION).doc(SM_DOC_ID);
   await docRef.set({
@@ -870,7 +864,6 @@ window.autoSeed = async function() {
 
   showLoader('Seeding demo data…', 'Please wait 10-15 seconds');
   try {
-    /* Build nested structure */
     const classesData = [];
 
     for (const cls of SEED_CLASSES) {
@@ -1166,7 +1159,6 @@ window.deleteClass = async function(id) {
 
   showLoader('Deleting…');
   try {
-    // Delete PDFs from Supabase
     for (const s of (cls.subjects || [])) {
       for (const ch of (s.chapters || [])) {
         if (ch.pdf_path) await deletePdfFromSupabase(ch.pdf_path);
@@ -1223,7 +1215,6 @@ window.saveSubject = async function() {
   showLoader('Saving subject…');
   try {
     if (state.editing.subject) {
-      // If class changed, move it
       const oldClassId = state.editing.parentClassId;
       if (oldClassId !== newClassId) {
         const oldCls = findClass(oldClassId);
@@ -1485,7 +1476,6 @@ window.saveChapter = async function() {
     if (!newSubject) throw new Error('Target subject not found');
 
     if (state.editing.chapter) {
-      // If moved to another subject
       if (state.editing.parentSubjectId !== targetSubjectId) {
         const oldSubj = findSubject(state.editing.parentClassId, state.editing.parentSubjectId);
         if (oldSubj) oldSubj.chapters = (oldSubj.chapters || []).filter(c => c.id !== state.editing.chapter.id);
