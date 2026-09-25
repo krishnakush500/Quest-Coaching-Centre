@@ -13,7 +13,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
-<!-- 🆕 Supabase SDK -->
+<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
 <style>
@@ -242,6 +242,27 @@
     display:flex;align-items:center;gap:6px;
   }
 
+  .upload-progress {
+    margin-top:12px;
+    background:#f1f5ff;
+    border-radius:10px;
+    padding:12px 14px;
+    border:1px solid #dbe6ff;
+    display:none;
+  }
+  .upload-progress.show { display:block; }
+  .upload-progress .label {
+    font-size:.78rem;font-weight:700;color:#0d2b6b;
+    display:flex;justify-content:space-between;margin-bottom:8px;
+  }
+  .upload-progress .bar {
+    width:100%;height:8px;background:#dbe6ff;border-radius:20px;overflow:hidden;
+  }
+  .upload-progress .fill {
+    height:100%;width:0%;background:linear-gradient(90deg,#0d2b6b,#f7b500);
+    border-radius:20px;transition:width .3s ease;
+  }
+
   .sm-toast {
     position:fixed;bottom:24px;left:50%;transform:translate(-50%,90px);
     background:#081f52;color:#fff;
@@ -264,7 +285,7 @@
   .sm-loader-box {
     background:#fff;border-radius:16px;padding:24px 30px;
     text-align:center;box-shadow:0 20px 60px rgba(8,31,82,.35);
-    min-width:220px;
+    min-width:240px;max-width:340px;
   }
   .sm-loader-box .spinner {
     width:38px;height:38px;border:3px solid #e3e9f5;
@@ -272,7 +293,7 @@
     animation:spin .75s linear infinite;margin:0 auto 12px;
   }
   .sm-loader-box p { font-size:.86rem;font-weight:700;color:#0d2b6b; }
-  .sm-loader-box small { display:block;font-size:.72rem;color:#8a95ae;margin-top:6px;font-weight:600; }
+  .sm-loader-box small { display:block;font-size:.72rem;color:#8a95ae;margin-top:6px;font-weight:600;line-height:1.4; }
 
   .back-bar {
     display:flex;align-items:center;justify-content:space-between;
@@ -335,7 +356,7 @@
       <span class="ico"><i class="fas fa-book-open"></i></span>
       Study Material Admin
     </h1>
-    <p>Manage classes · subjects · chapters · PDF uploads (via Supabase Storage)</p>
+    <p>Manage classes · subjects · chapters · PDF uploads (Supabase Storage)</p>
   </div>
 
   <div class="back-bar">
@@ -352,7 +373,7 @@
     <div class="ico"><i class="fas fa-magic"></i></div>
     <div class="txt">
       <strong>Firestore khali hai!</strong>
-      <span>Ek click me Class 10 & 12 ke saare subjects aur chapters auto-add karne ke liye button dabayein.</span>
+      <span>Ek click me saare classes (6th–12th tak) aur subjects auto-add karne ke liye button dabayein.</span>
     </div>
     <button class="btn-gold" onclick="autoSeed()" id="seedBtn">
       <i class="fas fa-cloud-upload-alt"></i> Auto-Seed Now
@@ -442,7 +463,7 @@
       <div class="modal-body">
         <div class="mb-3">
           <label class="form-label">Class Name *</label>
-          <input type="text" class="form-control" id="classFormName" placeholder="e.g. Class 10">
+          <input type="text" class="form-control" id="classFormName" placeholder="e.g. 10th or 12th (Science)">
         </div>
         <div class="mb-3">
           <label class="form-label">Display Order</label>
@@ -546,7 +567,7 @@
             <input type="file" id="chapterFormPdf" accept="application/pdf" style="display:none;">
             <div class="ico"><i class="fas fa-cloud-upload-alt"></i></div>
             <div class="txt">Click to upload PDF</div>
-            <div class="sub">Max ~20 MB · only .pdf files</div>
+            <div class="sub">Max 20 MB · only .pdf files</div>
           </div>
           <div class="file-info" id="fileInfo" style="display:none;">
             <i class="fas fa-check-circle"></i>
@@ -555,8 +576,12 @@
               <i class="fas fa-times"></i> Remove
             </button>
           </div>
-          <div class="text-muted mt-2" style="font-size:.75rem;">
-            <i class="fas fa-info-circle"></i> PDFs Supabase Storage me upload honge. Chapter names Firestore me rahenge.
+          <div class="upload-progress" id="uploadProgress">
+            <div class="label">
+              <span id="uploadStatus">Uploading…</span>
+              <span id="uploadPercent">0%</span>
+            </div>
+            <div class="bar"><div class="fill" id="uploadFill"></div></div>
           </div>
         </div>
       </div>
@@ -574,7 +599,7 @@
 
 <script>
 /* ============================================================
-   FIREBASE INIT (for Auth + Firestore — classes/subjects/chapters)
+   FIREBASE INIT
    ============================================================ */
 const firebaseConfig = {
   apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
@@ -591,11 +616,12 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 /* ============================================================
-   🆕 SUPABASE INIT (for PDF storage only)
+   SUPABASE INIT — PDF storage only
+   Bucket: study_material (LOWERCASE — exact!)
    ============================================================ */
 const SUPABASE_URL = 'https://zjwvxqjmccqhyxsaeggw.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_6a_9nxKSSLUZMmSGleyycg_kQ4a4BtI';
-const PDF_BUCKET = 'study_material'; // 🆕 Supabase Storage bucket for PDFs
+const PDF_BUCKET = 'study_material';  // ✅ lowercase — Supabase me jo hai
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -604,49 +630,121 @@ const COL_SUBJECTS = 'study_subjects';
 const COL_CHAPTERS = 'study_chapters';
 
 /* ============================================================
-   SEED DATA
+   SEED DATA — Class names EXACTLY match admission form
+   6th, 7th, 8th, 9th, 10th,
+   11th (Science), 11th (Commerce), 11th (Arts),
+   12th (Science), 12th (Commerce), 12th (Arts)
    ============================================================ */
 const SEED_CLASSES = [
-  { name: 'Class 10', display_order: 1 },
-  { name: 'Class 12', display_order: 2 }
+  { name: '6th', display_order: 1 },
+  { name: '7th', display_order: 2 },
+  { name: '8th', display_order: 3 },
+  { name: '9th', display_order: 4 },
+  { name: '10th', display_order: 5 },
+  { name: '11th (Science)', display_order: 6 },
+  { name: '11th (Commerce)', display_order: 7 },
+  { name: '11th (Arts)', display_order: 8 },
+  { name: '12th (Science)', display_order: 9 },
+  { name: '12th (Commerce)', display_order: 10 },
+  { name: '12th (Arts)', display_order: 11 }
 ];
 
+/* Subjects per class */
 const SEED_SUBJECTS = {
-  'Class 10': [
-    { name: 'Mathematics',    icon: '📘', display_order: 1 },
-    { name: 'Science',        icon: '🔬', display_order: 2 },
-    { name: 'English',        icon: '📖', display_order: 3 },
+  '6th': [
+    { name: 'Mathematics', icon: '📘', display_order: 1 },
+    { name: 'Science', icon: '🔬', display_order: 2 },
+    { name: 'English', icon: '📖', display_order: 3 },
     { name: 'Social Science', icon: '🌍', display_order: 4 },
-    { name: 'Hindi',          icon: '📕', display_order: 5 }
+    { name: 'Hindi', icon: '📕', display_order: 5 }
   ],
-  'Class 12': [
-    { name: 'Physics',     icon: '⚛️', display_order: 1 },
-    { name: 'Chemistry',   icon: '🧪', display_order: 2 },
+  '7th': [
+    { name: 'Mathematics', icon: '📘', display_order: 1 },
+    { name: 'Science', icon: '🔬', display_order: 2 },
+    { name: 'English', icon: '📖', display_order: 3 },
+    { name: 'Social Science', icon: '🌍', display_order: 4 },
+    { name: 'Hindi', icon: '📕', display_order: 5 }
+  ],
+  '8th': [
+    { name: 'Mathematics', icon: '📘', display_order: 1 },
+    { name: 'Science', icon: '🔬', display_order: 2 },
+    { name: 'English', icon: '📖', display_order: 3 },
+    { name: 'Social Science', icon: '🌍', display_order: 4 },
+    { name: 'Hindi', icon: '📕', display_order: 5 }
+  ],
+  '9th': [
+    { name: 'Mathematics', icon: '📘', display_order: 1 },
+    { name: 'Science', icon: '🔬', display_order: 2 },
+    { name: 'English', icon: '📖', display_order: 3 },
+    { name: 'Social Science', icon: '🌍', display_order: 4 },
+    { name: 'Hindi', icon: '📕', display_order: 5 }
+  ],
+  '10th': [
+    { name: 'Mathematics', icon: '📘', display_order: 1 },
+    { name: 'Science', icon: '🔬', display_order: 2 },
+    { name: 'English', icon: '📖', display_order: 3 },
+    { name: 'Social Science', icon: '🌍', display_order: 4 },
+    { name: 'Hindi', icon: '📕', display_order: 5 }
+  ],
+  '11th (Science)': [
+    { name: 'Physics', icon: '⚛️', display_order: 1 },
+    { name: 'Chemistry', icon: '🧪', display_order: 2 },
     { name: 'Mathematics', icon: '📘', display_order: 3 },
-    { name: 'Biology',     icon: '🧬', display_order: 4 },
-    { name: 'English',     icon: '📖', display_order: 5 }
+    { name: 'Biology', icon: '🧬', display_order: 4 },
+    { name: 'English', icon: '📖', display_order: 5 }
+  ],
+  '11th (Commerce)': [
+    { name: 'Accountancy', icon: '📊', display_order: 1 },
+    { name: 'Business Studies', icon: '💼', display_order: 2 },
+    { name: 'Economics', icon: '📈', display_order: 3 },
+    { name: 'English', icon: '📖', display_order: 4 }
+  ],
+  '11th (Arts)': [
+    { name: 'History', icon: '🏛️', display_order: 1 },
+    { name: 'Political Science', icon: '🗳️', display_order: 2 },
+    { name: 'Geography', icon: '🌍', display_order: 3 },
+    { name: 'English', icon: '📖', display_order: 4 }
+  ],
+  '12th (Science)': [
+    { name: 'Physics', icon: '⚛️', display_order: 1 },
+    { name: 'Chemistry', icon: '🧪', display_order: 2 },
+    { name: 'Mathematics', icon: '📘', display_order: 3 },
+    { name: 'Biology', icon: '🧬', display_order: 4 },
+    { name: 'English', icon: '📖', display_order: 5 }
+  ],
+  '12th (Commerce)': [
+    { name: 'Accountancy', icon: '📊', display_order: 1 },
+    { name: 'Business Studies', icon: '💼', display_order: 2 },
+    { name: 'Economics', icon: '📈', display_order: 3 },
+    { name: 'English', icon: '📖', display_order: 4 }
+  ],
+  '12th (Arts)': [
+    { name: 'History', icon: '🏛️', display_order: 1 },
+    { name: 'Political Science', icon: '🗳️', display_order: 2 },
+    { name: 'Geography', icon: '🌍', display_order: 3 },
+    { name: 'English', icon: '📖', display_order: 4 }
   ]
 };
 
+/* Sample chapters — only for Class 10 & 12 (Science/Commerce/Arts) */
 const SEED_CHAPTERS = {
-  'Class 10|Mathematics': ['Real Numbers','Polynomials','Pair of Linear Equations in Two Variables','Quadratic Equations','Arithmetic Progressions','Triangles','Coordinate Geometry','Introduction to Trigonometry','Some Applications of Trigonometry','Circles','Areas Related to Circles','Surface Areas and Volumes','Statistics','Probability'],
-  'Class 10|Science': ['Chemical Reactions and Equations','Acids, Bases and Salts','Metals and Non-metals','Carbon and its Compounds','Life Processes','Control and Coordination','How do Organisms Reproduce?','Heredity and Evolution','Light – Reflection and Refraction','The Human Eye and the Colourful World','Electricity','Magnetic Effects of Electric Current','Our Environment','Sustainable Management of Natural Resources','Science Practice Set – I','Science Sample Paper 2026'],
-  'Class 10|English': ['A Letter to God','Nelson Mandela: Long Walk to Freedom','Two Stories about Flying','From the Diary of Anne Frank','The Hundred Dresses – I','The Hundred Dresses – II','Glimpses of India','Mijbil the Otter','Madam Rides the Bus','The Sermon at Benares','The Proposal'],
-  'Class 10|Social Science': ['The Rise of Nationalism in Europe','Nationalism in India','The Making of a Global World','Resources and Development','Water Resources','Agriculture','Minerals and Energy Resources','Power Sharing','Federalism','Development'],
-  'Class 10|Hindi': ['सूरदास के पद','राम-लक्ष्मण-परशुराम संवाद','नेताजी का चश्मा','बालगोबिन भगत','लखनवी अंदाज़','व्याकरण संकलन'],
-  'Class 12|Physics': ['Electric Charges and Fields','Electrostatic Potential and Capacitance','Current Electricity','Moving Charges and Magnetism','Magnetism and Matter','Electromagnetic Induction','Alternating Current','Electromagnetic Waves','Ray Optics and Optical Instruments','Wave Optics','Dual Nature of Radiation and Matter','Atoms','Nuclei','Semiconductor Electronics'],
-  'Class 12|Chemistry': ['Solutions','Electrochemistry','Chemical Kinetics','The d- and f-Block Elements','Coordination Compounds','Haloalkanes and Haloarenes','Alcohols, Phenols and Ethers','Aldehydes, Ketones and Carboxylic Acids','Amines','Biomolecules'],
-  'Class 12|Mathematics': ['Relations and Functions','Inverse Trigonometric Functions','Matrices','Determinants','Continuity and Differentiability','Application of Derivatives','Integrals','Application of Integrals','Differential Equations','Vector Algebra','Three Dimensional Geometry','Linear Programming','Probability'],
-  'Class 12|Biology': ['Sexual Reproduction in Flowering Plants','Human Reproduction','Reproductive Health','Principles of Inheritance and Variation','Molecular Basis of Inheritance','Evolution','Human Health and Disease','Microbes in Human Welfare','Biotechnology: Principles and Processes','Biotechnology and its Applications','Organisms and Populations','Ecosystem','Biodiversity and Conservation','Biology Practice Set – I','Biology Practice Set – II','Biology Sample Paper 2026'],
-  'Class 12|English': ['The Last Lesson','Lost Spring','Deep Water','The Rattrap','Indigo','My Mother at Sixty-six']
+  '10th|Mathematics': ['Real Numbers','Polynomials','Pair of Linear Equations in Two Variables','Quadratic Equations','Arithmetic Progressions','Triangles','Coordinate Geometry','Introduction to Trigonometry','Some Applications of Trigonometry','Circles','Areas Related to Circles','Surface Areas and Volumes','Statistics','Probability'],
+  '10th|Science': ['Chemical Reactions and Equations','Acids, Bases and Salts','Metals and Non-metals','Carbon and its Compounds','Life Processes','Control and Coordination','How do Organisms Reproduce?','Heredity and Evolution','Light – Reflection and Refraction','The Human Eye and the Colourful World','Electricity','Magnetic Effects of Electric Current','Our Environment','Sustainable Management of Natural Resources'],
+  '10th|English': ['A Letter to God','Nelson Mandela: Long Walk to Freedom','Two Stories about Flying','From the Diary of Anne Frank','The Hundred Dresses – I','The Hundred Dresses – II','Glimpses of India','Mijbil the Otter','Madam Rides the Bus','The Sermon at Benares','The Proposal'],
+  '10th|Social Science': ['The Rise of Nationalism in Europe','Nationalism in India','The Making of a Global World','Resources and Development','Water Resources','Agriculture','Minerals and Energy Resources','Power Sharing','Federalism','Development'],
+  '10th|Hindi': ['सूरदास के पद','राम-लक्ष्मण-परशुराम संवाद','नेताजी का चश्मा','बालगोबिन भगत','लखनवी अंदाज़','व्याकरण संकलन'],
+  '12th (Science)|Physics': ['Electric Charges and Fields','Electrostatic Potential and Capacitance','Current Electricity','Moving Charges and Magnetism','Magnetism and Matter','Electromagnetic Induction','Alternating Current','Electromagnetic Waves','Ray Optics and Optical Instruments','Wave Optics','Dual Nature of Radiation and Matter','Atoms','Nuclei','Semiconductor Electronics'],
+  '12th (Science)|Chemistry': ['Solutions','Electrochemistry','Chemical Kinetics','The d- and f-Block Elements','Coordination Compounds','Haloalkanes and Haloarenes','Alcohols, Phenols and Ethers','Aldehydes, Ketones and Carboxylic Acids','Amines','Biomolecules'],
+  '12th (Science)|Mathematics': ['Relations and Functions','Inverse Trigonometric Functions','Matrices','Determinants','Continuity and Differentiability','Application of Derivatives','Integrals','Application of Integrals','Differential Equations','Vector Algebra','Three Dimensional Geometry','Linear Programming','Probability'],
+  '12th (Science)|Biology': ['Sexual Reproduction in Flowering Plants','Human Reproduction','Reproductive Health','Principles of Inheritance and Variation','Molecular Basis of Inheritance','Evolution','Human Health and Disease','Microbes in Human Welfare','Biotechnology: Principles and Processes','Biotechnology and its Applications','Organisms and Populations','Ecosystem','Biodiversity and Conservation']
 };
 
 const SEED_NEW = new Set([
-  'Class 10|Science|Chemical Reactions and Equations',
-  'Class 10|Mathematics|Polynomials',
-  'Class 12|Physics|Electric Charges and Fields',
-  'Class 12|Chemistry|The d- and f-Block Elements',
-  'Class 12|Biology|Sexual Reproduction in Flowering Plants'
+  '10th|Science|Chemical Reactions and Equations',
+  '10th|Mathematics|Polynomials',
+  '12th (Science)|Physics|Electric Charges and Fields',
+  '12th (Science)|Chemistry|The d- and f-Block Elements',
+  '12th (Science)|Biology|Sexual Reproduction in Flowering Plants'
 ]);
 
 /* ============================================================
@@ -672,7 +770,7 @@ function toast(msg, isError=false) {
   el.textContent = msg;
   el.className = 'sm-toast show' + (isError ? ' error' : '');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
 }
 
 function showLoader(text='Saving…', sub='') {
@@ -680,9 +778,7 @@ function showLoader(text='Saving…', sub='') {
   $('loaderSub').textContent = sub;
   $('loaderOverlay').classList.add('show');
 }
-function hideLoader() {
-  $('loaderOverlay').classList.remove('show');
-}
+function hideLoader() { $('loaderOverlay').classList.remove('show'); }
 function updateLoader(text, sub='') {
   $('loaderText').textContent = text;
   $('loaderSub').textContent = sub;
@@ -742,8 +838,9 @@ window.autoSeed = async function() {
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Seeding…';
 
-  showLoader('Seeding demo data…', 'Please wait, this may take 10-20 seconds');
+  showLoader('Seeding demo data…', 'Please wait, this may take 20-30 seconds');
   try {
+    /* 1. Classes */
     const classIdMap = {};
     for (const cls of SEED_CLASSES) {
       const ref = await db.collection(COL_CLASSES).add({
@@ -753,9 +850,11 @@ window.autoSeed = async function() {
       classIdMap[cls.name] = ref.id;
     }
 
+    /* 2. Subjects */
     const subjectIdMap = {};
     for (const [className, subs] of Object.entries(SEED_SUBJECTS)) {
       const classId = classIdMap[className];
+      if (!classId) continue;
       for (const sub of subs) {
         const ref = await db.collection(COL_SUBJECTS).add({
           class_id: classId, name: sub.name, icon: sub.icon,
@@ -766,6 +865,7 @@ window.autoSeed = async function() {
       }
     }
 
+    /* 3. Chapters */
     for (const [key, chapters] of Object.entries(SEED_CHAPTERS)) {
       const subjectId = subjectIdMap[key];
       if (!subjectId) continue;
@@ -914,7 +1014,6 @@ function renderChapters() {
           <div class="meta">
             <span><i class="fas fa-school"></i> ${esc(cls ? cls.name : '—')}</span>
             <span><i class="fas fa-book"></i> ${esc(subj ? subj.name : '—')}</span>
-            <span>Order: ${ch.display_order||0}</span>
             ${ch.is_new ? '<span class="badge-soft badge-new">NEW</span>' : ''}
             ${ch.is_published === false ? '<span class="badge-soft badge-draft">Draft</span>' : '<span class="badge-soft badge-pub">Live</span>'}
             ${hasPdf ? '<span class="badge-soft badge-pdf"><i class="fas fa-file-pdf"></i> PDF</span>' : '<span class="badge-soft badge-nopdf">No PDF</span>'}
@@ -1105,10 +1204,10 @@ window.deleteSubject = async function(id) {
 };
 
 /* ============================================================
-   🆕 SUPABASE PDF UPLOAD / DELETE
+   SUPABASE PDF UPLOAD / DELETE
+   Bucket: study_material (lowercase)
    ============================================================ */
 function extractSupabasePath(pdfUrl) {
-  // pdfUrl looks like: https://xxx.supabase.co/storage/v1/object/public/study_material/1234_file.pdf
   if (!pdfUrl || typeof pdfUrl !== 'string') return null;
   const marker = `/object/public/${PDF_BUCKET}/`;
   const idx = pdfUrl.indexOf(marker);
@@ -1117,11 +1216,12 @@ function extractSupabasePath(pdfUrl) {
 }
 
 async function uploadPdfToSupabase(file, chapterName) {
-  updateLoader('Uploading PDF to Supabase…', 'Please wait, don\'t close this window');
   const safeName = String(chapterName || 'chapter')
     .replace(/[^\w.\-\u0900-\u097F]/g, '_')
     .slice(0, 60);
   const fileName = `${Date.now()}_${safeName}.pdf`;
+
+  updateLoader('Uploading PDF to Supabase…', 'Please wait, don\'t close this window');
 
   const { data, error } = await supabaseClient.storage
     .from(PDF_BUCKET)
@@ -1131,7 +1231,10 @@ async function uploadPdfToSupabase(file, chapterName) {
       upsert: false
     });
 
-  if (error) throw new Error('Supabase upload failed: ' + error.message);
+  if (error) {
+    console.error('Supabase upload error:', error);
+    throw new Error('Supabase: ' + error.message);
+  }
 
   const { data: urlData } = supabaseClient.storage
     .from(PDF_BUCKET)
@@ -1182,6 +1285,7 @@ window.openChapterModal = function() {
   $('fileInfo').style.display = 'none';
   $('fileName').textContent = '';
   $('chapterFormPdf').value = '';
+  $('uploadProgress').classList.remove('show');
 
   chapterModal.show();
 };
@@ -1207,6 +1311,7 @@ window.editChapter = function(id) {
   $('chapterFormIsNew').checked = !!ch.is_new;
   $('chapterFormIsPublished').checked = ch.is_published !== false;
   $('chapterFormPdf').value = '';
+  $('uploadProgress').classList.remove('show');
 
   if (ch.pdf_path) {
     $('fileInfo').style.display = 'flex';
@@ -1259,17 +1364,25 @@ window.saveChapter = async function() {
   if (!subject_id) return toast('Select a subject', true);
   if (!name) return toast('Chapter name required', true);
 
-  // Disable save button to prevent double-click
   const saveBtn = $('saveChapterBtn');
   saveBtn.disabled = true;
 
   let pdf_path = state.editing.chapter?.pdf_path || null;
 
   try {
-    // 🆕 Upload to Supabase Storage (if new file selected)
+    /* 🆕 Upload to Supabase Storage */
     if (state.selectedPdfFile) {
       showLoader('Uploading PDF to Supabase…', 'Please wait, don\'t close this window');
+      $('uploadProgress').classList.add('show');
+      $('uploadStatus').textContent = 'Uploading to Supabase…';
+      $('uploadPercent').textContent = '30%';
+      $('uploadFill').style.width = '30%';
+
       const newUrl = await uploadPdfToSupabase(state.selectedPdfFile, name);
+
+      $('uploadPercent').textContent = '80%';
+      $('uploadFill').style.width = '80%';
+      $('uploadStatus').textContent = 'Upload complete!';
 
       // Delete old PDF if replacing
       if (state.editing.chapter?.pdf_path) {
@@ -1281,6 +1394,8 @@ window.saveChapter = async function() {
     }
 
     updateLoader('Saving chapter to Firestore…');
+    $('uploadPercent').textContent = '95%';
+    $('uploadFill').style.width = '95%';
 
     if (state.editing.chapter) {
       await db.collection(COL_CHAPTERS).doc(state.editing.chapter.id).update({
@@ -1297,12 +1412,18 @@ window.saveChapter = async function() {
       toast('Chapter added ✓');
     }
 
-    chapterModal.hide();
-    state.selectedPdfFile = null;
-    await loadAll();
+    $('uploadPercent').textContent = '100%';
+    $('uploadFill').style.width = '100%';
+
+    setTimeout(() => {
+      chapterModal.hide();
+      state.selectedPdfFile = null;
+      loadAll();
+    }, 400);
   } catch (err) {
-    console.error(err);
+    console.error('Save chapter error:', err);
     toast('Save failed: ' + err.message, true);
+    $('uploadProgress').classList.remove('show');
   } finally {
     saveBtn.disabled = false;
     hideLoader();
