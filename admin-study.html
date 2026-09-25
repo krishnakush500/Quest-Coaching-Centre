@@ -625,129 +625,136 @@ const PDF_BUCKET = 'study_material';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* ============================================================
-   SINGLE COLLECTION — study_materials
+   🆕 NESTED STRUCTURE:
+   study_materials (collection)
+     └── {classId} (document)
+          └── subjects (subcollection)
+               └── {subjectId} (document)
+                    └── chapters (subcollection)
+                         └── {chapterId} (document)
    ============================================================ */
 const SM_COLLECTION = 'study_materials';
-const SM_DOC_ID = 'quest_study_material';
+const SUB_SUBCOLLECTION = 'subjects';
+const CH_SUBCOLLECTION = 'chapters';
 
 /* ============================================================
-   SEED DATA (admission form wale class names)
+   SEED DATA — Class names admission form wale
    ============================================================ */
 const SEED_CLASSES = [
-  { name: '6th', display_order: 1 },
-  { name: '7th', display_order: 2 },
-  { name: '8th', display_order: 3 },
-  { name: '9th', display_order: 4 },
-  { name: '10th', display_order: 5 },
-  { name: '11th (Science)', display_order: 6 },
-  { name: '11th (Commerce)', display_order: 7 },
-  { name: '11th (Arts)', display_order: 8 },
-  { name: '12th (Science)', display_order: 9 },
-  { name: '12th (Commerce)', display_order: 10 },
-  { name: '12th (Arts)', display_order: 11 }
+  { id: '6th', name: '6th', display_order: 1 },
+  { id: '7th', name: '7th', display_order: 2 },
+  { id: '8th', name: '8th', display_order: 3 },
+  { id: '9th', name: '9th', display_order: 4 },
+  { id: '10th', name: '10th', display_order: 5 },
+  { id: '11th-science', name: '11th (Science)', display_order: 6 },
+  { id: '11th-commerce', name: '11th (Commerce)', display_order: 7 },
+  { id: '11th-arts', name: '11th (Arts)', display_order: 8 },
+  { id: '12th-science', name: '12th (Science)', display_order: 9 },
+  { id: '12th-commerce', name: '12th (Commerce)', display_order: 10 },
+  { id: '12th-arts', name: '12th (Arts)', display_order: 11 }
 ];
 
 const SEED_SUBJECTS = {
   '6th': [
-    { name: 'Mathematics', icon: '📘', display_order: 1 },
-    { name: 'Science', icon: '🔬', display_order: 2 },
-    { name: 'English', icon: '📖', display_order: 3 },
-    { name: 'Social Science', icon: '🌍', display_order: 4 },
-    { name: 'Hindi', icon: '📕', display_order: 5 }
+    { id: 'math', name: 'Mathematics', icon: '📘', display_order: 1 },
+    { id: 'science', name: 'Science', icon: '🔬', display_order: 2 },
+    { id: 'english', name: 'English', icon: '📖', display_order: 3 },
+    { id: 'sst', name: 'Social Science', icon: '🌍', display_order: 4 },
+    { id: 'hindi', name: 'Hindi', icon: '📕', display_order: 5 }
   ],
   '7th': [
-    { name: 'Mathematics', icon: '📘', display_order: 1 },
-    { name: 'Science', icon: '🔬', display_order: 2 },
-    { name: 'English', icon: '📖', display_order: 3 },
-    { name: 'Social Science', icon: '🌍', display_order: 4 },
-    { name: 'Hindi', icon: '📕', display_order: 5 }
+    { id: 'math', name: 'Mathematics', icon: '📘', display_order: 1 },
+    { id: 'science', name: 'Science', icon: '🔬', display_order: 2 },
+    { id: 'english', name: 'English', icon: '📖', display_order: 3 },
+    { id: 'sst', name: 'Social Science', icon: '🌍', display_order: 4 },
+    { id: 'hindi', name: 'Hindi', icon: '📕', display_order: 5 }
   ],
   '8th': [
-    { name: 'Mathematics', icon: '📘', display_order: 1 },
-    { name: 'Science', icon: '🔬', display_order: 2 },
-    { name: 'English', icon: '📖', display_order: 3 },
-    { name: 'Social Science', icon: '🌍', display_order: 4 },
-    { name: 'Hindi', icon: '📕', display_order: 5 }
+    { id: 'math', name: 'Mathematics', icon: '📘', display_order: 1 },
+    { id: 'science', name: 'Science', icon: '🔬', display_order: 2 },
+    { id: 'english', name: 'English', icon: '📖', display_order: 3 },
+    { id: 'sst', name: 'Social Science', icon: '🌍', display_order: 4 },
+    { id: 'hindi', name: 'Hindi', icon: '📕', display_order: 5 }
   ],
   '9th': [
-    { name: 'Mathematics', icon: '📘', display_order: 1 },
-    { name: 'Science', icon: '🔬', display_order: 2 },
-    { name: 'English', icon: '📖', display_order: 3 },
-    { name: 'Social Science', icon: '🌍', display_order: 4 },
-    { name: 'Hindi', icon: '📕', display_order: 5 }
+    { id: 'math', name: 'Mathematics', icon: '📘', display_order: 1 },
+    { id: 'science', name: 'Science', icon: '🔬', display_order: 2 },
+    { id: 'english', name: 'English', icon: '📖', display_order: 3 },
+    { id: 'sst', name: 'Social Science', icon: '🌍', display_order: 4 },
+    { id: 'hindi', name: 'Hindi', icon: '📕', display_order: 5 }
   ],
   '10th': [
-    { name: 'Mathematics', icon: '📘', display_order: 1 },
-    { name: 'Science', icon: '🔬', display_order: 2 },
-    { name: 'English', icon: '📖', display_order: 3 },
-    { name: 'Social Science', icon: '🌍', display_order: 4 },
-    { name: 'Hindi', icon: '📕', display_order: 5 }
+    { id: 'math', name: 'Mathematics', icon: '📘', display_order: 1 },
+    { id: 'science', name: 'Science', icon: '🔬', display_order: 2 },
+    { id: 'english', name: 'English', icon: '📖', display_order: 3 },
+    { id: 'sst', name: 'Social Science', icon: '🌍', display_order: 4 },
+    { id: 'hindi', name: 'Hindi', icon: '📕', display_order: 5 }
   ],
-  '11th (Science)': [
-    { name: 'Physics', icon: '⚛️', display_order: 1 },
-    { name: 'Chemistry', icon: '🧪', display_order: 2 },
-    { name: 'Mathematics', icon: '📘', display_order: 3 },
-    { name: 'Biology', icon: '🧬', display_order: 4 },
-    { name: 'English', icon: '📖', display_order: 5 }
+  '11th-science': [
+    { id: 'physics', name: 'Physics', icon: '⚛️', display_order: 1 },
+    { id: 'chemistry', name: 'Chemistry', icon: '🧪', display_order: 2 },
+    { id: 'math', name: 'Mathematics', icon: '📘', display_order: 3 },
+    { id: 'biology', name: 'Biology', icon: '🧬', display_order: 4 },
+    { id: 'english', name: 'English', icon: '📖', display_order: 5 }
   ],
-  '11th (Commerce)': [
-    { name: 'Accountancy', icon: '📊', display_order: 1 },
-    { name: 'Business Studies', icon: '💼', display_order: 2 },
-    { name: 'Economics', icon: '📈', display_order: 3 },
-    { name: 'English', icon: '📖', display_order: 4 }
+  '11th-commerce': [
+    { id: 'accountancy', name: 'Accountancy', icon: '📊', display_order: 1 },
+    { id: 'business', name: 'Business Studies', icon: '💼', display_order: 2 },
+    { id: 'economics', name: 'Economics', icon: '📈', display_order: 3 },
+    { id: 'english', name: 'English', icon: '📖', display_order: 4 }
   ],
-  '11th (Arts)': [
-    { name: 'History', icon: '🏛️', display_order: 1 },
-    { name: 'Political Science', icon: '🗳️', display_order: 2 },
-    { name: 'Geography', icon: '🌍', display_order: 3 },
-    { name: 'English', icon: '📖', display_order: 4 }
+  '11th-arts': [
+    { id: 'history', name: 'History', icon: '🏛️', display_order: 1 },
+    { id: 'polsci', name: 'Political Science', icon: '🗳️', display_order: 2 },
+    { id: 'geo', name: 'Geography', icon: '🌍', display_order: 3 },
+    { id: 'english', name: 'English', icon: '📖', display_order: 4 }
   ],
-  '12th (Science)': [
-    { name: 'Physics', icon: '⚛️', display_order: 1 },
-    { name: 'Chemistry', icon: '🧪', display_order: 2 },
-    { name: 'Mathematics', icon: '📘', display_order: 3 },
-    { name: 'Biology', icon: '🧬', display_order: 4 },
-    { name: 'English', icon: '📖', display_order: 5 }
+  '12th-science': [
+    { id: 'physics', name: 'Physics', icon: '⚛️', display_order: 1 },
+    { id: 'chemistry', name: 'Chemistry', icon: '🧪', display_order: 2 },
+    { id: 'math', name: 'Mathematics', icon: '📘', display_order: 3 },
+    { id: 'biology', name: 'Biology', icon: '🧬', display_order: 4 },
+    { id: 'english', name: 'English', icon: '📖', display_order: 5 }
   ],
-  '12th (Commerce)': [
-    { name: 'Accountancy', icon: '📊', display_order: 1 },
-    { name: 'Business Studies', icon: '💼', display_order: 2 },
-    { name: 'Economics', icon: '📈', display_order: 3 },
-    { name: 'English', icon: '📖', display_order: 4 }
+  '12th-commerce': [
+    { id: 'accountancy', name: 'Accountancy', icon: '📊', display_order: 1 },
+    { id: 'business', name: 'Business Studies', icon: '💼', display_order: 2 },
+    { id: 'economics', name: 'Economics', icon: '📈', display_order: 3 },
+    { id: 'english', name: 'English', icon: '📖', display_order: 4 }
   ],
-  '12th (Arts)': [
-    { name: 'History', icon: '🏛️', display_order: 1 },
-    { name: 'Political Science', icon: '🗳️', display_order: 2 },
-    { name: 'Geography', icon: '🌍', display_order: 3 },
-    { name: 'English', icon: '📖', display_order: 4 }
+  '12th-arts': [
+    { id: 'history', name: 'History', icon: '🏛️', display_order: 1 },
+    { id: 'polsci', name: 'Political Science', icon: '🗳️', display_order: 2 },
+    { id: 'geo', name: 'Geography', icon: '🌍', display_order: 3 },
+    { id: 'english', name: 'English', icon: '📖', display_order: 4 }
   ]
 };
 
 const SEED_CHAPTERS = {
-  '10th|Mathematics': ['Real Numbers','Polynomials','Pair of Linear Equations in Two Variables','Quadratic Equations','Arithmetic Progressions','Triangles','Coordinate Geometry','Introduction to Trigonometry','Some Applications of Trigonometry','Circles','Areas Related to Circles','Surface Areas and Volumes','Statistics','Probability'],
-  '10th|Science': ['Chemical Reactions and Equations','Acids, Bases and Salts','Metals and Non-metals','Carbon and its Compounds','Life Processes','Control and Coordination','How do Organisms Reproduce?','Heredity and Evolution','Light – Reflection and Refraction','The Human Eye and the Colourful World','Electricity','Magnetic Effects of Electric Current','Our Environment','Sustainable Management of Natural Resources'],
-  '10th|English': ['A Letter to God','Nelson Mandela: Long Walk to Freedom','Two Stories about Flying','From the Diary of Anne Frank','The Hundred Dresses – I','The Hundred Dresses – II','Glimpses of India','Mijbil the Otter','Madam Rides the Bus','The Sermon at Benares','The Proposal'],
-  '10th|Social Science': ['The Rise of Nationalism in Europe','Nationalism in India','The Making of a Global World','Resources and Development','Water Resources','Agriculture','Minerals and Energy Resources','Power Sharing','Federalism','Development'],
-  '10th|Hindi': ['सूरदास के पद','राम-लक्ष्मण-परशुराम संवाद','नेताजी का चश्मा','बालगोबिन भगत','लखनवी अंदाज़','व्याकरण संकलन'],
-  '12th (Science)|Physics': ['Electric Charges and Fields','Electrostatic Potential and Capacitance','Current Electricity','Moving Charges and Magnetism','Magnetism and Matter','Electromagnetic Induction','Alternating Current','Electromagnetic Waves','Ray Optics and Optical Instruments','Wave Optics','Dual Nature of Radiation and Matter','Atoms','Nuclei','Semiconductor Electronics'],
-  '12th (Science)|Chemistry': ['Solutions','Electrochemistry','Chemical Kinetics','The d- and f-Block Elements','Coordination Compounds','Haloalkanes and Haloarenes','Alcohols, Phenols and Ethers','Aldehydes, Ketones and Carboxylic Acids','Amines','Biomolecules'],
-  '12th (Science)|Mathematics': ['Relations and Functions','Inverse Trigonometric Functions','Matrices','Determinants','Continuity and Differentiability','Application of Derivatives','Integrals','Application of Integrals','Differential Equations','Vector Algebra','Three Dimensional Geometry','Linear Programming','Probability'],
-  '12th (Science)|Biology': ['Sexual Reproduction in Flowering Plants','Human Reproduction','Reproductive Health','Principles of Inheritance and Variation','Molecular Basis of Inheritance','Evolution','Human Health and Disease','Microbes in Human Welfare','Biotechnology: Principles and Processes','Biotechnology and its Applications','Organisms and Populations','Ecosystem','Biodiversity and Conservation']
+  '10th|math': ['Real Numbers','Polynomials','Pair of Linear Equations in Two Variables','Quadratic Equations','Arithmetic Progressions','Triangles','Coordinate Geometry','Introduction to Trigonometry','Some Applications of Trigonometry','Circles','Areas Related to Circles','Surface Areas and Volumes','Statistics','Probability'],
+  '10th|science': ['Chemical Reactions and Equations','Acids, Bases and Salts','Metals and Non-metals','Carbon and its Compounds','Life Processes','Control and Coordination','How do Organisms Reproduce?','Heredity and Evolution','Light – Reflection and Refraction','The Human Eye and the Colourful World','Electricity','Magnetic Effects of Electric Current','Our Environment','Sustainable Management of Natural Resources'],
+  '10th|english': ['A Letter to God','Nelson Mandela: Long Walk to Freedom','Two Stories about Flying','From the Diary of Anne Frank','The Hundred Dresses – I','The Hundred Dresses – II','Glimpses of India','Mijbil the Otter','Madam Rides the Bus','The Sermon at Benares','The Proposal'],
+  '10th|sst': ['The Rise of Nationalism in Europe','Nationalism in India','The Making of a Global World','Resources and Development','Water Resources','Agriculture','Minerals and Energy Resources','Power Sharing','Federalism','Development'],
+  '10th|hindi': ['सूरदास के पद','राम-लक्ष्मण-परशुराम संवाद','नेताजी का चश्मा','बालगोबिन भगत','लखनवी अंदाज़','व्याकरण संकलन'],
+  '12th-science|physics': ['Electric Charges and Fields','Electrostatic Potential and Capacitance','Current Electricity','Moving Charges and Magnetism','Magnetism and Matter','Electromagnetic Induction','Alternating Current','Electromagnetic Waves','Ray Optics and Optical Instruments','Wave Optics','Dual Nature of Radiation and Matter','Atoms','Nuclei','Semiconductor Electronics'],
+  '12th-science|chemistry': ['Solutions','Electrochemistry','Chemical Kinetics','The d- and f-Block Elements','Coordination Compounds','Haloalkanes and Haloarenes','Alcohols, Phenols and Ethers','Aldehydes, Ketones and Carboxylic Acids','Amines','Biomolecules'],
+  '12th-science|math': ['Relations and Functions','Inverse Trigonometric Functions','Matrices','Determinants','Continuity and Differentiability','Application of Derivatives','Integrals','Application of Integrals','Differential Equations','Vector Algebra','Three Dimensional Geometry','Linear Programming','Probability'],
+  '12th-science|biology': ['Sexual Reproduction in Flowering Plants','Human Reproduction','Reproductive Health','Principles of Inheritance and Variation','Molecular Basis of Inheritance','Evolution','Human Health and Disease','Microbes in Human Welfare','Biotechnology: Principles and Processes','Biotechnology and its Applications','Organisms and Populations','Ecosystem','Biodiversity and Conservation']
 };
 
 const SEED_NEW = new Set([
-  '10th|Science|Chemical Reactions and Equations',
-  '10th|Mathematics|Polynomials',
-  '12th (Science)|Physics|Electric Charges and Fields',
-  '12th (Science)|Chemistry|The d- and f-Block Elements',
-  '12th (Science)|Biology|Sexual Reproduction in Flowering Plants'
+  '10th|science|Chemical Reactions and Equations',
+  '10th|math|Polynomials',
+  '12th-science|physics|Electric Charges and Fields',
+  '12th-science|chemistry|The d- and f-Block Elements',
+  '12th-science|biology|Sexual Reproduction in Flowering Plants'
 ]);
 
 /* ============================================================
    STATE
    ============================================================ */
 const state = {
-  classes: [],
+  classes: [],       // [{ id, name, display_order, subjects: [{ id, name, icon, display_order, chapters: [...] }] }]
   editing: { class:null, subject:null, chapter:null, parentClassId:null, parentSubjectId:null },
   selectedPdfFile: null
 };
@@ -802,7 +809,21 @@ function updateLoader(text, sub='') {
   $('loaderSub').textContent = sub;
 }
 
-const uid = () => 'id_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+/* Class ka Firestore doc ID banao — spaces/special chars safe */
+function classDocId(name) {
+  return String(name || 'class')
+    .toLowerCase()
+    .replace(/[^\w\-\u0900-\u097F]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/* Subject ka Firestore doc ID */
+function subjectDocId(name) {
+  return String(name || 'subject')
+    .toLowerCase()
+    .replace(/[^\w\-\u0900-\u097F]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
 
 /* ============================================================
    AUTH CHECK
@@ -818,23 +839,68 @@ auth.onAuthStateChanged((user) => {
 });
 
 /* ============================================================
-   LOAD DATA
+   LOAD DATA — read nested structure
    ============================================================ */
 async function loadAll() {
   showLoader('Loading…');
   try {
-    const docRef = db.collection(SM_COLLECTION).doc(SM_DOC_ID);
-    const snap = await docRef.get();
+    const classesSnap = await db.collection(SM_COLLECTION).orderBy('display_order').get();
 
-    if (snap.exists) {
-      const data = snap.data();
-      state.classes = data.classes || [];
-      $('seedBanner').style.display = state.classes.length === 0 ? 'flex' : 'none';
-    } else {
+    if (classesSnap.empty) {
       state.classes = [];
       $('seedBanner').style.display = 'flex';
+      renderAll();
+      refreshFilters();
+      return;
     }
 
+    const classes = [];
+    for (const classDoc of classesSnap.docs) {
+      const classData = classDoc.data();
+      const cls = {
+        id: classDoc.id,
+        name: classData.name || classDoc.id,
+        display_order: classData.display_order || 0,
+        subjects: []
+      };
+
+      // Get subjects subcollection
+      const subjectsSnap = await db
+        .collection(SM_COLLECTION).doc(classDoc.id)
+        .collection(SUB_SUBCOLLECTION)
+        .orderBy('display_order')
+        .get();
+
+      for (const subjectDoc of subjectsSnap.docs) {
+        const subjectData = subjectDoc.data();
+        const subj = {
+          id: subjectDoc.id,
+          name: subjectData.name || subjectDoc.id,
+          icon: subjectData.icon || '📘',
+          display_order: subjectData.display_order || 0,
+          chapters: []
+        };
+
+        // Get chapters sub-subcollection
+        const chaptersSnap = await db
+          .collection(SM_COLLECTION).doc(classDoc.id)
+          .collection(SUB_SUBCOLLECTION).doc(subjectDoc.id)
+          .collection(CH_SUBCOLLECTION)
+          .orderBy('display_order')
+          .get();
+
+        chaptersSnap.forEach(chDoc => {
+          subj.chapters.push({ id: chDoc.id, ...chDoc.data() });
+        });
+
+        cls.subjects.push(subj);
+      }
+
+      classes.push(cls);
+    }
+
+    state.classes = classes;
+    $('seedBanner').style.display = state.classes.length === 0 ? 'flex' : 'none';
     renderAll();
     refreshFilters();
   } catch (err) {
@@ -845,16 +911,8 @@ async function loadAll() {
   }
 }
 
-async function saveAll() {
-  const docRef = db.collection(SM_COLLECTION).doc(SM_DOC_ID);
-  await docRef.set({
-    classes: state.classes,
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  }, { merge: true });
-}
-
 /* ============================================================
-   AUTO SEED
+   AUTO SEED — create nested structure
    ============================================================ */
 window.autoSeed = async function() {
   const btn = $('seedBtn');
@@ -862,58 +920,50 @@ window.autoSeed = async function() {
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Seeding…';
 
-  showLoader('Seeding demo data…', 'Please wait 10-15 seconds');
+  showLoader('Seeding demo data…', 'Please wait 20-40 seconds');
   try {
-    const classesData = [];
-
     for (const cls of SEED_CLASSES) {
-      const classId = uid();
-      const subjectsData = [];
+      // Create class document
+      await db.collection(SM_COLLECTION).doc(cls.id).set({
+        name: cls.name,
+        display_order: cls.display_order,
+        created_at: firebase.firestore.FieldValue.serverTimestamp()
+      });
 
       const subs = SEED_SUBJECTS[cls.name] || [];
       for (const sub of subs) {
-        const subjectId = uid();
-        const chaptersData = [];
-
-        const chapKey = `${cls.name}|${sub.name}`;
-        const chapList = SEED_CHAPTERS[chapKey] || [];
-        chapList.forEach((chName, i) => {
-          const isNew = SEED_NEW.has(`${cls.name}|${sub.name}|${chName}`);
-          chaptersData.push({
-            id: uid(),
-            chapter_number: i + 1,
-            name: chName,
-            display_order: i + 1,
-            pdf_path: null,
-            is_new: isNew,
-            is_published: true
+        // Create subject document
+        await db.collection(SM_COLLECTION).doc(cls.id)
+          .collection(SUB_SUBCOLLECTION).doc(sub.id).set({
+            name: sub.name,
+            icon: sub.icon,
+            display_order: sub.display_order,
+            created_at: firebase.firestore.FieldValue.serverTimestamp()
           });
-        });
 
-        subjectsData.push({
-          id: subjectId,
-          name: sub.name,
-          icon: sub.icon,
-          display_order: sub.display_order,
-          chapters: chaptersData
-        });
+        const chapKey = `${cls.name}|${sub.id}`;
+        const chapList = SEED_CHAPTERS[chapKey] || [];
+        for (let i = 0; i < chapList.length; i++) {
+          const chName = chapList[i];
+          const chapterId = `ch-${String(i+1).padStart(2, '0')}`;
+          const isNew = SEED_NEW.has(`${cls.name}|${sub.id}|${chName}`);
+          await db.collection(SM_COLLECTION).doc(cls.id)
+            .collection(SUB_SUBCOLLECTION).doc(sub.id)
+            .collection(CH_SUBCOLLECTION).doc(chapterId).set({
+              chapter_number: i + 1,
+              name: chName,
+              display_order: i + 1,
+              pdf_path: null,
+              is_new: isNew,
+              is_published: true,
+              created_at: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
       }
-
-      classesData.push({
-        id: classId,
-        name: cls.name,
-        display_order: cls.display_order,
-        subjects: subjectsData
-      });
     }
 
-    state.classes = classesData;
-    await saveAll();
-
     toast('✅ Seed complete!');
-    renderAll();
-    refreshFilters();
-    $('seedBanner').style.display = 'none';
+    await loadAll();
   } catch (err) {
     console.error(err);
     toast('Seed failed: ' + err.message, true);
@@ -1075,7 +1125,7 @@ function updateChapterSubjectFilter() {
   if (!ss) return;
   const cur = ss.value;
   let subs = getAllSubjects();
-  if (classFilter) subs = subs.filter(s => s.class_id === filter);
+  if (classFilter) subs = subs.filter(s => s.class_id === classFilter);
   ss.innerHTML = '<option value="">All Subjects</option>' +
     subs.map(s => `<option value="${s.id}">${esc(s.class_name)} · ${esc(s.name)}</option>`).join('');
   ss.value = cur;
@@ -1103,7 +1153,9 @@ document.addEventListener('DOMContentLoaded', () => {
   chapterModal = new bootstrap.Modal($('chapterModal'));
 });
 
-/* CLASS CRUD */
+/* ============================================================
+   CLASS CRUD — nested
+   ============================================================ */
 window.openClassModal = function() {
   state.editing.class = null;
   $('classModalTitle').textContent = 'Add Class';
@@ -1130,21 +1182,32 @@ window.saveClass = async function() {
   showLoader('Saving class…');
   try {
     if (state.editing.class) {
+      // Update existing class doc (id stays same)
+      await db.collection(SM_COLLECTION).doc(state.editing.class.id).update({
+        name, display_order: order
+      });
       state.editing.class.name = name;
       state.editing.class.display_order = order;
+      toast('Class updated ✓');
     } else {
-      state.classes.push({
-        id: uid(),
+      const newId = classDocId(name);
+      // Check duplicate
+      const existing = await db.collection(SM_COLLECTION).doc(newId).get();
+      if (existing.exists) {
+        toast('Class with this name already exists', true);
+        hideLoader();
+        return;
+      }
+      await db.collection(SM_COLLECTION).doc(newId).set({
         name, display_order: order,
-        subjects: []
+        created_at: firebase.firestore.FieldValue.serverTimestamp()
       });
+      toast('Class added ✓');
     }
-    await saveAll();
     classModal.hide();
-    toast(state.editing.class ? 'Class updated ✓' : 'Class added ✓');
-    renderAll();
-    refreshFilters();
+    await loadAll();
   } catch (err) {
+    console.error(err);
     toast('Save failed: ' + err.message, true);
   } finally {
     hideLoader();
@@ -1155,28 +1218,45 @@ window.deleteClass = async function(id) {
   const cls = findClass(id);
   if (!cls) return;
   const subCount = (cls.subjects || []).length;
-  if (!confirm(subCount ? `Delete "${cls.name}" + ${subCount} subject(s)?` : `Delete "${cls.name}"?`)) return;
+  if (!confirm(subCount ? `Delete "${cls.name}" + ${subCount} subject(s) + all chapters?` : `Delete "${cls.name}"?`)) return;
 
   showLoader('Deleting…');
   try {
+    // Delete PDFs from Supabase
     for (const s of (cls.subjects || [])) {
       for (const ch of (s.chapters || [])) {
         if (ch.pdf_path) await deletePdfFromSupabase(ch.pdf_path);
       }
     }
-    state.classes = state.classes.filter(c => c.id !== id);
-    await saveAll();
-    toast('Class deleted ✓');
-    renderAll();
-    refreshFilters();
+    // Delete all subcollections (Firestore doesn't cascade)
+    // Subjects subcollection
+    const subjectsSnap = await db.collection(SM_COLLECTION).doc(id).collection(SUB_SUBCOLLECTION).get();
+    for (const sDoc of subjectsSnap.docs) {
+      // Chapters in this subject
+      const chaptersSnap = await db.collection(SM_COLLECTION).doc(id)
+        .collection(SUB_SUBCOLLECTION).doc(sDoc.id)
+        .collection(CH_SUBCOLLECTION).get();
+      for (const chDoc of chaptersSnap.docs) {
+        await chDoc.ref.delete();
+      }
+      await sDoc.ref.delete();
+    }
+    // Finally delete class doc
+    await db.collection(SM_COLLECTION).doc(id).delete();
+
+    toast('Class + children deleted ✓');
+    await loadAll();
   } catch (err) {
+    console.error(err);
     toast('Delete failed: ' + err.message, true);
   } finally {
     hideLoader();
   }
 };
 
-/* SUBJECT CRUD */
+/* ============================================================
+   SUBJECT CRUD — nested
+   ============================================================ */
 window.openSubjectModal = function(presetClassId) {
   state.editing.subject = null;
   state.editing.parentClassId = null;
@@ -1216,35 +1296,61 @@ window.saveSubject = async function() {
   try {
     if (state.editing.subject) {
       const oldClassId = state.editing.parentClassId;
+      const oldSubjectId = state.editing.subject.id;
+
       if (oldClassId !== newClassId) {
-        const oldCls = findClass(oldClassId);
-        oldCls.subjects = oldCls.subjects.filter(s => s.id !== state.editing.subject.id);
-        const newCls = findClass(newClassId);
-        state.editing.subject.name = name;
-        state.editing.subject.icon = icon;
-        state.editing.subject.display_order = order;
-        newCls.subjects = newCls.subjects || [];
-        newCls.subjects.push(state.editing.subject);
+        // Moving to different class → copy chapters, delete from old
+        const newSubjectId = subjectDocId(name);
+
+        // Create new subject doc
+        await db.collection(SM_COLLECTION).doc(newClassId)
+          .collection(SUB_SUBCOLLECTION).doc(newSubjectId).set({
+            name, icon, display_order: order,
+            created_at: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+        // Copy chapters
+        const oldChaptersSnap = await db.collection(SM_COLLECTION).doc(oldClassId)
+          .collection(SUB_SUBCOLLECTION).doc(oldSubjectId)
+          .collection(CH_SUBCOLLECTION).get();
+        for (const chDoc of oldChaptersSnap.docs) {
+          await db.collection(SM_COLLECTION).doc(newClassId)
+            .collection(SUB_SUBCOLLECTION).doc(newSubjectId)
+            .collection(CH_SUBCOLLECTION).doc(chDoc.id).set(chDoc.data());
+        }
+
+        // Delete old subject + its chapters
+        for (const chDoc of oldChaptersSnap.docs) await chDoc.ref.delete();
+        await db.collection(SM_COLLECTION).doc(oldClassId)
+          .collection(SUB_SUBCOLLECTION).doc(oldSubjectId).delete();
       } else {
-        state.editing.subject.name = name;
-        state.editing.subject.icon = icon;
-        state.editing.subject.display_order = order;
+        // Same class — just update
+        await db.collection(SM_COLLECTION).doc(oldClassId)
+          .collection(SUB_SUBCOLLECTION).doc(oldSubjectId).update({
+            name, icon, display_order: order
+          });
       }
+      toast('Subject updated ✓');
     } else {
-      const cls = findClass(newClassId);
-      cls.subjects = cls.subjects || [];
-      cls.subjects.push({
-        id: uid(),
-        name, icon, display_order: order,
-        chapters: []
-      });
+      const subjectId = subjectDocId(name);
+      const existing = await db.collection(SM_COLLECTION).doc(newClassId)
+        .collection(SUB_SUBCOLLECTION).doc(subjectId).get();
+      if (existing.exists) {
+        toast('Subject already exists in this class', true);
+        hideLoader();
+        return;
+      }
+      await db.collection(SM_COLLECTION).doc(newClassId)
+        .collection(SUB_SUBCOLLECTION).doc(subjectId).set({
+          name, icon, display_order: order,
+          created_at: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      toast('Subject added ✓');
     }
-    await saveAll();
     subjectModal.hide();
-    toast(state.editing.subject ? 'Subject updated ✓' : 'Subject added ✓');
-    renderAll();
-    refreshFilters();
+    await loadAll();
   } catch (err) {
+    console.error(err);
     toast('Save failed: ' + err.message, true);
   } finally {
     hideLoader();
@@ -1252,8 +1358,6 @@ window.saveSubject = async function() {
 };
 
 window.deleteSubject = async function(classId, subjectId) {
-  const cls = findClass(classId);
-  if (!cls) return;
   const s = findSubject(classId, subjectId);
   if (!s) return;
   const chCount = (s.chapters || []).length;
@@ -1261,15 +1365,22 @@ window.deleteSubject = async function(classId, subjectId) {
 
   showLoader('Deleting…');
   try {
+    // Delete PDFs
     for (const ch of (s.chapters || [])) {
       if (ch.pdf_path) await deletePdfFromSupabase(ch.pdf_path);
     }
-    cls.subjects = cls.subjects.filter(x => x.id !== subjectId);
-    await saveAll();
-    toast('Subject deleted ✓');
-    renderAll();
-    refreshFilters();
+    // Delete chapters subcollection
+    const chaptersSnap = await db.collection(SM_COLLECTION).doc(classId)
+      .collection(SUB_SUBCOLLECTION).doc(subjectId)
+      .collection(CH_SUBCOLLECTION).get();
+    for (const chDoc of chaptersSnap.docs) await chDoc.ref.delete();
+    // Delete subject doc
+    await db.collection(SM_COLLECTION).doc(classId)
+      .collection(SUB_SUBCOLLECTION).doc(subjectId).delete();
+    toast('Subject + chapters deleted ✓');
+    await loadAll();
   } catch (err) {
+    console.error(err);
     toast('Delete failed: ' + err.message, true);
   } finally {
     hideLoader();
@@ -1277,8 +1388,7 @@ window.deleteSubject = async function(classId, subjectId) {
 };
 
 /* ============================================================
-   SUPABASE PDF UPLOAD / DELETE
-   — Filename me Hindi/special chars nahi jaayenge
+   SUPABASE PDF UPLOAD / DELETE — filename safe
    ============================================================ */
 function extractSupabasePath(pdfUrl) {
   if (!pdfUrl || typeof pdfUrl !== 'string') return null;
@@ -1291,12 +1401,11 @@ function extractSupabasePath(pdfUrl) {
 async function uploadPdfToSupabase(file, chapterName) {
   // Hindi/Devanagari aur special chars hatao — sirf ASCII safe
   let safeName = String(chapterName || 'chapter')
-    .replace(/[^\w.\-]/g, '_')     // sirf a-z A-Z 0-9 _ - . allow
-    .replace(/_+/g, '_')            // multiple underscore → single
-    .replace(/^_|_$/g, '')          // start/end underscore hatao
+    .replace(/[^\w.\-]/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_|_$/g, '')
     .slice(0, 50);
 
-  // Agar sab Hindi tha aur khali ho gaya to fallback
   if (!safeName || safeName.length < 2) {
     safeName = 'chapter';
   }
@@ -1340,7 +1449,7 @@ async function deletePdfFromSupabase(pdfUrlOrPath) {
 }
 
 /* ============================================================
-   CHAPTER CRUD
+   CHAPTER CRUD — nested
    ============================================================ */
 function refreshChapterFormSubjects() {
   const classId = $('chapterFormClass').value;
@@ -1482,47 +1591,57 @@ window.saveChapter = async function() {
     $('uploadPercent').textContent = '95%';
     $('uploadFill').style.width = '95%';
 
-    const newSubject = findSubject(targetClassId, targetSubjectId);
-    if (!newSubject) throw new Error('Target subject not found');
+    const chapterData = {
+      chapter_number: number,
+      name,
+      display_order: order,
+      pdf_path,
+      is_new,
+      is_published
+    };
 
     if (state.editing.chapter) {
-      if (state.editing.parentSubjectId !== targetSubjectId) {
-        const oldSubj = findSubject(state.editing.parentClassId, state.editing.parentSubjectId);
-        if (oldSubj) oldSubj.chapters = (oldSubj.chapters || []).filter(c => c.id !== state.editing.chapter.id);
-        newSubject.chapters = newSubject.chapters || [];
-        Object.assign(state.editing.chapter, {
-          chapter_number: number, name, display_order: order,
-          is_new, is_published, pdf_path
-        });
-        newSubject.chapters.push(state.editing.chapter);
+      const oldClassId = state.editing.parentClassId;
+      const oldSubjectId = state.editing.parentSubjectId;
+      const chapterId = state.editing.chapter.id;
+
+      if (oldClassId === targetClassId && oldSubjectId === targetSubjectId) {
+        // Same location — update
+        await db.collection(SM_COLLECTION).doc(targetClassId)
+          .collection(SUB_SUBCOLLECTION).doc(targetSubjectId)
+          .collection(CH_SUBCOLLECTION).doc(chapterId).update(chapterData);
       } else {
-        Object.assign(state.editing.chapter, {
-          chapter_number: number, name, display_order: order,
-          is_new, is_published, pdf_path
-        });
+        // Moved → delete from old, create in new
+        await db.collection(SM_COLLECTION).doc(oldClassId)
+          .collection(SUB_SUBCOLLECTION).doc(oldSubjectId)
+          .collection(CH_SUBCOLLECTION).doc(chapterId).delete();
+        await db.collection(SM_COLLECTION).doc(targetClassId)
+          .collection(SUB_SUBCOLLECTION).doc(targetSubjectId)
+          .collection(CH_SUBCOLLECTION).doc(chapterId).set({
+            ...chapterData,
+            created_at: firebase.firestore.FieldValue.serverTimestamp()
+          });
       }
       toast('Chapter updated ✓');
     } else {
-      newSubject.chapters = newSubject.chapters || [];
-      newSubject.chapters.push({
-        id: uid(),
-        chapter_number: number,
-        name, display_order: order,
-        pdf_path, is_new, is_published
+      // Auto-generate chapter ID
+      const chapterRef = db.collection(SM_COLLECTION).doc(targetClassId)
+        .collection(SUB_SUBCOLLECTION).doc(targetSubjectId)
+        .collection(CH_SUBCOLLECTION).doc();
+      await chapterRef.set({
+        ...chapterData,
+        created_at: firebase.firestore.FieldValue.serverTimestamp()
       });
       toast('Chapter added ✓');
     }
 
-    await saveAll();
-
     $('uploadPercent').textContent = '100%';
     $('uploadFill').style.width = '100%';
 
-    setTimeout(() => {
+    setTimeout(async () => {
       chapterModal.hide();
       state.selectedPdfFile = null;
-      renderAll();
-      refreshFilters();
+      await loadAll();
     }, 400);
   } catch (err) {
     console.error('Save chapter error:', err);
@@ -1544,12 +1663,13 @@ window.deleteChapter = async function(classId, subjectId, chapterId) {
   showLoader('Deleting…');
   try {
     if (ch.pdf_path) await deletePdfFromSupabase(ch.pdf_path);
-    s.chapters = (s.chapters || []).filter(c => c.id !== chapterId);
-    await saveAll();
+    await db.collection(SM_COLLECTION).doc(classId)
+      .collection(SUB_SUBCOLLECTION).doc(subjectId)
+      .collection(CH_SUBCOLLECTION).doc(chapterId).delete();
     toast('Chapter deleted ✓');
-    renderAll();
-    refreshFilters();
+    await loadAll();
   } catch (err) {
+    console.error(err);
     toast('Delete failed: ' + err.message, true);
   } finally {
     hideLoader();
