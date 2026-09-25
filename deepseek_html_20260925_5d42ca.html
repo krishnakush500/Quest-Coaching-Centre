@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Study Material Admin · Quest Coaching</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:#f0f2f5;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding:20px;
+    min-height:100vh;
+  }
+  .admin-container { max-width:1300px; margin:0 auto; }
+
+  /* Header */
+  .page-header {
+    background:linear-gradient(135deg, #0d2b6b 0%, #16409b 100%);
+    border-radius:20px;
+    padding:22px 26px;
+    color:#fff;
+    margin-bottom:24px;
+    box-shadow:0 10px 30px rgba(13,43,107,.25);
+    border-bottom:4px solid #ffc42e;
+    position:relative;
+    overflow:hidden;
+  }
+  .page-header::before {
+    content:"";position:absolute;top:-60%;right:-10%;width:50%;height:220%;
+    background:radial-gradient(circle, rgba(255,196,46,.18) 0%, transparent 70%);
+    pointer-events:none;
+  }
+  .page-header h1 {
+    font-size:1.6rem;font-weight:800;letter-spacing:.4px;
+    display:flex;align-items:center;gap:12px;
+    position:relative;z-index:2;
+  }
+  .page-header h1 .ico {
+    width:46px;height:46px;border-radius:12px;
+    background:linear-gradient(135deg,#ffd257,#f7b500);
+    color:#0d2b6b;display:grid;place-items:center;font-size:22px;
+    box-shadow:0 4px 12px rgba(247,181,0,.4);
+  }
+  .page-header p {
+    font-size:.88rem;color:#c3d2f2;margin-top:6px;
+    position:relative;z-index:2;
+  }
+
+  /* Tabs */
+  .sm-tabs {
+    display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;
+    background:#fff;padding:8px;border-radius:14px;
+    box-shadow:0 4px 14px rgba(13,43,107,.06);
+  }
+  .sm-tab {
+    flex:1;min-width:140px;
+    padding:12px 16px;border-radius:10px;
+    background:transparent;border:none;
+    font-size:.92rem;font-weight:700;color:#64748b;
+    cursor:pointer;transition:all .2s;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .sm-tab:hover { background:#f1f5ff;color:#0d2b6b; }
+  .sm-tab.active {
+    background:linear-gradient(135deg,#0d2b6b,#16409b);
+    color:#fff;box-shadow:0 4px 12px rgba(13,43,107,.28);
+  }
+  .sm-tab .count {
+    background:rgba(255,255,255,.22);
+    font-size:.7rem;font-weight:800;
+    padding:2px 7px;border-radius:20px;
+    min-width:22px;text-align:center;
+  }
+  .sm-tab.active .count { background:#ffc42e;color:#0d2b6b; }
+
+  /* Panels */
+  .sm-panel { display:none; animation:fade .3s ease; }
+  .sm-panel.active { display:block; }
+  @keyframes fade { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
+
+  /* Card */
+  .sm-card {
+    background:#fff;border-radius:18px;
+    padding:22px;box-shadow:0 4px 16px rgba(13,43,107,.06);
+    border:1px solid #eef2f9;margin-bottom:18px;
+  }
+  .sm-card-header {
+    display:flex;align-items:center;justify-content:space-between;
+    flex-wrap:wrap;gap:12px;margin-bottom:16px;
+    padding-bottom:14px;border-bottom:1px solid #eef2f9;
+  }
+  .sm-card-header h2 {
+    font-size:1.1rem;font-weight:800;color:#0d2b6b;
+    display:flex;align-items:center;gap:10px;
+  }
+  .sm-card-header h2 .num {
+    background:#e8eafe;color:#1a237e;
+    font-size:.72rem;font-weight:800;
+    padding:3px 9px;border-radius:20px;
+  }
+
+  /* Buttons */
+  .btn-gold {
+    background:linear-gradient(135deg,#ffd257,#f7b500);
+    color:#0d2b6b;font-weight:800;
+    border:none;border-radius:10px;
+    padding:9px 16px;font-size:.88rem;
+    box-shadow:0 3px 10px rgba(247,181,0,.32);
+    display:inline-flex;align-items:center;gap:7px;
+    transition:all .2s;
+  }
+  .btn-gold:hover { transform:translateY(-1px);box-shadow:0 6px 16px rgba(247,181,0,.45);color:#0d2b6b; }
+  .btn-gold:active { transform:scale(.97); }
+
+  .btn-navy {
+    background:linear-gradient(135deg,#0d2b6b,#16409b);
+    color:#fff;font-weight:700;border:none;border-radius:10px;
+    padding:9px 16px;font-size:.88rem;
+    box-shadow:0 3px 10px rgba(13,43,107,.22);
+    display:inline-flex;align-items:center;gap:7px;
+    transition:all .2s;
+  }
+  .btn-navy:hover { transform:translateY(-1px);color:#fff; }
+
+  .btn-outline-soft {
+    background:#fff;border:1.5px solid #dbe6ff;color:#0d2b6b;
+    font-weight:700;border-radius:9px;
+    padding:6px 12px;font-size:.8rem;
+    transition:all .2s;
+  }
+  .btn-outline-soft:hover { background:#f1f5ff;border-color:#0d2b6b;color:#0d2b6b; }
+
+  .btn-danger-soft {
+    background:#fff;border:1.5px solid #ffd3de;color:#e0245e;
+    font-weight:700;border-radius:9px;
+    padding:6px 12px;font-size:.8rem;
+    transition:all .2s;
+  }
+  .btn-danger-soft:hover { background:#ffe3ea;border-color:#e0245e;color:#e0245e; }
+
+  /* List items */
+  .sm-list { display:flex;flex-direction:column;gap:10px; }
+
+  .sm-item {
+    background:#f9fbff;border:1.5px solid #e3e9f5;
+    border-radius:14px;padding:14px 16px;
+    display:flex;align-items:center;gap:12px;
+    transition:all .2s;
+  }
+  .sm-item:hover { border-color:#cfdcf5;box-shadow:0 4px 12px rgba(13,43,107,.08); }
+
+  .sm-item-icon {
+    width:44px;height:44px;flex:none;
+    border-radius:12px;
+    background:linear-gradient(135deg,#eef3ff,#dde7ff);
+    border:1px solid #dbe6ff;
+    display:grid;place-items:center;
+    font-size:1.2rem;color:#0d2b6b;
+  }
+  .sm-item-body { flex:1;min-width:0; }
+  .sm-item-body h4 {
+    font-size:.95rem;font-weight:800;color:#0d2b6b;margin-bottom:2px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .sm-item-body .meta {
+    font-size:.75rem;color:#64748b;font-weight:600;
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  }
+  .sm-item-body .meta .badge-soft {
+    padding:2px 8px;border-radius:20px;
+    font-size:.62rem;font-weight:800;letter-spacing:.4px;
+    text-transform:uppercase;
+  }
+  .badge-new { background:#ffe3ea;color:#e0245e; }
+  .badge-pub { background:#e3fcef;color:#0e9f6e; }
+  .badge-draft { background:#f0f2f7;color:#64748b; }
+  .badge-pdf { background:#e0f2fe;color:#0369a1; }
+  .badge-nopdf { background:#fef3c7;color:#b45309; }
+
+  .sm-item-actions {
+    display:flex;gap:6px;flex-wrap:wrap;flex:none;
+  }
+  @media(max-width:600px){
+    .sm-item { flex-wrap:wrap; }
+    .sm-item-actions { width:100%;justify-content:flex-end;margin-top:6px; }
+  }
+
+  /* Empty state */
+  .sm-empty {
+    text-align:center;padding:40px 20px;
+    background:#fbfcff;border:2px dashed #dbe6ff;
+    border-radius:14px;color:#64748b;
+  }
+  .sm-empty .ico-big {
+    font-size:2.6rem;color:#cfdcf5;margin-bottom:12px;
+  }
+  .sm-empty h4 { color:#0d2b6b;font-weight:800;font-size:.98rem;margin-bottom:6px; }
+  .sm-empty p { font-size:.84rem;color:#8a95ae; }
+
+  /* Loading */
+  .sm-loading {
+    text-align:center;padding:34px 20px;color:#64748b;
+  }
+  .sm-loading .spinner {
+    width:36px;height:36px;border:3px solid #e3e9f5;
+    border-top-color:#0d2b6b;border-radius:50%;
+    animation:spin .75s linear infinite;margin:0 auto 12px;
+  }
+  @keyframes spin { to{transform:rotate(360deg);} }
+
+  /* Modal */
+  .modal-content { border:none;border-radius:18px;overflow:hidden; }
+  .modal-header {
+    background:linear-gradient(135deg,#0d2b6b,#16409b);
+    color:#fff;border-bottom:3px solid #ffc42e;
+    padding:16px 20px;
+  }
+  .modal-header .btn-close { filter:brightness(0) invert(1);opacity:.85; }
+  .modal-title { font-weight:800;font-size:1rem;letter-spacing:.2px; }
+  .modal-body { padding:22px; }
+
+  .form-label { font-size:.78rem;font-weight:800;color:#5f6f90;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px; }
+  .form-control, .form-select {
+    border:1.5px solid #dbe6ff;border-radius:10px;
+    padding:10px 12px;font-size:.9rem;
+    transition:all .15s;
+  }
+  .form-control:focus, .form-select:focus {
+    border-color:#16409b;box-shadow:0 0 0 3px rgba(22,64,155,.12);
+  }
+  .form-check-input:checked { background-color:#0d2b6b;border-color:#0d2b6b; }
+  .form-check-label { font-size:.86rem;font-weight:600;color:#0f2452; }
+
+  .upload-drop {
+    border:2px dashed #dbe6ff;border-radius:12px;
+    padding:20px;text-align:center;
+    background:#fbfcff;cursor:pointer;
+    transition:all .2s;
+  }
+  .upload-drop:hover { border-color:#16409b;background:#f1f5ff; }
+  .upload-drop .ico { font-size:1.8rem;color:#0d2b6b;margin-bottom:8px; }
+  .upload-drop .txt { font-size:.85rem;font-weight:700;color:#0d2b6b; }
+  .upload-drop .sub { font-size:.74rem;color:#8a95ae;margin-top:4px; }
+
+  .file-info {
+    margin-top:10px;font-size:.78rem;color:#0e9f6e;font-weight:700;
+    display:flex;align-items:center;gap:6px;
+  }
+
+  /* Toast */
+  .sm-toast {
+    position:fixed;bottom:24px;left:50%;transform:translate(-50%,90px);
+    background:#081f52;color:#fff;
+    padding:12px 20px;border-radius:12px;
+    font-size:.88rem;font-weight:700;
+    box-shadow:0 12px 32px rgba(8,31,82,.4);
+    border-left:4px solid #ffc42e;
+    opacity:0;pointer-events:none;transition:all .28s;
+    z-index:9999;max-width:90vw;text-align:center;
+  }
+  .sm-toast.show { opacity:1;transform:translate(-50%,0); }
+  .sm-toast.error { border-left-color:#e0245e; }
+
+  /* Loader overlay */
+  .sm-loader-overlay {
+    position:fixed;inset:0;background:rgba(8,31,82,.55);
+    backdrop-filter:blur(3px);z-index:9998;
+    display:none;align-items:center;justify-content:center;
+  }
+  .sm-loader-overlay.show { display:flex; }
+  .sm-loader-box {
+    background:#fff;border-radius:16px;padding:24px 30px;
+    text-align:center;box-shadow:0 20px 60px rgba(8,31,82,.35);
+    min-width:200px;
+  }
+  .sm-loader-box .spinner {
+    width:38px;height:38px;border:3px solid #e3e9f5;
+    border-top-color:#0d2b6b;border-radius:50%;
+    animation:spin .75s linear infinite;margin:0 auto 12px;
+  }
+  .sm-loader-box p { font-size:.86rem;font-weight:700;color:#0d2b6b; }
+
+  /* Back button */
+  .back-bar {
+    display:flex;align-items:center;justify-content:space-between;
+    flex-wrap:wrap;gap:10px;margin-bottom:16px;
+  }
+  .back-btn {
+    background:#fff;border:1.5px solid #dbe6ff;color:#0d2b6b;
+    border-radius:10px;padding:8px 14px;
+    font-size:.84rem;font-weight:700;
+    display:inline-flex;align-items:center;gap:7px;
+    transition:all .2s;text-decoration:none;
+  }
+  .back-btn:hover { background:#f1f5ff;border-color:#0d2b6b;color:#0d2b6b; }
+
+  .user-pill {
+    background:#f1f5ff;border:1.5px solid #dbe6ff;
+    padding:7px 14px;border-radius:50px;
+    font-size:.78rem;color:#0d2b6b;font-weight:700;
+    display:inline-flex;align-items:center;gap:7px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== LOADER OVERLAY ==================== -->
+<div class="sm-loader-overlay" id="loaderOverlay">
+  <div class="sm-loader-box">
+    <div class="spinner"></div>
+    <p id="loaderText">Saving…</p>
+  </div>
+</div>
+
+<!-- ==================== MAIN ==================== -->
+<div class="admin-container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <h1>
+      <span class="ico"><i class="fas fa-book-open"></i></span>
+      Study Material Admin
+    </h1>
+    <p>Manage classes · subjects · chapters · PDF uploads</p>
+  </div>
+
+  <!-- Back bar -->
+  <div class="back-bar">
+    <a href="admin.html" class="back-btn">
+      <i class="fas fa-arrow-left"></i> Back to Admin Panel
+    </a>
+    <span class="user-pill" id="userPill">
+      <i class="fas fa-user-shield"></i>
+      <span id="userEmail">--</span>
+    </span>
+  </div>
+
+  <!-- Tabs -->
+  <div class="sm-tabs">
+    <button class="sm-tab active" data-tab="classes">
+      <i class="fas fa-school"></i> Classes
+      <span class="count" id="tabCountClasses">0</span>
+    </button>
+    <button class="sm-tab" data-tab="subjects">
+      <i class="fas fa-book"></i> Subjects
+      <span class="count" id="tabCountSubjects">0</span>
+    </button>
+    <button class="sm-tab" data-tab="chapters">
+      <i class="fas fa-file-alt"></i> Chapters
+      <span class="count" id="tabCountChapters">0</span>
+    </button>
+  </div>
+
+  <!-- ==================== CLASSES PANEL ==================== -->
+  <div class="sm-panel active" id="panel-classes">
+    <div class="sm-card">
+      <div class="sm-card-header">
+        <h2><i class="fas fa-school"></i> Classes <span class="num" id="classesCount">0</span></h2>
+        <button class="btn-gold" onclick="openClassModal()">
+          <i class="fas fa-plus"></i> Add Class
+        </button>
+      </div>
+      <div class="sm-list" id="classesList">
+        <div class="sm-loading"><div class="spinner"></div><span>Loading classes…</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SUBJECTS PANEL ==================== -->
+  <div class="sm-panel" id="panel-subjects">
+    <div class="sm-card">
+      <div class="sm-card-header">
+        <h2><i class="fas fa-book"></i> Subjects <span class="num" id="subjectsCount">0</span></h2>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <select class="form-select" id="subjectClassFilter" style="max-width:220px;border-radius:10px;font-size:.85rem;">
+            <option value="">All Classes</option>
+          </select>
+          <button class="btn-gold" onclick="openSubjectModal()">
+            <i class="fas fa-plus"></i> Add Subject
+          </button>
+        </div>
+      </div>
+      <div class="sm-list" id="subjectsList">
+        <div class="sm-loading"><div class="spinner"></div><span>Loading subjects…</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CHAPTERS PANEL ==================== -->
+  <div class="sm-panel" id="panel-chapters">
+    <div class="sm-card">
+      <div class="sm-card-header">
+        <h2><i class="fas fa-file-alt"></i> Chapters <span class="num" id="chaptersCount">0</span></h2>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <select class="form-select" id="chapterClassFilter" style="max-width:180px;border-radius:10px;font-size:.85rem;">
+            <option value="">All Classes</option>
+          </select>
+          <select class="form-select" id="chapterSubjectFilter" style="max-width:220px;border-radius:10px;font-size:.85rem;">
+            <option value="">All Subjects</option>
+          </select>
+          <button class="btn-gold" onclick="openChapterModal()">
+            <i class="fas fa-plus"></i> Add Chapter
+          </button>
+        </div>
+      </div>
+      <div class="sm-list" id="chaptersList">
+        <div class="sm-loading"><div class="spinner"></div><span>Loading chapters…</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== MODAL — CLASS ==================== -->
+<div class="modal fade" id="classModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-school"></i> <span id="classModalTitle">Add Class</span></h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Class Name *</label>
+          <input type="text" class="form-control" id="classFormName" placeholder="e.g. Class 10">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Display Order</label>
+          <input type="number" class="form-control" id="classFormOrder" value="1" min="0">
+        </div>
+      </div>
+      <div class="modal-footer" style="border-top:1px solid #eef2f9;padding:14px 20px;">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:10px;font-weight:700;font-size:.85rem;">Cancel</button>
+        <button class="btn-gold" onclick="saveClass()">
+          <i class="fas fa-save"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL — SUBJECT ==================== -->
+<div class="modal fade" id="subjectModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-book"></i> <span id="subjectModalTitle">Add Subject</span></h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Class *</label>
+          <select class="form-select" id="subjectFormClass"></select>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="form-label">Subject Name *</label>
+            <input type="text" class="form-control" id="subjectFormName" placeholder="e.g. Science">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Icon (Emoji)</label>
+            <input type="text" class="form-control" id="subjectFormIcon" value="📘" maxlength="4" placeholder="📘">
+          </div>
+        </div>
+        <div class="mt-3">
+          <label class="form-label">Display Order</label>
+          <input type="number" class="form-control" id="subjectFormOrder" value="1" min="0">
+        </div>
+      </div>
+      <div class="modal-footer" style="border-top:1px solid #eef2f9;padding:14px 20px;">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:10px;font-weight:700;font-size:.85rem;">Cancel</button>
+        <button class="btn-gold" onclick="saveSubject()">
+          <i class="fas fa-save"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL — CHAPTER ==================== -->
+<div class="modal fade" id="chapterModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-file-alt"></i> <span id="chapterModalTitle">Add Chapter</span></h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Class *</label>
+            <select class="form-select" id="chapterFormClass"></select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Subject *</label>
+            <select class="form-select" id="chapterFormSubject"></select>
+          </div>
+        </div>
+        <div class="row g-3 mt-1">
+          <div class="col-md-3">
+            <label class="form-label">Ch. No. *</label>
+            <input type="number" class="form-control" id="chapterFormNumber" value="1" min="1">
+          </div>
+          <div class="col-md-9">
+            <label class="form-label">Chapter Name *</label>
+            <input type="text" class="form-control" id="chapterFormName" placeholder="e.g. Chemical Reactions and Equations">
+          </div>
+        </div>
+        <div class="row g-3 mt-1">
+          <div class="col-md-4">
+            <label class="form-label">Display Order</label>
+            <input type="number" class="form-control" id="chapterFormOrder" value="1" min="0">
+          </div>
+          <div class="col-md-4">
+            <div class="form-check mt-4">
+              <input class="form-check-input" type="checkbox" id="chapterFormIsNew">
+              <label class="form-check-label" for="chapterFormIsNew">Mark as NEW</label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-check mt-4">
+              <input class="form-check-input" type="checkbox" id="chapterFormIsPublished" checked>
+              <label class="form-check-label" for="chapterFormIsPublished">Published</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <label class="form-label">PDF File</label>
+          <div class="upload-drop" id="uploadDrop">
+            <input type="file" id="chapterFormPdf" accept="application/pdf" style="display:none;">
+            <div class="ico"><i class="fas fa-cloud-upload-alt"></i></div>
+            <div class="txt">Click to upload PDF</div>
+            <div class="sub">Max ~15 MB · only .pdf files</div>
+          </div>
+          <div class="file-info" id="fileInfo" style="display:none;">
+            <i class="fas fa-check-circle"></i>
+            <span id="fileName"></span>
+            <button class="btn-outline-soft ms-2" onclick="clearPdfSelection()" style="padding:3px 8px;font-size:.72rem;">
+              <i class="fas fa-times"></i> Remove
+            </button>
+          </div>
+          <div class="text-muted mt-2" style="font-size:.75rem;">
+            <i class="fas fa-info-circle"></i> Agar PDF skip karega to chapter bina PDF ke save hoga (student preview me sample page dikhega).
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="border-top:1px solid #eef2f9;padding:14px 20px;">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:10px;font-weight:700;font-size:.85rem;">Cancel</button>
+        <button class="btn-gold" onclick="saveChapter()">
+          <i class="fas fa-save"></i> Save Chapter
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TOAST ==================== -->
+<div class="sm-toast" id="smToast"></div>
+
+<!-- Bootstrap -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<!-- Firebase v9 modular -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+import {
+  getFirestore, collection, getDocs, doc, getDoc,
+  addDoc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+import {
+  getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
+
+/* ============================================================
+   FIREBASE INIT
+   ============================================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
+  authDomain: "quest-coaching.firebaseapp.com",
+  databaseURL: "https://quest-coaching-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "quest-coaching",
+  storageBucket: "quest-coaching.firebasestorage.app",
+  messagingSenderId: "131948734089",
+  appId: "1:131948734089:web:f4ba25110c8b1298360858"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+/* Collections */
+const COL_CLASSES  = 'study_classes';
+const COL_SUBJECTS = 'study_subjects';
+const COL_CHAPTERS = 'study_chapters';
+const PDF_FOLDER   = 'study-material/pdfs';
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  classes: [],
+  subjects: [],
+  chapters: [],
+  editing: { class:null, subject:null, chapter:null },
+  selectedPdfFile: null,
+  deleteExistingPdfPath: null
+};
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+const $ = (id) => document.getElementById(id);
+const esc = (s='') => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+let toastTimer;
+function toast(msg, isError=false) {
+  const el = $('smToast');
+  el.textContent = msg;
+  el.className = 'sm-toast show' + (isError ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+function showLoader(text='Saving…') {
+  $('loaderText').textContent = text;
+  $('loaderOverlay').classList.add('show');
+}
+function hideLoader() {
+  $('loaderOverlay').classList.remove('show');
+}
+
+function sortByOrder(arr) {
+  return [...arr].sort((a,b) => (a.display_order||0) - (b.display_order||0));
+}
+
+/* ============================================================
+   AUTH CHECK
+   ============================================================ */
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    alert('Please login from main page first!');
+    window.location.href = 'index.html';
+    return;
+  }
+  $('userEmail').textContent = user.email || 'Admin';
+  loadAll();
+});
+
+/* ============================================================
+   LOAD DATA
+   ============================================================ */
+async function loadAll() {
+  showLoader('Loading…');
+  try {
+    const [cSnap, sSnap, chSnap] = await Promise.all([
+      getDocs(collection(db, COL_CLASSES)),
+      getDocs(collection(db, COL_SUBJECTS)),
+      getDocs(collection(db, COL_CHAPTERS))
+    ]);
+
+    state.classes = sortByOrder(cSnap.docs.map(d => ({ id:d.id, ...d.data() })));
+    state.subjects = sortByOrder(sSnap.docs.map(d => ({ id:d.id, ...d.data() })));
+    state.chapters = sortByOrder(chSnap.docs.map(d => ({ id:d.id, ...d.data() })));
+
+    renderAll();
+    refreshFilters();
+  } catch (err) {
+    console.error(err);
+    toast('Load failed: ' + err.message, true);
+  } finally {
+    hideLoader();
+  }
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function renderAll() {
+  renderClasses();
+  renderSubjects();
+  renderChapters();
+  updateCounts();
+}
+
+function updateCounts() {
+  $('tabCountClasses').textContent = state.classes.length;
+  $('tabCountSubjects').textContent = state.subjects.length;
+  $('tabCountChapters').textContent = state.chapters.length;
+  $('classesCount').textContent = state.classes.length;
+  $('subjectsCount').textContent = state.subjects.length;
+  $('chaptersCount').textContent = state.chapters.length;
+}
+
+/* ---------- CLASSES ---------- */
+function renderClasses() {
+  const box = $('classesList');
+  if (!state.classes.length) {
+    box.innerHTML = `<div class="sm-empty">
+      <div class="ico-big"><i class="fas fa-school"></i></div>
+      <h4>No classes yet</h4>
+      <p>Click "Add Class" to create your first class.</p>
+    </div>`;
+    return;
+  }
+  box.innerHTML = state.classes.map(c => `
+    <div class="sm-item">
+      <div class="sm-item-icon"><i class="fas fa-school"></i></div>
+      <div class="sm-item-body">
+        <h4>${esc(c.name)}</h4>
+        <div class="meta">
+          <span>Order: ${c.display_order||0}</span>
+          <span class="badge-soft badge-pub">${state.subjects.filter(s=>s.class_id===c.id).length} subjects</span>
+        </div>
+      </div>
+      <div class="sm-item-actions">
+        <button class="btn-outline-soft" onclick="editClass('${c.id}')"><i class="fas fa-pen"></i> Edit</button>
+        <button class="btn-danger-soft" onclick="deleteClass('${c.id}')"><i class="fas fa-trash"></i> Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ---------- SUBJECTS ---------- */
+function renderSubjects() {
+  const filter = $('subjectClassFilter')?.value || '';
+  const list = filter ? state.subjects.filter(s => s.class_id === filter) : state.subjects;
+  const box = $('subjectsList');
+
+  if (!list.length) {
+    box.innerHTML = `<div class="sm-empty">
+      <div class="ico-big"><i class="fas fa-book"></i></div>
+      <h4>No subjects ${filter ? 'for this class' : 'yet'}</h4>
+      <p>Click "Add Subject" to create one.</p>
+    </div>`;
+    return;
+  }
+  box.innerHTML = list.map(s => {
+    const cls = state.classes.find(c => c.id === s.class_id);
+    const chCount = state.chapters.filter(ch => ch.subject_id === s.id).length;
+    return `
+      <div class="sm-item">
+        <div class="sm-item-icon" style="font-size:1.4rem;">${esc(s.icon || '📘')}</div>
+        <div class="sm-item-body">
+          <h4>${esc(s.name)}</h4>
+          <div class="meta">
+            <span><i class="fas fa-school"></i> ${esc(cls ? cls.name : '—')}</span>
+            <span>Order: ${s.display_order||0}</span>
+            <span class="badge-soft badge-pdf">${chCount} chapters</span>
+          </div>
+        </div>
+        <div class="sm-item-actions">
+          <button class="btn-outline-soft" onclick="editSubject('${s.id}')"><i class="fas fa-pen"></i> Edit</button>
+          <button class="btn-danger-soft" onclick="deleteSubject('${s.id}')"><i class="fas fa-trash"></i> Delete</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ---------- CHAPTERS ---------- */
+function renderChapters() {
+  const classFilter = $('chapterClassFilter')?.value || '';
+  const subjectFilter = $('chapterSubjectFilter')?.value || '';
+
+  let list = [...state.chapters];
+  if (classFilter) {
+    const subjectIdsInClass = state.subjects.filter(s => s.class_id === classFilter).map(s => s.id);
+    list = list.filter(ch => subjectIdsInClass.includes(ch.subject_id));
+  }
+  if (subjectFilter) {
+    list = list.filter(ch => ch.subject_id === subjectFilter);
+  }
+  list = sortByOrder(list);
+
+  const box = $('chaptersList');
+  if (!list.length) {
+    box.innerHTML = `<div class="sm-empty">
+      <div class="ico-big"><i class="fas fa-file-alt"></i></div>
+      <h4>No chapters found</h4>
+      <p>Adjust filters or click "Add Chapter".</p>
+    </div>`;
+    return;
+  }
+  box.innerHTML = list.map(ch => {
+    const subj = state.subjects.find(s => s.id === ch.subject_id);
+    const cls = subj ? state.classes.find(c => c.id === subj.class_id) : null;
+    const hasPdf = !!ch.pdf_path;
+    return `
+      <div class="sm-item">
+        <div class="sm-item-icon" style="font-size:.9rem;font-weight:800;">${String(ch.chapter_number||0).padStart(2,'0')}</div>
+        <div class="sm-item-body">
+          <h4>${esc(ch.name)}</h4>
+          <div class="meta">
+            <span><i class="fas fa-school"></i> ${esc(cls ? cls.name : '—')}</span>
+            <span><i class="fas fa-book"></i> ${esc(subj ? subj.name : '—')}</span>
+            <span>Order: ${ch.display_order||0}</span>
+            ${ch.is_new ? '<span class="badge-soft badge-new">NEW</span>' : ''}
+            ${ch.is_published === false ? '<span class="badge-soft badge-draft">Draft</span>' : '<span class="badge-soft badge-pub">Live</span>'}
+            ${hasPdf ? '<span class="badge-soft badge-pdf"><i class="fas fa-file-pdf"></i> PDF</span>' : '<span class="badge-soft badge-nopdf">No PDF</span>'}
+          </div>
+        </div>
+        <div class="sm-item-actions">
+          <button class="btn-outline-soft" onclick="editChapter('${ch.id}')"><i class="fas fa-pen"></i> Edit</button>
+          <button class="btn-danger-soft" onclick="deleteChapter('${ch.id}')"><i class="fas fa-trash"></i> Delete</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ============================================================
+   FILTERS
+   ============================================================ */
+function refreshFilters() {
+  // Subject class filter
+  const sc = $('subjectClassFilter');
+  if (sc) {
+    const cur = sc.value;
+    sc.innerHTML = '<option value="">All Classes</option>' +
+      state.classes.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+    sc.value = cur;
+  }
+  // Chapter class filter
+  const cc = $('chapterClassFilter');
+  if (cc) {
+    const cur = cc.value;
+    cc.innerHTML = '<option value="">All Classes</option>' +
+      state.classes.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+    cc.value = cur;
+  }
+  updateChapterSubjectFilter();
+}
+
+function updateChapterSubjectFilter() {
+  const classFilter = $('chapterClassFilter')?.value || '';
+  const ss = $('chapterSubjectFilter');
+  if (!ss) return;
+  const cur = ss.value;
+  let subs = state.subjects;
+  if (classFilter) subs = subs.filter(s => s.class_id === classFilter);
+  ss.innerHTML = '<option value="">All Subjects</option>' +
+    subs.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
+  ss.value = cur;
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+document.querySelectorAll('.sm-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sm-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.sm-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    $('panel-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ============================================================
+   CLASS MODAL
+   ============================================================ */
+let classModal, subjectModal, chapterModal;
+document.addEventListener('DOMContentLoaded', () => {
+  classModal = new bootstrap.Modal($('classModal'));
+  subjectModal = new bootstrap.Modal($('subjectModal'));
+  chapterModal = new bootstrap.Modal($('chapterModal'));
+});
+
+window.openClassModal = function() {
+  state.editing.class = null;
+  $('classModalTitle').textContent = 'Add Class';
+  $('classFormName').value = '';
+  $('classFormOrder').value = (state.classes.length + 1);
+  classModal.show();
+};
+
+window.editClass = function(id) {
+  const c = state.classes.find(x => x.id === id);
+  if (!c) return;
+  state.editing.class = c;
+  $('classModalTitle').textContent = 'Edit Class';
+  $('classFormName').value = c.name || '';
+  $('classFormOrder').value = c.display_order || 0;
+  classModal.show();
+};
+
+window.saveClass = async function() {
+  const name = $('classFormName').value.trim();
+  const order = parseInt($('classFormOrder').value, 10) || 0;
+  if (!name) return toast('Class name required', true);
+
+  showLoader('Saving class…');
+  try {
+    if (state.editing.class) {
+      await updateDoc(doc(db, COL_CLASSES, state.editing.class.id), {
+        name, display_order: order
+      });
+      toast('Class updated ✓');
+    } else {
+      await addDoc(collection(db, COL_CLASSES), {
+        name, display_order: order, created_at: serverTimestamp()
+      });
+      toast('Class added ✓');
+    }
+    classModal.hide();
+    await loadAll();
+  } catch (err) {
+    console.error(err);
+    toast('Save failed: ' + err.message, true);
+  } finally {
+    hideLoader();
+  }
+};
+
+window.deleteClass = async function(id) {
+  const cls = state.classes.find(c => c.id === id);
+  if (!cls) return;
+  const subCount = state.subjects.filter(s => s.class_id === id).length;
+  const msg = subCount
+    ? `Delete "${cls.name}" and its ${subCount} subject(s) + all chapters?`
+    : `Delete "${cls.name}"?`;
+  if (!confirm(msg)) return;
+
+  showLoader('Deleting…');
+  try {
+    // Delete child chapters + subjects
+    const subjectIds = state.subjects.filter(s => s.class_id === id).map(s => s.id);
+    const chaptersToDelete = state.chapters.filter(c => subjectIds.includes(c.subject_id));
+
+    // Delete PDFs from Storage
+    for (const ch of chaptersToDelete) {
+      if (ch.pdf_path) {
+        try { await deleteObject(storageRef(storage, ch.pdf_path)); } catch(e){}
+      }
+    }
+
+    await Promise.all(chaptersToDelete.map(c => deleteDoc(doc(db, COL_CHAPTERS, c.id))));
+    await Promise.all(subjectIds.map(sid => deleteDoc(doc(db, COL_SUBJECTS, sid))));
+    await deleteDoc(doc(db, COL_CLASSES, id));
+
+    toast('Class + children deleted ✓');
+    await loadAll();
+  } catch (err) {
+    console.error(err);
+    toast('Delete failed: ' + err.message, true);
+  } finally {
+    hideLoader();
+  }
+};
+
+/* ============================================================
+   SUBJECT MODAL
+   ============================================================ */
+window.openSubjectModal = function(presetClassId) {
+  state.editing.subject = null;
+  $('subjectModalTitle').textContent = 'Add Subject';
+  $('subjectFormClass').innerHTML = state.classes.map(c =>
+    `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  if (!state.classes.length) {
+    return toast('Add a class first!', true);
+  }
+  $('subjectFormClass').value = presetClassId || state.classes[0].id;
+  $('subjectFormName').value = '';
+  $('subjectFormIcon').value = '📘';
+  $('subjectFormOrder').value = 1;
+  subjectModal.show();
+};
+
+window.editSubject = function(id) {
+  const s = state.subjects.find(x => x.id === id);
+  if (!s) return;
+  state.editing.subject = s;
+  $('subjectModalTitle').textContent = 'Edit Subject';
+  $('subjectFormClass').innerHTML = state.classes.map(c =>
+    `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  $('subjectFormClass').value = s.class_id;
+  $('subjectFormName').value = s.name || '';
+  $('subjectFormIcon').value = s.icon || '📘';
+  $('subjectFormOrder').value = s.display_order || 0;
+  subjectModal.show();
+};
+
+window.saveSubject = async function() {
+  const class_id = $('subjectFormClass').value;
+  const name = $('subjectFormName').value.trim();
+  const icon = $('subjectFormIcon').value.trim() || '📘';
+  const order = parseInt($('subjectFormOrder').value, 10) || 0;
+  if (!class_id) return toast('Select a class', true);
+  if (!name) return toast('Subject name required', true);
+
+  showLoader('Saving subject…');
+  try {
+    if (state.editing.subject) {
+      await updateDoc(doc(db, COL_SUBJECTS, state.editing.subject.id), {
+        class_id, name, icon, display_order: order
+      });
+      toast('Subject updated ✓');
+    } else {
+      await addDoc(collection(db, COL_SUBJECTS), {
+        class_id, name, icon, display_order: order, created_at: serverTimestamp()
+      });
+      toast('Subject added ✓');
+    }
+    subjectModal.hide();
+    await loadAll();
+  } catch (err) {
+    console.error(err);
+    toast('Save failed: ' + err.message, true);
+  } finally {
+    hideLoader();
+  }
+};
+
+window.deleteSubject = async function(id) {
+  const subj = state.subjects.find(s => s.id === id);
+  if (!subj) return;
+  const chCount = state.chapters.filter(c => c.subject_id === id).length;
+  const msg = chCount
+    ? `Delete "${subj.name}" and its ${chCount} chapter(s)?`
+    : `Delete "${subj.name}"?`;
+  if (!confirm(msg)) return;
+
+  showLoader('Deleting…');
+  try {
+    const chaptersToDelete = state.chapters.filter(c => c.subject_id === id);
+    for (const ch of chaptersToDelete) {
+      if (ch.pdf_path) {
+        try { await deleteObject(storageRef(storage, ch.pdf_path)); } catch(e){}
+      }
+    }
+    await Promise.all(chaptersToDelete.map(c => deleteDoc(doc(db, COL_CHAPTERS, c.id))));
+    await deleteDoc(doc(db, COL_SUBJECTS, id));
+    toast('Subject + chapters deleted ✓');
+    await loadAll();
+  } catch (err) {
+    console.error(err);
+    toast('Delete failed: ' + err.message, true);
+  } finally {
+    hideLoader();
+  }
+};
+
+/* ============================================================
+   CHAPTER MODAL
+   ============================================================ */
+function refreshChapterFormSubjects() {
+  const classId = $('chapterFormClass').value;
+  const subs = state.subjects.filter(s => s.class_id === classId);
+  $('chapterFormSubject').innerHTML = subs.length
+    ? subs.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('')
+    : '<option value="">No subjects</option>';
+}
+
+window.openChapterModal = function() {
+  state.editing.chapter = null;
+  state.selectedPdfFile = null;
+  state.deleteExistingPdfPath = null;
+  if (!state.classes.length) return toast('Add a class first!', true);
+  if (!state.subjects.length) return toast('Add a subject first!', true);
+
+  $('chapterModalTitle').textContent = 'Add Chapter';
+  $('chapterFormClass').innerHTML = state.classes.map(c =>
+    `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  $('chapterFormClass').value = state.classes[0].id;
+  refreshChapterFormSubjects();
+
+  $('chapterFormNumber').value = 1;
+  $('chapterFormName').value = '';
+  $('chapterFormOrder').value = 1;
+  $('chapterFormIsNew').checked = false;
+  $('chapterFormIsPublished').checked = true;
+  $('fileInfo').style.display = 'none';
+  $('fileName').textContent = '';
+  $('chapterFormPdf').value = '';
+
+  chapterModal.show();
+};
+
+window.editChapter = function(id) {
+  const ch = state.chapters.find(c => c.id === id);
+  if (!ch) return;
+  const subj = state.subjects.find(s => s.id === ch.subject_id);
+  if (!subj) return toast('Subject missing', true);
+
+  state.editing.chapter = ch;
+  state.selectedPdfFile = null;
+  state.deleteExistingPdfPath = null;
+
+  $('chapterModalTitle').textContent = 'Edit Chapter';
+  $('chapterFormClass').innerHTML = state.classes.map(c =>
+    `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  $('chapterFormClass').value = subj.class_id;
+  refreshChapterFormSubjects();
+  $('chapterFormSubject').value = ch.subject_id;
+
+  $('chapterFormNumber').value = ch.chapter_number || 1;
+  $('chapterFormName').value = ch.name || '';
+  $('chapterFormOrder').value = ch.display_order || 0;
+  $('chapterFormIsNew').checked = !!ch.is_new;
+  $('chapterFormIsPublished').checked = ch.is_published !== false;
+  $('chapterFormPdf').value = '';
+
+  if (ch.pdf_path) {
+    $('fileInfo').style.display = 'flex';
+    $('fileName').textContent = 'Existing PDF: ' + ch.pdf_path.split('/').pop();
+  } else {
+    $('fileInfo').style.display = 'none';
+  }
+
+  chapterModal.show();
+};
+
+document.addEventListener('change', (e) => {
+  if (e.target && e.target.id === 'chapterFormClass') {
+    refreshChapterFormSubjects();
+  }
+});
+
+// PDF upload UI
+$('uploadDrop').addEventListener('click', () => $('chapterFormPdf').click());
+$('chapterFormPdf').addEventListener('change', (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  if (f.type !== 'application/pdf' && !/\.pdf$/i.test(f.name)) {
+    return toast('Only PDF files allowed', true);
+  }
+  if (f.size > 15 * 1024 * 1024) {
+    return toast('PDF too large (max 15 MB)', true);
+  }
+  state.selectedPdfFile = f;
+  $('fileInfo').style.display = 'flex';
+  $('fileName').textContent = f.name + ' (' + (f.size/1024/1024).toFixed(2) + ' MB)';
+});
+
+window.clearPdfSelection = function() {
+  state.selectedPdfFile = null;
+  $('chapterFormPdf').value = '';
+  if (state.editing.chapter && state.editing.chapter.pdf_path) {
+    // keep old PDF indication
+    $('fileName').textContent = 'Existing PDF: ' + state.editing.chapter.pdf_path.split('/').pop();
+  } else {
+    $('fileInfo').style.display = 'none';
+  }
+};
+
+window.saveChapter = async function() {
+  const subject_id = $('chapterFormSubject').value;
+  const number = parseInt($('chapterFormNumber').value, 10) || 1;
+  const name = $('chapterFormName').value.trim();
+  const order = parseInt($('chapterFormOrder').value, 10) || 0;
+  const is_new = $('chapterFormIsNew').checked;
+  const is_published = $('chapterFormIsPublished').checked;
+
+  if (!subject_id) return toast('Select a subject', true);
+  if (!name) return toast('Chapter name required', true);
+
+  let pdf_path = state.editing.chapter?.pdf_path || null;
+
+  showLoader(state.selectedPdfFile ? 'Uploading PDF…' : 'Saving chapter…');
+  try {
+    // Upload new PDF if selected
+    if (state.selectedPdfFile) {
+      const safe = state.selectedPdfFile.name.replace(/[^\w.\-]/g, '_');
+      const path = `${PDF_FOLDER}/${Date.now()}_${safe}`;
+      const sRef = storageRef(storage, path);
+      await uploadBytes(sRef, state.selectedPdfFile);
+      // Delete old PDF if replacing
+      if (state.editing.chapter?.pdf_path) {
+        try { await deleteObject(storageRef(storage, state.editing.chapter.pdf_path)); } catch(e){}
+      }
+      pdf_path = path;
+    }
+
+    if (state.editing.chapter) {
+      await updateDoc(doc(db, COL_CHAPTERS, state.editing.chapter.id), {
+        subject_id, chapter_number:number, name, display_order:order,
+        is_new, is_published, pdf_path
+      });
+      toast('Chapter updated ✓');
+    } else {
+      await addDoc(collection(db, COL_CHAPTERS), {
+        subject_id, chapter_number:number, name, display_order:order,
+        is_new, is_published, pdf_path, created_at: serverTimestamp()
+      });
+      toast('Chapter added ✓');
+    }
+
+    chapterModal.hide();
+    state.selectedPdfFile = null;
+    await loadAll();
+  } catch (err) {
+    console.error(err);
+    toast('Save failed: ' + err.message, true);
+  } finally {
+    hideLoader();
+  }
+};
+
+window.deleteChapter = async function(id) {
+  const ch = state.chapters.find(c => c.id === id);
+  if (!ch) return;
+  if (!confirm(`Delete chapter "${ch.name}"?`)) return;
+
+  showLoader('Deleting…');
+  try {
+    if (ch.pdf_path) {
+      try { await deleteObject(storageRef(storage, ch.pdf_path)); } catch(e){}
+    }
+    await deleteDoc(doc(db, COL_CHAPTERS, id));
+    toast('Chapter deleted ✓');
+    await loadAll();
+  } catch (err) {
+    console.error(err);
+    toast('Delete failed: ' + err.message, true);
+  } finally {
+    hideLoader();
+  }
+};
+
+/* ============================================================
+   FILTER EVENT LISTENERS
+   ============================================================ */
+document.addEventListener('change', (e) => {
+  if (!e.target) return;
+  if (e.target.id === 'subjectClassFilter') renderSubjects();
+  if (e.target.id === 'chapterClassFilter') {
+    updateChapterSubjectFilter();
+    renderChapters();
+  }
+  if (e.target.id === 'chapterSubjectFilter') renderChapters();
+});
+</script>
+</body>
+</html>
