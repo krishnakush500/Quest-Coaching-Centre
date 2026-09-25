@@ -18,7 +18,6 @@
   }
   .admin-container { max-width:1300px; margin:0 auto; }
 
-  /* Header */
   .page-header {
     background:linear-gradient(135deg, #0d2b6b 0%, #16409b 100%);
     border-radius:20px;
@@ -51,7 +50,6 @@
     position:relative;z-index:2;
   }
 
-  /* Tabs */
   .sm-tabs {
     display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;
     background:#fff;padding:8px;border-radius:14px;
@@ -78,12 +76,10 @@
   }
   .sm-tab.active .count { background:#ffc42e;color:#0d2b6b; }
 
-  /* Panels */
   .sm-panel { display:none; animation:fade .3s ease; }
   .sm-panel.active { display:block; }
   @keyframes fade { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
 
-  /* Card */
   .sm-card {
     background:#fff;border-radius:18px;
     padding:22px;box-shadow:0 4px 16px rgba(13,43,107,.06);
@@ -104,7 +100,6 @@
     padding:3px 9px;border-radius:20px;
   }
 
-  /* Buttons */
   .btn-gold {
     background:linear-gradient(135deg,#ffd257,#f7b500);
     color:#0d2b6b;font-weight:800;
@@ -143,7 +138,6 @@
   }
   .btn-danger-soft:hover { background:#ffe3ea;border-color:#e0245e;color:#e0245e; }
 
-  /* List items */
   .sm-list { display:flex;flex-direction:column;gap:10px; }
 
   .sm-item {
@@ -190,7 +184,6 @@
     .sm-item-actions { width:100%;justify-content:flex-end;margin-top:6px; }
   }
 
-  /* Empty state */
   .sm-empty {
     text-align:center;padding:40px 20px;
     background:#fbfcff;border:2px dashed #dbe6ff;
@@ -202,7 +195,6 @@
   .sm-empty h4 { color:#0d2b6b;font-weight:800;font-size:.98rem;margin-bottom:6px; }
   .sm-empty p { font-size:.84rem;color:#8a95ae; }
 
-  /* Loading */
   .sm-loading {
     text-align:center;padding:34px 20px;color:#64748b;
   }
@@ -213,7 +205,6 @@
   }
   @keyframes spin { to{transform:rotate(360deg);} }
 
-  /* Modal */
   .modal-content { border:none;border-radius:18px;overflow:hidden; }
   .modal-header {
     background:linear-gradient(135deg,#0d2b6b,#16409b);
@@ -252,7 +243,6 @@
     display:flex;align-items:center;gap:6px;
   }
 
-  /* Toast */
   .sm-toast {
     position:fixed;bottom:24px;left:50%;transform:translate(-50%,90px);
     background:#081f52;color:#fff;
@@ -266,7 +256,6 @@
   .sm-toast.show { opacity:1;transform:translate(-50%,0); }
   .sm-toast.error { border-left-color:#e0245e; }
 
-  /* Loader overlay */
   .sm-loader-overlay {
     position:fixed;inset:0;background:rgba(8,31,82,.55);
     backdrop-filter:blur(3px);z-index:9998;
@@ -285,7 +274,6 @@
   }
   .sm-loader-box p { font-size:.86rem;font-weight:700;color:#0d2b6b; }
 
-  /* Back button */
   .back-bar {
     display:flex;align-items:center;justify-content:space-between;
     flex-wrap:wrap;gap:10px;margin-bottom:16px;
@@ -305,11 +293,33 @@
     font-size:.78rem;color:#0d2b6b;font-weight:700;
     display:inline-flex;align-items:center;gap:7px;
   }
+
+  /* Seed banner */
+  .seed-banner {
+    background:linear-gradient(135deg, #fff5cc 0%, #ffe9a8 100%);
+    border:2px solid #f7b500;
+    border-radius:14px;
+    padding:16px 20px;
+    margin-bottom:18px;
+    display:flex;align-items:center;gap:14px;
+    box-shadow:0 6px 20px rgba(247,181,0,.22);
+  }
+  .seed-banner .ico {
+    width:44px;height:44px;flex:none;
+    background:linear-gradient(135deg,#ffd257,#f7b500);
+    color:#0d2b6b;border-radius:12px;
+    display:grid;place-items:center;font-size:20px;
+    box-shadow:0 4px 12px rgba(247,181,0,.4);
+  }
+  .seed-banner .txt { flex:1;min-width:0; }
+  .seed-banner .txt strong {
+    display:block;font-size:.92rem;font-weight:800;color:#0d2b6b;margin-bottom:3px;
+  }
+  .seed-banner .txt span { font-size:.78rem;color:#7a5a00;font-weight:600;line-height:1.45; }
 </style>
 </head>
 <body>
 
-<!-- ==================== LOADER OVERLAY ==================== -->
 <div class="sm-loader-overlay" id="loaderOverlay">
   <div class="sm-loader-box">
     <div class="spinner"></div>
@@ -317,10 +327,8 @@
   </div>
 </div>
 
-<!-- ==================== MAIN ==================== -->
 <div class="admin-container">
 
-  <!-- Header -->
   <div class="page-header">
     <h1>
       <span class="ico"><i class="fas fa-book-open"></i></span>
@@ -329,7 +337,6 @@
     <p>Manage classes · subjects · chapters · PDF uploads</p>
   </div>
 
-  <!-- Back bar -->
   <div class="back-bar">
     <a href="admin.html" class="back-btn">
       <i class="fas fa-arrow-left"></i> Back to Admin Panel
@@ -340,7 +347,18 @@
     </span>
   </div>
 
-  <!-- Tabs -->
+  <!-- 🆕 Seed banner — shows when Firestore is empty -->
+  <div class="seed-banner" id="seedBanner" style="display:none;">
+    <div class="ico"><i class="fas fa-magic"></i></div>
+    <div class="txt">
+      <strong>Firestore khali hai!</strong>
+      <span>Ek click me Class 10 & 12 ke saare subjects aur chapters auto-add karne ke liye niche button dabayein.</span>
+    </div>
+    <button class="btn-gold" onclick="autoSeed()" id="seedBtn">
+      <i class="fas fa-cloud-upload-alt"></i> Auto-Seed Now
+    </button>
+  </div>
+
   <div class="sm-tabs">
     <button class="sm-tab active" data-tab="classes">
       <i class="fas fa-school"></i> Classes
@@ -356,7 +374,7 @@
     </button>
   </div>
 
-  <!-- ==================== CLASSES PANEL ==================== -->
+  <!-- CLASSES -->
   <div class="sm-panel active" id="panel-classes">
     <div class="sm-card">
       <div class="sm-card-header">
@@ -371,7 +389,7 @@
     </div>
   </div>
 
-  <!-- ==================== SUBJECTS PANEL ==================== -->
+  <!-- SUBJECTS -->
   <div class="sm-panel" id="panel-subjects">
     <div class="sm-card">
       <div class="sm-card-header">
@@ -391,7 +409,7 @@
     </div>
   </div>
 
-  <!-- ==================== CHAPTERS PANEL ==================== -->
+  <!-- CHAPTERS -->
   <div class="sm-panel" id="panel-chapters">
     <div class="sm-card">
       <div class="sm-card-header">
@@ -416,7 +434,7 @@
 
 </div>
 
-<!-- ==================== MODAL — CLASS ==================== -->
+<!-- MODALS -->
 <div class="modal fade" id="classModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -436,15 +454,12 @@
       </div>
       <div class="modal-footer" style="border-top:1px solid #eef2f9;padding:14px 20px;">
         <button class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:10px;font-weight:700;font-size:.85rem;">Cancel</button>
-        <button class="btn-gold" onclick="saveClass()">
-          <i class="fas fa-save"></i> Save
-        </button>
+        <button class="btn-gold" onclick="saveClass()"><i class="fas fa-save"></i> Save</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ==================== MODAL — SUBJECT ==================== -->
 <div class="modal fade" id="subjectModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -474,15 +489,12 @@
       </div>
       <div class="modal-footer" style="border-top:1px solid #eef2f9;padding:14px 20px;">
         <button class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:10px;font-weight:700;font-size:.85rem;">Cancel</button>
-        <button class="btn-gold" onclick="saveSubject()">
-          <i class="fas fa-save"></i> Save
-        </button>
+        <button class="btn-gold" onclick="saveSubject()"><i class="fas fa-save"></i> Save</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ==================== MODAL — CHAPTER ==================== -->
 <div class="modal fade" id="chapterModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -529,7 +541,6 @@
             </div>
           </div>
         </div>
-
         <div class="mt-3">
           <label class="form-label">PDF File</label>
           <div class="upload-drop" id="uploadDrop">
@@ -552,30 +563,25 @@
       </div>
       <div class="modal-footer" style="border-top:1px solid #eef2f9;padding:14px 20px;">
         <button class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:10px;font-weight:700;font-size:.85rem;">Cancel</button>
-        <button class="btn-gold" onclick="saveChapter()">
-          <i class="fas fa-save"></i> Save Chapter
-        </button>
+        <button class="btn-gold" onclick="saveChapter()"><i class="fas fa-save"></i> Save Chapter</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ==================== TOAST ==================== -->
 <div class="sm-toast" id="smToast"></div>
 
-<!-- Bootstrap -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
-<!-- Firebase v9 modular -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 import {
-  getFirestore, collection, getDocs, doc, getDoc,
-  addDoc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp
+  getFirestore, collection, getDocs, doc,
+  addDoc, updateDoc, deleteDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 import {
-  getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject
+  getStorage, ref as storageRef, uploadBytes, deleteObject
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
 
 /* ============================================================
@@ -596,11 +602,103 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-/* Collections */
 const COL_CLASSES  = 'study_classes';
 const COL_SUBJECTS = 'study_subjects';
 const COL_CHAPTERS = 'study_chapters';
 const PDF_FOLDER   = 'study-material/pdfs';
+
+/* ============================================================
+   AUTO-SEED DATA (Class 10 & 12)
+   ============================================================ */
+const SEED_CLASSES = [
+  { name: 'Class 10', display_order: 1 },
+  { name: 'Class 12', display_order: 2 }
+];
+
+const SEED_SUBJECTS = {
+  'Class 10': [
+    { name: 'Mathematics',    icon: '📘', display_order: 1 },
+    { name: 'Science',        icon: '🔬', display_order: 2 },
+    { name: 'English',        icon: '📖', display_order: 3 },
+    { name: 'Social Science', icon: '🌍', display_order: 4 },
+    { name: 'Hindi',          icon: '📕', display_order: 5 }
+  ],
+  'Class 12': [
+    { name: 'Physics',     icon: '⚛️', display_order: 1 },
+    { name: 'Chemistry',   icon: '🧪', display_order: 2 },
+    { name: 'Mathematics', icon: '📘', display_order: 3 },
+    { name: 'Biology',     icon: '🧬', display_order: 4 },
+    { name: 'English',     icon: '📖', display_order: 5 }
+  ]
+};
+
+const SEED_CHAPTERS = {
+  'Class 10|Mathematics': [
+    'Real Numbers','Polynomials','Pair of Linear Equations in Two Variables',
+    'Quadratic Equations','Arithmetic Progressions','Triangles','Coordinate Geometry',
+    'Introduction to Trigonometry','Some Applications of Trigonometry','Circles',
+    'Areas Related to Circles','Surface Areas and Volumes','Statistics','Probability'
+  ],
+  'Class 10|Science': [
+    'Chemical Reactions and Equations','Acids, Bases and Salts','Metals and Non-metals',
+    'Carbon and its Compounds','Life Processes','Control and Coordination',
+    'How do Organisms Reproduce?','Heredity and Evolution','Light – Reflection and Refraction',
+    'The Human Eye and the Colourful World','Electricity','Magnetic Effects of Electric Current',
+    'Our Environment','Sustainable Management of Natural Resources',
+    'Science Practice Set – I','Science Sample Paper 2026'
+  ],
+  'Class 10|English': [
+    'A Letter to God','Nelson Mandela: Long Walk to Freedom','Two Stories about Flying',
+    'From the Diary of Anne Frank','The Hundred Dresses – I','The Hundred Dresses – II',
+    'Glimpses of India','Mijbil the Otter','Madam Rides the Bus','The Sermon at Benares',
+    'The Proposal'
+  ],
+  'Class 10|Social Science': [
+    'The Rise of Nationalism in Europe','Nationalism in India','The Making of a Global World',
+    'Resources and Development','Water Resources','Agriculture',
+    'Minerals and Energy Resources','Power Sharing','Federalism','Development'
+  ],
+  'Class 10|Hindi': [
+    'सूरदास के पद','राम-लक्ष्मण-परशुराम संवाद','नेताजी का चश्मा',
+    'बालगोबिन भगत','लखनवी अंदाज़','व्याकरण संकलन'
+  ],
+  'Class 12|Physics': [
+    'Electric Charges and Fields','Electrostatic Potential and Capacitance','Current Electricity',
+    'Moving Charges and Magnetism','Magnetism and Matter','Electromagnetic Induction',
+    'Alternating Current','Electromagnetic Waves','Ray Optics and Optical Instruments',
+    'Wave Optics','Dual Nature of Radiation and Matter','Atoms','Nuclei','Semiconductor Electronics'
+  ],
+  'Class 12|Chemistry': [
+    'Solutions','Electrochemistry','Chemical Kinetics','The d- and f-Block Elements',
+    'Coordination Compounds','Haloalkanes and Haloarenes','Alcohols, Phenols and Ethers',
+    'Aldehydes, Ketones and Carboxylic Acids','Amines','Biomolecules'
+  ],
+  'Class 12|Mathematics': [
+    'Relations and Functions','Inverse Trigonometric Functions','Matrices','Determinants',
+    'Continuity and Differentiability','Application of Derivatives','Integrals',
+    'Application of Integrals','Differential Equations','Vector Algebra',
+    'Three Dimensional Geometry','Linear Programming','Probability'
+  ],
+  'Class 12|Biology': [
+    'Sexual Reproduction in Flowering Plants','Human Reproduction','Reproductive Health',
+    'Principles of Inheritance and Variation','Molecular Basis of Inheritance','Evolution',
+    'Human Health and Disease','Microbes in Human Welfare',
+    'Biotechnology: Principles and Processes','Biotechnology and its Applications',
+    'Organisms and Populations','Ecosystem','Biodiversity and Conservation',
+    'Biology Practice Set – I','Biology Practice Set – II','Biology Sample Paper 2026'
+  ],
+  'Class 12|English': [
+    'The Last Lesson','Lost Spring','Deep Water','The Rattrap','Indigo','My Mother at Sixty-six'
+  ]
+};
+
+const SEED_NEW = new Set([
+  'Class 10|Science|Chemical Reactions and Equations',
+  'Class 10|Mathematics|Polynomials',
+  'Class 12|Physics|Electric Charges and Fields',
+  'Class 12|Chemistry|The d- and f-Block Elements',
+  'Class 12|Biology|Sexual Reproduction in Flowering Plants'
+]);
 
 /* ============================================================
    STATE
@@ -610,8 +708,7 @@ const state = {
   subjects: [],
   chapters: [],
   editing: { class:null, subject:null, chapter:null },
-  selectedPdfFile: null,
-  deleteExistingPdfPath: null
+  selectedPdfFile: null
 };
 
 /* ============================================================
@@ -655,7 +752,7 @@ onAuthStateChanged(auth, (user) => {
 });
 
 /* ============================================================
-   LOAD DATA
+   LOAD DATA + AUTO SEED CHECK
    ============================================================ */
 async function loadAll() {
   showLoader('Loading…');
@@ -670,6 +767,13 @@ async function loadAll() {
     state.subjects = sortByOrder(sSnap.docs.map(d => ({ id:d.id, ...d.data() })));
     state.chapters = sortByOrder(chSnap.docs.map(d => ({ id:d.id, ...d.data() })));
 
+    // 🆕 Show seed banner if empty
+    if (state.classes.length === 0) {
+      $('seedBanner').style.display = 'flex';
+    } else {
+      $('seedBanner').style.display = 'none';
+    }
+
     renderAll();
     refreshFilters();
   } catch (err) {
@@ -679,6 +783,77 @@ async function loadAll() {
     hideLoader();
   }
 }
+
+/* ============================================================
+   AUTO SEED
+   ============================================================ */
+window.autoSeed = async function() {
+  const btn = $('seedBtn');
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Seeding…';
+
+  showLoader('Seeding demo data…');
+  try {
+    // 1. Classes
+    const classIdMap = {};
+    for (const cls of SEED_CLASSES) {
+      const ref = await addDoc(collection(db, COL_CLASSES), {
+        name: cls.name,
+        display_order: cls.display_order,
+        created_at: serverTimestamp()
+      });
+      classIdMap[cls.name] = ref.id;
+    }
+
+    // 2. Subjects
+    const subjectIdMap = {};
+    for (const [className, subs] of Object.entries(SEED_SUBJECTS)) {
+      const classId = classIdMap[className];
+      for (const sub of subs) {
+        const ref = await addDoc(collection(db, COL_SUBJECTS), {
+          class_id: classId,
+          name: sub.name,
+          icon: sub.icon,
+          display_order: sub.display_order,
+          created_at: serverTimestamp()
+        });
+        subjectIdMap[`${className}|${sub.name}`] = ref.id;
+      }
+    }
+
+    // 3. Chapters
+    for (const [key, chapters] of Object.entries(SEED_CHAPTERS)) {
+      const subjectId = subjectIdMap[key];
+      if (!subjectId) continue;
+      const [className, subjectName] = key.split('|');
+      for (let i = 0; i < chapters.length; i++) {
+        const chName = chapters[i];
+        const isNew = SEED_NEW.has(`${className}|${subjectName}|${chName}`);
+        await addDoc(collection(db, COL_CHAPTERS), {
+          subject_id: subjectId,
+          chapter_number: i + 1,
+          name: chName,
+          display_order: i + 1,
+          pdf_path: null,
+          is_new: isNew,
+          is_published: true,
+          created_at: serverTimestamp()
+        });
+      }
+    }
+
+    toast('✅ Seed complete! Loading data…');
+    await loadAll();
+  } catch (err) {
+    console.error(err);
+    toast('Seed failed: ' + err.message, true);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = orig;
+    hideLoader();
+  }
+};
 
 /* ============================================================
    RENDER
@@ -699,14 +874,13 @@ function updateCounts() {
   $('chaptersCount').textContent = state.chapters.length;
 }
 
-/* ---------- CLASSES ---------- */
 function renderClasses() {
   const box = $('classesList');
   if (!state.classes.length) {
     box.innerHTML = `<div class="sm-empty">
       <div class="ico-big"><i class="fas fa-school"></i></div>
       <h4>No classes yet</h4>
-      <p>Click "Add Class" to create your first class.</p>
+      <p>Use "Auto-Seed Now" or click "Add Class" to create one.</p>
     </div>`;
     return;
   }
@@ -728,7 +902,6 @@ function renderClasses() {
   `).join('');
 }
 
-/* ---------- SUBJECTS ---------- */
 function renderSubjects() {
   const filter = $('subjectClassFilter')?.value || '';
   const list = filter ? state.subjects.filter(s => s.class_id === filter) : state.subjects;
@@ -765,7 +938,6 @@ function renderSubjects() {
   }).join('');
 }
 
-/* ---------- CHAPTERS ---------- */
 function renderChapters() {
   const classFilter = $('chapterClassFilter')?.value || '';
   const subjectFilter = $('chapterSubjectFilter')?.value || '';
@@ -820,7 +992,6 @@ function renderChapters() {
    FILTERS
    ============================================================ */
 function refreshFilters() {
-  // Subject class filter
   const sc = $('subjectClassFilter');
   if (sc) {
     const cur = sc.value;
@@ -828,7 +999,6 @@ function refreshFilters() {
       state.classes.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
     sc.value = cur;
   }
-  // Chapter class filter
   const cc = $('chapterClassFilter');
   if (cc) {
     const cur = cc.value;
@@ -864,7 +1034,7 @@ document.querySelectorAll('.sm-tab').forEach(btn => {
 });
 
 /* ============================================================
-   CLASS MODAL
+   MODAL INIT
    ============================================================ */
 let classModal, subjectModal, chapterModal;
 document.addEventListener('DOMContentLoaded', () => {
@@ -873,6 +1043,9 @@ document.addEventListener('DOMContentLoaded', () => {
   chapterModal = new bootstrap.Modal($('chapterModal'));
 });
 
+/* ============================================================
+   CLASS CRUD
+   ============================================================ */
 window.openClassModal = function() {
   state.editing.class = null;
   $('classModalTitle').textContent = 'Add Class';
@@ -899,14 +1072,10 @@ window.saveClass = async function() {
   showLoader('Saving class…');
   try {
     if (state.editing.class) {
-      await updateDoc(doc(db, COL_CLASSES, state.editing.class.id), {
-        name, display_order: order
-      });
+      await updateDoc(doc(db, COL_CLASSES, state.editing.class.id), { name, display_order: order });
       toast('Class updated ✓');
     } else {
-      await addDoc(collection(db, COL_CLASSES), {
-        name, display_order: order, created_at: serverTimestamp()
-      });
+      await addDoc(collection(db, COL_CLASSES), { name, display_order: order, created_at: serverTimestamp() });
       toast('Class added ✓');
     }
     classModal.hide();
@@ -930,21 +1099,14 @@ window.deleteClass = async function(id) {
 
   showLoader('Deleting…');
   try {
-    // Delete child chapters + subjects
     const subjectIds = state.subjects.filter(s => s.class_id === id).map(s => s.id);
     const chaptersToDelete = state.chapters.filter(c => subjectIds.includes(c.subject_id));
-
-    // Delete PDFs from Storage
     for (const ch of chaptersToDelete) {
-      if (ch.pdf_path) {
-        try { await deleteObject(storageRef(storage, ch.pdf_path)); } catch(e){}
-      }
+      if (ch.pdf_path) { try { await deleteObject(storageRef(storage, ch.pdf_path)); } catch(e){} }
     }
-
     await Promise.all(chaptersToDelete.map(c => deleteDoc(doc(db, COL_CHAPTERS, c.id))));
     await Promise.all(subjectIds.map(sid => deleteDoc(doc(db, COL_SUBJECTS, sid))));
     await deleteDoc(doc(db, COL_CLASSES, id));
-
     toast('Class + children deleted ✓');
     await loadAll();
   } catch (err) {
@@ -956,16 +1118,14 @@ window.deleteClass = async function(id) {
 };
 
 /* ============================================================
-   SUBJECT MODAL
+   SUBJECT CRUD
    ============================================================ */
 window.openSubjectModal = function(presetClassId) {
   state.editing.subject = null;
   $('subjectModalTitle').textContent = 'Add Subject';
+  if (!state.classes.length) return toast('Add a class first!', true);
   $('subjectFormClass').innerHTML = state.classes.map(c =>
     `<option value="${c.id}">${esc(c.name)}</option>`).join('');
-  if (!state.classes.length) {
-    return toast('Add a class first!', true);
-  }
   $('subjectFormClass').value = presetClassId || state.classes[0].id;
   $('subjectFormName').value = '';
   $('subjectFormIcon').value = '📘';
@@ -1022,18 +1182,14 @@ window.deleteSubject = async function(id) {
   const subj = state.subjects.find(s => s.id === id);
   if (!subj) return;
   const chCount = state.chapters.filter(c => c.subject_id === id).length;
-  const msg = chCount
-    ? `Delete "${subj.name}" and its ${chCount} chapter(s)?`
-    : `Delete "${subj.name}"?`;
+  const msg = chCount ? `Delete "${subj.name}" and its ${chCount} chapter(s)?` : `Delete "${subj.name}"?`;
   if (!confirm(msg)) return;
 
   showLoader('Deleting…');
   try {
     const chaptersToDelete = state.chapters.filter(c => c.subject_id === id);
     for (const ch of chaptersToDelete) {
-      if (ch.pdf_path) {
-        try { await deleteObject(storageRef(storage, ch.pdf_path)); } catch(e){}
-      }
+      if (ch.pdf_path) { try { await deleteObject(storageRef(storage, ch.pdf_path)); } catch(e){} }
     }
     await Promise.all(chaptersToDelete.map(c => deleteDoc(doc(db, COL_CHAPTERS, c.id))));
     await deleteDoc(doc(db, COL_SUBJECTS, id));
@@ -1048,7 +1204,7 @@ window.deleteSubject = async function(id) {
 };
 
 /* ============================================================
-   CHAPTER MODAL
+   CHAPTER CRUD
    ============================================================ */
 function refreshChapterFormSubjects() {
   const classId = $('chapterFormClass').value;
@@ -1061,7 +1217,6 @@ function refreshChapterFormSubjects() {
 window.openChapterModal = function() {
   state.editing.chapter = null;
   state.selectedPdfFile = null;
-  state.deleteExistingPdfPath = null;
   if (!state.classes.length) return toast('Add a class first!', true);
   if (!state.subjects.length) return toast('Add a subject first!', true);
 
@@ -1091,7 +1246,6 @@ window.editChapter = function(id) {
 
   state.editing.chapter = ch;
   state.selectedPdfFile = null;
-  state.deleteExistingPdfPath = null;
 
   $('chapterModalTitle').textContent = 'Edit Chapter';
   $('chapterFormClass').innerHTML = state.classes.map(c =>
@@ -1118,22 +1272,15 @@ window.editChapter = function(id) {
 };
 
 document.addEventListener('change', (e) => {
-  if (e.target && e.target.id === 'chapterFormClass') {
-    refreshChapterFormSubjects();
-  }
+  if (e.target && e.target.id === 'chapterFormClass') refreshChapterFormSubjects();
 });
 
-// PDF upload UI
 $('uploadDrop').addEventListener('click', () => $('chapterFormPdf').click());
 $('chapterFormPdf').addEventListener('change', (e) => {
   const f = e.target.files[0];
   if (!f) return;
-  if (f.type !== 'application/pdf' && !/\.pdf$/i.test(f.name)) {
-    return toast('Only PDF files allowed', true);
-  }
-  if (f.size > 15 * 1024 * 1024) {
-    return toast('PDF too large (max 15 MB)', true);
-  }
+  if (f.type !== 'application/pdf' && !/\.pdf$/i.test(f.name)) return toast('Only PDF files allowed', true);
+  if (f.size > 15 * 1024 * 1024) return toast('PDF too large (max 15 MB)', true);
   state.selectedPdfFile = f;
   $('fileInfo').style.display = 'flex';
   $('fileName').textContent = f.name + ' (' + (f.size/1024/1024).toFixed(2) + ' MB)';
@@ -1143,7 +1290,6 @@ window.clearPdfSelection = function() {
   state.selectedPdfFile = null;
   $('chapterFormPdf').value = '';
   if (state.editing.chapter && state.editing.chapter.pdf_path) {
-    // keep old PDF indication
     $('fileName').textContent = 'Existing PDF: ' + state.editing.chapter.pdf_path.split('/').pop();
   } else {
     $('fileInfo').style.display = 'none';
@@ -1165,13 +1311,10 @@ window.saveChapter = async function() {
 
   showLoader(state.selectedPdfFile ? 'Uploading PDF…' : 'Saving chapter…');
   try {
-    // Upload new PDF if selected
     if (state.selectedPdfFile) {
       const safe = state.selectedPdfFile.name.replace(/[^\w.\-]/g, '_');
       const path = `${PDF_FOLDER}/${Date.now()}_${safe}`;
-      const sRef = storageRef(storage, path);
-      await uploadBytes(sRef, state.selectedPdfFile);
-      // Delete old PDF if replacing
+      await uploadBytes(storageRef(storage, path), state.selectedPdfFile);
       if (state.editing.chapter?.pdf_path) {
         try { await deleteObject(storageRef(storage, state.editing.chapter.pdf_path)); } catch(e){}
       }
@@ -1210,9 +1353,7 @@ window.deleteChapter = async function(id) {
 
   showLoader('Deleting…');
   try {
-    if (ch.pdf_path) {
-      try { await deleteObject(storageRef(storage, ch.pdf_path)); } catch(e){}
-    }
+    if (ch.pdf_path) { try { await deleteObject(storageRef(storage, ch.pdf_path)); } catch(e){} }
     await deleteDoc(doc(db, COL_CHAPTERS, id));
     toast('Chapter deleted ✓');
     await loadAll();
@@ -1225,15 +1366,12 @@ window.deleteChapter = async function(id) {
 };
 
 /* ============================================================
-   FILTER EVENT LISTENERS
+   FILTER EVENTS
    ============================================================ */
 document.addEventListener('change', (e) => {
   if (!e.target) return;
   if (e.target.id === 'subjectClassFilter') renderSubjects();
-  if (e.target.id === 'chapterClassFilter') {
-    updateChapterSubjectFilter();
-    renderChapters();
-  }
+  if (e.target.id === 'chapterClassFilter') { updateChapterSubjectFilter(); renderChapters(); }
   if (e.target.id === 'chapterSubjectFilter') renderChapters();
 });
 </script>
