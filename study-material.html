@@ -64,7 +64,6 @@ input{font:inherit}
   padding:7px 0;
   position:relative;
 }
-/* Chhota back button — top-left corner */
 .back-header-btn{
   width:32px;height:32px;flex:none;border-radius:9px;
   background:rgba(255,255,255,0.14);
@@ -190,9 +189,7 @@ main{flex:1 0 auto;padding-bottom:26px}
 }
 
 /* ============================================================
-   🆕 CHAPTER CARD — CLEAN & COMPACT
-   Name = hero (bold + big), click karne par preview.
-   Download icon = chapter name ke baad chhota golden circle.
+   CHAPTER CARD — CLEAN & COMPACT
    ============================================================ */
 .chapter-row{
   display:flex;
@@ -226,7 +223,6 @@ main{flex:1 0 auto;padding-bottom:26px}
 .chapter-row:hover::before{opacity:1;}
 .chapter-row:active{transform:scale(.99);}
 
-/* Chapter number — clean minimal */
 .ch-num{
   width:34px;height:34px;flex:none;border-radius:10px;
   background:linear-gradient(135deg,#eef3ff,#dde7ff);
@@ -239,7 +235,6 @@ main{flex:1 0 auto;padding-bottom:26px}
   place-items:center;
 }
 
-/* Chapter name — HERO */
 .ch-body{
   flex:1;
   min-width:0;
@@ -274,7 +269,6 @@ main{flex:1 0 auto;padding-bottom:26px}
   border-radius:4px;
 }
 
-/* Download icon — chhota, circular, chapter name ke baad */
 .ch-download{
   width:38px;
   height:38px;
@@ -297,7 +291,6 @@ main{flex:1 0 auto;padding-bottom:26px}
 }
 .ch-download:active{transform:scale(.94);}
 
-/* Desktop: bigger name, better spacing */
 @media(min-width:600px){
   .chapter-row{padding:16px 16px 16px 18px;gap:14px;}
   .ch-num{width:38px;height:38px;font-size:12.5px;}
@@ -306,7 +299,7 @@ main{flex:1 0 auto;padding-bottom:26px}
   .ch-download{width:42px;height:42px;font-size:16px;}
 }
 
-/* ---------------- BUTTONS (kept for preview/download page) ---------------- */
+/* ---------------- BUTTONS ---------------- */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
   min-height:40px;padding:9px 13px;
@@ -353,48 +346,67 @@ main{flex:1 0 auto;padding-bottom:26px}
 }
 .back-link:active{opacity:.6}
 
-/* ---------------- PDF PREVIEW ---------------- */
-.preview-card{
+/* ============================================================
+   PDF PREVIEW — CLEAN FULL-VIEW (no card, no heading, no button)
+   ============================================================ */
+.pdf-view-full{
+  margin-top:10px;
+  border-radius:var(--radius);
+  overflow:hidden;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+  background:#fff;
+}
+.pdf-view-full iframe{
+  width:100%;
+  height:calc(100vh - 190px);
+  min-height:520px;
+  border:0;
+  display:block;
+  background:#e9edf5;
+}
+@media(max-width:600px){
+  .pdf-view-full iframe{
+    height:calc(100vh - 160px);
+    min-height:480px;
+  }
+}
+
+/* Android fallback — only Open PDF button, centered, clean */
+.pdf-fallback-simple{
+  margin-top:14px;
   background:var(--card);
   border:1px solid var(--border);
   border-radius:var(--radius);
-  padding:16px;
   box-shadow:var(--shadow);
-  margin-top:6px;
+  padding:36px 20px;
+  text-align:center;
 }
-.preview-card h2{
-  font-size:19px;font-weight:800;color:var(--navy);line-height:1.3;
-  letter-spacing:-.2px;
+.pdf-fallback-simple .pf-ico{
+  font-size:42px;
+  color:var(--navy);
+  line-height:1;
 }
-.preview-card .pv-sub{
-  font-size:11.5px;color:var(--muted);margin-top:6px;letter-spacing:.2px;
-  font-weight:600;
+.pdf-fallback-simple h3{
+  font-size:16px;
+  font-weight:800;
+  color:var(--navy);
+  margin-top:14px;
+  letter-spacing:.2px;
 }
-.preview-card .pv-actions{margin-top:14px}
-.pdf-wrap{
-  margin-top:12px;background:#fff;
-  border:1px solid var(--border);border-radius:var(--radius);
-  overflow:hidden;box-shadow:var(--shadow);
+.pdf-fallback-simple p{
+  font-size:12.5px;
+  color:var(--muted);
+  margin-top:8px;
+  max-width:320px;
+  margin-left:auto;
+  margin-right:auto;
+  line-height:1.5;
 }
-.pdf-wrap iframe{
-  width:100%;height:76vh;min-height:440px;
-  border:0;display:block;background:#e9edf5;
+.pdf-fallback-simple .btn{
+  margin-top:18px;
+  min-width:180px;
 }
-.pdf-note{
-  font-size:11.5px;color:var(--muted);text-align:center;
-  padding:9px 12px;border-top:1px solid var(--border);background:#fbfcff;
-}
-.pdf-fallback{
-  margin-top:12px;background:var(--card);
-  border:1px solid var(--border);border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  padding:26px 18px;text-align:center;
-}
-.pdf-fallback .pf-ico{font-size:36px;line-height:1;color:var(--navy);}
-.pdf-fallback h3{font-size:15px;font-weight:800;color:var(--navy);margin-top:10px;}
-.pdf-fallback p{font-size:12.5px;color:var(--muted);margin-top:6px;max-width:320px;margin-left:auto;margin-right:auto;}
-.pf-btns{display:flex;gap:9px;margin-top:16px;justify-content:center;flex-wrap:wrap;}
-.pf-btns .btn{flex:1;min-width:130px;}
 
 /* ---------------- STATES ---------------- */
 .empty{
@@ -443,14 +455,12 @@ main{flex:1 0 auto;padding-bottom:26px}
 }
 .toast.show{opacity:1;transform:translate(-50%,0);}
 
-/* ---------------- RESPONSIVE ---------------- */
 @media(min-width:600px){
   body{font-size:15.5px}
   .page-head h2{font-size:23px}
   .class-card,.item-card{padding:15px 16px}
   .card-icon{width:48px;height:48px;font-size:22px}
   .card-text h3{font-size:15.5px}
-  .pdf-wrap iframe{height:80vh}
 }
 @media(max-width:359px){
   .wrap{padding:0 11px}
@@ -516,7 +526,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-/* Collections */
 const COL_CLASSES  = 'study_classes';
 const COL_SUBJECTS = 'study_subjects';
 const COL_CHAPTERS = 'study_chapters';
@@ -1002,7 +1011,7 @@ async function renderClassPage(classId) {
 }
 
 /* ---------------------------------------------------------------
-   9. PAGE — SUBJECT → CHAPTER LIST (CLEAN ROWS)
+   9. PAGE — SUBJECT → CHAPTER LIST
    --------------------------------------------------------------- */
 async function renderSubjectPage(classId, subjectId) {
   app.innerHTML = `
@@ -1064,13 +1073,12 @@ async function renderSubjectPage(classId, subjectId) {
 }
 
 /* ---------------------------------------------------------------
-   10. PAGE — CHAPTER PDF PREVIEW
+   10. PAGE — CHAPTER PDF PREVIEW (CLEAN — only PDF viewer)
    --------------------------------------------------------------- */
 async function renderChapterPage(chapterId) {
   app.innerHTML = `
     ${crumbsHTML([{ label: 'Home', href: '#/' }, { label: 'Loading…' }])}
-    <div class="page-head"><h2>Loading…</h2></div>
-    <div class="sk" style="height:120px;border-radius:14px"></div>
+    <div class="sk" style="height:120px;border-radius:14px;margin-top:12px"></div>
   `;
 
   const ctx = await DataSource.getChapterContext(chapterId);
@@ -1093,34 +1101,20 @@ async function renderChapterPage(chapterId) {
       { label: `Ch ${pad2(chapter.chapter_number)}` }
     ])}
 
-    <div class="preview-card">
-      <h2>${esc(chapter.name)}</h2>
-      <p class="pv-sub">${esc(cls.name)} · ${esc(subject.name)} · Chapter ${pad2(chapter.chapter_number)}</p>
-      <div class="pv-actions">
-        <button class="btn btn-gold btn-block btn-lg" type="button" data-download="${chapter.id}">
-          <span aria-hidden="true">⬇</span> DOWNLOAD PDF
-        </button>
-      </div>
-    </div>
-
     ${ANDROID_NO_INLINE_PDF ? `
-      <div class="pdf-fallback">
+      <div class="pdf-fallback-simple">
         <div class="pf-ico" aria-hidden="true"><i class="fas fa-file-pdf"></i></div>
-        <h3>PDF Preview</h3>
-        <p>Your browser can't display PDFs inline. Open it in a viewer or download it to read offline.</p>
-        <div class="pf-btns">
-          <a class="btn btn-navy" href="${pdfUrl}" target="_blank" rel="noopener">Open PDF</a>
-          <button class="btn btn-gold" type="button" data-download="${chapter.id}">Download PDF</button>
-        </div>
+        <h3>${esc(chapter.name)}</h3>
+        <p>Your browser can't display PDFs inline. Open it in a new tab to read.</p>
+        <a class="btn btn-navy" href="${pdfUrl}" target="_blank" rel="noopener">
+          <i class="fas fa-external-link-alt"></i> Open PDF
+        </a>
       </div>
     ` : `
-      <div class="pdf-wrap">
-        <iframe src="${pdfUrl}#view=FitH" title="${esc(chapter.name)} — PDF preview"
+      <div class="pdf-view-full">
+        <iframe src="${pdfUrl}#view=FitH&toolbar=1"
+                title="${esc(chapter.name)} — PDF preview"
                 loading="lazy" referrerpolicy="no-referrer"></iframe>
-        <div class="pdf-note">
-          Trouble viewing? <a href="${pdfUrl}" target="_blank" rel="noopener"
-          style="color:#0d2b6b;font-weight:700;text-decoration:underline">Open in new tab</a>
-        </div>
       </div>
     `}
   `;
@@ -1130,7 +1124,6 @@ async function renderChapterPage(chapterId) {
    11. CLICK HANDLER — Preview (chapter-row) + Download icon
    --------------------------------------------------------------- */
 document.addEventListener('click', e => {
-  // Download icon click
   const dlBtn = e.target.closest('[data-download]');
   if (dlBtn) {
     e.preventDefault();
@@ -1139,7 +1132,6 @@ document.addEventListener('click', e => {
     return;
   }
 
-  // Chapter row click (anywhere except download icon) → preview
   const row = e.target.closest('.chapter-row[data-preview-href]');
   if (row) {
     e.preventDefault();
