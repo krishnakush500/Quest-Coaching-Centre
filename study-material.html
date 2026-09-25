@@ -6,10 +6,20 @@
 <meta name="theme-color" content="#0d2b6b" />
 <title>Study Material · Quest Coaching Centre</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- 🆕 PDF.js — PDF ko page-images ki tarah render karta hai -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  // PDF.js worker setup
+  if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+</script>
+
 <style>
 /* ============================================================
    QUEST COACHING CENTRE — STUDY MATERIAL PORTAL
-   Design: Royal Blue + Golden Yellow + White Cards
    ============================================================ */
 :root{
   --navy:#0d2b6b;
@@ -188,9 +198,7 @@ main{flex:1 0 auto;padding-bottom:26px}
   transition:background .15s,color .15s,border-color .15s;
 }
 
-/* ============================================================
-   CHAPTER CARD — CLEAN & COMPACT
-   ============================================================ */
+/* ---------------- CHAPTER ROW ---------------- */
 .chapter-row{
   display:flex;
   align-items:center;
@@ -234,7 +242,6 @@ main{flex:1 0 auto;padding-bottom:26px}
   display:grid;
   place-items:center;
 }
-
 .ch-body{
   flex:1;
   min-width:0;
@@ -268,7 +275,6 @@ main{flex:1 0 auto;padding-bottom:26px}
   padding:1.5px 5px;
   border-radius:4px;
 }
-
 .ch-download{
   width:38px;
   height:38px;
@@ -321,9 +327,6 @@ main{flex:1 0 auto;padding-bottom:26px}
   color:#fff;
   box-shadow:0 2px 8px rgba(13,43,107,.28);
 }
-.btn-ghost{
-  background:#fff;border-color:var(--border-strong);color:var(--navy);
-}
 .btn-block{width:100%}
 .btn-lg{min-height:46px;font-size:13.5px}
 
@@ -339,74 +342,76 @@ main{flex:1 0 auto;padding-bottom:26px}
   color:var(--muted);font-weight:600;
   max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
-.back-link{
-  display:inline-flex;align-items:center;gap:6px;
-  font-size:12.5px;font-weight:700;color:var(--navy);
-  padding:2px 0 8px;
-}
-.back-link:active{opacity:.6}
 
 /* ============================================================
-   PDF PREVIEW — CLEAN FULL-VIEW (no card, no heading, no button)
+   🆕 PDF.js VIEWER — pages scroll hote hain jaise PDF app me
    ============================================================ */
-.pdf-view-full{
-  margin-top:10px;
-  border-radius:var(--radius);
-  overflow:hidden;
+.pdfjs-viewer{
+  margin-top:12px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  padding-bottom:24px;
+}
+.pdf-page{
+  background:#fff;
   border:1px solid var(--border);
-  box-shadow:var(--shadow);
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:0 3px 12px rgba(13,43,107,.10);
+  position:relative;
+  width:100%;
+}
+.pdf-page canvas{
+  display:block;
+  width:100%;
+  height:auto;
   background:#fff;
 }
-.pdf-view-full iframe{
-  width:100%;
-  height:calc(100vh - 190px);
-  min-height:520px;
-  border:0;
-  display:block;
-  background:#e9edf5;
-}
-@media(max-width:600px){
-  .pdf-view-full iframe{
-    height:calc(100vh - 160px);
-    min-height:480px;
-  }
-}
-
-/* Android fallback — only Open PDF button, centered, clean */
-.pdf-fallback-simple{
-  margin-top:14px;
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  padding:36px 20px;
-  text-align:center;
-}
-.pdf-fallback-simple .pf-ico{
-  font-size:42px;
-  color:var(--navy);
-  line-height:1;
-}
-.pdf-fallback-simple h3{
-  font-size:16px;
+.pdf-page-num{
+  position:absolute;
+  top:8px;
+  right:10px;
+  background:rgba(13,43,107,.82);
+  color:#fff;
+  font-size:10px;
   font-weight:800;
-  color:var(--navy);
-  margin-top:14px;
-  letter-spacing:.2px;
+  letter-spacing:.4px;
+  padding:3px 9px;
+  border-radius:20px;
+  pointer-events:none;
 }
-.pdf-fallback-simple p{
-  font-size:12.5px;
+.pdf-loading{
+  text-align:center;
+  padding:40px 20px;
   color:var(--muted);
-  margin-top:8px;
-  max-width:320px;
-  margin-left:auto;
-  margin-right:auto;
-  line-height:1.5;
+  font-size:13px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:14px;
 }
-.pdf-fallback-simple .btn{
-  margin-top:18px;
-  min-width:180px;
+.pdf-loading .spinner-lg{
+  width:38px;height:38px;
+  border:3px solid #e3e9f5;
+  border-top-color:var(--navy);
+  border-radius:50%;
+  animation:spin 0.8s linear infinite;
 }
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.pdf-error{
+  background:#ffe3ea;
+  color:#c4114a;
+  border:1px solid #ffc9d6;
+  border-radius:12px;
+  padding:18px;
+  text-align:center;
+  font-size:13px;
+  font-weight:600;
+  margin-top:14px;
+}
+.pdf-error .btn{margin-top:12px;}
 
 /* ---------------- STATES ---------------- */
 .empty{
@@ -507,7 +512,7 @@ main{flex:1 0 auto;padding-bottom:26px}
 <script>
 /* ==========================================================================
    QUEST COACHING CENTRE — STUDY MATERIAL PORTAL
-   Firebase-powered, mobile-first, clean & minimal
+   PDF.js powered viewer — pages scrollable like a real PDF app
    ========================================================================== */
 
 /* ---------------------------------------------------------------
@@ -559,8 +564,6 @@ const skeletonCards = (n = 3) =>
 
 const skeletonChapters = (n = 5) =>
   Array.from({ length: n }, () => '<div class="sk sk-chapter"></div>').join('');
-
-const ANDROID_NO_INLINE_PDF = /Android/i.test(navigator.userAgent);
 
 /* ---------------------------------------------------------------
    3. DEMO FALLBACK DATA
@@ -760,6 +763,7 @@ const DataSource = {
    5. PDF RESOLUTION
    --------------------------------------------------------------- */
 const pdfBlobCache = new Map();
+const pdfDataCache = new Map();  // 🆕 caches ArrayBuffer per chapter
 
 function resolvePdfUrl(chapter) {
   if (chapter.pdf_path && /^https?:\/\//i.test(chapter.pdf_path)) return chapter.pdf_path;
@@ -783,24 +787,52 @@ function buildSamplePdf(chapter) {
   const title = clean(chapter.name || 'Study Material');
   const meta  = clean(`Quest Coaching Centre  |  Chapter ${pad2(chapter.chapter_number || 1)}`);
 
-  const content =
-    `BT\n/F1 22 Tf\n0.05 0.17 0.42 rg\n60 742 Td\n(${title}) Tj\nET\n` +
-    `BT\n/F2 12 Tf\n0.37 0.44 0.56 rg\n60 714 Td\n(${meta}) Tj\nET\n` +
-    `0.85 0.85 0.9 RG\n1 w\n60 700 m 535 700 l S\n` +
-    `BT\n/F2 11 Tf\n0.2 0.25 0.35 rg\n60 664 Td\n(This is a sample study-material PDF.) Tj\nET\n` +
-    `BT\n/F2 11 Tf\n0.2 0.25 0.35 rg\n60 644 Td\n(Real notes will appear once uploaded by admin.) Tj\nET\n` +
-    `0.05 0.17 0.42 rg\n60 60 475 8 re f\n` +
-    `1 0.77 0.18 rg\n60 60 150 8 re f\n`;
+  // Build a multi-page sample PDF so scroll experience is visible
+  const pages = [];
+  const totalPages = 3;
+  for (let p = 1; p <= totalPages; p++) {
+    pages.push(
+      `BT\n/F1 20 Tf\n0.05 0.17 0.42 rg\n60 780 Td\n(${title}) Tj\nET\n` +
+      `BT\n/F2 11 Tf\n0.37 0.44 0.56 rg\n60 755 Td\n(${meta}) Tj\nET\n` +
+      `0.85 0.85 0.9 RG\n1 w\n60 742 m 535 742 l S\n` +
+      `BT\n/F2 12 Tf\n0.2 0.25 0.35 rg\n60 700 Td\n(Page ${p} of ${totalPages}) Tj\nET\n` +
+      `BT\n/F2 11 Tf\n0.2 0.25 0.35 rg\n60 660 Td\n(This is a sample study-material page.) Tj\nET\n` +
+      `BT\n/F2 11 Tf\n0.2 0.25 0.35 rg\n60 640 Td\n(Real notes will appear once uploaded by admin.) Tj\nET\n` +
+      `0.05 0.17 0.42 rg\n60 60 475 8 re f\n` +
+      `1 0.77 0.18 rg\n60 60 150 8 re f\n`
+    );
+  }
 
-  const objects = [
-    '<< /Type /Catalog /Pages 2 0 R >>',
-    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
-    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] ' +
-      '/Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> /Contents 4 0 R >>',
-    `<< /Length ${content.length} >>\nstream\n${content}endstream`,
-    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>',
-    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'
-  ];
+  const objects = [];
+  objects.push('<< /Type /Catalog /Pages 2 0 R >>');
+
+  // Page objects: 3 + 1 references to each content stream
+  const pageObjStart = 3;
+  const contentObjStart = pageObjStart + totalPages;
+  const fontBoldObj = contentObjStart + totalPages;
+  const fontNormalObj = fontBoldObj + 1;
+
+  const kids = [];
+  for (let i = 0; i < totalPages; i++) {
+    kids.push(`${pageObjStart + i} 0 R`);
+  }
+  objects.push(`<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${totalPages} >>`);
+
+  // Page objects
+  for (let i = 0; i < totalPages; i++) {
+    objects.push(
+      `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] ` +
+      `/Resources << /Font << /F1 ${fontBoldObj} 0 R /F2 ${fontNormalObj} 0 R >> >> ` +
+      `/Contents ${contentObjStart + i} 0 R >>`
+    );
+  }
+  // Content streams
+  pages.forEach(content => {
+    objects.push(`<< /Length ${content.length} >>\nstream\n${content}endstream`);
+  });
+  // Fonts
+  objects.push('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>');
+  objects.push('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>');
 
   let pdf = '%PDF-1.4\n';
   const offsets = [];
@@ -813,6 +845,20 @@ function buildSamplePdf(chapter) {
   offsets.forEach(off => { pdf += `${String(off).padStart(10, '0')} 00000 n \n`; });
   pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`;
   return pdf;
+}
+
+/* 🆕 Fetch PDF as ArrayBuffer (for PDF.js) */
+async function fetchPdfData(chapter) {
+  if (pdfDataCache.has(chapter.id)) return pdfDataCache.get(chapter.id);
+
+  const url = resolvePdfUrl(chapter);
+
+  // For blob URLs, use fetch too
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('PDF fetch failed: ' + res.status);
+  const buffer = await res.arrayBuffer();
+  pdfDataCache.set(chapter.id, buffer);
+  return buffer;
 }
 
 /* ---------------------------------------------------------------
@@ -920,7 +966,6 @@ async function renderHome() {
   `).join('');
 }
 
-/* Live search */
 let searchTimer;
 app.addEventListener('input', e => {
   if (e.target.id !== 'searchInput') return;
@@ -1073,7 +1118,7 @@ async function renderSubjectPage(classId, subjectId) {
 }
 
 /* ---------------------------------------------------------------
-   10. PAGE — CHAPTER PDF PREVIEW (CLEAN — only PDF viewer)
+   10. PAGE — CHAPTER PDF PREVIEW (PDF.js — scrollable pages)
    --------------------------------------------------------------- */
 async function renderChapterPage(chapterId) {
   app.innerHTML = `
@@ -1090,7 +1135,6 @@ async function renderChapterPage(chapterId) {
   }
 
   const { chapter, subject, cls } = ctx;
-  const pdfUrl = resolvePdfUrl(chapter);
   const subjectHref = `#/class/${cls.id}/subject/${subject.id}`;
 
   app.innerHTML = `
@@ -1101,27 +1145,130 @@ async function renderChapterPage(chapterId) {
       { label: `Ch ${pad2(chapter.chapter_number)}` }
     ])}
 
-    ${ANDROID_NO_INLINE_PDF ? `
-      <div class="pdf-fallback-simple">
-        <div class="pf-ico" aria-hidden="true"><i class="fas fa-file-pdf"></i></div>
-        <h3>${esc(chapter.name)}</h3>
-        <p>Your browser can't display PDFs inline. Open it in a new tab to read.</p>
-        <a class="btn btn-navy" href="${pdfUrl}" target="_blank" rel="noopener">
-          <i class="fas fa-external-link-alt"></i> Open PDF
-        </a>
+    <div class="pdfjs-viewer" id="pdfViewer">
+      <div class="pdf-loading" id="pdfLoading">
+        <div class="spinner-lg"></div>
+        <span>Loading PDF pages…</span>
       </div>
-    ` : `
-      <div class="pdf-view-full">
-        <iframe src="${pdfUrl}#view=FitH&toolbar=1"
-                title="${esc(chapter.name)} — PDF preview"
-                loading="lazy" referrerpolicy="no-referrer"></iframe>
-      </div>
-    `}
+    </div>
   `;
+
+  renderPdfPages(chapter);
 }
 
+/* 🆕 Render all PDF pages using PDF.js */
+async function renderPdfPages(chapter) {
+  const viewer = document.getElementById('pdfViewer');
+  if (!viewer) return;
+
+  try {
+    // Ensure PDF.js is loaded
+    if (!window.pdfjsLib) {
+      throw new Error('PDF.js library not loaded');
+    }
+
+    const buffer = await fetchPdfData(chapter);
+    const loadingTask = pdfjsLib.getDocument({ data: buffer });
+    const pdf = await loadingTask.promise;
+
+    // Remove loading indicator
+    const loadingEl = document.getElementById('pdfLoading');
+    if (loadingEl) loadingEl.remove();
+
+    // Render each page
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+
+      // Calculate scale to fit container width
+      const container = viewer;
+      const containerWidth = container.clientWidth || window.innerWidth - 28;
+      const unscaledViewport = page.getViewport({ scale: 1 });
+      const scale = (containerWidth - 2) / unscaledViewport.width; // -2 for border
+      const viewport = page.getViewport({ scale });
+
+      // Create wrapper
+      const pageWrap = document.createElement('div');
+      pageWrap.className = 'pdf-page';
+      pageWrap.style.aspectRatio = `${viewport.width} / ${viewport.height}`;
+
+      // Page number badge
+      const numBadge = document.createElement('div');
+      numBadge.className = 'pdf-page-num';
+      numBadge.textContent = `${pageNum} / ${pdf.numPages}`;
+      pageWrap.appendChild(numBadge);
+
+      // Canvas
+      const canvas = document.createElement('canvas');
+      const ctx2d = canvas.getContext('2d');
+
+      // Support high DPI
+      const outputScale = window.devicePixelRatio || 1;
+      canvas.width = Math.floor(viewport.width * outputScale);
+      canvas.height = Math.floor(viewport.height * outputScale);
+      canvas.style.width = Math.floor(viewport.width) + 'px';
+      canvas.style.height = Math.floor(viewport.height) + 'px';
+
+      const transform = outputScale !== 1
+        ? [outputScale, 0, 0, outputScale, 0, 0]
+        : null;
+
+      pageWrap.appendChild(canvas);
+      viewer.appendChild(pageWrap);
+
+      await page.render({
+        canvasContext: ctx2d,
+        viewport,
+        transform
+      }).promise;
+    }
+
+  } catch (err) {
+    console.error('[PDF.js] render failed:', err);
+    viewer.innerHTML = `
+      <div class="pdf-error">
+        <div>⚠️ PDF load nahi ho paya</div>
+        <p style="margin-top:8px;font-weight:500;color:#7a2040;font-size:12.5px;">
+          ${esc(err.message || 'Unknown error')}
+        </p>
+        <button class="btn btn-navy" onclick="retryPdfRender('${chapter.id}')">
+          <i class="fas fa-redo"></i> Retry
+        </button>
+      </div>
+    `;
+  }
+}
+
+/* Retry handler */
+window.retryPdfRender = function(chapterId) {
+  DataSource.getChapterContext(chapterId).then(ctx => {
+    if (ctx && ctx.chapter) {
+      const viewer = document.getElementById('pdfViewer');
+      if (viewer) {
+        viewer.innerHTML = `
+          <div class="pdf-loading" id="pdfLoading">
+            <div class="spinner-lg"></div>
+            <span>Loading PDF pages…</span>
+          </div>
+        `;
+      }
+      renderPdfPages(ctx.chapter);
+    }
+  });
+};
+
+/* Re-render on resize (debounced) to keep pages fitting width */
+let resizeTimer;
+window.addEventListener('resize', () => {
+  if (!location.hash.includes('/chapter/')) return;
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const route = parseRoute();
+    if (route.name === 'chapter') renderChapterPage(route.chapterId);
+  }, 400);
+});
+
 /* ---------------------------------------------------------------
-   11. CLICK HANDLER — Preview (chapter-row) + Download icon
+   11. CLICK HANDLER — Preview + Download
    --------------------------------------------------------------- */
 document.addEventListener('click', e => {
   const dlBtn = e.target.closest('[data-download]');
