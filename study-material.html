@@ -234,19 +234,11 @@ main{flex:1 0 auto;padding-bottom:26px}
   -webkit-user-select:none;user-select:none;
 }
 .btn:active{transform:scale(.97)}
-.btn-gold{
-  background:linear-gradient(135deg,#ffd257,#f7b500);
-  color:var(--gold-ink);
-  box-shadow:0 2px 8px rgba(247,181,0,.32);
-  border-color:#f0ad00;
-}
 .btn-navy{
   background:linear-gradient(135deg,#0d2b6b,#1b4bb5);
   color:#fff;
   box-shadow:0 2px 8px rgba(13,43,107,.28);
 }
-.btn-block{width:100%}
-.btn-lg{min-height:46px;font-size:13.5px}
 
 .crumbs{
   display:flex;align-items:center;gap:6px;flex-wrap:wrap;
@@ -388,7 +380,7 @@ main{flex:1 0 auto;padding-bottom:26px}
 <script>
 /* ============================================================
    QUEST COACHING — STUDY MATERIAL PORTAL
-   Firebase-only (no demo fallback)
+   Single collection: study_materials (nested structure)
    ============================================================ */
 
 const firebaseConfig = {
@@ -404,9 +396,9 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-const COL_CLASSES  = 'study_classes';
-const COL_SUBJECTS = 'study_subjects';
-const COL_CHAPTERS = 'study_chapters';
+/* 🆕 SINGLE COLLECTION */
+const SM_COLLECTION = 'study_materials';
+const SM_DOC_ID = 'quest_study_material';
 
 const $  = (sel, root = document) => root.querySelector(sel);
 const app = $('#app');
@@ -433,28 +425,30 @@ const skeletonChapters = (n = 5) =>
   Array.from({ length: n }, () => '<div class="sk sk-chapter"></div>').join('');
 
 /* ============================================================
-   DATA SOURCE — Firebase only
+   DATA SOURCE — Single collection read
    ============================================================ */
 const DataSource = {
-  _cache: { classes:null, subjects:null, chapters:null },
+  _cache: null,
 
-  async _fetchCollection(col) {
-    const snap = await db.collection(col).get();
-    const items = [];
-    snap.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
-    return items;
+  async _load() {
+    if (this._cache) return this._cache;
+    try {
+      const snap = await db.collection(SM_COLLECTION).doc(SM_DOC_ID).get();
+      if (snap.exists) {
+        this._cache = snap.data().classes || [];
+      } else {
+        this._cache = [];
+      }
+    } catch (err) {
+      console.warn('study_materials fetch failed:', err.message);
+      this._cache = [];
+    }
+    return this._cache;
   },
 
   async getClasses() {
-    if (this._cache.classes) return this._cache.classes;
-    try {
-      const items = await this._fetchCollection(COL_CLASSES);
-      this._cache.classes = items.sort((a,b) => (a.display_order||0) - (b.display_order||0));
-    } catch (err) {
-      console.warn('classes fetch failed:', err.message);
-      this._cache.classes = [];
-    }
-    return this._cache.classes;
+    const classes = await this._load();
+    return [...classes].sort((a,b) => (a.display_order||0) - (b.display_order||0));
   },
 
   async getClass(id) {
@@ -462,86 +456,60 @@ const DataSource = {
     return list.find(c => c.id === id) || null;
   },
 
-  async getSubjects() {
-    if (this._cache.subjects) return this._cache.subjects;
-    try {
-      const items = await this._fetchCollection(COL_SUBJECTS);
-      this._cache.subjects = items.sort((a,b) => (a.display_order||0) - (b.display_order||0));
-    } catch (err) {
-      console.warn('subjects fetch failed:', err.message);
-      this._cache.subjects = [];
-    }
-    return this._cache.subjects;
-  },
-
-  async getSubject(id) {
-    const list = await this.getSubjects();
-    return list.find(s => s.id === id) || null;
-  },
-
   async getSubjectsWithCounts(classId) {
-    const [subjects, chapters] = await Promise.all([this.getSubjects(), this.getChapters()]);
-    const filtered = subjects.filter(s => s.class_id === classId)
-      .sort((a,b) => (a.display_order||0) - (b.display_order||0));
-    return filtered.map(s => ({
-      ...s,
-      chapter_count: chapters.filter(c => c.subject_id === s.id).length
-    }));
+    const cls = await this.getClass(classId);
+    if (!cls) return [];
+    return [...(cls.subjects || [])]
+      .sort((a,b) => (a.display_order||0) - (b.display_order||0))
+      .map(s => ({
+        ...s,
+        class_id: cls.id,
+        chapter_count: (s.chapters || []).length
+      }));
   },
 
-  async getChapters() {
-    if (this._cache.chapters) return this._cache.chapters;
-    try {
-      const items = await this._fetchCollection(COL_CHAPTERS);
-      this._cache.chapters = items.sort((a,b) => (a.display_order||0) - (b.display_order||0));
-    } catch (err) {
-      console.warn('chapters fetch failed:', err.message);
-      this._cache.chapters = [];
-    }
-    return this._cache.chapters;
+  async getSubject(classId, subjectId) {
+    const cls = await this.getClass(classId);
+    if (!cls) return null;
+    const s = (cls.subjects || []).find(x => x.id === subjectId);
+    return s ? { ...s, class_id: cls.id } : null;
   },
 
-  async getChaptersBySubject(subjectId) {
-    const all = await this.getChapters();
-    return all.filter(c => c.subject_id === subjectId)
-      .sort((a,b) => (a.display_order||0) - (b.display_order||0));
+  async getChaptersBySubject(classId, subjectId) {
+    const s = await this.getSubject(classId, subjectId);
+    if (!s) return [];
+    return [...(s.chapters || [])].sort((a,b) => (a.display_order||0) - (b.display_order||0));
   },
 
-  async getChapterContext(chapterId) {
-    const [chapters, subjects, classes] = await Promise.all([
-      this.getChapters(), this.getSubjects(), this.getClasses()
-    ]);
-    const chapter = chapters.find(c => c.id === chapterId);
+  async getChapterContext(classId, subjectId, chapterId) {
+    const cls = await this.getClass(classId);
+    if (!cls) return null;
+    const subject = (cls.subjects || []).find(s => s.id === subjectId);
+    if (!subject) return null;
+    const chapter = (subject.chapters || []).find(c => c.id === chapterId);
     if (!chapter) return null;
-    const subject = subjects.find(s => s.id === chapter.subject_id) || null;
-    const cls = subject ? classes.find(c => c.id === subject.class_id) : null;
     return { chapter, subject, cls };
   },
 
   async search(query) {
     const q = String(query || '').trim().toLowerCase();
     if (!q) return [];
-    const [chapters, subjects, classes] = await Promise.all([
-      this.getChapters(), this.getSubjects(), this.getClasses()
-    ]);
-    const subjectMap = new Map(subjects.map(s => [s.id, s]));
-    const classMap = new Map(classes.map(c => [c.id, c]));
-
+    const classes = await this.getClasses();
     const results = [];
-    chapters.forEach(ch => {
-      const subject = subjectMap.get(ch.subject_id);
-      if (!subject) return;
-      const cls = classMap.get(subject.class_id);
-      if (!cls) return;
-      const nameHit = ch.name.toLowerCase().includes(q);
-      const subjectHit = subject.name.toLowerCase().includes(q);
-      if (!nameHit && !subjectHit) return;
-      results.push({
-        classId: cls.id, className: cls.name,
-        subjectId: subject.id, subjectName: subject.name,
-        subjectIcon: subject.icon || '📘',
-        chapterId: ch.id, chapterName: ch.name,
-        score: nameHit ? ch.name.toLowerCase().indexOf(q) : 100 + subject.name.toLowerCase().indexOf(q)
+    classes.forEach(cls => {
+      (cls.subjects || []).forEach(subject => {
+        (subject.chapters || []).forEach(ch => {
+          const nameHit = ch.name.toLowerCase().includes(q);
+          const subjectHit = subject.name.toLowerCase().includes(q);
+          if (!nameHit && !subjectHit) return;
+          results.push({
+            classId: cls.id, className: cls.name,
+            subjectId: subject.id, subjectName: subject.name,
+            subjectIcon: subject.icon || '📘',
+            chapterId: ch.id, chapterName: ch.name,
+            score: nameHit ? ch.name.toLowerCase().indexOf(q) : 100 + subject.name.toLowerCase().indexOf(q)
+          });
+        });
       });
     });
     return results.sort((a,b) => a.score - b.score).slice(0, 40);
@@ -549,15 +517,11 @@ const DataSource = {
 };
 
 /* ============================================================
-   PDF RESOLUTION
+   PDF RESOLUTION — Supabase URL stored in Firestore
    ============================================================ */
 function resolvePdfUrl(chapter) {
+  // Supabase public URL stored directly in Firestore's pdf_path field
   if (chapter.pdf_path && /^https?:\/\//i.test(chapter.pdf_path)) return chapter.pdf_path;
-  if (chapter.pdf_path) {
-    const bucket = firebaseConfig.storageBucket;
-    const path = chapter.pdf_path.replace(/^\/+/, '');
-    return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(path)}?alt=media`;
-  }
   return null;
 }
 
@@ -574,7 +538,7 @@ async function fetchPdfData(chapter) {
 }
 
 /* ============================================================
-   ROUTER
+   ROUTER — same URL structure
    ============================================================ */
 function parseRoute() {
   const raw = location.hash.replace(/^#\/?/, '');
@@ -602,7 +566,7 @@ async function router() {
     if (route.name === 'home')         await renderHome();
     else if (route.name === 'class')   await renderClassPage(route.classId);
     else if (route.name === 'subject') await renderSubjectPage(route.classId, route.subjectId);
-    else                                await renderChapterPage(route.chapterId);
+    else                                await renderChapterPage(route.classId, route.subjectId, route.chapterId);
   } catch (err) {
     console.error('[Study Portal]', err);
     app.innerHTML = `<div class="page-head"><h2>Something went wrong</h2>
@@ -764,14 +728,14 @@ async function renderSubjectPage(classId, subjectId) {
     <div class="stack">${skeletonChapters(6)}</div>
   `;
   const [cls, subject] = await Promise.all([
-    DataSource.getClass(classId), DataSource.getSubject(subjectId)
+    DataSource.getClass(classId), DataSource.getSubject(classId, subjectId)
   ]);
   if (!cls || !subject) {
     app.innerHTML = crumbsHTML([{ label:'Home', href:'#/' }]) +
       `<div class="empty" style="margin-top:16px"><strong>Subject not found</strong></div>`;
     return;
   }
-  const chapters = await DataSource.getChaptersBySubject(subjectId);
+  const chapters = await DataSource.getChaptersBySubject(classId, subjectId);
   app.innerHTML = `
     ${crumbsHTML([
       { label:'Home', href:'#/' },
@@ -810,12 +774,12 @@ async function renderSubjectPage(classId, subjectId) {
 /* ============================================================
    CHAPTER PAGE — PDF.js viewer
    ============================================================ */
-async function renderChapterPage(chapterId) {
+async function renderChapterPage(classId, subjectId, chapterId) {
   app.innerHTML = `
     ${crumbsHTML([{ label:'Home', href:'#/' }, { label:'Loading…' }])}
     <div class="sk" style="height:120px;border-radius:14px;margin-top:12px"></div>
   `;
-  const ctx = await DataSource.getChapterContext(chapterId);
+  const ctx = await DataSource.getChapterContext(classId, subjectId, chapterId);
   if (!ctx || !ctx.chapter) {
     app.innerHTML = crumbsHTML([{ label:'Home', href:'#/' }]) +
       `<div class="empty" style="margin-top:16px"><strong>Chapter not found</strong></div>`;
@@ -905,7 +869,9 @@ async function renderPdfPages(chapter) {
 }
 
 window.retryPdfRender = function(chapterId) {
-  DataSource.getChapterContext(chapterId).then(ctx => {
+  const route = parseRoute();
+  if (route.name !== 'chapter') return;
+  DataSource.getChapterContext(route.classId, route.subjectId, route.chapterId).then(ctx => {
     if (ctx && ctx.chapter) {
       const viewer = document.getElementById('pdfViewer');
       if (viewer) {
@@ -927,7 +893,7 @@ window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
     const route = parseRoute();
-    if (route.name === 'chapter') renderChapterPage(route.chapterId);
+    if (route.name === 'chapter') renderChapterPage(route.classId, route.subjectId, route.chapterId);
   }, 400);
 });
 
@@ -951,13 +917,25 @@ document.addEventListener('click', e => {
 
 async function handleDownload(chapterId) {
   try {
-    const ctx = await DataSource.getChapterContext(chapterId);
-    if (!ctx || !ctx.chapter) return toast('Chapter not found');
-    const url = resolvePdfUrl(ctx.chapter);
+    const route = parseRoute();
+    // Find chapter in the loaded tree (fallback: search all)
+    let chapter = null;
+    const classes = await DataSource.getClasses();
+    outer:
+    for (const cls of classes) {
+      for (const s of (cls.subjects || [])) {
+        for (const ch of (s.chapters || [])) {
+          if (ch.id === chapterId) { chapter = ch; break outer; }
+        }
+      }
+    }
+    if (!chapter) return toast('Chapter not found');
+    const url = resolvePdfUrl(chapter);
     if (!url) return toast('PDF not uploaded yet');
     const link = document.createElement('a');
     link.href = url;
-    link.download = sanitizeFile(ctx.chapter.name) + '.pdf';
+    link.download = sanitizeFile(chapter.name) + '.pdf';
+    link.target = '_blank';
     link.rel = 'noopener';
     link.style.display = 'none';
     document.body.appendChild(link);
