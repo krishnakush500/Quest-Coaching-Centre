@@ -1075,7 +1075,7 @@ function updateChapterSubjectFilter() {
   if (!ss) return;
   const cur = ss.value;
   let subs = getAllSubjects();
-  if (classFilter) subs = subs.filter(s => s.class_id === classFilter);
+  if (classFilter) subs = subs.filter(s => s.class_id === filter);
   ss.innerHTML = '<option value="">All Subjects</option>' +
     subs.map(s => `<option value="${s.id}">${esc(s.class_name)} · ${esc(s.name)}</option>`).join('');
   ss.value = cur;
@@ -1278,6 +1278,7 @@ window.deleteSubject = async function(classId, subjectId) {
 
 /* ============================================================
    SUPABASE PDF UPLOAD / DELETE
+   — Filename me Hindi/special chars nahi jaayenge
    ============================================================ */
 function extractSupabasePath(pdfUrl) {
   if (!pdfUrl || typeof pdfUrl !== 'string') return null;
@@ -1288,9 +1289,18 @@ function extractSupabasePath(pdfUrl) {
 }
 
 async function uploadPdfToSupabase(file, chapterName) {
-  const safeName = String(chapterName || 'chapter')
-    .replace(/[^\w.\-\u0900-\u097F]/g, '_')
-    .slice(0, 60);
+  // Hindi/Devanagari aur special chars hatao — sirf ASCII safe
+  let safeName = String(chapterName || 'chapter')
+    .replace(/[^\w.\-]/g, '_')     // sirf a-z A-Z 0-9 _ - . allow
+    .replace(/_+/g, '_')            // multiple underscore → single
+    .replace(/^_|_$/g, '')          // start/end underscore hatao
+    .slice(0, 50);
+
+  // Agar sab Hindi tha aur khali ho gaya to fallback
+  if (!safeName || safeName.length < 2) {
+    safeName = 'chapter';
+  }
+
   const fileName = `${Date.now()}_${safeName}.pdf`;
 
   updateLoader('Uploading PDF to Supabase…', 'Please wait, don\'t close this window');
