@@ -8,12 +8,10 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
-<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
 <style>
@@ -58,87 +56,63 @@
     position:relative;z-index:2;
   }
 
-  /* MEDIUM SWITCHER */
-  .medium-switcher {
-    background:#fff;
-    border-radius:14px;
-    padding:6px;
-    margin-bottom:16px;
-    display:flex;
-    gap:6px;
-    box-shadow:0 4px 14px rgba(13,43,107,.08);
-    border:1px solid #eef2f9;
+  /* Medium Switch */
+  .medium-switch {
+    display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;
+    background:#fff;padding:10px;border-radius:14px;
+    box-shadow:0 4px 14px rgba(13,43,107,.06);
+    align-items:center;
+  }
+  .medium-switch .label {
+    font-size:.82rem;font-weight:800;color:#5f6f90;
+    letter-spacing:.5px;text-transform:uppercase;padding:0 8px;
   }
   .medium-btn {
-    flex:1;
-    padding:12px 16px;
-    border-radius:10px;
-    background:transparent;
-    border:none;
-    font-size:.9rem;
-    font-weight:800;
-    color:#64748b;
-    cursor:pointer;
-    transition:all .2s;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
+    flex:1;min-width:160px;
+    padding:12px 18px;border-radius:12px;
+    background:#f1f5ff;border:2px solid #dbe6ff;
+    font-size:.92rem;font-weight:800;color:#64748b;
+    cursor:pointer;transition:all .2s;
+    display:flex;align-items:center;justify-content:center;gap:8px;
   }
-  .medium-btn:hover { background:#f1f5ff;color:#0d2b6b; }
-  .medium-btn.active.hindi {
-    background:linear-gradient(135deg,#ff9933,#ff6600);
-    color:#fff;
-    box-shadow:0 4px 12px rgba(255,102,0,.32);
-  }
-  .medium-btn.active.english {
+  .medium-btn:hover { background:#e4edff;color:#0d2b6b;border-color:#cfdcf5; }
+  .medium-btn.active {
     background:linear-gradient(135deg,#0d2b6b,#16409b);
-    color:#fff;
+    color:#fff;border-color:#16409b;
     box-shadow:0 4px 12px rgba(13,43,107,.28);
   }
+  .medium-btn.active .tick { display:inline-block; }
+  .medium-btn .tick { display:none; margin-left:4px; }
 
-  /* CONTENT TYPE TABS */
-  .content-switcher {
-    background:#fff;
-    border-radius:14px;
-    padding:6px;
-    margin-bottom:20px;
-    display:flex;
-    gap:6px;
-    flex-wrap:wrap;
-    box-shadow:0 4px 14px rgba(13,43,107,.08);
-    border:1px solid #eef2f9;
+  /* Content Type Tabs */
+  .content-tabs {
+    display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;
+    background:#fff;padding:8px;border-radius:14px;
+    box-shadow:0 4px 14px rgba(13,43,107,.06);
   }
-  .content-btn {
-    flex:1;
-    min-width:100px;
-    padding:10px 12px;
-    border-radius:9px;
-    background:transparent;
-    border:none;
-    font-size:.82rem;
-    font-weight:700;
-    color:#64748b;
-    cursor:pointer;
-    transition:all .2s;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
+  .content-tab {
+    flex:1;min-width:120px;
+    padding:11px 14px;border-radius:10px;
+    background:transparent;border:none;
+    font-size:.88rem;font-weight:800;color:#64748b;
+    cursor:pointer;transition:all .2s;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    position:relative;
   }
-  .content-btn:hover { background:#f1f5ff;color:#0d2b6b; }
-  .content-btn.active {
+  .content-tab:hover { background:#f1f5ff;color:#0d2b6b; }
+  .content-tab.active {
     background:linear-gradient(135deg,#0d2b6b,#16409b);
-    color:#fff;
-    box-shadow:0 4px 12px rgba(13,43,107,.28);
+    color:#fff;box-shadow:0 4px 12px rgba(13,43,107,.28);
   }
-  .content-btn .new-badge {
-    background:#e0245e;color:#fff;
-    font-size:.55rem;font-weight:800;
-    padding:1px 5px;border-radius:8px;
-    letter-spacing:.3px;
+  .content-tab .count {
+    background:rgba(255,255,255,.22);
+    font-size:.68rem;font-weight:800;
+    padding:2px 7px;border-radius:20px;
+    min-width:22px;text-align:center;
   }
+  .content-tab.active .count { background:#ffc42e;color:#0d2b6b; }
 
+  /* Structure tabs (Classes/Subjects/Chapters) */
   .sm-tabs {
     display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;
     background:#fff;padding:8px;border-radius:14px;
@@ -255,6 +229,10 @@
   .badge-draft { background:#f0f2f7;color:#64748b; }
   .badge-pdf { background:#e0f2fe;color:#0369a1; }
   .badge-nopdf { background:#fef3c7;color:#b45309; }
+  .badge-locked { background:#ffe3ea;color:#e0245e; }
+  .badge-unlocked { background:#e3fcef;color:#0e9f6e; }
+  .badge-hindi { background:#fef3c7;color:#b45309; }
+  .badge-english { background:#dbeafe;color:#16409b; }
 
   .sm-item-actions {
     display:flex;gap:6px;flex-wrap:wrap;flex:none;
@@ -291,10 +269,6 @@
     color:#fff;border-bottom:3px solid #ffc42e;
     padding:16px 20px;
   }
-  .modal-header.hindi-mode {
-    background:linear-gradient(135deg,#ff9933,#ff6600);
-    border-bottom:3px solid #0d2b6b;
-  }
   .modal-header .btn-close { filter:brightness(0) invert(1);opacity:.85; }
   .modal-title { font-weight:800;font-size:1rem;letter-spacing:.2px; }
   .modal-body { padding:22px; }
@@ -311,123 +285,16 @@
   .form-check-input:checked { background-color:#0d2b6b;border-color:#0d2b6b; }
   .form-check-label { font-size:.86rem;font-weight:600;color:#0f2452; }
 
-  /* CONTENT UPLOAD SECTION */
-  .content-type-section {
-    background:#f9fbff;
-    border:1.5px solid #e3e9f5;
-    border-radius:14px;
-    padding:16px;
-    margin-bottom:12px;
-  }
-  .content-type-header {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:10px;
-    flex-wrap:wrap;
-    gap:8px;
-  }
-  .content-type-header .label {
-    font-size:.88rem;
-    font-weight:800;
-    color:#0d2b6b;
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
-  .content-type-header .label .c-ico {
-    width:32px;height:32px;
-    border-radius:9px;
-    display:grid;place-items:center;
-    font-size:1rem;
-  }
-  .c-notes .c-ico { background:#e8eafe;color:#1a237e; }
-  .c-pyqs .c-ico { background:#d1fae5;color:#10b981; }
-  .c-test .c-ico { background:#fee2e2;color:#dc3545; }
-  .c-obj .c-ico { background:#e0f2fe;color:#0ea5e9; }
-  .c-subj .c-ico { background:#f3e8ff;color:#8b5cf6; }
-
-  .download-toggle {
-    display:flex;
-    align-items:center;
-    gap:6px;
-    font-size:.72rem;
-    font-weight:800;
-    letter-spacing:.4px;
-  }
-  .download-toggle input[type="checkbox"] {
-    width:38px;height:20px;
-    appearance:none;
-    background:#dbe6ff;
-    border-radius:20px;
-    position:relative;
-    cursor:pointer;
-    transition:background .2s;
-    outline:none;
-  }
-  .download-toggle input[type="checkbox"]::before {
-    content:"";
-    position:absolute;
-    top:2px;left:2px;
-    width:16px;height:16px;
-    border-radius:50%;
-    background:#fff;
-    transition:transform .2s;
-    box-shadow:0 1px 3px rgba(0,0,0,.2);
-  }
-  .download-toggle input[type="checkbox"]:checked {
-    background:#10b981;
-  }
-  .download-toggle input[type="checkbox"]:checked::before {
-    transform:translateX(18px);
-  }
-  .download-toggle .dt-label { color:#64748b; }
-  .download-toggle input:checked ~ .dt-label { color:#10b981; }
-
-  .upload-drop-small {
-    border:2px dashed #dbe6ff;
-    border-radius:10px;
-    padding:14px;
-    text-align:center;
-    background:#fff;
-    cursor:pointer;
+  .upload-drop {
+    border:2px dashed #dbe6ff;border-radius:12px;
+    padding:20px;text-align:center;
+    background:#fbfcff;cursor:pointer;
     transition:all .2s;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:10px;
-    min-height:60px;
   }
-  .upload-drop-small:hover { border-color:#16409b;background:#f1f5ff; }
-  .upload-drop-small.has-file {
-    border-style:solid;
-    border-color:#10b981;
-    background:#f0fdf4;
-    justify-content:space-between;
-  }
-  .upload-drop-small .file-icon { font-size:1.4rem;color:#0d2b6b; }
-  .upload-drop-small .upload-txt {
-    font-size:.82rem;font-weight:700;color:#0d2b6b;
-  }
-  .upload-drop-small .file-name {
-    font-size:.78rem;font-weight:700;color:#0e9f6e;
-    display:flex;align-items:center;gap:6px;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-    flex:1;
-    min-width:0;
-  }
-  .upload-drop-small .remove-file {
-    background:#fff;
-    border:1px solid #ffd3de;
-    color:#e0245e;
-    border-radius:8px;
-    padding:3px 8px;
-    font-size:.7rem;
-    font-weight:700;
-    cursor:pointer;
-  }
+  .upload-drop:hover { border-color:#16409b;background:#f1f5ff; }
+  .upload-drop .ico { font-size:1.8rem;color:#0d2b6b;margin-bottom:8px; }
+  .upload-drop .txt { font-size:.85rem;font-weight:700;color:#0d2b6b; }
+  .upload-drop .sub { font-size:.74rem;color:#8a95ae;margin-top:4px; }
 
   .file-info {
     margin-top:10px;font-size:.78rem;color:#0e9f6e;font-weight:700;
@@ -453,6 +320,33 @@
   .upload-progress .fill {
     height:100%;width:0%;background:linear-gradient(90deg,#0d2b6b,#f7b500);
     border-radius:20px;transition:width .3s ease;
+  }
+
+  /* Download lock radio */
+  .lock-toggle {
+    display:flex;gap:10px;margin-top:6px;
+  }
+  .lock-opt {
+    flex:1;padding:12px 14px;
+    border:2px solid #dbe6ff;border-radius:12px;
+    background:#fbfcff;cursor:pointer;
+    display:flex;align-items:center;gap:10px;
+    transition:all .2s;
+  }
+  .lock-opt:hover { border-color:#16409b;background:#f1f5ff; }
+  .lock-opt.selected { border-color:#0d2b6b;background:#e8f0fe; }
+  .lock-opt .lock-ico {
+    width:36px;height:36px;flex:none;border-radius:10px;
+    display:grid;place-items:center;font-size:1rem;
+    background:#fff;border:1px solid #dbe6ff;
+  }
+  .lock-opt.unlock.selected .lock-ico { background:#e3fcef;color:#0e9f6e;border-color:#b8f0d4; }
+  .lock-opt.lock.selected .lock-ico { background:#ffe3ea;color:#e0245e;border-color:#ffc9d6; }
+  .lock-opt .lock-txt strong {
+    display:block;font-size:.82rem;font-weight:800;color:#0d2b6b;
+  }
+  .lock-opt .lock-txt small {
+    display:block;font-size:.7rem;color:#8a95ae;margin-top:2px;font-weight:600;
   }
 
   .sm-toast {
@@ -506,47 +400,6 @@
     font-size:.78rem;color:#0d2b6b;font-weight:700;
     display:inline-flex;align-items:center;gap:7px;
   }
-
-  .info-banner {
-    background:linear-gradient(135deg, #e8f5ff 0%, #dbe6ff 100%);
-    border:2px solid #16409b;
-    border-radius:14px;
-    padding:16px 20px;
-    margin-bottom:18px;
-    display:flex;align-items:center;gap:14px;
-    box-shadow:0 6px 20px rgba(22,64,155,.15);
-  }
-  .info-banner .ico {
-    width:44px;height:44px;flex:none;
-    background:linear-gradient(135deg,#0d2b6b,#16409b);
-    color:#fff;border-radius:12px;
-    display:grid;place-items:center;font-size:20px;
-  }
-  .info-banner .txt { flex:1;min-width:200px; }
-  .info-banner .txt strong {
-    display:block;font-size:.92rem;font-weight:800;color:#0d2b6b;margin-bottom:3px;
-  }
-  .info-banner .txt span { font-size:.78rem;color:#3d5a9b;font-weight:600;line-height:1.45; }
-
-  .medium-indicator {
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    padding:4px 12px;
-    border-radius:20px;
-    font-size:.7rem;
-    font-weight:800;
-    letter-spacing:.4px;
-    margin-left:8px;
-  }
-  .medium-indicator.hindi {
-    background:#fff3e0;color:#e65c00;
-    border:1px solid #ffcc80;
-  }
-  .medium-indicator.english {
-    background:#e8eafe;color:#1a237e;
-    border:1px solid #c5cae9;
-  }
 </style>
 </head>
 <body>
@@ -566,7 +419,7 @@
       <span class="ico"><i class="fas fa-book-open"></i></span>
       Study Material Admin
     </h1>
-    <p>Manage classes · subjects · chapters · 5 content types · PDF uploads</p>
+    <p>Medium-wise content · 5 types · PDF upload to Supabase</p>
   </div>
 
   <div class="back-bar">
@@ -579,43 +432,42 @@
     </span>
   </div>
 
-  <!-- MEDIUM SWITCHER -->
-  <div class="medium-switcher">
-    <button class="medium-btn hindi active" data-medium="hindi" onclick="switchMedium('hindi')">
-      <i class="fas fa-language"></i> हिंदी मीडियम
+  <!-- 🆕 MEDIUM SWITCH -->
+  <div class="medium-switch">
+    <span class="label"><i class="fas fa-language"></i> Medium:</span>
+    <button class="medium-btn active" id="mediumHindi" onclick="setMedium('hindi')">
+      <i class="fas fa-om"></i> हिंदी मीडियम <span class="tick">✓</span>
     </button>
-    <button class="medium-btn english" data-medium="english" onclick="switchMedium('english')">
-      <i class="fas fa-language"></i> English Medium
-    </button>
-  </div>
-
-  <!-- CONTENT TYPE SWITCHER -->
-  <div class="content-switcher">
-    <button class="content-btn active" data-content="notes" onclick="switchContent('notes')">
-      📝 Notes
-    </button>
-    <button class="content-btn" data-content="pyqs" onclick="switchContent('pyqs')">
-      📜 PYQs
-    </button>
-    <button class="content-btn" data-content="test_paper" onclick="switchContent('test_paper')">
-      📋 Test Paper
-    </button>
-    <button class="content-btn" data-content="objective" onclick="switchContent('objective')">
-      🔘 Objective
-    </button>
-    <button class="content-btn" data-content="subjective" onclick="switchContent('subjective')">
-      ✍️ Subjective
+    <button class="medium-btn" id="mediumEnglish" onclick="setMedium('english')">
+      <i class="fas fa-globe"></i> English Medium <span class="tick">✓</span>
     </button>
   </div>
 
-  <div class="info-banner">
-    <div class="ico"><i class="fas fa-info-circle"></i></div>
-    <div class="txt">
-      <strong id="infoTitle">Hindi Medium · Notes</strong>
-      <span id="infoDesc">Chapters add karein aur har type ka PDF upload karein. Medium aur content type ke hisab se PDF alag alag store honge.</span>
-    </div>
+  <!-- 🆕 CONTENT TYPE TABS -->
+  <div class="content-tabs" id="contentTabs">
+    <button class="content-tab active" data-content="notes">
+      <i class="fas fa-book"></i> Notes
+      <span class="count" id="cntNotes">0</span>
+    </button>
+    <button class="content-tab" data-content="pyqs">
+      <i class="fas fa-history"></i> PYQs
+      <span class="count" id="cntPyqs">0</span>
+    </button>
+    <button class="content-tab" data-content="test_paper">
+      <i class="fas fa-file-signature"></i> Test Paper
+      <span class="count" id="cntTest">0</span>
+    </button>
+    <button class="content-tab" data-content="objective">
+      <i class="fas fa-check-square"></i> Objective
+      <span class="count" id="cntObj">0</span>
+    </button>
+    <button class="content-tab" data-content="subjective">
+      <i class="fas fa-pen-fancy"></i> Subjective
+      <span class="count" id="cntSubj">0</span>
+    </button>
   </div>
 
+  <!-- Structure Tabs -->
   <div class="sm-tabs">
     <button class="sm-tab active" data-tab="classes">
       <i class="fas fa-school"></i> Classes
@@ -631,7 +483,7 @@
     </button>
   </div>
 
-  <!-- CLASSES -->
+  <!-- Classes Panel -->
   <div class="sm-panel active" id="panel-classes">
     <div class="sm-card">
       <div class="sm-card-header">
@@ -646,7 +498,7 @@
     </div>
   </div>
 
-  <!-- SUBJECTS -->
+  <!-- Subjects Panel -->
   <div class="sm-panel" id="panel-subjects">
     <div class="sm-card">
       <div class="sm-card-header">
@@ -666,7 +518,7 @@
     </div>
   </div>
 
-  <!-- CHAPTERS -->
+  <!-- Chapters Panel -->
   <div class="sm-panel" id="panel-chapters">
     <div class="sm-card">
       <div class="sm-card-header">
@@ -678,8 +530,8 @@
           <select class="form-select" id="chapterSubjectFilter" style="max-width:220px;border-radius:10px;font-size:.85rem;">
             <option value="">All Subjects</option>
           </select>
-          <button class="btn-gold" onclick="openChapterModal()">
-            <i class="fas fa-plus"></i> Add Chapter
+          <button class="btn-gold" id="addContentBtn" onclick="openContentModal()">
+            <i class="fas fa-plus"></i> Add Notes
           </button>
         </div>
       </div>
@@ -695,7 +547,7 @@
 <div class="modal fade" id="classModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header" id="classModalHeader">
+      <div class="modal-header">
         <h5 class="modal-title"><i class="fas fa-school"></i> <span id="classModalTitle">Add Class</span></h5>
         <button class="btn-close" data-bs-dismiss="modal"></button>
       </div>
@@ -721,7 +573,7 @@
 <div class="modal fade" id="subjectModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header" id="subjectModalHeader">
+      <div class="modal-header">
         <h5 class="modal-title"><i class="fas fa-book"></i> <span id="subjectModalTitle">Add Subject</span></h5>
         <button class="btn-close" data-bs-dismiss="modal"></button>
       </div>
@@ -753,239 +605,120 @@
   </div>
 </div>
 
-<!-- CHAPTER MODAL -->
-<div class="modal fade" id="chapterModal" tabindex="-1">
+<!-- CONTENT MODAL (Add/Edit Notes / PYQs / Test / Objective / Subjective) -->
+<div class="modal fade" id="contentModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header" id="chapterModalHeader">
-        <h5 class="modal-title"><i class="fas fa-file-alt"></i> <span id="chapterModalTitle">Add Chapter</span></h5>
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-file-alt"></i> <span id="contentModalTitle">Add Notes</span></h5>
         <button class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
+
+        <!-- Medium (auto-set but editable) -->
+        <div class="mb-3">
+          <label class="form-label">Medium *</label>
+          <div style="display:flex;gap:10px;">
+            <button type="button" class="medium-btn" id="modalMediumHindi" onclick="setModalMedium('hindi')" style="padding:10px;font-size:.85rem;">
+              <i class="fas fa-om"></i> हिंदी
+            </button>
+            <button type="button" class="medium-btn" id="modalMediumEnglish" onclick="setModalMedium('english')" style="padding:10px;font-size:.85rem;">
+              <i class="fas fa-globe"></i> English
+            </button>
+          </div>
+        </div>
+
         <div class="row g-3">
           <div class="col-md-6">
             <label class="form-label">Class *</label>
-            <select class="form-select" id="chapterFormClass"></select>
+            <select class="form-select" id="contentFormClass"></select>
           </div>
           <div class="col-md-6">
             <label class="form-label">Subject *</label>
-            <select class="form-select" id="chapterFormSubject"></select>
+            <select class="form-select" id="contentFormSubject"></select>
           </div>
         </div>
+
         <div class="row g-3 mt-1">
           <div class="col-md-3">
             <label class="form-label">Ch. No. *</label>
-            <input type="number" class="form-control" id="chapterFormNumber" value="1" min="1">
+            <input type="number" class="form-control" id="contentFormNumber" value="1" min="1">
           </div>
           <div class="col-md-9">
             <label class="form-label">Chapter Name *</label>
-            <input type="text" class="form-control" id="chapterFormName" placeholder="e.g. Chemical Reactions and Equations">
+            <input type="text" class="form-control" id="contentFormName" placeholder="e.g. Chemical Reactions">
           </div>
         </div>
+
         <div class="row g-3 mt-1">
           <div class="col-md-4">
             <label class="form-label">Display Order</label>
-            <input type="number" class="form-control" id="chapterFormOrder" value="1" min="0">
+            <input type="number" class="form-control" id="contentFormOrder" value="1" min="0">
           </div>
           <div class="col-md-4">
             <div class="form-check mt-4">
-              <input class="form-check-input" type="checkbox" id="chapterFormIsNew">
-              <label class="form-check-label" for="chapterFormIsNew">Mark as NEW</label>
+              <input class="form-check-input" type="checkbox" id="contentFormIsNew">
+              <label class="form-check-label" for="contentFormIsNew">Mark as NEW</label>
             </div>
           </div>
           <div class="col-md-4">
             <div class="form-check mt-4">
-              <input class="form-check-input" type="checkbox" id="chapterFormIsPublished" checked>
-              <label class="form-check-label" for="chapterFormIsPublished">Published</label>
+              <input class="form-check-input" type="checkbox" id="contentFormIsPublished" checked>
+              <label class="form-check-label" for="contentFormIsPublished">Published</label>
             </div>
           </div>
         </div>
 
-        <!-- CONTENT TYPE UPLOADS -->
-        <div class="mt-4">
-          <h6 style="font-size:.9rem;font-weight:800;color:#0d2b6b;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
-            <i class="fas fa-upload"></i> Upload PDFs (Hindi + English dono ke liye)
-          </h6>
-
-          <!-- NOTES -->
-          <div class="content-type-section c-notes">
-            <div class="content-type-header">
-              <div class="label"><span class="c-ico">📝</span> Notes</div>
-              <div class="download-toggle">
-                <input type="checkbox" id="dl_notes" checked>
-                <span class="dt-label">Download ON</span>
+        <!-- Download Lock -->
+        <div class="mt-3">
+          <label class="form-label">Download Access *</label>
+          <div class="lock-toggle">
+            <div class="lock-opt unlock selected" id="lockOptUnlock" onclick="setDownloadLock(false)">
+              <div class="lock-ico"><i class="fas fa-unlock"></i></div>
+              <div class="lock-txt">
+                <strong>🔓 Unlock</strong>
+                <small>Anyone can download this PDF</small>
               </div>
             </div>
-            <div class="row g-2">
-              <div class="col-md-6">
-                <div style="font-size:.72rem;font-weight:700;color:#e65c00;margin-bottom:6px;">
-                  <i class="fas fa-language"></i> Hindi Notes PDF
-                </div>
-                <div class="upload-drop-small" data-upload="hindi_notes" onclick="triggerUpload('hindi_notes')">
-                  <input type="file" id="file_hindi_notes" accept="application/pdf" style="display:none" onchange="handleFileSelect(this, 'hindi_notes')">
-                  <div class="file-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                  <div class="upload-txt">Click to upload</div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div style="font-size:.72rem;font-weight:700;color:#1a237e;margin-bottom:6px;">
-                  <i class="fas fa-language"></i> English Notes PDF
-                </div>
-                <div class="upload-drop-small" data-upload="english_notes" onclick="triggerUpload('english_notes')">
-                  <input type="file" id="file_english_notes" accept="application/pdf" style="display:none" onchange="handleFileSelect(this, 'english_notes')">
-                  <div class="file-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                  <div class="upload-txt">Click to upload</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- PYQS -->
-          <div class="content-type-section c-pyqs">
-            <div class="content-type-header">
-              <div class="label"><span class="c-ico">📜</span> PYQs (Previous Year Questions)</div>
-              <div class="download-toggle">
-                <input type="checkbox" id="dl_pyqs" checked>
-                <span class="dt-label">Download ON</span>
-              </div>
-            </div>
-            <div class="row g-2">
-              <div class="col-md-6">
-                <div style="font-size:.72rem;font-weight:700;color:#e65c00;margin-bottom:6px;">
-                  <i class="fas fa-language"></i> Hindi PYQs PDF
-                </div>
-                <div class="upload-drop-small" data-upload="hindi_pyqs" onclick="triggerUpload('hindi_pyqs')">
-                  <input type="file" id="file_hindi_pyqs" accept="application/pdf" style="display:none" onchange="handleFileSelect(this, 'hindi_pyqs')">
-                  <div class="file-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                  <div class="upload-txt">Click to upload</div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div style="font-size:.72rem;font-weight:700;color:#1a237e;margin-bottom:6px;">
-                  <i class="fas fa-language"></i> English PYQs PDF
-                </div>
-                <div class="upload-drop-small" data-upload="english_pyqs" onclick="triggerUpload('english_pyqs')">
-                  <input type="file" id="file_english_pyqs" accept="application/pdf" style="display:none" onchange="handleFileSelect(this, 'english_pyqs')">
-                  <div class="file-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                  <div class="upload-txt">Click to upload</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- TEST PAPER -->
-          <div class="content-type-section c-test">
-            <div class="content-type-header">
-              <div class="label"><span class="c-ico">📋</span> Test Paper</div>
-              <div class="download-toggle">
-                <input type="checkbox" id="dl_test_paper" checked>
-                <span class="dt-label">Download ON</span>
-              </div>
-            </div>
-            <div class="row g-2">
-              <div class="col-md-6">
-                <div style="font-size:.72rem;font-weight:700;color:#e65c00;margin-bottom:6px;">
-                  <i class="fas fa-language"></i> Hindi Test Paper PDF
-                </div>
-                <div class="upload-drop-small" data-upload="hindi_test_paper" onclick="triggerUpload('hindi_test_paper')">
-                  <input type="file" id="file_hindi_test_paper" accept="application/pdf" style="display:none" onchange="handleFileSelect(this, 'hindi_test_paper')">
-                  <div class="file-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                  <div class="upload-txt">Click to upload</div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div style="font-size:.72rem;font-weight:700;color:#1a237e;margin-bottom:6px;">
-                  <i class="fas fa-language"></i> English Test Paper PDF
-                </div>
-                <div class="upload-drop-small" data-upload="english_test_paper" onclick="triggerUpload('english_test_paper')">
-                  <input type="file" id="file_english_test_paper" accept="application/pdf" style="display:none" onchange="handleFileSelect(this, 'english_test_paper')">
-                  <div class="file-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                  <div class="upload-txt">Click to upload</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- OBJECTIVE -->
-          <div class="content-type-section c-obj">
-            <div class="content-type-header">
-              <div class="label"><span class="c-ico">🔘</span> Objective Questions</div>
-              <div class="download-toggle">
-                <input type="checkbox" id="dl_objective" checked>
-                <span class="dt-label">Download ON</span>
-              </div>
-            </div>
-            <div class="row g-2">
-              <div class="col-md-6">
-                <div style="font-size:.72rem;font-weight:700;color:#e65c00;margin-bottom:6px;">
-                  <i class="fas fa-language"></i> Hindi Objective PDF
-                </div>
-                <div class="upload-drop-small" data-upload="hindi_objective" onclick="triggerUpload('hindi_objective')">
-                  <input type="file" id="file_hindi_objective" accept="application/pdf" style="display:none" onchange="handleFileSelect(this, 'hindi_objective')">
-                  <div class="file-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                  <div class="upload-txt">Click to upload</div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div style="font-size:.72rem;font-weight:700;color:#1a237e;margin-bottom:6px;">
-                  <i class="fas fa-language"></i> English Objective PDF
-                </div>
-                <div class="upload-drop-small" data-upload="english_objective" onclick="triggerUpload('english_objective')">
-                  <input type="file" id="file_english_objective" accept="application/pdf" style="display:none" onchange="handleFileSelect(this, 'english_objective')">
-                  <div class="file-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                  <div class="upload-txt">Click to upload</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- SUBJECTIVE -->
-          <div class="content-type-section c-subj">
-            <div class="content-type-header">
-              <div class="label"><span class="c-ico">✍️</span> Subjective Questions</div>
-              <div class="download-toggle">
-                <input type="checkbox" id="dl_subjective" checked>
-                <span class="dt-label">Download ON</span>
-              </div>
-            </div>
-            <div class="row g-2">
-              <div class="col-md-6">
-                <div style="font-size:.72rem;font-weight:700;color:#e65c00;margin-bottom:6px;">
-                  <i class="fas fa-language"></i> Hindi Subjective PDF
-                </div>
-                <div class="upload-drop-small" data-upload="hindi_subjective" onclick="triggerUpload('hindi_subjective')">
-                  <input type="file" id="file_hindi_subjective" accept="application/pdf" style="display:none" onchange="handleFileSelect(this, 'hindi_subjective')">
-                  <div class="file-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                  <div class="upload-txt">Click to upload</div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div style="font-size:.72rem;font-weight:700;color:#1a237e;margin-bottom:6px;">
-                  <i class="fas fa-language"></i> English Subjective PDF
-                </div>
-                <div class="upload-drop-small" data-upload="english_subjective" onclick="triggerUpload('english_subjective')">
-                  <input type="file" id="file_english_subjective" accept="application/pdf" style="display:none" onchange="handleFileSelect(this, 'english_subjective')">
-                  <div class="file-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                  <div class="upload-txt">Click to upload</div>
-                </div>
+            <div class="lock-opt lock" id="lockOptLock" onclick="setDownloadLock(true)">
+              <div class="lock-ico"><i class="fas fa-lock"></i></div>
+              <div class="lock-txt">
+                <strong>🔒 Lock</strong>
+                <small>Roll No + Reg No required</small>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="upload-progress" id="uploadProgress">
-          <div class="label">
-            <span id="uploadStatus">Uploading…</span>
-            <span id="uploadPercent">0%</span>
+        <!-- PDF Upload -->
+        <div class="mt-3">
+          <label class="form-label">PDF File *</label>
+          <div class="upload-drop" id="uploadDrop">
+            <input type="file" id="contentFormPdf" accept="application/pdf" style="display:none;">
+            <div class="ico"><i class="fas fa-cloud-upload-alt"></i></div>
+            <div class="txt">Click to upload PDF</div>
+            <div class="sub">Max 20 MB · only .pdf files</div>
           </div>
-          <div class="bar"><div class="fill" id="uploadFill"></div></div>
+          <div class="file-info" id="fileInfo" style="display:none;">
+            <i class="fas fa-check-circle"></i>
+            <span id="fileName"></span>
+            <button class="btn-outline-soft ms-2" onclick="clearPdfSelection()" style="padding:3px 8px;font-size:.72rem;">
+              <i class="fas fa-times"></i> Remove
+            </button>
+          </div>
+          <div class="upload-progress" id="uploadProgress">
+            <div class="label">
+              <span id="uploadStatus">Uploading…</span>
+              <span id="uploadPercent">0%</span>
+            </div>
+            <div class="bar"><div class="fill" id="uploadFill"></div></div>
+          </div>
         </div>
+
       </div>
       <div class="modal-footer" style="border-top:1px solid #eef2f9;padding:14px 20px;">
         <button class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:10px;font-weight:700;font-size:.85rem;">Cancel</button>
-        <button class="btn-gold" onclick="saveChapter()" id="saveChapterBtn">
-          <i class="fas fa-save"></i> Save Chapter
-        </button>
+        <button class="btn-gold" onclick="saveContent()" id="saveContentBtn"><i class="fas fa-save"></i> Save</button>
       </div>
     </div>
   </div>
@@ -997,7 +730,7 @@
 
 <script>
 /* ============================================================
-   FIREBASE INIT
+   FIREBASE + SUPABASE INIT
    ============================================================ */
 const firebaseConfig = {
   apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
@@ -1013,43 +746,37 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-/* ============================================================
-   SUPABASE INIT — PDF storage
-   ============================================================ */
 const SUPABASE_URL = 'https://zjwvxqjmccqhyxsaeggw.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_6a_9nxKSSLUZMmSGleyycg_kQ4a4BtI';
 const PDF_BUCKET = 'study_material';
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* ============================================================
-   CONSTANTS
-   ============================================================ */
 const SM_COLLECTION = 'study_materials';
 const SUB_SUBCOLLECTION = 'subjects';
 const CH_SUBCOLLECTION = 'chapters';
 
 const CONTENT_TYPES = ['notes', 'pyqs', 'test_paper', 'objective', 'subjective'];
-const MEDIUMS = ['hindi', 'english'];
+const CONTENT_LABELS = {
+  notes: 'Notes',
+  pyqs: 'PYQs',
+  test_paper: 'Test Paper',
+  objective: 'Objective',
+  subjective: 'Subjective'
+};
 
 /* ============================================================
    STATE
    ============================================================ */
 const state = {
+  medium: 'hindi',              // auto-selected
+  contentType: 'notes',         // auto-selected
   classes: [],
   editing: { class:null, subject:null, chapter:null, parentClassId:null, parentSubjectId:null },
-  currentMedium: 'hindi',  // default Hindi
-  currentContent: 'notes', // default Notes
-  // 10 uploads (5 types × 2 mediums)
-  selectedFiles: {
-    hindi_notes: null, english_notes: null,
-    hindi_pyqs: null, english_pyqs: null,
-    hindi_test_paper: null, english_test_paper: null,
-    hindi_objective: null, english_objective: null,
-    hindi_subjective: null, english_subjective: null
-  },
-  // Existing content data (when editing)
-  existingContent: null
+  editingContent: null,
+  selectedPdfFile: null,
+  downloadLocked: false,
+  modalMedium: 'hindi'
 };
 
 function getAllSubjects() {
@@ -1060,6 +787,7 @@ function getAllSubjects() {
   return list;
 }
 
+/* Get all chapters with medium + content info */
 function getAllChapters() {
   const list = [];
   state.classes.forEach(c => {
@@ -1078,6 +806,10 @@ function findSubject(classId, subjectId) {
   const c = findClass(classId);
   return c ? (c.subjects || []).find(s => s.id === subjectId) : null;
 }
+function findChapter(classId, subjectId, chapterId) {
+  const s = findSubject(classId, subjectId);
+  return s ? (s.chapters || []).find(c => c.id === chapterId) : null;
+}
 
 const $ = (id) => document.getElementById(id);
 const esc = (s='') => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1088,7 +820,7 @@ function toast(msg, isError=false) {
   el.textContent = msg;
   el.className = 'sm-toast show' + (isError ? ' error' : '');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 3400);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
 }
 
 function showLoader(text='Saving…', sub='') {
@@ -1102,47 +834,19 @@ function updateLoader(text, sub='') {
   $('loaderSub').textContent = sub;
 }
 
+const uid = () => 'id_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+
 function classDocId(name) {
-  return String(name || 'class').toLowerCase().replace(/[^\w\-\u0900-\u097F]+/g, '-').replace(/^-+|-+$/g, '');
+  return String(name || 'class')
+    .toLowerCase()
+    .replace(/[^\w\-\u0900-\u097F]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 function subjectDocId(name) {
-  return String(name || 'subject').toLowerCase().replace(/[^\w\-\u0900-\u097F]+/g, '-').replace(/^-+|-+$/g, '');
-}
-
-/* ============================================================
-   MEDIUM & CONTENT SWITCHERS
-   ============================================================ */
-function switchMedium(medium) {
-  state.currentMedium = medium;
-  document.querySelectorAll('.medium-btn').forEach(b => {
-    b.classList.remove('active', 'hindi', 'english');
-    if (b.dataset.medium === medium) {
-      b.classList.add('active');
-      b.classList.add(medium);
-    }
-  });
-  updateInfoBanner();
-}
-
-function switchContent(content) {
-  state.currentContent = content;
-  document.querySelectorAll('.content-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.content === content);
-  });
-  updateInfoBanner();
-}
-
-function updateInfoBanner() {
-  const mediumLabel = state.currentMedium === 'hindi' ? 'हिंदी मीडियम' : 'English Medium';
-  const contentLabels = {
-    notes: 'Notes',
-    pyqs: 'PYQs (Previous Year Questions)',
-    test_paper: 'Test Paper',
-    objective: 'Objective Questions',
-    subjective: 'Subjective Questions'
-  };
-  $('infoTitle').textContent = `${mediumLabel} · ${contentLabels[state.currentContent]}`;
-  $('infoDesc').textContent = `Har chapter ke liye ${mediumLabel} ke ${contentLabels[state.currentContent]} PDF upload karein. Chapter add/edit karte waqt saare 5 types ek saath upload kar sakte hain.`;
+  return String(name || 'subject')
+    .toLowerCase()
+    .replace(/[^\w\-\u0900-\u097F]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 /* ============================================================
@@ -1165,6 +869,7 @@ async function loadAll() {
   showLoader('Loading…');
   try {
     const classesSnap = await db.collection(SM_COLLECTION).orderBy('display_order').get();
+
     if (classesSnap.empty) {
       state.classes = [];
       renderAll();
@@ -1182,8 +887,11 @@ async function loadAll() {
         subjects: []
       };
 
-      const subjectsSnap = await db.collection(SM_COLLECTION).doc(classDoc.id)
-        .collection(SUB_SUBCOLLECTION).orderBy('display_order').get();
+      const subjectsSnap = await db
+        .collection(SM_COLLECTION).doc(classDoc.id)
+        .collection(SUB_SUBCOLLECTION)
+        .orderBy('display_order')
+        .get();
 
       for (const subjectDoc of subjectsSnap.docs) {
         const subjectData = subjectDoc.data();
@@ -1195,12 +903,39 @@ async function loadAll() {
           chapters: []
         };
 
-        const chaptersSnap = await db.collection(SM_COLLECTION).doc(classDoc.id)
+        const chaptersSnap = await db
+          .collection(SM_COLLECTION).doc(classDoc.id)
           .collection(SUB_SUBCOLLECTION).doc(subjectDoc.id)
-          .collection(CH_SUBCOLLECTION).orderBy('display_order').get();
+          .collection(CH_SUBCOLLECTION)
+          .orderBy('display_order')
+          .get();
 
         chaptersSnap.forEach(chDoc => {
-          subj.chapters.push({ id: chDoc.id, ...chDoc.data() });
+          const chData = chDoc.data();
+
+          // 🔥 PURANA DATA MIGRATION: agar `pdf_path` top-level hai (old structure)
+          // to usko mediums.hindi.notes me daal do
+          if (chData.pdf_path && !chData.mediums) {
+            chData.mediums = {
+              hindi: {
+                notes: {
+                  pdf_path: chData.pdf_path,
+                  download_locked: false
+                }
+              }
+            };
+            // Note: don't delete pdf_path here — we'll migrate on next save
+          }
+
+          subj.chapters.push({
+            id: chDoc.id,
+            name: chData.name || '',
+            chapter_number: chData.chapter_number || 0,
+            display_order: chData.display_order || 0,
+            is_new: chData.is_new || false,
+            is_published: chData.is_published !== false,
+            mediums: chData.mediums || {}
+          });
         });
 
         cls.subjects.push(subj);
@@ -1218,6 +953,43 @@ async function loadAll() {
   } finally {
     hideLoader();
   }
+}
+
+/* ============================================================
+   MEDIUM SWITCH
+   ============================================================ */
+window.setMedium = function(medium) {
+  state.medium = medium;
+  $('mediumHindi').classList.toggle('active', medium === 'hindi');
+  $('mediumEnglish').classList.toggle('active', medium === 'english');
+  renderAll();
+};
+
+/* ============================================================
+   CONTENT TYPE SWITCH
+   ============================================================ */
+document.querySelectorAll('.content-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.content-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.contentType = btn.dataset.content;
+    $('addContentBtn').innerHTML = `<i class="fas fa-plus"></i> Add ${CONTENT_LABELS[state.contentType]}`;
+    renderAll();
+  });
+});
+
+/* ============================================================
+   HELPER: Get content for chapter (medium + type)
+   ============================================================ */
+function getContent(chapter, medium, type) {
+  const m = (chapter.mediums || {})[medium] || {};
+  return m[type] || null;
+}
+
+/* Check if chapter has any content for current medium+type */
+function hasContent(chapter) {
+  const c = getContent(chapter, state.medium, state.contentType);
+  return c && c.pdf_path;
 }
 
 /* ============================================================
@@ -1239,7 +1011,26 @@ function updateCounts() {
   $('tabCountChapters').textContent = allChs.length;
   $('classesCount').textContent = state.classes.length;
   $('subjectsCount').textContent = allSubs.length;
-  $('chaptersCount').textContent = allChs.length;
+
+  // Count chapters that have content for current medium+type
+  const withContent = allChs.filter(ch => hasContent(ch));
+  $('chaptersCount').textContent = withContent.length;
+
+  // Content-type counts
+  CONTENT_TYPES.forEach(t => {
+    const cnt = allChs.filter(ch => {
+      const c = getContent(ch, state.medium, t);
+      return c && c.pdf_path;
+    }).length;
+    const el = $('cnt' + t.charAt(0).toUpperCase() + t.slice(1).replace('_',''));
+    if (el) el.textContent = cnt;
+  });
+  // Fix test_paper id (cntTest)
+  const testCnt = allChs.filter(ch => {
+    const c = getContent(ch, state.medium, 'test_paper');
+    return c && c.pdf_path;
+  }).length;
+  if ($('cntTest')) $('cntTest').textContent = testCnt;
 }
 
 function renderClasses() {
@@ -1248,7 +1039,7 @@ function renderClasses() {
     box.innerHTML = `<div class="sm-empty">
       <div class="ico-big"><i class="fas fa-school"></i></div>
       <h4>No classes yet</h4>
-      <p>Click "Add Class" to create your first class. Class ek hi baar add hoti hai — dono medium me available hogi.</p>
+      <p>Click "Add Class" to create your first class.</p>
     </div>`;
     return;
   }
@@ -1260,7 +1051,6 @@ function renderClasses() {
         <div class="meta">
           <span>Order: ${c.display_order||0}</span>
           <span class="badge-soft badge-pub">${(c.subjects||[]).length} subjects</span>
-          <span class="badge-soft badge-pdf">🌐 Hindi + English</span>
         </div>
       </div>
       <div class="sm-item-actions">
@@ -1312,25 +1102,27 @@ function renderChapters() {
   if (classFilter) list = list.filter(ch => ch.class_id === classFilter);
   if (subjectFilter) list = list.filter(ch => ch.subject_id === subjectFilter);
 
+  // Only show chapters that have content for CURRENT medium + type
+  list = list.filter(ch => hasContent(ch));
+
   const box = $('chaptersList');
   if (!list.length) {
     box.innerHTML = `<div class="sm-empty">
       <div class="ico-big"><i class="fas fa-file-alt"></i></div>
-      <h4>No chapters found</h4>
-      <p>Adjust filters or click "Add Chapter".</p>
+      <h4>No ${CONTENT_LABELS[state.contentType]} found</h4>
+      <p>Is medium me abhi ${CONTENT_LABELS[state.contentType]} upload nahi hua.</p>
+      <p style="margin-top:6px;color:#0d2b6b;font-weight:700;">"Add ${CONTENT_LABELS[state.contentType]}" button dabao.</p>
     </div>`;
     return;
   }
-  box.innerHTML = list.map(ch => {
-    const content = ch.content || {};
-    // Count uploaded PDFs
-    let totalPdfs = 0;
-    let hindiPdfs = 0, englishPdfs = 0;
-    CONTENT_TYPES.forEach(t => {
-      if (content.hindi?.[t]?.pdf_path) { hindiPdfs++; totalPdfs++; }
-      if (content.english?.[t]?.pdf_path) { englishPdfs++; totalPdfs++; }
-    });
 
+  const mediumBadge = state.medium === 'hindi'
+    ? '<span class="badge-soft badge-hindi">हिंदी</span>'
+    : '<span class="badge-soft badge-english">English</span>';
+
+  box.innerHTML = list.map(ch => {
+    const content = getContent(ch, state.medium, state.contentType);
+    const locked = content?.download_locked;
     return `
       <div class="sm-item">
         <div class="sm-item-icon" style="font-size:.9rem;font-weight:800;">${String(ch.chapter_number||0).padStart(2,'0')}</div>
@@ -1339,16 +1131,16 @@ function renderChapters() {
           <div class="meta">
             <span><i class="fas fa-school"></i> ${esc(ch.class_name)}</span>
             <span><i class="fas fa-book"></i> ${esc(ch.subject_name)}</span>
+            ${mediumBadge}
+            <span class="badge-soft badge-pdf"><i class="fas fa-file-pdf"></i> ${CONTENT_LABELS[state.contentType]}</span>
+            ${locked ? '<span class="badge-soft badge-locked"><i class="fas fa-lock"></i> Locked</span>' : '<span class="badge-soft badge-unlocked"><i class="fas fa-unlock"></i> Unlocked</span>'}
             ${ch.is_new ? '<span class="badge-soft badge-new">NEW</span>' : ''}
-            ${ch.is_published === false ? '<span class="badge-soft badge-draft">Draft</span>' : '<span class="badge-soft badge-pub">Live</span>'}
-            <span class="badge-soft badge-pdf">📄 ${totalPdfs}/10 PDFs</span>
-            <span class="badge-soft badge-nopdf">🇮🇳 H: ${hindiPdfs}/5</span>
-            <span class="badge-soft badge-pdf">🌐 E: ${englishPdfs}/5</span>
+            ${ch.is_published === false ? '<span class="badge-soft badge-draft">Draft</span>' : ''}
           </div>
         </div>
         <div class="sm-item-actions">
-          <button class="btn-outline-soft" onclick="editChapter('${ch.class_id}', '${ch.subject_id}', '${ch.id}')"><i class="fas fa-pen"></i> Edit</button>
-          <button class="btn-danger-soft" onclick="deleteChapter('${ch.class_id}', '${ch.subject_id}', '${ch.id}')"><i class="fas fa-trash"></i> Delete</button>
+          <button class="btn-outline-soft" onclick="editContent('${ch.class_id}', '${ch.subject_id}', '${ch.id}')"><i class="fas fa-pen"></i> Edit</button>
+          <button class="btn-danger-soft" onclick="deleteContent('${ch.class_id}', '${ch.subject_id}', '${ch.id}')"><i class="fas fa-trash"></i> Delete</button>
         </div>
       </div>
     `;
@@ -1389,7 +1181,7 @@ function updateChapterSubjectFilter() {
 }
 
 /* ============================================================
-   TABS
+   STRUCTURE TABS
    ============================================================ */
 document.querySelectorAll('.sm-tab').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1403,20 +1195,14 @@ document.querySelectorAll('.sm-tab').forEach(btn => {
 /* ============================================================
    MODALS
    ============================================================ */
-let classModal, subjectModal, chapterModal;
+let classModal, subjectModal, contentModal;
 document.addEventListener('DOMContentLoaded', () => {
   classModal = new bootstrap.Modal($('classModal'));
   subjectModal = new bootstrap.Modal($('subjectModal'));
-  chapterModal = new bootstrap.Modal($('chapterModal'));
-
-  // Auto-select Hindi & Notes
-  switchMedium('hindi');
-  switchContent('notes');
+  contentModal = new bootstrap.Modal($('contentModal'));
 });
 
-/* ============================================================
-   CLASS CRUD
-   ============================================================ */
+/* CLASS CRUD */
 window.openClassModal = function() {
   state.editing.class = null;
   $('classModalTitle').textContent = 'Add Class';
@@ -1444,8 +1230,6 @@ window.saveClass = async function() {
   try {
     if (state.editing.class) {
       await db.collection(SM_COLLECTION).doc(state.editing.class.id).update({ name, display_order: order });
-      state.editing.class.name = name;
-      state.editing.class.display_order = order;
       toast('Class updated ✓');
     } else {
       const newId = classDocId(name);
@@ -1459,7 +1243,7 @@ window.saveClass = async function() {
         name, display_order: order,
         created_at: firebase.firestore.FieldValue.serverTimestamp()
       });
-      toast('Class added ✓ (dono medium me available)');
+      toast('Class added ✓');
     }
     classModal.hide();
     await loadAll();
@@ -1474,24 +1258,22 @@ window.saveClass = async function() {
 window.deleteClass = async function(id) {
   const cls = findClass(id);
   if (!cls) return;
-  const subCount = (cls.subjects || []).length;
-  if (!confirm(`Delete "${cls.name}" + ${subCount} subject(s) + all chapters + saare PDFs?`)) return;
+  if (!confirm(`Delete "${cls.name}" + all subjects + chapters?`)) return;
 
   showLoader('Deleting…');
   try {
-    // Delete PDFs
+    // Delete PDFs from Supabase
     for (const s of (cls.subjects || [])) {
       for (const ch of (s.chapters || [])) {
-        const content = ch.content || {};
-        MEDIUMS.forEach(m => {
-          CONTENT_TYPES.forEach(t => {
-            const p = content[m]?.[t]?.pdf_path;
-            if (p) deletePdfFromSupabase(p);
-          });
-        });
+        for (const med of Object.keys(ch.mediums || {})) {
+          for (const t of CONTENT_TYPES) {
+            const c = (ch.mediums[med] || {})[t];
+            if (c && c.pdf_path) await deletePdfFromSupabase(c.pdf_path);
+          }
+        }
       }
     }
-    // Delete Firestore docs
+    // Delete subcollections
     const subjectsSnap = await db.collection(SM_COLLECTION).doc(id).collection(SUB_SUBCOLLECTION).get();
     for (const sDoc of subjectsSnap.docs) {
       const chaptersSnap = await db.collection(SM_COLLECTION).doc(id)
@@ -1501,8 +1283,7 @@ window.deleteClass = async function(id) {
       await sDoc.ref.delete();
     }
     await db.collection(SM_COLLECTION).doc(id).delete();
-
-    toast('Class + children + PDFs deleted ✓');
+    toast('Class deleted ✓');
     await loadAll();
   } catch (err) {
     console.error(err);
@@ -1512,9 +1293,7 @@ window.deleteClass = async function(id) {
   }
 };
 
-/* ============================================================
-   SUBJECT CRUD
-   ============================================================ */
+/* SUBJECT CRUD */
 window.openSubjectModal = function(presetClassId) {
   state.editing.subject = null;
   state.editing.parentClassId = null;
@@ -1555,7 +1334,6 @@ window.saveSubject = async function() {
     if (state.editing.subject) {
       const oldClassId = state.editing.parentClassId;
       const oldSubjectId = state.editing.subject.id;
-
       if (oldClassId !== newClassId) {
         const newSubjectId = subjectDocId(name);
         await db.collection(SM_COLLECTION).doc(newClassId)
@@ -1563,23 +1341,21 @@ window.saveSubject = async function() {
             name, icon, display_order: order,
             created_at: firebase.firestore.FieldValue.serverTimestamp()
           });
-
-        const oldChaptersSnap = await db.collection(SM_COLLECTION).doc(oldClassId)
+        // Copy chapters
+        const oldChSnap = await db.collection(SM_COLLECTION).doc(oldClassId)
           .collection(SUB_SUBCOLLECTION).doc(oldSubjectId)
           .collection(CH_SUBCOLLECTION).get();
-        for (const chDoc of oldChaptersSnap.docs) {
+        for (const chDoc of oldChSnap.docs) {
           await db.collection(SM_COLLECTION).doc(newClassId)
             .collection(SUB_SUBCOLLECTION).doc(newSubjectId)
             .collection(CH_SUBCOLLECTION).doc(chDoc.id).set(chDoc.data());
         }
-        for (const chDoc of oldChaptersSnap.docs) await chDoc.ref.delete();
+        for (const chDoc of oldChSnap.docs) await chDoc.ref.delete();
         await db.collection(SM_COLLECTION).doc(oldClassId)
           .collection(SUB_SUBCOLLECTION).doc(oldSubjectId).delete();
       } else {
         await db.collection(SM_COLLECTION).doc(oldClassId)
-          .collection(SUB_SUBCOLLECTION).doc(oldSubjectId).update({
-            name, icon, display_order: order
-          });
+          .collection(SUB_SUBCOLLECTION).doc(oldSubjectId).update({ name, icon, display_order: order });
       }
       toast('Subject updated ✓');
     } else {
@@ -1611,19 +1387,17 @@ window.saveSubject = async function() {
 window.deleteSubject = async function(classId, subjectId) {
   const s = findSubject(classId, subjectId);
   if (!s) return;
-  const chCount = (s.chapters || []).length;
-  if (!confirm(`Delete "${s.name}" + ${chCount} chapter(s) + saare PDFs?`)) return;
+  if (!confirm(`Delete "${s.name}" + all chapters?`)) return;
 
   showLoader('Deleting…');
   try {
     for (const ch of (s.chapters || [])) {
-      const content = ch.content || {};
-      MEDIUMS.forEach(m => {
-        CONTENT_TYPES.forEach(t => {
-          const p = content[m]?.[t]?.pdf_path;
-          if (p) deletePdfFromSupabase(p);
-        });
-      });
+      for (const med of Object.keys(ch.mediums || {})) {
+        for (const t of CONTENT_TYPES) {
+          const c = (ch.mediums[med] || {})[t];
+          if (c && c.pdf_path) await deletePdfFromSupabase(c.pdf_path);
+        }
+      }
     }
     const chaptersSnap = await db.collection(SM_COLLECTION).doc(classId)
       .collection(SUB_SUBCOLLECTION).doc(subjectId)
@@ -1631,7 +1405,7 @@ window.deleteSubject = async function(classId, subjectId) {
     for (const chDoc of chaptersSnap.docs) await chDoc.ref.delete();
     await db.collection(SM_COLLECTION).doc(classId)
       .collection(SUB_SUBCOLLECTION).doc(subjectId).delete();
-    toast('Subject + chapters + PDFs deleted ✓');
+    toast('Subject deleted ✓');
     await loadAll();
   } catch (err) {
     console.error(err);
@@ -1652,16 +1426,17 @@ function extractSupabasePath(pdfUrl) {
   return decodeURIComponent(pdfUrl.substring(idx + marker.length));
 }
 
-async function uploadPdfToSupabase(file, chapterName, medium, contentType) {
-  let safeName = String(chapterName || 'chapter')
+async function uploadPdfToSupabase(file, baseName) {
+  let safeName = String(baseName || 'file')
     .replace(/[^\w.\-]/g, '_')
     .replace(/_+/g, '_')
     .replace(/^_|_$/g, '')
-    .slice(0, 40);
+    .slice(0, 50);
+  if (!safeName || safeName.length < 2) safeName = 'file';
 
-  if (!safeName || safeName.length < 2) safeName = 'chapter';
+  const fileName = `${Date.now()}_${safeName}.pdf`;
 
-  const fileName = `${Date.now()}_${medium}_${contentType}_${safeName}.pdf`;
+  updateLoader('Uploading PDF to Supabase…', 'Please wait…');
 
   const { data, error } = await supabaseClient.storage
     .from(PDF_BUCKET)
@@ -1673,14 +1448,19 @@ async function uploadPdfToSupabase(file, chapterName, medium, contentType) {
 
   if (error) throw new Error('Supabase: ' + error.message);
 
-  const { data: urlData } = supabaseClient.storage.from(PDF_BUCKET).getPublicUrl(fileName);
+  const { data: urlData } = supabaseClient.storage
+    .from(PDF_BUCKET)
+    .getPublicUrl(fileName);
+
   return urlData.publicUrl;
 }
 
 async function deletePdfFromSupabase(pdfUrlOrPath) {
   try {
     let path = pdfUrlOrPath;
-    if (pdfUrlOrPath && pdfUrlOrPath.startsWith('http')) path = extractSupabasePath(pdfUrlOrPath);
+    if (pdfUrlOrPath && pdfUrlOrPath.startsWith('http')) {
+      path = extractSupabasePath(pdfUrlOrPath);
+    }
     if (!path) return;
     const { error } = await supabaseClient.storage.from(PDF_BUCKET).remove([path]);
     if (error) console.warn('Supabase delete failed:', error.message);
@@ -1690,300 +1470,257 @@ async function deletePdfFromSupabase(pdfUrlOrPath) {
 }
 
 /* ============================================================
-   FILE UPLOAD HANDLERS (10 slots)
+   CONTENT (CHAPTER) MODAL — notes/pyqs/test/objective/subjective
    ============================================================ */
-window.triggerUpload = function(slot) {
-  $(`file_${slot}`).click();
-};
-
-window.handleFileSelect = function(input, slot) {
-  const file = input.files[0];
-  if (!file) return;
-  if (file.type !== 'application/pdf' && !/\.pdf$/i.test(file.name)) {
-    toast('Only PDF files allowed', true);
-    input.value = '';
-    return;
-  }
-  if (file.size > 25 * 1024 * 1024) {
-    toast('PDF too large (max 25 MB)', true);
-    input.value = '';
-    return;
-  }
-  state.selectedFiles[slot] = file;
-  updateUploadSlot(slot, file.name);
-};
-
-window.clearSlot = function(slot) {
-  state.selectedFiles[slot] = null;
-  $(`file_${slot}`).value = '';
-  const drop = document.querySelector(`.upload-drop-small[data-upload="${slot}"]`);
-  if (drop) {
-    drop.classList.remove('has-file');
-    drop.innerHTML = `
-      <input type="file" id="file_${slot}" accept="application/pdf" style="display:none" onchange="handleFileSelect(this, '${slot}')">
-      <div class="file-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-      <div class="upload-txt">Click to upload</div>
-    `;
-  }
-};
-
-function updateUploadSlot(slot, fileName) {
-  const drop = document.querySelector(`.upload-drop-small[data-upload="${slot}"]`);
-  if (!drop) return;
-  drop.classList.add('has-file');
-  drop.innerHTML = `
-    <input type="file" id="file_${slot}" accept="application/pdf" style="display:none" onchange="handleFileSelect(this, '${slot}')">
-    <div class="file-name">
-      <i class="fas fa-file-pdf"></i>
-      <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(fileName)}</span>
-    </div>
-    <button class="remove-file" onclick="event.stopPropagation();clearSlot('${slot}')">
-      <i class="fas fa-times"></i> Remove
-    </button>
-  `;
-}
-
-function resetAllUploadSlots() {
-  state.selectedFiles = {
-    hindi_notes: null, english_notes: null,
-    hindi_pyqs: null, english_pyqs: null,
-    hindi_test_paper: null, english_test_paper: null,
-    hindi_objective: null, english_objective: null,
-    hindi_subjective: null, english_subjective: null
-  };
-  const slots = Object.keys(state.selectedFiles);
-  slots.forEach(slot => clearSlot(slot));
-}
-
-function prefillUploadSlots(content) {
-  // content = { hindi: { notes: { pdf_path, download_on }, ... }, english: {...} }
-  const slots = [
-    'hindi_notes', 'hindi_pyqs', 'hindi_test_paper', 'hindi_objective', 'hindi_subjective',
-    'english_notes', 'english_pyqs', 'english_test_paper', 'english_objective', 'english_subjective'
-  ];
-  slots.forEach(slot => {
-    const [medium, type] = slot.split('_').length === 3 && slot.includes('test_paper')
-      ? ['hindi'/*not used*/, ''] /* placeholder */
-      : [null, null];
-    // Parse slot into medium + type
-    let med, typ;
-    if (slot.startsWith('hindi_')) { med = 'hindi'; typ = slot.slice(6); }
-    else if (slot.startsWith('english_')) { med = 'english'; typ = slot.slice(8); }
-    else return;
-
-    const entry = content?.[med]?.[typ];
-    if (entry?.pdf_path) {
-      const fname = extractSupabasePath(entry.pdf_path)?.split('/').pop() || 'uploaded.pdf';
-      updateUploadSlot(slot, '✓ ' + fname);
-    }
-    // Set download toggle
-    const dlToggle = $(`dl_${typ}`);
-    if (dlToggle && entry) {
-      dlToggle.checked = entry.download_on !== false;
-    }
-  });
-}
-
-/* ============================================================
-   CHAPTER CRUD
-   ============================================================ */
-function refreshChapterFormSubjects() {
-  const classId = $('chapterFormClass').value;
+function refreshContentFormSubjects() {
+  const classId = $('contentFormClass').value;
   const cls = findClass(classId);
   const subs = cls ? (cls.subjects || []) : [];
-  $('chapterFormSubject').innerHTML = subs.length
+  $('contentFormSubject').innerHTML = subs.length
     ? subs.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('')
     : '<option value="">No subjects</option>';
 }
 
-window.openChapterModal = function() {
-  state.editing.chapter = null;
+window.setModalMedium = function(medium) {
+  state.modalMedium = medium;
+  $('modalMediumHindi').classList.toggle('active', medium === 'hindi');
+  $('modalMediumEnglish').classList.toggle('active', medium === 'english');
+};
+
+window.setDownloadLock = function(locked) {
+  state.downloadLocked = locked;
+  $('lockOptUnlock').classList.toggle('selected', !locked);
+  $('lockOptLock').classList.toggle('selected', locked);
+};
+
+window.openContentModal = function() {
+  state.editingContent = null;
   state.editing.parentClassId = null;
   state.editing.parentSubjectId = null;
-  state.existingContent = null;
-  resetAllUploadSlots();
+  state.editing.chapterId = null;
+  state.selectedPdfFile = null;
+  state.modalMedium = state.medium; // auto-set from top medium switch
+  state.downloadLocked = false;
 
   if (!state.classes.length) return toast('Add a class first!', true);
 
-  $('chapterModalTitle').textContent = 'Add Chapter';
-  $('chapterFormClass').innerHTML = state.classes.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
-  $('chapterFormClass').value = state.classes[0].id;
-  refreshChapterFormSubjects();
+  const label = CONTENT_LABELS[state.contentType];
+  $('contentModalTitle').textContent = 'Add ' + label;
 
-  $('chapterFormNumber').value = 1;
-  $('chapterFormName').value = '';
-  $('chapterFormOrder').value = 1;
-  $('chapterFormIsNew').checked = false;
-  $('chapterFormIsPublished').checked = true;
-  // Reset download toggles
-  CONTENT_TYPES.forEach(t => { $(`dl_${t}`).checked = true; });
+  $('contentFormClass').innerHTML = state.classes.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  $('contentFormClass').value = state.classes[0].id;
+  refreshContentFormSubjects();
+
+  $('contentFormNumber').value = 1;
+  $('contentFormName').value = '';
+  $('contentFormOrder').value = 1;
+  $('contentFormIsNew').checked = false;
+  $('contentFormIsPublished').checked = true;
+
+  setModalMedium(state.modalMedium);
+  setDownloadLock(false);
+
+  $('fileInfo').style.display = 'none';
+  $('fileName').textContent = '';
+  $('contentFormPdf').value = '';
   $('uploadProgress').classList.remove('show');
 
-  chapterModal.show();
+  contentModal.show();
 };
 
-window.editChapter = function(classId, subjectId, chapterId) {
-  const s = findSubject(classId, subjectId);
-  if (!s) return;
-  const ch = (s.chapters || []).find(c => c.id === chapterId);
+window.editContent = function(classId, subjectId, chapterId) {
+  const ch = findChapter(classId, subjectId, chapterId);
   if (!ch) return;
 
-  state.editing.chapter = ch;
+  state.editingContent = ch;
   state.editing.parentClassId = classId;
   state.editing.parentSubjectId = subjectId;
-  state.existingContent = ch.content || {};
-  resetAllUploadSlots();
+  state.editing.chapterId = chapterId;
+  state.selectedPdfFile = null;
+  state.modalMedium = state.medium;
 
-  $('chapterModalTitle').textContent = 'Edit Chapter';
-  $('chapterFormClass').innerHTML = state.classes.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
-  $('chapterFormClass').value = classId;
-  refreshChapterFormSubjects();
-  $('chapterFormSubject').value = subjectId;
+  const label = CONTENT_LABELS[state.contentType];
+  $('contentModalTitle').textContent = 'Edit ' + label;
 
-  $('chapterFormNumber').value = ch.chapter_number || 1;
-  $('chapterFormName').value = ch.name || '';
-  $('chapterFormOrder').value = ch.display_order || 0;
-  $('chapterFormIsNew').checked = !!ch.is_new;
-  $('chapterFormIsPublished').checked = ch.is_published !== false;
+  $('contentFormClass').innerHTML = state.classes.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  $('contentFormClass').value = classId;
+  refreshContentFormSubjects();
+  $('contentFormSubject').value = subjectId;
+
+  $('contentFormNumber').value = ch.chapter_number || 1;
+  $('contentFormName').value = ch.name || '';
+  $('contentFormOrder').value = ch.display_order || 0;
+  $('contentFormIsNew').checked = !!ch.is_new;
+  $('contentFormIsPublished').checked = ch.is_published !== false;
+
+  setModalMedium(state.medium);
+
+  // Load existing content for current medium + type
+  const existing = getContent(ch, state.medium, state.contentType);
+  if (existing) {
+    setDownloadLock(!!existing.download_locked);
+    if (existing.pdf_path) {
+      $('fileInfo').style.display = 'flex';
+      const p = extractSupabasePath(existing.pdf_path) || existing.pdf_path;
+      $('fileName').textContent = 'Existing: ' + p.split('/').pop();
+    }
+  } else {
+    setDownloadLock(false);
+  }
+
+  $('contentFormPdf').value = '';
   $('uploadProgress').classList.remove('show');
 
-  // Prefill existing content
-  prefillUploadSlots(ch.content || {});
-
-  chapterModal.show();
+  contentModal.show();
 };
 
 document.addEventListener('change', (e) => {
-  if (e.target && e.target.id === 'chapterFormClass') refreshChapterFormSubjects();
+  if (e.target && e.target.id === 'contentFormClass') refreshContentFormSubjects();
 });
 
-/* ============================================================
-   SAVE CHAPTER — 10 uploads (5 types × 2 mediums)
-   ============================================================ */
-window.saveChapter = async function() {
-  const targetClassId = $('chapterFormClass').value;
-  const targetSubjectId = $('chapterFormSubject').value;
-  const number = parseInt($('chapterFormNumber').value, 10) || 1;
-  const name = $('chapterFormName').value.trim();
-  const order = parseInt($('chapterFormOrder').value, 10) || 0;
-  const is_new = $('chapterFormIsNew').checked;
-  const is_published = $('chapterFormIsPublished').checked;
+document.addEventListener('DOMContentLoaded', () => {
+  $('uploadDrop').addEventListener('click', () => $('contentFormPdf').click());
+  $('contentFormPdf').addEventListener('change', (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    if (f.type !== 'application/pdf' && !/\.pdf$/i.test(f.name)) return toast('Only PDF files allowed', true);
+    if (f.size > 20 * 1024 * 1024) return toast('PDF too large (max 20 MB)', true);
+    state.selectedPdfFile = f;
+    $('fileInfo').style.display = 'flex';
+    $('fileName').textContent = f.name + ' (' + (f.size/1024/1024).toFixed(2) + ' MB)';
+  });
+});
+
+window.clearPdfSelection = function() {
+  state.selectedPdfFile = null;
+  $('contentFormPdf').value = '';
+  $('fileInfo').style.display = 'none';
+  $('fileName').textContent = '';
+};
+
+window.saveContent = async function() {
+  const targetClassId = $('contentFormClass').value;
+  const targetSubjectId = $('contentFormSubject').value;
+  const number = parseInt($('contentFormNumber').value, 10) || 1;
+  const name = $('contentFormName').value.trim();
+  const order = parseInt($('contentFormOrder').value, 10) || 0;
+  const is_new = $('contentFormIsNew').checked;
+  const is_published = $('contentFormIsPublished').checked;
+  const targetMedium = state.modalMedium;
+  const contentType = state.contentType;
+  const downloadLocked = state.downloadLocked;
 
   if (!targetSubjectId) return toast('Select a subject', true);
   if (!name) return toast('Chapter name required', true);
 
-  const saveBtn = $('saveChapterBtn');
+  const saveBtn = $('saveContentBtn');
   saveBtn.disabled = true;
 
   try {
-    // Build content structure — preserve existing
-    const content = state.existingContent ? JSON.parse(JSON.stringify(state.existingContent)) : {};
-    MEDIUMS.forEach(m => {
-      if (!content[m]) content[m] = {};
-      CONTENT_TYPES.forEach(t => {
-        if (!content[m][t]) content[m][t] = { pdf_path: null, download_on: true };
-      });
-    });
+    // Find chapter — either editing existing or new
+    let chapter = state.editingContent;
+    let chapterId = state.editing.chapterId;
+    let existingContent = chapter ? getContent(chapter, targetMedium, contentType) : null;
+    let pdf_path = existingContent?.pdf_path || null;
 
-    // Apply download toggles
-    CONTENT_TYPES.forEach(t => {
-      const val = $(`dl_${t}`).checked;
-      MEDIUMS.forEach(m => {
-        content[m][t].download_on = val;
-      });
-    });
-
-    // Count files to upload
-    const filesToUpload = Object.entries(state.selectedFiles).filter(([k, v]) => v);
-    const totalUploads = filesToUpload.length;
-
-    if (totalUploads > 0) {
-      showLoader('Uploading PDFs…', `0 / ${totalUploads} files uploaded`);
+    // Upload new PDF if selected
+    if (state.selectedPdfFile) {
+      showLoader('Uploading PDF to Supabase…');
       $('uploadProgress').classList.add('show');
+      $('uploadPercent').textContent = '40%';
+      $('uploadFill').style.width = '40%';
+
+      pdf_path = await uploadPdfToSupabase(state.selectedPdfFile, name + '_' + contentType + '_' + targetMedium);
+
+      $('uploadPercent').textContent = '80%';
+      $('uploadFill').style.width = '80%';
+
+      // Delete old PDF if replacing
+      if (existingContent?.pdf_path) {
+        updateLoader('Removing old PDF…');
+        await deletePdfFromSupabase(existingContent.pdf_path);
+      }
     }
 
-    let uploadedCount = 0;
-    for (const [slot, file] of filesToUpload) {
-      // slot = "hindi_notes", "english_pyqs", etc.
-      let medium, contentType;
-      if (slot.startsWith('hindi_')) { medium = 'hindi'; contentType = slot.slice(6); }
-      else if (slot.startsWith('english_')) { medium = 'english'; contentType = slot.slice(8); }
-      else continue;
-
-      const percent = Math.round((uploadedCount / totalUploads) * 100);
-      updateLoader('Uploading PDFs…', `${uploadedCount} / ${totalUploads} files`);
-      $('uploadStatus').textContent = `Uploading ${medium} ${contentType}…`;
-      $('uploadPercent').textContent = percent + '%';
-      $('uploadFill').style.width = percent + '%';
-
-      // Delete old PDF if exists
-      const oldPath = content[medium]?.[contentType]?.pdf_path;
-      if (oldPath) await deletePdfFromSupabase(oldPath);
-
-      const newUrl = await uploadPdfToSupabase(file, name, medium, contentType);
-      content[medium][contentType].pdf_path = newUrl;
-
-      uploadedCount++;
-      const p2 = Math.round((uploadedCount / totalUploads) * 100);
-      $('uploadPercent').textContent = p2 + '%';
-      $('uploadFill').style.width = p2 + '%';
+    // If no PDF and no existing — error
+    if (!pdf_path) {
+      saveBtn.disabled = false;
+      toast('PDF required', true);
+      $('uploadProgress').classList.remove('show');
+      return;
     }
 
     updateLoader('Saving chapter…');
+    $('uploadPercent').textContent = '95%';
+    $('uploadFill').style.width = '95%';
 
     const chapterData = {
-      chapter_number: number,
       name,
+      chapter_number: number,
       display_order: order,
       is_new,
       is_published,
-      content
+      mediums: chapter ? (chapter.mediums || {}) : {}
     };
 
-    if (state.editing.chapter) {
+    // Ensure medium + content type structure
+    if (!chapterData.mediums[targetMedium]) chapterData.mediums[targetMedium] = {};
+    chapterData.mediums[targetMedium][contentType] = {
+      pdf_path,
+      download_locked: downloadLocked
+    };
+
+    if (chapter) {
+      // Check if moved to another subject/class
       const oldClassId = state.editing.parentClassId;
       const oldSubjectId = state.editing.parentSubjectId;
-      const chapterId = state.editing.chapter.id;
+      const chId = state.editing.chapterId;
 
       if (oldClassId === targetClassId && oldSubjectId === targetSubjectId) {
+        // Same location — update (but preserve other medium/content data from chapter.mediums)
         await db.collection(SM_COLLECTION).doc(targetClassId)
           .collection(SUB_SUBCOLLECTION).doc(targetSubjectId)
-          .collection(CH_SUBCOLLECTION).doc(chapterId).update(chapterData);
+          .collection(CH_SUBCOLLECTION).doc(chId).update({
+            name, chapter_number: number, display_order: order,
+            is_new, is_published,
+            mediums: chapterData.mediums
+          });
       } else {
+        // Moved — delete old, create new
         await db.collection(SM_COLLECTION).doc(oldClassId)
           .collection(SUB_SUBCOLLECTION).doc(oldSubjectId)
-          .collection(CH_SUBCOLLECTION).doc(chapterId).delete();
-        await db.collection(SM_COLLECTION).doc(targetClassId)
+          .collection(CH_SUBCOLLECTION).doc(chId).delete();
+        const newRef = db.collection(SM_COLLECTION).doc(targetClassId)
           .collection(SUB_SUBCOLLECTION).doc(targetSubjectId)
-          .collection(CH_SUBCOLLECTION).doc(chapterId).set({
-            ...chapterData,
-            created_at: firebase.firestore.FieldValue.serverTimestamp()
-          });
+          .collection(CH_SUBCOLLECTION).doc(chId);
+        await newRef.set({
+          ...chapterData,
+          created_at: firebase.firestore.FieldValue.serverTimestamp()
+        });
       }
-      toast('Chapter updated ✓');
+      toast('Updated ✓');
     } else {
-      const chapterRef = db.collection(SM_COLLECTION).doc(targetClassId)
+      // New chapter
+      const newRef = db.collection(SM_COLLECTION).doc(targetClassId)
         .collection(SUB_SUBCOLLECTION).doc(targetSubjectId)
         .collection(CH_SUBCOLLECTION).doc();
-      await chapterRef.set({
+      await newRef.set({
         ...chapterData,
         created_at: firebase.firestore.FieldValue.serverTimestamp()
       });
-      toast('Chapter added ✓');
+      toast('Added ✓');
     }
 
-    if (totalUploads > 0) {
-      $('uploadPercent').textContent = '100%';
-      $('uploadFill').style.width = '100%';
-    }
+    $('uploadPercent').textContent = '100%';
+    $('uploadFill').style.width = '100%';
 
     setTimeout(async () => {
-      chapterModal.hide();
-      resetAllUploadSlots();
+      contentModal.hide();
+      state.selectedPdfFile = null;
       await loadAll();
-    }, 500);
+    }, 400);
   } catch (err) {
-    console.error('Save chapter error:', err);
+    console.error('Save error:', err);
     toast('Save failed: ' + err.message, true);
     $('uploadProgress').classList.remove('show');
   } finally {
@@ -1992,27 +1729,49 @@ window.saveChapter = async function() {
   }
 };
 
-window.deleteChapter = async function(classId, subjectId, chapterId) {
-  const s = findSubject(classId, subjectId);
-  if (!s) return;
-  const ch = (s.chapters || []).find(c => c.id === chapterId);
+window.deleteContent = async function(classId, subjectId, chapterId) {
+  const ch = findChapter(classId, subjectId, chapterId);
   if (!ch) return;
-  if (!confirm(`Delete chapter "${ch.name}" + saare uploaded PDFs?`)) return;
+
+  const contentType = state.contentType;
+  const medium = state.medium;
+  const label = CONTENT_LABELS[contentType];
+
+  if (!confirm(`Delete "${label}" for "${ch.name}" (${medium})?`)) return;
 
   showLoader('Deleting…');
   try {
-    // Delete all PDFs
-    const content = ch.content || {};
-    MEDIUMS.forEach(m => {
-      CONTENT_TYPES.forEach(t => {
-        const p = content[m]?.[t]?.pdf_path;
-        if (p) deletePdfFromSupabase(p);
-      });
-    });
-    await db.collection(SM_COLLECTION).doc(classId)
-      .collection(SUB_SUBCOLLECTION).doc(subjectId)
-      .collection(CH_SUBCOLLECTION).doc(chapterId).delete();
-    toast('Chapter + PDFs deleted ✓');
+    const content = getContent(ch, medium, contentType);
+
+    // Delete this specific content's PDF
+    if (content?.pdf_path) {
+      await deletePdfFromSupabase(content.pdf_path);
+    }
+
+    // Remove this content from chapter's mediums
+    const newMediums = JSON.parse(JSON.stringify(ch.mediums || {}));
+    if (newMediums[medium]) {
+      delete newMediums[medium][contentType];
+      if (Object.keys(newMediums[medium]).length === 0) {
+        delete newMediums[medium];
+      }
+    }
+
+    if (Object.keys(newMediums).length === 0) {
+      // No more content — delete whole chapter document
+      await db.collection(SM_COLLECTION).doc(classId)
+        .collection(SUB_SUBCOLLECTION).doc(subjectId)
+        .collection(CH_SUBCOLLECTION).doc(chapterId).delete();
+    } else {
+      // Update chapter with remaining content
+      await db.collection(SM_COLLECTION).doc(classId)
+        .collection(SUB_SUBCOLLECTION).doc(subjectId)
+        .collection(CH_SUBCOLLECTION).doc(chapterId).update({
+          mediums: newMediums
+        });
+    }
+
+    toast('Deleted ✓');
     await loadAll();
   } catch (err) {
     console.error(err);
