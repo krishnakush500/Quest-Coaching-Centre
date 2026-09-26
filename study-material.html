@@ -295,6 +295,17 @@ main{flex:1 0 auto;padding-bottom:26px}
   font-size:13px;color:var(--muted);
 }
 .empty strong{display:block;color:var(--navy);font-size:14px;margin-bottom:4px;}
+.empty .empty-ico{
+  font-size:2.8rem;
+  color:#cfdcf5;
+  margin-bottom:12px;
+  display:block;
+}
+.empty small{
+  display:block;margin-top:8px;color:#8a95ae;font-size:11.5px;
+}
+.empty a{color:var(--navy);font-weight:700;text-decoration:underline;}
+
 .sk{
   border-radius:var(--radius);
   background:linear-gradient(90deg,#eef2f9 25%,#e2e9f6 37%,#eef2f9 63%);
@@ -382,6 +393,7 @@ main{flex:1 0 auto;padding-bottom:26px}
    QUEST COACHING — STUDY MATERIAL PORTAL
    Nested structure:
    study_materials/{classId}/subjects/{subjectId}/chapters/{chapterId}
+   Only shows what teacher uploads via admin-study.html
    ============================================================ */
 
 const firebaseConfig = {
@@ -427,7 +439,8 @@ const skeletonChapters = (n = 5) =>
   Array.from({ length: n }, () => '<div class="sk sk-chapter"></div>').join('');
 
 /* ============================================================
-   🆕 DATA SOURCE — nested subcollections
+   DATA SOURCE — Nested subcollections
+   Only reads what exists — no demo, no fallback
    ============================================================ */
 const DataSource = {
   _cache: null,
@@ -448,7 +461,7 @@ const DataSource = {
           subjects: []
         };
 
-        // Load subjects subcollection
+        // Load subjects
         const subjectsSnap = await db.collection(SM_COLLECTION).doc(classDoc.id)
           .collection(SUB_SUBCOLLECTION)
           .orderBy('display_order')
@@ -464,7 +477,7 @@ const DataSource = {
             chapters: []
           };
 
-          // Load chapters sub-subcollection
+          // Load chapters
           const chaptersSnap = await db.collection(SM_COLLECTION).doc(classDoc.id)
             .collection(SUB_SUBCOLLECTION).doc(subjectDoc.id)
             .collection(CH_SUBCOLLECTION)
@@ -472,7 +485,10 @@ const DataSource = {
             .get();
 
           chaptersSnap.forEach(chDoc => {
-            subj.chapters.push({ id: chDoc.id, ...chDoc.data() });
+            const chData = chDoc.data();
+            // Only show published chapters (hide drafts)
+            if (chData.is_published === false) return;
+            subj.chapters.push({ id: chDoc.id, ...chData });
           });
 
           cls.subjects.push(subj);
@@ -560,7 +576,7 @@ const DataSource = {
 };
 
 /* ============================================================
-   PDF RESOLUTION — Supabase URL stored in Firestore
+   PDF RESOLUTION — Supabase public URL stored in Firestore
    ============================================================ */
 function resolvePdfUrl(chapter) {
   if (chapter.pdf_path && /^https?:\/\//i.test(chapter.pdf_path)) return chapter.pdf_path;
@@ -571,7 +587,7 @@ const pdfDataCache = new Map();
 async function fetchPdfData(chapter) {
   if (pdfDataCache.has(chapter.id)) return pdfDataCache.get(chapter.id);
   const url = resolvePdfUrl(chapter);
-  if (!url) throw new Error('No PDF uploaded for this chapter yet.');
+  if (!url) throw new Error('Is chapter ka PDF abhi upload nahi hua hai.');
   const res = await fetch(url);
   if (!res.ok) throw new Error('PDF fetch failed: ' + res.status);
   const buffer = await res.arrayBuffer();
@@ -580,7 +596,7 @@ async function fetchPdfData(chapter) {
 }
 
 /* ============================================================
-   ROUTER — same URL structure
+   ROUTER
    ============================================================ */
 function parseRoute() {
   const raw = location.hash.replace(/^#\/?/, '');
@@ -662,11 +678,10 @@ async function renderHome() {
 
   if (!classes.length) {
     list.innerHTML = `<div class="empty">
-      <strong>No classes available</strong>
-      Study material will appear here soon.<br>
-      <small style="display:block;margin-top:8px;color:#8a95ae;">
-        (Admin: <a href="admin-study.html" style="color:#0d2b6b;font-weight:700;text-decoration:underline;">admin-study.html</a> se classes add karein)
-      </small>
+      <span class="empty-ico"><i class="fas fa-book-open"></i></span>
+      <strong>Study Material Coming Soon</strong>
+      Abhi tak koi material upload nahi hua hai.<br>
+      <small>Teacher jab class, subject aur chapters upload karenge, yaha dikh jaayenge.</small>
     </div>`;
     return;
   }
@@ -734,7 +749,11 @@ async function renderClassPage(classId) {
   const cls = await DataSource.getClass(classId);
   if (!cls) {
     app.innerHTML = crumbsHTML([{ label:'Home', href:'#/' }]) +
-      `<div class="empty" style="margin-top:16px"><strong>Class not found</strong></div>`;
+      `<div class="empty" style="margin-top:16px">
+        <span class="empty-ico"><i class="fas fa-school"></i></span>
+        <strong>Class not found</strong>
+        Ye class abhi available nahi hai.
+      </div>`;
     return;
   }
   const subjects = await DataSource.getSubjectsWithCounts(classId);
@@ -754,8 +773,11 @@ async function renderClassPage(classId) {
           </div>
           <div class="card-arrow" aria-hidden="true">→</div>
         </a>
-      `).join('') : `<div class="empty"><strong>No subjects yet</strong>
-        Subjects for this class will be added shortly.</div>`}
+      `).join('') : `<div class="empty">
+        <span class="empty-ico"><i class="fas fa-book"></i></span>
+        <strong>No subjects yet</strong>
+        Is class ke subjects abhi upload nahi hue hain.
+      </div>`}
     </div>
   `;
 }
@@ -774,7 +796,10 @@ async function renderSubjectPage(classId, subjectId) {
   ]);
   if (!cls || !subject) {
     app.innerHTML = crumbsHTML([{ label:'Home', href:'#/' }]) +
-      `<div class="empty" style="margin-top:16px"><strong>Subject not found</strong></div>`;
+      `<div class="empty" style="margin-top:16px">
+        <span class="empty-ico"><i class="fas fa-book"></i></span>
+        <strong>Subject not found</strong>
+      </div>`;
     return;
   }
   const chapters = await DataSource.getChaptersBySubject(classId, subjectId);
@@ -807,8 +832,11 @@ async function renderSubjectPage(classId, subjectId) {
             </button>
           </div>
         `;
-      }).join('') : `<div class="empty"><strong>No chapters yet</strong>
-        Chapters for this subject will be uploaded soon.</div>`}
+      }).join('') : `<div class="empty">
+        <span class="empty-ico"><i class="fas fa-file-alt"></i></span>
+        <strong>No chapters yet</strong>
+        Is subject ke chapters abhi upload nahi hue hain.
+      </div>`}
     </div>
   `;
 }
@@ -824,11 +852,33 @@ async function renderChapterPage(classId, subjectId, chapterId) {
   const ctx = await DataSource.getChapterContext(classId, subjectId, chapterId);
   if (!ctx || !ctx.chapter) {
     app.innerHTML = crumbsHTML([{ label:'Home', href:'#/' }]) +
-      `<div class="empty" style="margin-top:16px"><strong>Chapter not found</strong></div>`;
+      `<div class="empty" style="margin-top:16px">
+        <span class="empty-ico"><i class="fas fa-file-alt"></i></span>
+        <strong>Chapter not found</strong>
+      </div>`;
     return;
   }
   const { chapter, subject, cls } = ctx;
   const subjectHref = `#/class/${cls.id}/subject/${subject.id}`;
+
+  // Agar PDF uploaded nahi hai
+  if (!resolvePdfUrl(chapter)) {
+    app.innerHTML = `
+      ${crumbsHTML([
+        { label:'Home', href:'#/' },
+        { label: cls.name, href:`#/class/${cls.id}` },
+        { label: subject.name, href: subjectHref },
+        { label: `Ch ${pad2(chapter.chapter_number)}` }
+      ])}
+      <div class="empty" style="margin-top:16px">
+        <span class="empty-ico"><i class="fas fa-file-pdf"></i></span>
+        <strong>PDF abhi upload nahi hua</strong>
+        ${esc(chapter.name)} ka PDF abhi teacher ne upload nahi kiya hai.<br>
+        <small>Thodi der baad check karein.</small>
+      </div>
+    `;
+    return;
+  }
 
   app.innerHTML = `
     ${crumbsHTML([
@@ -959,7 +1009,6 @@ document.addEventListener('click', e => {
 
 async function handleDownload(chapterId) {
   try {
-    // Find chapter in loaded tree
     let chapter = null;
     const classes = await DataSource.getClasses();
     outer:
@@ -972,7 +1021,7 @@ async function handleDownload(chapterId) {
     }
     if (!chapter) return toast('Chapter not found');
     const url = resolvePdfUrl(chapter);
-    if (!url) return toast('PDF not uploaded yet');
+    if (!url) return toast('PDF abhi upload nahi hua');
     const link = document.createElement('a');
     link.href = url;
     link.download = sanitizeFile(chapter.name) + '.pdf';
