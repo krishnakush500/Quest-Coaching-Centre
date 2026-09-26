@@ -53,7 +53,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 input{font:inherit}
 .wrap{width:100%;max-width:820px;margin:0 auto;padding:0 14px}
 
-/* HEADER */
+/* Header */
 .app-header{
   position:sticky;top:0;z-index:60;
   background:linear-gradient(135deg,#0d2b6b 0%,#16409b 100%);
@@ -101,88 +101,67 @@ main{flex:1 0 auto;padding-bottom:26px}
 }
 .page-head p{font-size:12.5px;color:var(--muted);margin-top:7px}
 
-.section-label{
-  font-size:11px;font-weight:800;letter-spacing:1px;
-  text-transform:uppercase;color:var(--muted);margin:16px 0 9px;
-}
-.stack{display:flex;flex-direction:column;gap:10px}
-
-/* MEDIUM SWITCHER */
-.medium-switcher{
-  display:flex;gap:6px;
-  background:#fff;
-  border-radius:12px;
-  padding:5px;
-  margin-bottom:12px;
+/* Medium Switch */
+.medium-switch{
+  display:flex;gap:8px;margin-bottom:14px;
+  background:var(--card);padding:8px;border-radius:12px;
   box-shadow:var(--shadow);
-  border:1px solid var(--border);
 }
 .medium-btn{
-  flex:1;
-  padding:10px 12px;
-  border-radius:9px;
-  background:transparent;
-  border:none;
-  font-size:.85rem;
-  font-weight:800;
-  color:#64748b;
-  cursor:pointer;
-  transition:all .2s;
+  flex:1;padding:10px 12px;border-radius:9px;
+  background:#f1f5ff;border:1.5px solid #dbe6ff;
+  font-size:.85rem;font-weight:800;color:#64748b;
+  cursor:pointer;transition:all .2s;
   display:flex;align-items:center;justify-content:center;gap:6px;
 }
-.medium-btn:hover{background:#f1f5ff;color:var(--navy);}
-.medium-btn.active.hindi{
-  background:linear-gradient(135deg,#ff9933,#ff6600);
-  color:#fff;
-  box-shadow:0 3px 10px rgba(255,102,0,.32);
-}
-.medium-btn.active.english{
+.medium-btn:hover{background:#e4edff;color:#0d2b6b;}
+.medium-btn.active{
   background:linear-gradient(135deg,#0d2b6b,#16409b);
-  color:#fff;
+  color:#fff;border-color:#16409b;
   box-shadow:0 3px 10px rgba(13,43,107,.28);
 }
 
-/* CONTENT TYPE SWITCHER */
-.content-switcher{
-  display:flex;gap:5px;
-  background:#fff;
-  border-radius:12px;
-  padding:5px;
-  margin-bottom:14px;
-  overflow-x:auto;
+/* Content Type Tabs */
+.content-tabs{
+  display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;
+  background:var(--card);padding:6px;border-radius:12px;
   box-shadow:var(--shadow);
-  border:1px solid var(--border);
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
 }
-.content-switcher::-webkit-scrollbar{display:none;}
-.content-btn{
-  flex:0 0 auto;
-  min-width:82px;
-  padding:9px 10px;
-  border-radius:9px;
-  background:transparent;
-  border:none;
-  font-size:.76rem;
-  font-weight:700;
-  color:#64748b;
-  cursor:pointer;
-  transition:all .2s;
+.content-tab{
+  flex:1;min-width:70px;
+  padding:9px 8px;border-radius:9px;
+  background:transparent;border:none;
+  font-size:.78rem;font-weight:800;color:#64748b;
+  cursor:pointer;transition:all .2s;
   display:flex;align-items:center;justify-content:center;gap:5px;
   white-space:nowrap;
 }
-.content-btn:hover{background:#f1f5ff;color:var(--navy);}
-.content-btn.active{
+.content-tab i{font-size:.85rem;}
+.content-tab:hover{background:#f1f5ff;color:#0d2b6b;}
+.content-tab.active{
   background:linear-gradient(135deg,#0d2b6b,#16409b);
-  color:#fff;
-  box-shadow:0 3px 10px rgba(13,43,107,.28);
+  color:#fff;box-shadow:0 3px 10px rgba(13,43,107,.28);
 }
+.content-tab .cnt{
+  background:rgba(255,255,255,.22);
+  font-size:.6rem;font-weight:800;
+  padding:1px 5px;border-radius:20px;
+  min-width:18px;text-align:center;
+}
+.content-tab.active .cnt{background:#ffc42e;color:#0d2b6b;}
+.content-tab.hidden-tab{display:none;}
 
-/* SEARCH */
+.section-label{
+  font-size:11px;font-weight:800;letter-spacing:1px;
+  text-transform:uppercase;color:var(--muted);margin:14px 0 9px;
+}
+.stack{display:flex;flex-direction:column;gap:10px}
+
 .search-box{
   display:flex;align-items:center;gap:9px;background:var(--card);
   border:1px solid var(--border);border-radius:12px;padding:0 12px;
   box-shadow:var(--shadow);transition:border-color .15s, box-shadow .15s;
+  margin-bottom:12px;
 }
 .search-box:focus-within{border-color:var(--navy-2);box-shadow:0 0 0 3px rgba(22,64,155,.10)}
 .search-box .s-ico{font-size:14px;opacity:.7;flex:none}
@@ -193,7 +172,6 @@ main{flex:1 0 auto;padding-bottom:26px}
 .search-box input::placeholder{color:#9aa8c4}
 .search-box input::-webkit-search-cancel-button{-webkit-appearance:none}
 
-/* CARDS */
 .card-icon{
   width:44px;height:44px;flex:none;border-radius:12px;
   display:grid;place-items:center;font-size:20px;
@@ -240,7 +218,6 @@ main{flex:1 0 auto;padding-bottom:26px}
   transition:background .15s,color .15s,border-color .15s;
 }
 
-/* CHAPTER ROW */
 .chapter-row{
   display:flex;align-items:center;gap:12px;
   background:var(--card);border:1px solid var(--border);
@@ -273,13 +250,19 @@ main{flex:1 0 auto;padding-bottom:26px}
   line-height:1.3;letter-spacing:-.1px;word-break:break-word;
 }
 .ch-meta{
-  display:flex;align-items:center;gap:6px;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
   font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.2px;
 }
 .ch-meta .badge-new-inline{
   background:var(--red-bg);color:var(--red);
   font-size:9px;font-weight:800;letter-spacing:.5px;
   padding:1.5px 5px;border-radius:4px;
+}
+.ch-meta .badge-lock-inline{
+  background:#ffe3ea;color:#e0245e;
+  font-size:9px;font-weight:800;letter-spacing:.5px;
+  padding:1.5px 5px;border-radius:4px;
+  display:inline-flex;align-items:center;gap:3px;
 }
 .ch-download{
   width:38px;height:38px;flex:none;border-radius:11px;
@@ -293,11 +276,6 @@ main{flex:1 0 auto;padding-bottom:26px}
   background:linear-gradient(135deg,#ffdf7a,#ffc42e);
 }
 .ch-download:active{transform:scale(.94);}
-.ch-download.locked{
-  background:linear-gradient(135deg,#64748b,#475569);
-  color:#fff;border-color:#475569;
-  box-shadow:0 3px 8px rgba(71,85,105,.28);
-}
 
 @media(min-width:600px){
   .chapter-row{padding:16px 16px 16px 18px;gap:14px;}
@@ -307,7 +285,6 @@ main{flex:1 0 auto;padding-bottom:26px}
   .ch-download{width:42px;height:42px;font-size:16px;}
 }
 
-/* BUTTONS */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
   min-height:40px;padding:9px 13px;border-radius:10px;border:1px solid transparent;
@@ -328,8 +305,9 @@ main{flex:1 0 auto;padding-bottom:26px}
   box-shadow:0 2px 8px rgba(247,181,0,.32);
   border-color:#f0ad00;
 }
+.btn-block{width:100%;}
+.btn-lg{min-height:46px;font-size:13.5px;}
 
-/* BREADCRUMBS */
 .crumbs{
   display:flex;align-items:center;gap:6px;flex-wrap:wrap;
   padding:12px 0 0;font-size:11.5px;color:var(--muted);
@@ -342,7 +320,7 @@ main{flex:1 0 auto;padding-bottom:26px}
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 
-/* PDF VIEWER */
+/* PDF viewer */
 .pdfjs-viewer{
   margin-top:12px;display:flex;flex-direction:column;
   gap:14px;padding-bottom:24px;
@@ -379,7 +357,6 @@ main{flex:1 0 auto;padding-bottom:26px}
 }
 .pdf-error .btn{margin-top:12px;}
 
-/* EMPTY */
 .empty{
   background:var(--card);border:1px dashed var(--border-strong);
   border-radius:var(--radius);padding:22px 16px;text-align:center;
@@ -387,15 +364,9 @@ main{flex:1 0 auto;padding-bottom:26px}
 }
 .empty strong{display:block;color:var(--navy);font-size:14px;margin-bottom:4px;}
 .empty .empty-ico{
-  font-size:2.8rem;
-  color:#cfdcf5;
-  margin-bottom:12px;
-  display:block;
+  font-size:2.8rem;color:#cfdcf5;margin-bottom:12px;display:block;
 }
-.empty small{
-  display:block;margin-top:8px;color:#8a95ae;font-size:11.5px;
-}
-.empty a{color:var(--navy);font-weight:700;text-decoration:underline;}
+.empty small{display:block;margin-top:8px;color:#8a95ae;font-size:11.5px;}
 
 .sk{
   border-radius:var(--radius);
@@ -408,7 +379,6 @@ main{flex:1 0 auto;padding-bottom:26px}
 @keyframes shimmer{0%{background-position:100% 50%}100%{background-position:0 50%}}
 @media(prefers-reduced-motion:reduce){.sk{animation:none}}
 
-/* FOOTER */
 .app-footer{
   flex:none;margin-top:auto;background:#fff;border-top:1px solid var(--border);
   padding:18px 14px calc(20px + env(safe-area-inset-bottom));
@@ -421,7 +391,6 @@ main{flex:1 0 auto;padding-bottom:26px}
 .app-footer span{display:block;font-size:11.5px;color:var(--muted);margin-top:4px;}
 .app-footer small{display:block;font-size:11px;color:#93a1bd;margin-top:8px;}
 
-/* TOAST */
 .toast{
   position:fixed;left:50%;bottom:22px;z-index:200;
   transform:translate(-50%,90px);
@@ -436,177 +405,107 @@ main{flex:1 0 auto;padding-bottom:26px}
 }
 .toast.show{opacity:1;transform:translate(-50%,0);}
 
-/* POPUP MODAL */
+/* Download Lock Popup */
 .popup-overlay{
   position:fixed;inset:0;
   background:rgba(8,31,82,.62);
-  backdrop-filter:blur(5px);
-  -webkit-backdrop-filter:blur(5px);
-  z-index:9999;
-  display:flex;align-items:center;justify-content:center;
-  padding:18px;
-  opacity:0;pointer-events:none;
+  backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
+  z-index:9999;display:flex;align-items:center;justify-content:center;
+  padding:18px;opacity:0;pointer-events:none;
   transition:opacity .28s ease;
 }
 .popup-overlay.open{opacity:1;pointer-events:auto;}
-
 .popup-box{
-  width:100%;max-width:420px;
-  background:#fff;
-  border-radius:20px;
-  overflow:hidden;
+  width:100%;max-width:420px;background:#fff;
+  border-radius:20px;overflow:hidden;
   box-shadow:0 25px 70px rgba(8,31,82,.42);
   transform:translateY(18px) scale(.96);
-  transition:transform .32s cubic-bezier(0.25, 0.8, 0.25, 1);
-  max-height:92vh;
-  display:flex;flex-direction:column;
+  transition:transform .32s cubic-bezier(.25,.8,.25,1);
 }
 .popup-overlay.open .popup-box{transform:translateY(0) scale(1);}
-
 .popup-header{
   background:linear-gradient(135deg,#0d2b6b,#16409b);
-  color:#fff;
-  padding:20px 22px;
-  position:relative;
-  border-bottom:3px solid #ffc42e;
+  color:#fff;padding:22px 22px 20px;
+  position:relative;border-bottom:3px solid #ffc42e;
 }
-.popup-header .popup-icon{
-  width:48px;height:48px;
-  border-radius:13px;
+.popup-header::before{
+  content:"";position:absolute;top:-60%;left:-20%;width:60%;height:220%;
+  background:radial-gradient(circle,rgba(255,196,46,.18) 0%,transparent 70%);
+  pointer-events:none;
+}
+.popup-icon{
+  width:52px;height:52px;border-radius:14px;
   background:linear-gradient(135deg,#ffd257,#f7b500);
-  color:#0d2b6b;
-  display:grid;place-items:center;
-  font-size:1.35rem;
-  margin-bottom:10px;
-  box-shadow:0 5px 14px rgba(247,181,0,.4);
+  color:#0d2b6b;display:grid;place-items:center;font-size:1.5rem;
+  margin-bottom:12px;position:relative;z-index:2;
+  box-shadow:0 6px 16px rgba(247,181,0,.42);
+  border:1px solid rgba(255,255,255,.35);
 }
 .popup-header h3{
-  font-size:1.1rem;font-weight:800;
-  line-height:1.3;
+  font-size:1.15rem;font-weight:800;
+  letter-spacing:.3px;line-height:1.3;
+  position:relative;z-index:2;
 }
 .popup-header p{
-  font-size:.78rem;color:#c3d2f2;
-  margin-top:4px;line-height:1.45;
+  font-size:.8rem;color:#c3d2f2;margin-top:5px;
+  position:relative;z-index:2;line-height:1.4;
 }
 .popup-close-x{
   position:absolute;top:14px;right:14px;
-  width:32px;height:32px;
-  border-radius:9px;
-  background:rgba(255,255,255,0.16);
-  border:1px solid rgba(255,255,255,0.28);
-  color:#fff;font-size:.9rem;
-  display:grid;place-items:center;
-  cursor:pointer;transition:all .2s;
+  width:34px;height:34px;border-radius:9px;
+  background:rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.28);
+  color:#fff;font-size:.95rem;
+  display:grid;place-items:center;cursor:pointer;
+  z-index:5;transition:all .2s;
 }
 .popup-close-x:hover{
-  background:#ffc107;color:#1a237e;
-  border-color:#ffc107;
+  background:#ffc42e;color:#1a237e;border-color:#ffc42e;
   transform:rotate(90deg);
 }
-.popup-body{
-  padding:22px;
-  overflow-y:auto;
-  flex:1;
-}
+.popup-body{padding:22px;}
 .popup-field{margin-bottom:14px;}
 .popup-field label{
-  display:block;
-  font-size:.72rem;font-weight:800;
-  letter-spacing:.9px;
-  text-transform:uppercase;
-  color:#5f6f90;
-  margin-bottom:6px;
+  display:block;font-size:.72rem;font-weight:800;
+  letter-spacing:.9px;text-transform:uppercase;
+  color:#5f6f90;margin-bottom:7px;
 }
 .popup-input-wrap{
-  display:flex;align-items:center;
-  border:2px solid #e3e9f5;
-  border-radius:12px;
-  background:#f9fbff;
-  transition:all .2s;
+  position:relative;display:flex;align-items:center;
+  border:2px solid #e3e9f5;border-radius:12px;
+  background:#f9fbff;transition:all .2s ease;
 }
 .popup-input-wrap:focus-within{
-  border-color:#16409b;
-  background:#fff;
+  border-color:#16409b;background:#fff;
   box-shadow:0 0 0 4px rgba(22,64,155,.10);
 }
 .popup-input-wrap .pi-ico{
-  padding:0 14px;
-  font-size:1rem;color:#8a95ae;
-  flex-shrink:0;
+  padding:0 14px;font-size:1rem;color:#8a95ae;flex-shrink:0;
 }
 .popup-input-wrap input{
-  flex:1;min-width:0;
-  padding:14px 14px 14px 0;
-  border:none;outline:none;
-  background:transparent;
-  font-size:.95rem;
-  color:#0f2452;
-  font-weight:600;
+  flex:1;min-width:0;padding:14px 14px 14px 0;
+  border:none;outline:none;background:transparent;
+  font-size:.95rem;color:#0f2452;font-weight:600;
 }
-.popup-input-wrap input::placeholder{
-  color:#9aa8c4;font-weight:500;
-}
-.popup-actions{
-  display:flex;gap:10px;
-  margin-top:18px;
-}
-.popup-btn{
-  flex:1;
-  min-height:46px;
-  border-radius:12px;
-  font-size:.92rem;
-  font-weight:800;
-  cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  gap:8px;
-  transition:all .2s;
-  border:2px solid transparent;
-  padding:10px 16px;
-}
-.popup-btn:active{transform:scale(.97);}
-.popup-btn.primary{
-  background:linear-gradient(135deg,#0d2b6b,#16409b);
-  color:#fff;
-  box-shadow:0 6px 16px rgba(13,43,107,.32);
-}
-.popup-btn.primary:hover{
-  box-shadow:0 8px 22px rgba(13,43,107,.42);
-  transform:translateY(-1px);
-}
-.popup-btn.ghost{
-  background:#fff;
-  border-color:#e3e9f5;
-  color:#5f6f90;
-  flex:0 0 auto;
-  min-width:90px;
-}
-.popup-btn.ghost:hover{
-  background:#f5f8ff;border-color:#cfdcf5;color:#0d2b6b;
-}
+.popup-input-wrap input::placeholder{color:#9aa8c4;font-weight:500;}
+
 .popup-status{
-  padding:11px 14px;
-  border-radius:10px;
-  font-size:.82rem;
-  font-weight:650;
-  margin-top:12px;
-  display:none;
-  align-items:center;gap:8px;
-  line-height:1.4;
+  padding:12px 14px;border-radius:10px;
+  font-size:.85rem;font-weight:650;
+  margin-top:14px;display:none;
+  align-items:center;gap:8px;line-height:1.4;
 }
 .popup-status.error{
   background:#ffe3ea;color:#c4114a;
-  border:1px solid #ffc9d6;
-  display:flex;
+  border:1px solid #ffc9d6;display:flex;
 }
 .popup-status.success{
   background:#e3fcef;color:#0e9f6e;
-  border:1px solid #b8f0d4;
-  display:flex;
+  border:1px solid #b8f0d4;display:flex;
 }
 .popup-status.loading{
   background:#eef3ff;color:#16409b;
-  border:1px solid #dbe6ff;
-  display:flex;
+  border:1px solid #dbe6ff;display:flex;
 }
 .popup-status .spinner{
   width:15px;height:15px;
@@ -617,30 +516,54 @@ main{flex:1 0 auto;padding-bottom:26px}
   flex-shrink:0;
 }
 .popup-hint{
-  font-size:.72rem;color:#8a95ae;
+  font-size:.75rem;color:#8a95ae;
   margin-top:8px;line-height:1.5;
   display:flex;gap:6px;align-items:flex-start;
 }
-.popup-hint i{
-  color:#f7b500;font-size:.78rem;
-  margin-top:2px;flex-shrink:0;
+.popup-hint i{color:#f7b500;font-size:.8rem;margin-top:2px;flex-shrink:0;}
+.popup-actions{display:flex;gap:10px;margin-top:18px;}
+.popup-btn{
+  flex:1;min-height:46px;border-radius:12px;
+  font-size:.92rem;font-weight:800;letter-spacing:.3px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:all .2s ease;border:2px solid transparent;
+}
+.popup-btn:active{transform:scale(.97);}
+.popup-btn.primary{
+  background:linear-gradient(135deg,#0d2b6b,#16409b);
+  color:#fff;
+  box-shadow:0 6px 16px rgba(13,43,107,.32);
+}
+.popup-btn.primary:hover{
+  background:linear-gradient(135deg,#16409b,#1b4bb5);
+  transform:translateY(-1px);
+}
+.popup-btn.ghost{
+  background:#fff;border-color:#e3e9f5;
+  color:#5f6f90;flex:0 0 auto;min-width:100px;
+}
+.popup-btn.ghost:hover{
+  background:#f5f8ff;border-color:#cfdcf5;color:#0d2b6b;
 }
 
-/* RESPONSIVE */
-@media(min-width:600px){
+@media(max-width:600px){
   body{font-size:15.5px}
   .page-head h2{font-size:23px}
   .class-card,.item-card{padding:15px 16px}
   .card-icon{width:48px;height:48px;font-size:22px}
   .card-text h3{font-size:15.5px}
 }
+@media(max-width:400px){
+  .medium-btn{font-size:.78rem;padding:9px 8px;}
+  .content-tab{font-size:.72rem;padding:8px 6px;}
+  .content-tab i{font-size:.78rem;}
+  .content-tab .cnt{font-size:.55rem;}
+}
 @media(max-width:359px){
   .wrap{padding:0 11px}
   .brand h1{font-size:12.5px}
   .btn{font-size:12.5px;padding:9px 10px}
   .ch-name{font-size:14px;}
-  .medium-btn{font-size:.78rem;padding:9px 8px;}
-  .content-btn{min-width:76px;font-size:.72rem;padding:8px 8px;}
 }
 </style>
 </head>
@@ -653,9 +576,9 @@ main{flex:1 0 auto;padding-bottom:26px}
     </button>
     <div class="brand">
       <h1>QUEST COACHING CENTRE</h1>
-      <p id="headerSub">Study Material</p>
+      <p>Study Material</p>
     </div>
-    <span class="header-tag" id="headerTag">Hindi</span>
+    <span class="header-tag">Study</span>
   </div>
 </header>
 
@@ -671,48 +594,45 @@ main{flex:1 0 auto;padding-bottom:26px}
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<!-- DOWNLOAD VERIFICATION POPUP -->
-<div class="popup-overlay" id="verifyPopup" onclick="if(event.target===this) closeVerifyPopup()">
+<!-- 🆕 Download Lock Popup -->
+<div class="popup-overlay" id="lockPopup" onclick="if(event.target===this) closeLockPopup()">
   <div class="popup-box">
     <div class="popup-header">
-      <button class="popup-close-x" onclick="closeVerifyPopup()" aria-label="Close">
+      <button class="popup-close-x" onclick="closeLockPopup()" aria-label="Close">
         <i class="fas fa-times"></i>
       </button>
       <div class="popup-icon"><i class="fas fa-lock"></i></div>
-      <h3>Download Locked</h3>
-      <p id="verifySubtitle">Ye PDF download karne ke liye apna Roll No aur Registration No daalein.</p>
+      <h3>Verify Your Identity</h3>
+      <p>Ye PDF download karne ke liye apni details daalein</p>
     </div>
     <div class="popup-body">
       <div class="popup-field">
         <label>Roll Number</label>
         <div class="popup-input-wrap">
           <span class="pi-ico"><i class="fas fa-hashtag"></i></span>
-          <input type="text" id="verifyRoll" placeholder="e.g. 101" autocomplete="off"
-                 onkeypress="if(event.key==='Enter') submitVerify()">
+          <input type="text" id="lockRollInput" placeholder="Enter your Roll Number" autocomplete="off"
+                 onkeypress="if(event.key==='Enter') submitLockVerification()">
         </div>
       </div>
       <div class="popup-field">
         <label>Registration Number</label>
         <div class="popup-input-wrap">
           <span class="pi-ico"><i class="fas fa-id-card"></i></span>
-          <input type="text" id="verifyReg" placeholder="e.g. QCC/2026/0001" autocomplete="off"
-                 onkeypress="if(event.key==='Enter') submitVerify()">
+          <input type="text" id="lockRegInput" placeholder="QCC/2026/XXXX" autocomplete="off"
+                 onkeypress="if(event.key==='Enter') submitLockVerification()">
         </div>
       </div>
-
-      <div class="popup-status" id="verifyStatus"></div>
-
+      <div class="popup-status" id="lockStatus"></div>
       <div class="popup-hint">
         <i class="fas fa-info-circle"></i>
-        <span>Ye dono numbers aapke admission form me hain. Match hone par PDF download ho jaayega.</span>
+        <span>Jo Roll No aur Reg No aapke admission form me tha wahi daalein.</span>
       </div>
-
       <div class="popup-actions">
-        <button class="popup-btn ghost" onclick="closeVerifyPopup()">
+        <button class="popup-btn ghost" onclick="closeLockPopup()">
           <i class="fas fa-times"></i> Cancel
         </button>
-        <button class="popup-btn primary" id="verifyBtn" onclick="submitVerify()">
-          <i class="fas fa-unlock"></i> Verify & Download
+        <button class="popup-btn primary" id="lockSubmitBtn" onclick="submitLockVerification()">
+          <i class="fas fa-download"></i> Verify & Download
         </button>
       </div>
     </div>
@@ -724,7 +644,8 @@ main{flex:1 0 auto;padding-bottom:26px}
 
 <script>
 /* ============================================================
-   QUEST COACHING — STUDY MATERIAL PORTAL (Student)
+   QUEST COACHING — STUDY MATERIAL PORTAL
+   Nested structure with medium + 5 content types
    ============================================================ */
 
 const firebaseConfig = {
@@ -743,17 +664,15 @@ const db = firebase.firestore();
 const SM_COLLECTION = 'study_materials';
 const SUB_SUBCOLLECTION = 'subjects';
 const CH_SUBCOLLECTION = 'chapters';
-const ADMISSIONS_COLLECTION = 'admissions';
 
 const CONTENT_TYPES = ['notes', 'pyqs', 'test_paper', 'objective', 'subjective'];
 const CONTENT_LABELS = {
-  notes: '📝 Notes',
-  pyqs: '📜 PYQs',
-  test_paper: '📋 Test Paper',
-  objective: '🔘 Objective',
-  subjective: '✍️ Subjective'
+  notes: 'Notes',
+  pyqs: 'PYQs',
+  test_paper: 'Test Paper',
+  objective: 'Objective',
+  subjective: 'Subjective'
 };
-const MEDIUMS = ['hindi', 'english'];
 
 const $  = (sel, root = document) => root.querySelector(sel);
 const app = $('#app');
@@ -783,29 +702,31 @@ const skeletonChapters = (n = 5) =>
    STATE
    ============================================================ */
 const state = {
-  medium: 'hindi',       // default Hindi
-  contentType: 'notes',  // default Notes
-  // Verified student session (sessionStorage)
-  verifiedStudent: null,
-  // Pending download request
-  pendingDownload: null, // { chapterId, contentType, medium, pdfUrl, fileName }
-  _cache: null
+  medium: 'hindi',           // auto-selected
+  contentType: 'notes',      // auto-selected
+  pendingDownload: null,     // { chapterId, url, filename }
+  verifiedStudent: null      // session me verify hone ke baad save hoga
 };
 
 /* Load verified student from sessionStorage */
-try {
-  const saved = sessionStorage.getItem('quest_study_verified');
-  if (saved) state.verifiedStudent = JSON.parse(saved);
-} catch(e){}
+(function restoreSession() {
+  try {
+    const s = sessionStorage.getItem('qcc_student_verified');
+    if (s) state.verifiedStudent = JSON.parse(s);
+  } catch(e) {}
+})();
 
 /* ============================================================
    DATA SOURCE
    ============================================================ */
 const DataSource = {
+  _cache: null,
+
   async _load() {
-    if (state._cache) return state._cache;
+    if (this._cache) return this._cache;
     try {
-      const classesSnap = await db.collection(SM_COLLECTION).orderBy('display_order').get();
+      const classesSnap = await db.collection(SM_COLLECTION)
+        .orderBy('display_order').get();
 
       const classes = [];
       for (const classDoc of classesSnap.docs) {
@@ -818,7 +739,9 @@ const DataSource = {
         };
 
         const subjectsSnap = await db.collection(SM_COLLECTION).doc(classDoc.id)
-          .collection(SUB_SUBCOLLECTION).orderBy('display_order').get();
+          .collection(SUB_SUBCOLLECTION)
+          .orderBy('display_order')
+          .get();
 
         for (const subjectDoc of subjectsSnap.docs) {
           const subjectData = subjectDoc.data();
@@ -832,12 +755,35 @@ const DataSource = {
 
           const chaptersSnap = await db.collection(SM_COLLECTION).doc(classDoc.id)
             .collection(SUB_SUBCOLLECTION).doc(subjectDoc.id)
-            .collection(CH_SUBCOLLECTION).orderBy('display_order').get();
+            .collection(CH_SUBCOLLECTION)
+            .orderBy('display_order')
+            .get();
 
           chaptersSnap.forEach(chDoc => {
             const chData = chDoc.data();
             if (chData.is_published === false) return;
-            subj.chapters.push({ id: chDoc.id, ...chData });
+
+            // 🔥 Migration: purana pdf_path ko mediums.hindi.notes me convert
+            if (chData.pdf_path && !chData.mediums) {
+              chData.mediums = {
+                hindi: {
+                  notes: {
+                    pdf_path: chData.pdf_path,
+                    download_locked: false
+                  }
+                }
+              };
+            }
+
+            subj.chapters.push({
+              id: chDoc.id,
+              name: chData.name || '',
+              chapter_number: chData.chapter_number || 0,
+              display_order: chData.display_order || 0,
+              is_new: chData.is_new || false,
+              is_published: chData.is_published !== false,
+              mediums: chData.mediums || {}
+            });
           });
 
           cls.subjects.push(subj);
@@ -846,12 +792,12 @@ const DataSource = {
         classes.push(cls);
       }
 
-      state._cache = classes;
+      this._cache = classes;
     } catch (err) {
       console.warn('study_materials fetch failed:', err.message);
-      state._cache = [];
+      this._cache = [];
     }
-    return state._cache;
+    return this._cache;
   },
 
   async getClasses() {
@@ -872,7 +818,9 @@ const DataSource = {
       .map(s => ({
         ...s,
         class_id: cls.id,
-        chapter_count: (s.chapters || []).length
+        chapter_count: (s.chapters || []).filter(ch =>
+          (ch.mediums?.[state.medium]?.[state.contentType]?.pdf_path)
+        ).length
       }));
   },
 
@@ -886,7 +834,10 @@ const DataSource = {
   async getChaptersBySubject(classId, subjectId) {
     const s = await this.getSubject(classId, subjectId);
     if (!s) return [];
-    return [...(s.chapters || [])].sort((a,b) => (a.display_order||0) - (b.display_order||0));
+    // Only chapters that have content for current medium + type
+    return [...(s.chapters || [])]
+      .filter(ch => ch.mediums?.[state.medium]?.[state.contentType]?.pdf_path)
+      .sort((a,b) => (a.display_order||0) - (b.display_order||0));
   },
 
   async getChapterContext(classId, subjectId, chapterId) {
@@ -907,6 +858,9 @@ const DataSource = {
     classes.forEach(cls => {
       (cls.subjects || []).forEach(subject => {
         (subject.chapters || []).forEach(ch => {
+          // Only if current medium + type has content
+          const content = ch.mediums?.[state.medium]?.[state.contentType];
+          if (!content || !content.pdf_path) return;
           const nameHit = ch.name.toLowerCase().includes(q);
           const subjectHit = subject.name.toLowerCase().includes(q);
           if (!nameHit && !subjectHit) return;
@@ -927,83 +881,33 @@ const DataSource = {
 /* ============================================================
    PDF RESOLUTION
    ============================================================ */
-function getContentEntry(chapter, medium, type) {
-  return chapter?.content?.[medium]?.[type] || null;
+function getChapterContent(chapter) {
+  return chapter?.mediums?.[state.medium]?.[state.contentType] || null;
 }
 
-function resolvePdfUrl(chapter, medium, type) {
-  const entry = getContentEntry(chapter, medium, type);
-  if (entry?.pdf_path && /^https?:\/\//i.test(entry.pdf_path)) return entry.pdf_path;
+function resolvePdfUrl(chapter) {
+  const content = getChapterContent(chapter);
+  if (content?.pdf_path && /^https?:\/\//i.test(content.pdf_path)) return content.pdf_path;
   return null;
 }
 
+function isDownloadLocked(chapter) {
+  const content = getChapterContent(chapter);
+  return content?.download_locked === true;
+}
+
 const pdfDataCache = new Map();
-async function fetchPdfData(url, cacheKey) {
-  if (pdfDataCache.has(cacheKey)) {
-    return pdfDataCache.get(cacheKey).slice(0);
+async function fetchPdfData(chapter) {
+  if (pdfDataCache.has(chapter.id)) {
+    return pdfDataCache.get(chapter.id).slice(0);
   }
+  const url = resolvePdfUrl(chapter);
+  if (!url) throw new Error('Is chapter ka PDF abhi upload nahi hua hai.');
   const res = await fetch(url);
   if (!res.ok) throw new Error('PDF fetch failed: ' + res.status);
   const buffer = await res.arrayBuffer();
-  pdfDataCache.set(cacheKey, buffer);
+  pdfDataCache.set(chapter.id, buffer);
   return buffer.slice(0);
-}
-
-/* ============================================================
-   MEDIUM & CONTENT SWITCH
-   ============================================================ */
-function switchMedium(m) {
-  state.medium = m;
-  document.querySelectorAll('.medium-btn').forEach(b => {
-    b.classList.remove('active', 'hindi', 'english');
-    if (b.dataset.medium === m) {
-      b.classList.add('active', m);
-    }
-  });
-  // Update header tag
-  const tag = $('#headerTag');
-  if (tag) tag.textContent = m === 'hindi' ? 'Hindi' : 'English';
-  const sub = $('#headerSub');
-  if (sub) sub.textContent = m === 'hindi' ? 'Study Material · हिंदी' : 'Study Material · English';
-  // Re-render current route
-  router();
-}
-
-function switchContentType(c) {
-  state.contentType = c;
-  document.querySelectorAll('.content-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.content === c);
-  });
-  // Re-render current route
-  router();
-}
-
-function mediumSwitcherHTML() {
-  return `
-    <div class="medium-switcher">
-      <button class="medium-btn hindi ${state.medium === 'hindi' ? 'active' : ''}"
-              data-medium="hindi" onclick="switchMedium('hindi')">
-        <i class="fas fa-language"></i> हिंदी मीडियम
-      </button>
-      <button class="medium-btn english ${state.medium === 'english' ? 'active' : ''}"
-              data-medium="english" onclick="switchMedium('english')">
-        <i class="fas fa-language"></i> English Medium
-      </button>
-    </div>
-  `;
-}
-
-function contentSwitcherHTML() {
-  return `
-    <div class="content-switcher">
-      ${CONTENT_TYPES.map(t => `
-        <button class="content-btn ${state.contentType === t ? 'active' : ''}"
-                data-content="${t}" onclick="switchContentType('${t}')">
-          ${CONTENT_LABELS[t]}
-        </button>
-      `).join('')}
-    </div>
-  `;
 }
 
 /* ============================================================
@@ -1063,6 +967,59 @@ function crumbsHTML(items) {
 }
 
 /* ============================================================
+   MEDIUM & CONTENT SWITCH HELPERS
+   ============================================================ */
+function mediumSwitchHTML() {
+  return `
+    <div class="medium-switch">
+      <button class="medium-btn ${state.medium==='hindi'?'active':''}" onclick="setMedium('hindi')">
+        <i class="fas fa-om"></i> हिंदी
+      </button>
+      <button class="medium-btn ${state.medium==='english'?'active':''}" onclick="setMedium('english')">
+        <i class="fas fa-globe"></i> English
+      </button>
+    </div>
+  `;
+}
+
+function contentTabsHTML() {
+  return `
+    <div class="content-tabs">
+      ${CONTENT_TYPES.map(t => `
+        <button class="content-tab ${state.contentType===t?'active':''}" onclick="setContentType('${t}')">
+          <i class="fas fa-${contentIcon(t)}"></i> ${CONTENT_LABELS[t]}
+        </button>
+      `).join('')}
+    </div>
+  `;
+}
+
+function contentIcon(t) {
+  return {
+    notes: 'book',
+    pyqs: 'history',
+    test_paper: 'file-signature',
+    objective: 'check-square',
+    subjective: 'pen-fancy'
+  }[t] || 'file';
+}
+
+window.setMedium = function(m) {
+  if (state.medium === m) return;
+  state.medium = m;
+  // Clear PDF cache (medium change se different PDFs)
+  pdfDataCache.clear();
+  router();
+};
+
+window.setContentType = function(t) {
+  if (state.contentType === t) return;
+  state.contentType = t;
+  pdfDataCache.clear();
+  router();
+};
+
+/* ============================================================
    HOME
    ============================================================ */
 async function renderHome() {
@@ -1071,12 +1028,12 @@ async function renderHome() {
       <h2>Study Material</h2>
       <p>Select your class to get started</p>
     </div>
-    ${mediumSwitcherHTML()}
-    ${contentSwitcherHTML()}
+    ${mediumSwitchHTML()}
+    ${contentTabsHTML()}
     <div class="search-box">
       <span class="s-ico" aria-hidden="true">🔍</span>
       <input id="searchInput" type="search" inputmode="search"
-             placeholder="Search Chapter or Subject" autocomplete="off" />
+             placeholder="Search ${CONTENT_LABELS[state.contentType]} or Subject" autocomplete="off" />
     </div>
     <div id="searchResults" class="stack" style="margin-top:12px"></div>
     <div id="classSection">
@@ -1089,22 +1046,37 @@ async function renderHome() {
   const list = $('#classList');
   if (!list) return;
 
-  if (!classes.length) {
+  // Filter classes that have at least 1 chapter with current medium+type content
+  const classesWithContent = [];
+  for (const cls of classes) {
+    let hasAny = false;
+    for (const s of (cls.subjects || [])) {
+      for (const ch of (s.chapters || [])) {
+        if (ch.mediums?.[state.medium]?.[state.contentType]?.pdf_path) {
+          hasAny = true; break;
+        }
+      }
+      if (hasAny) break;
+    }
+    if (hasAny) classesWithContent.push(cls);
+  }
+
+  if (!classesWithContent.length) {
     list.innerHTML = `<div class="empty">
       <span class="empty-ico"><i class="fas fa-book-open"></i></span>
-      <strong>Study Material Coming Soon</strong>
-      Abhi tak koi material upload nahi hua hai.<br>
-      <small>Teacher jab class, subject aur PDFs upload karenge, yaha dikh jaayenge.</small>
+      <strong>${CONTENT_LABELS[state.contentType]} Coming Soon</strong>
+      Abhi is medium me ${CONTENT_LABELS[state.contentType]} upload nahi hua hai.<br>
+      <small>Thodi der baad check karein ya doosra content type try karein.</small>
     </div>`;
     return;
   }
 
-  list.innerHTML = classes.map(cls => `
+  list.innerHTML = classesWithContent.map(cls => `
     <a class="class-card" href="#/class/${cls.id}">
       <div class="card-icon" aria-hidden="true">📚</div>
       <div class="card-text">
         <h3>${esc(cls.name)}</h3>
-        <span>Study Material</span>
+        <span>${CONTENT_LABELS[state.contentType]} · ${state.medium === 'hindi' ? 'हिंदी' : 'English'}</span>
       </div>
       <div class="card-arrow" aria-hidden="true">→</div>
     </a>
@@ -1134,7 +1106,7 @@ async function runSearch(query) {
   if (!results.length) {
     resultsBox.innerHTML = `<div class="empty">
       <strong>No results found</strong>
-      Nothing matched "${esc(query)}". Try another chapter or subject name.
+      Nothing matched "${esc(query)}". Try another name.
     </div>`;
     return;
   }
@@ -1156,6 +1128,8 @@ async function runSearch(query) {
 async function renderClassPage(classId) {
   app.innerHTML = `
     ${crumbsHTML([{ label:'Home', href:'#/' }, { label:'Class' }])}
+    ${mediumSwitchHTML()}
+    ${contentTabsHTML()}
     <div class="page-head"><h2>Loading…</h2></div>
     <div class="stack">${skeletonCards(4)}</div>
   `;
@@ -1169,28 +1143,29 @@ async function renderClassPage(classId) {
     return;
   }
   const subjects = await DataSource.getSubjectsWithCounts(classId);
+
   app.innerHTML = `
     ${crumbsHTML([{ label:'Home', href:'#/' }, { label: cls.name }])}
-    ${mediumSwitcherHTML()}
-    ${contentSwitcherHTML()}
+    ${mediumSwitchHTML()}
+    ${contentTabsHTML()}
     <div class="page-head">
       <h2>${esc(cls.name)}</h2>
-      <p>Study Material · Select a subject</p>
+      <p>${CONTENT_LABELS[state.contentType]} · Select a subject</p>
     </div>
     <div class="stack">
-      ${subjects.length ? subjects.map(s => `
+      ${subjects.filter(s => s.chapter_count > 0).length ? subjects.filter(s => s.chapter_count > 0).map(s => `
         <a class="item-card" href="#/class/${cls.id}/subject/${s.id}">
           <div class="card-icon" aria-hidden="true">${s.icon || '📘'}</div>
           <div class="card-text">
             <h3>${esc(s.name)}</h3>
-            <span>${s.chapter_count} Chapter${s.chapter_count === 1 ? '' : 's'}</span>
+            <span>${s.chapter_count} ${CONTENT_LABELS[state.contentType]}</span>
           </div>
           <div class="card-arrow" aria-hidden="true">→</div>
         </a>
       `).join('') : `<div class="empty">
         <span class="empty-ico"><i class="fas fa-book"></i></span>
-        <strong>No subjects yet</strong>
-        Is class ke subjects abhi upload nahi hue hain.
+        <strong>No ${CONTENT_LABELS[state.contentType]} yet</strong>
+        Is class me abhi ${CONTENT_LABELS[state.contentType]} upload nahi hua.
       </div>`}
     </div>
   `;
@@ -1202,6 +1177,8 @@ async function renderClassPage(classId) {
 async function renderSubjectPage(classId, subjectId) {
   app.innerHTML = `
     ${crumbsHTML([{ label:'Home', href:'#/' }, { label:'Class' }, { label:'Subject' }])}
+    ${mediumSwitchHTML()}
+    ${contentTabsHTML()}
     <div class="page-head"><h2>Loading…</h2></div>
     <div class="stack">${skeletonChapters(6)}</div>
   `;
@@ -1217,11 +1194,6 @@ async function renderSubjectPage(classId, subjectId) {
     return;
   }
   const chapters = await DataSource.getChaptersBySubject(classId, subjectId);
-  // Filter chapters that have this content type in current medium
-  const chaptersWithContent = chapters.filter(ch => {
-    const entry = getContentEntry(ch, state.medium, state.contentType);
-    return entry && entry.pdf_path;
-  });
 
   app.innerHTML = `
     ${crumbsHTML([
@@ -1229,41 +1201,37 @@ async function renderSubjectPage(classId, subjectId) {
       { label: cls.name, href:`#/class/${cls.id}` },
       { label: subject.name }
     ])}
-    ${mediumSwitcherHTML()}
-    ${contentSwitcherHTML()}
+    ${mediumSwitchHTML()}
+    ${contentTabsHTML()}
     <div class="page-head">
       <h2>${esc(cls.name)} ${esc(subject.name)}</h2>
-      <p>${CONTENT_LABELS[state.contentType]} · ${chaptersWithContent.length} available</p>
+      <p>${CONTENT_LABELS[state.contentType]} · ${chapters.length} available</p>
     </div>
-    <div class="section-label" style="margin-top:4px">Chapters</div>
+    <div class="section-label" style="margin-top:4px">${CONTENT_LABELS[state.contentType]}</div>
     <div class="stack">
-      ${chaptersWithContent.length ? chaptersWithContent.map(ch => {
+      ${chapters.length ? chapters.map(ch => {
         const previewHref = `#/class/${cls.id}/subject/${subject.id}/chapter/${ch.id}`;
-        const entry = getContentEntry(ch, state.medium, state.contentType);
-        const downloadOn = entry.download_on !== false;
+        const locked = isDownloadLocked(ch);
         return `
           <div class="chapter-row" data-preview-href="${previewHref}">
             <div class="ch-num" aria-hidden="true">${pad2(ch.chapter_number)}</div>
             <div class="ch-body">
               <div class="ch-name">${esc(ch.name)}</div>
               <div class="ch-meta">
-                <span>${CONTENT_LABELS[state.contentType]}</span>
+                <span>Chapter ${pad2(ch.chapter_number)}</span>
                 ${ch.is_new ? '<span class="badge-new-inline">NEW</span>' : ''}
-                ${!downloadOn ? '<span style="background:#fef3c7;color:#b45309;font-size:9px;font-weight:800;padding:1.5px 5px;border-radius:4px;letter-spacing:.5px;">🔒 LOCKED</span>' : ''}
+                ${locked ? '<span class="badge-lock-inline"><i class="fas fa-lock"></i> Locked</span>' : ''}
               </div>
             </div>
-            <button class="ch-download ${!downloadOn ? 'locked' : ''}"
-                    type="button"
-                    data-download="${ch.id}"
-                    aria-label="Download PDF">
-              <i class="fas fa-${downloadOn ? 'download' : 'lock'}"></i>
+            <button class="ch-download" type="button" data-download="${ch.id}" aria-label="Download PDF">
+              <i class="fas fa-download"></i>
             </button>
           </div>
         `;
       }).join('') : `<div class="empty">
         <span class="empty-ico"><i class="fas fa-file-alt"></i></span>
-        <strong>No ${CONTENT_LABELS[state.contentType]} available</strong>
-        Is subject me ${state.medium === 'hindi' ? 'हिंदी' : 'English'} medium ke ${CONTENT_LABELS[state.contentType]} abhi upload nahi hue.
+        <strong>No ${CONTENT_LABELS[state.contentType]} yet</strong>
+        Is subject me abhi upload nahi hua.
       </div>`}
     </div>
   `;
@@ -1289,9 +1257,7 @@ async function renderChapterPage(classId, subjectId, chapterId) {
   const { chapter, subject, cls } = ctx;
   const subjectHref = `#/class/${cls.id}/subject/${subject.id}`;
 
-  const pdfUrl = resolvePdfUrl(chapter, state.medium, state.contentType);
-
-  if (!pdfUrl) {
+  if (!resolvePdfUrl(chapter)) {
     app.innerHTML = `
       ${crumbsHTML([
         { label:'Home', href:'#/' },
@@ -1299,17 +1265,18 @@ async function renderChapterPage(classId, subjectId, chapterId) {
         { label: subject.name, href: subjectHref },
         { label: `Ch ${pad2(chapter.chapter_number)}` }
       ])}
-      ${mediumSwitcherHTML()}
-      ${contentSwitcherHTML()}
       <div class="empty" style="margin-top:16px">
         <span class="empty-ico"><i class="fas fa-file-pdf"></i></span>
-        <strong>${CONTENT_LABELS[state.contentType]} abhi upload nahi hua</strong>
-        ${esc(chapter.name)} ka ${state.medium === 'hindi' ? 'हिंदी' : 'English'} medium ${CONTENT_LABELS[state.contentType]} abhi upload nahi kiya gaya.<br>
-        <small>Dusra medium ya content type try karein.</small>
+        <strong>PDF abhi upload nahi hua</strong>
+        ${esc(chapter.name)} ka PDF abhi upload nahi kiya gaya.
       </div>
     `;
     return;
   }
+
+  const locked = isDownloadLocked(chapter);
+  const contentLabel = CONTENT_LABELS[state.contentType];
+  const mediumLabel = state.medium === 'hindi' ? 'हिंदी मीडियम' : 'English Medium';
 
   app.innerHTML = `
     ${crumbsHTML([
@@ -1318,11 +1285,15 @@ async function renderChapterPage(classId, subjectId, chapterId) {
       { label: subject.name, href: subjectHref },
       { label: `Ch ${pad2(chapter.chapter_number)}` }
     ])}
-    ${mediumSwitcherHTML()}
-    ${contentSwitcherHTML()}
-    <div class="page-head" style="padding-top:10px;">
+    <div class="page-head" style="padding:12px 0 10px;">
       <h2 style="font-size:17px;">${esc(chapter.name)}</h2>
-      <p style="font-size:11.5px;">${CONTENT_LABELS[state.contentType]} · ${state.medium === 'hindi' ? 'हिंदी मीडियम' : 'English Medium'}</p>
+      <p>${contentLabel} · ${mediumLabel}</p>
+    </div>
+    <div style="margin-bottom:14px;">
+      <button class="btn btn-gold btn-block btn-lg" onclick="handleDownloadClick('${chapter.id}')">
+        <i class="fas fa-${locked ? 'lock' : 'download'}"></i>
+        ${locked ? 'Verify & Download PDF' : 'DOWNLOAD PDF'}
+      </button>
     </div>
     <div class="pdfjs-viewer" id="pdfViewer">
       <div class="pdf-loading" id="pdfLoading">
@@ -1332,18 +1303,16 @@ async function renderChapterPage(classId, subjectId, chapterId) {
     </div>
   `;
 
-  renderPdfPages(chapter, state.medium, state.contentType, pdfUrl);
+  renderPdfPages(chapter);
 }
 
-async function renderPdfPages(chapter, medium, type, pdfUrl) {
+async function renderPdfPages(chapter) {
   const viewer = document.getElementById('pdfViewer');
   if (!viewer) return;
 
-  const cacheKey = `${chapter.id}_${medium}_${type}`;
-
   try {
     if (!window.pdfjsLib) throw new Error('PDF.js library not loaded');
-    const buffer = await fetchPdfData(pdfUrl, cacheKey);
+    const buffer = await fetchPdfData(chapter);
     const loadingTask = pdfjsLib.getDocument({ data: buffer });
     const pdf = await loadingTask.promise;
 
@@ -1385,7 +1354,7 @@ async function renderPdfPages(chapter, medium, type, pdfUrl) {
     }
   } catch (err) {
     console.error('[PDF.js] render failed:', err);
-    pdfDataCache.delete(cacheKey);
+    pdfDataCache.delete(chapter.id);
     viewer.innerHTML = `
       <div class="pdf-error">
         <div>⚠️ PDF load nahi ho paya</div>
@@ -1403,8 +1372,7 @@ async function renderPdfPages(chapter, medium, type, pdfUrl) {
 window.retryPdfRender = function(chapterId) {
   const route = parseRoute();
   if (route.name !== 'chapter') return;
-  // Clear caches
-  pdfDataCache.delete(`${chapterId}_${state.medium}_${state.contentType}`);
+  pdfDataCache.delete(chapterId);
   DataSource.getChapterContext(route.classId, route.subjectId, route.chapterId).then(ctx => {
     if (ctx && ctx.chapter) {
       const viewer = document.getElementById('pdfViewer');
@@ -1416,7 +1384,7 @@ window.retryPdfRender = function(chapterId) {
           </div>
         `;
       }
-      renderChapterPage(route.classId, route.subjectId, route.chapterId);
+      renderPdfPages(ctx.chapter);
     }
   });
 };
@@ -1432,7 +1400,7 @@ window.addEventListener('resize', () => {
 });
 
 /* ============================================================
-   DOWNLOAD FLOW
+   DOWNLOAD HANDLERS
    ============================================================ */
 document.addEventListener('click', e => {
   const dlBtn = e.target.closest('[data-download]');
@@ -1449,11 +1417,11 @@ document.addEventListener('click', e => {
   }
 });
 
-async function handleDownloadClick(chapterId) {
+window.handleDownloadClick = async function(chapterId) {
   try {
     // Find chapter
-    const classes = await DataSource.getClasses();
     let chapter = null;
+    const classes = await DataSource.getClasses();
     outer:
     for (const cls of classes) {
       for (const s of (cls.subjects || [])) {
@@ -1464,38 +1432,40 @@ async function handleDownloadClick(chapterId) {
     }
     if (!chapter) return toast('Chapter not found');
 
-    const entry = getContentEntry(chapter, state.medium, state.contentType);
-    if (!entry?.pdf_path) return toast('PDF abhi upload nahi hua');
+    const url = resolvePdfUrl(chapter);
+    if (!url) return toast('PDF abhi upload nahi hua');
 
-    const pdfUrl = entry.pdf_path;
-    const fileName = sanitizeFile(chapter.name + '_' + state.medium + '_' + state.contentType) + '.pdf';
-    const downloadOn = entry.download_on !== false;
+    const filename = sanitizeFile(chapter.name) + '.pdf';
+    const locked = isDownloadLocked(chapter);
 
-    if (downloadOn) {
-      // Free download
-      triggerDownload(pdfUrl, fileName);
+    if (!locked) {
+      // Direct download
+      triggerDownload(url, filename);
       toast('Download started ✓');
-    } else {
-      // Locked — check if already verified
-      if (state.verifiedStudent) {
-        // Already verified in this session
-        triggerDownload(pdfUrl, fileName);
-        toast('Verified ✓ Download started');
-      } else {
-        // Show popup
-        openVerifyPopup(chapterId, pdfUrl, fileName);
-      }
+      return;
     }
+
+    // Locked — check session first
+    if (state.verifiedStudent) {
+      // Already verified in this session
+      triggerDownload(url, filename);
+      toast('Download started ✓');
+      return;
+    }
+
+    // Need to open lock popup
+    state.pendingDownload = { chapterId, url, filename };
+    openLockPopup();
   } catch (err) {
     console.error('[Download]', err);
     toast('Download failed. Please try again.');
   }
-}
+};
 
-function triggerDownload(url, fileName) {
+function triggerDownload(url, filename) {
   const link = document.createElement('a');
   link.href = url;
-  link.download = fileName;
+  link.download = filename;
   link.target = '_blank';
   link.rel = 'noopener';
   link.style.display = 'none';
@@ -1505,104 +1475,102 @@ function triggerDownload(url, fileName) {
 }
 
 /* ============================================================
-   VERIFY POPUP
+   LOCK POPUP — Roll + Reg verification
    ============================================================ */
-function openVerifyPopup(chapterId, pdfUrl, fileName) {
-  state.pendingDownload = { chapterId, pdfUrl, fileName };
-  $('#verifyPopup').classList.add('open');
-  $('#verifyRoll').value = '';
-  $('#verifyReg').value = '';
-  $('#verifyStatus').className = 'popup-status';
-  $('#verifyStatus').textContent = '';
+function openLockPopup() {
+  document.getElementById('lockPopup').classList.add('open');
+  document.getElementById('lockRollInput').value = '';
+  document.getElementById('lockRegInput').value = '';
+  document.getElementById('lockStatus').className = 'popup-status';
+  document.getElementById('lockStatus').textContent = '';
   document.body.style.overflow = 'hidden';
-  setTimeout(() => $('#verifyRoll').focus(), 350);
+  setTimeout(() => document.getElementById('lockRollInput').focus(), 320);
 }
 
-window.closeVerifyPopup = function() {
-  $('#verifyPopup').classList.remove('open');
-  state.pendingDownload = null;
+function closeLockPopup() {
+  document.getElementById('lockPopup').classList.remove('open');
   document.body.style.overflow = '';
-};
-
-function setVerifyStatus(type, message) {
-  const el = $('#verifyStatus');
-  el.className = 'popup-status ' + type;
-  el.innerHTML = type === 'loading'
-    ? `<span class="spinner"></span><span>${esc(message)}</span>`
-    : `<i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i><span>${esc(message)}</span>`;
+  state.pendingDownload = null;
 }
 
-window.submitVerify = async function() {
-  const roll = $('#verifyRoll').value.trim();
-  const reg = $('#verifyReg').value.trim();
+window.openLockPopup = openLockPopup;
+window.closeLockPopup = closeLockPopup;
+
+function setLockStatus(type, message) {
+  const el = document.getElementById('lockStatus');
+  el.className = 'popup-status ' + type;
+  if (type === 'loading') {
+    el.innerHTML = '<span class="spinner"></span><span>' + message + '</span>';
+  } else {
+    const icon = type === 'error' ? 'exclamation-circle' : 'check-circle';
+    el.innerHTML = `<i class="fas fa-${icon}"></i><span>${message}</span>`;
+  }
+}
+
+window.submitLockVerification = async function() {
+  const roll = document.getElementById('lockRollInput').value.trim();
+  const reg = document.getElementById('lockRegInput').value.trim();
 
   if (!roll) {
-    setVerifyStatus('error', 'Roll Number daalein');
-    $('#verifyRoll').focus();
+    setLockStatus('error', 'Please enter Roll Number');
+    document.getElementById('lockRollInput').focus();
     return;
   }
   if (!reg) {
-    setVerifyStatus('error', 'Registration Number daalein');
-    $('#verifyReg').focus();
+    setLockStatus('error', 'Please enter Registration Number');
+    document.getElementById('lockRegInput').focus();
     return;
   }
 
-  setVerifyStatus('loading', 'Verifying student…');
-  const btn = $('#verifyBtn');
+  setLockStatus('loading', 'Verifying your details…');
+  const btn = document.getElementById('lockSubmitBtn');
   btn.disabled = true;
 
   try {
-    // Query admissions collection — match rollNumber + admissionNo
-    const snap = await db.collection(ADMISSIONS_COLLECTION)
+    // Query admissions collection
+    const snap = await db.collection('admissions')
       .where('rollNumber', '==', roll)
       .where('admissionNo', '==', reg)
       .limit(1)
       .get();
 
     if (snap.empty) {
-      setVerifyStatus('error', 'Aapka Roll No ya Registration No galat hai. Dobara try karein.');
+      setLockStatus('error', 'Details match nahi hui. Roll No aur Reg No sahi check karein.');
       btn.disabled = false;
       return;
     }
 
-    const doc = snap.docs[0];
-    const student = doc.data();
+    const studentData = snap.docs[0].data();
 
-    // Save verified session
+    // Save to session
     state.verifiedStudent = {
-      id: doc.id,
       rollNumber: roll,
       admissionNo: reg,
-      name: student.studentName || '',
+      name: studentData.studentName || '',
       verifiedAt: Date.now()
     };
-    sessionStorage.setItem('quest_study_verified', JSON.stringify(state.verifiedStudent));
+    try {
+      sessionStorage.setItem('qcc_student_verified', JSON.stringify(state.verifiedStudent));
+    } catch(e) {}
 
-    setVerifyStatus('success', `Verified! Welcome ${student.studentName || 'Student'}`);
+    setLockStatus('success', `✓ Verified! ${studentData.studentName || 'Welcome'}`);
 
+    // Trigger download after short delay
+    const pending = state.pendingDownload;
     setTimeout(() => {
-      // Download the PDF
-      if (state.pendingDownload) {
-        triggerDownload(state.pendingDownload.pdfUrl, state.pendingDownload.fileName);
-        toast('Verified ✓ Download started');
+      closeLockPopup();
+      if (pending) {
+        triggerDownload(pending.url, pending.filename);
+        toast('Download started ✓');
       }
-      closeVerifyPopup();
-    }, 900);
-
+    }, 800);
   } catch (err) {
-    console.error('[Verify]', err);
-    setVerifyStatus('error', 'Verification failed: ' + err.message);
+    console.error('Verification error:', err);
+    setLockStatus('error', 'Verification failed. Please try again.');
   } finally {
     btn.disabled = false;
   }
 };
-
-/* Esc key to close popup */
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    if ($('#verifyPopup').classList.contains('open')) closeVerifyPopup();
-  }
-});
 
 /* ============================================================
    BOOT
