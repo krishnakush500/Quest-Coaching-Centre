@@ -32,6 +32,8 @@
   --border-strong:#cfdcf5;
   --red:#e0245e;
   --red-bg:#ffe3ea;
+  --green:#0e9f6e;
+  --green-bg:#e3fcef;
   --radius:14px;
   --shadow:0 2px 10px rgba(13,43,107,.07);
   --shadow-hover:0 10px 26px rgba(13,43,107,.14);
@@ -164,65 +166,81 @@ main{flex:1 0 auto;padding-bottom:26px}
   transition:background .15s,color .15s,border-color .15s;
 }
 
-.chapter-row{
-  display:flex;align-items:center;gap:12px;
+/* Chapter card */
+.chapter-card{
   background:var(--card);border:1px solid var(--border);
-  border-radius:var(--radius);padding:14px 12px 14px 14px;
+  border-radius:var(--radius);padding:14px 14px 12px;
   box-shadow:var(--shadow);
   transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
-  position:relative;overflow:hidden;cursor:pointer;text-decoration:none;
+  position:relative;overflow:hidden;
 }
-.chapter-row::before{
-  content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
-  background:linear-gradient(180deg,#ffd257,#f7b500);opacity:0;transition:opacity .2s;
-}
-.chapter-row:hover{
+.chapter-card:hover{
   transform:translateY(-1px);box-shadow:var(--shadow-hover);
   border-color:var(--border-strong);
 }
-.chapter-row:hover::before{opacity:1;}
-.chapter-row:active{transform:scale(.99);}
-
+.ch-top{
+  display:flex;align-items:flex-start;gap:12px;
+  margin-bottom:10px;
+}
 .ch-num{
-  width:34px;height:34px;flex:none;border-radius:10px;
-  background:linear-gradient(135deg,#eef3ff,#dde7ff);
-  border:1px solid #dbe6ff;color:var(--navy);
-  font-size:11.5px;font-weight:800;letter-spacing:.3px;
+  width:38px;height:38px;flex:none;border-radius:10px;
+  background:linear-gradient(135deg,#0d2b6b,#1b4bb5);
+  color:#fff;font-size:12px;font-weight:800;letter-spacing:.3px;
   display:grid;place-items:center;
+  box-shadow:0 3px 8px rgba(13,43,107,.25);
 }
-.ch-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
+.ch-info{flex:1;min-width:0}
 .ch-name{
-  font-size:15px;font-weight:800;color:var(--navy);
-  line-height:1.3;letter-spacing:-.1px;word-break:break-word;
+  font-size:14.5px;font-weight:800;color:var(--navy);
+  line-height:1.3;word-break:break-word;
 }
-.ch-meta{
-  display:flex;align-items:center;gap:6px;
-  font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.2px;
+.ch-sub{
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  margin-top:4px;font-size:11px;color:var(--muted);font-weight:600;
 }
-.ch-meta .badge-new-inline{
+.ch-sub .badge-new-inline{
   background:var(--red-bg);color:var(--red);
   font-size:9px;font-weight:800;letter-spacing:.5px;
   padding:1.5px 5px;border-radius:4px;
 }
-.ch-download{
-  width:38px;height:38px;flex:none;border-radius:11px;
-  background:linear-gradient(135deg,#ffd257,#f7b500);
-  color:var(--navy);display:grid;place-items:center;font-size:15px;
-  box-shadow:0 3px 8px rgba(247,181,0,.28);
-  border:1px solid #f0ad00;transition:all .18s ease;cursor:pointer;
-}
-.ch-download:hover{
-  transform:scale(1.08);box-shadow:0 5px 14px rgba(247,181,0,.45);
-  background:linear-gradient(135deg,#ffdf7a,#ffc42e);
-}
-.ch-download:active{transform:scale(.94);}
 
-@media(min-width:600px){
-  .chapter-row{padding:16px 16px 16px 18px;gap:14px;}
-  .ch-num{width:38px;height:38px;font-size:12.5px;}
-  .ch-name{font-size:16.5px;}
-  .ch-meta{font-size:12px;}
-  .ch-download{width:42px;height:42px;font-size:16px;}
+/* Content type chips — student view */
+.ctype-chips{
+  display:flex;flex-wrap:wrap;gap:6px;
+  margin-top:8px;
+}
+.ctype-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:6px 10px;border-radius:20px;
+  font-size:11.5px;font-weight:700;
+  background:#f1f5ff;
+  border:1.5px solid #dbe6ff;
+  color:var(--navy);
+  cursor:pointer;
+  transition:all .15s;
+  text-decoration:none;
+}
+.ctype-chip:hover{
+  background:var(--gold);border-color:#f0ad00;color:var(--gold-ink);
+  transform:translateY(-1px);
+}
+.ctype-chip:active{transform:scale(.96)}
+.ctype-chip .chiplock{
+  font-size:9px;opacity:.7;margin-left:2px;
+}
+.ctype-chip.ctype-no-pdf{
+  background:#f8f9fc;border-color:#e9edf5;color:#9aa8c4;
+  cursor:not-allowed;
+}
+.ctype-chip.ctype-no-pdf:hover{
+  background:#f8f9fc;border-color:#e9edf5;color:#9aa8c4;transform:none;
+}
+
+.ctype-empty-note{
+  font-size:11.5px;color:var(--muted);font-weight:600;
+  background:#f8f9fc;border:1px dashed #dbe6ff;
+  padding:8px 12px;border-radius:10px;margin-top:8px;
+  text-align:center;
 }
 
 .btn{
@@ -238,6 +256,12 @@ main{flex:1 0 auto;padding-bottom:26px}
   background:linear-gradient(135deg,#0d2b6b,#1b4bb5);
   color:#fff;
   box-shadow:0 2px 8px rgba(13,43,107,.28);
+}
+.btn-gold{
+  background:linear-gradient(135deg,#ffd257,#f7b500);
+  color:var(--gold-ink);
+  box-shadow:0 2px 8px rgba(247,181,0,.32);
+  border:1px solid #f0ad00;
 }
 
 .crumbs{
@@ -289,6 +313,24 @@ main{flex:1 0 auto;padding-bottom:26px}
 }
 .pdf-error .btn{margin-top:12px;}
 
+/* PDF top bar with download */
+.pdf-topbar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:12px 14px;
+  box-shadow:var(--shadow);margin-top:12px;
+}
+.pdf-topbar-info{flex:1;min-width:150px}
+.pdf-topbar-info h4{
+  font-size:13.5px;font-weight:800;color:var(--navy);line-height:1.3;
+}
+.pdf-topbar-info p{
+  font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px;
+}
+.pdf-topbar-actions{
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+
 .empty{
   background:var(--card);border:1px dashed var(--border-strong);
   border-radius:var(--radius);padding:22px 16px;text-align:center;
@@ -296,14 +338,9 @@ main{flex:1 0 auto;padding-bottom:26px}
 }
 .empty strong{display:block;color:var(--navy);font-size:14px;margin-bottom:4px;}
 .empty .empty-ico{
-  font-size:2.8rem;
-  color:#cfdcf5;
-  margin-bottom:12px;
-  display:block;
+  font-size:2.8rem;color:#cfdcf5;margin-bottom:12px;display:block;
 }
-.empty small{
-  display:block;margin-top:8px;color:#8a95ae;font-size:11.5px;
-}
+.empty small{display:block;margin-top:8px;color:#8a95ae;font-size:11.5px;}
 .empty a{color:var(--navy);font-weight:700;text-decoration:underline;}
 
 .sk{
@@ -343,6 +380,168 @@ main{flex:1 0 auto;padding-bottom:26px}
 }
 .toast.show{opacity:1;transform:translate(-50%,0);}
 
+/* ============================================================
+   DOWNLOAD VERIFY POPUP — Roll No + Reg No
+   ============================================================ */
+.verify-overlay{
+  position:fixed;inset:0;z-index:9998;
+  background:rgba(8,31,82,.62);
+  backdrop-filter:blur(5px);
+  -webkit-backdrop-filter:blur(5px);
+  display:flex;align-items:center;justify-content:center;
+  padding:18px;
+  opacity:0;pointer-events:none;
+  transition:opacity .28s ease;
+}
+.verify-overlay.open{opacity:1;pointer-events:auto;}
+
+.verify-box{
+  width:100%;max-width:420px;
+  background:#fff;border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 25px 70px rgba(8,31,82,.42);
+  transform:translateY(18px) scale(.96);
+  transition:transform .32s cubic-bezier(0.25,0.8,0.25,1);
+  max-height:92vh;display:flex;flex-direction:column;
+}
+.verify-overlay.open .verify-box{transform:translateY(0) scale(1);}
+
+.verify-header{
+  background:linear-gradient(135deg, #0d2b6b 0%, #16409b 100%);
+  color:#fff;padding:22px 22px 20px;
+  border-bottom:3px solid #ffc107;
+  position:relative;flex-shrink:0;
+}
+.verify-header::before{
+  content:"";position:absolute;top:-60%;left:-20%;width:60%;height:220%;
+  background:radial-gradient(circle, rgba(255,196,46,.18) 0%, transparent 70%);
+  pointer-events:none;
+}
+.verify-icon{
+  width:52px;height:52px;border-radius:14px;
+  background:linear-gradient(135deg,#ffd257,#f7b500);
+  color:#0d2b6b;display:grid;place-items:center;
+  font-size:1.5rem;margin-bottom:12px;
+  position:relative;z-index:2;
+  box-shadow:0 6px 16px rgba(247,181,0,.42);
+  border:1px solid rgba(255,255,255,0.35);
+}
+.verify-header h3{
+  font-size:1.15rem;font-weight:800;letter-spacing:.3px;
+  line-height:1.3;position:relative;z-index:2;
+}
+.verify-header p{
+  font-size:.82rem;color:#c3d2f2;margin-top:5px;
+  position:relative;z-index:2;line-height:1.4;
+}
+.verify-close{
+  position:absolute;top:14px;right:14px;
+  width:34px;height:34px;border-radius:9px;
+  background:rgba(255,255,255,0.16);
+  border:1px solid rgba(255,255,255,0.28);
+  color:#fff;font-size:.95rem;
+  display:grid;place-items:center;cursor:pointer;
+  z-index:5;transition:all .2s;
+}
+.verify-close:hover{
+  background:#ffc107;color:#1a237e;
+  border-color:#ffc107;transform:rotate(90deg);
+}
+
+.verify-body{
+  padding:22px;overflow-y:auto;flex:1;
+}
+.verify-field{margin-bottom:14px;}
+.verify-field label{
+  display:block;font-size:.72rem;font-weight:800;
+  letter-spacing:.9px;text-transform:uppercase;
+  color:#5f6f90;margin-bottom:7px;
+}
+.verify-input-wrap{
+  position:relative;display:flex;align-items:center;
+  border:2px solid #e3e9f5;border-radius:12px;
+  background:#f9fbff;transition:all .2s ease;
+}
+.verify-input-wrap:focus-within{
+  border-color:#16409b;background:#fff;
+  box-shadow:0 0 0 4px rgba(22,64,155,0.10);
+}
+.verify-input-wrap .vi-ico{
+  padding:0 14px;font-size:1rem;color:#8a95ae;flex-shrink:0;
+}
+.verify-input-wrap input{
+  flex:1;min-width:0;padding:14px 14px 14px 0;
+  border:none;outline:none;background:transparent;
+  font-size:.95rem;color:#0f2452;font-weight:600;
+}
+.verify-input-wrap input::placeholder{
+  color:#9aa8c4;font-weight:500;
+}
+
+.verify-status{
+  padding:12px 14px;border-radius:10px;
+  font-size:.85rem;font-weight:650;
+  margin-top:10px;display:none;
+  align-items:center;gap:8px;line-height:1.4;
+}
+.verify-status.error{
+  background:#ffe3ea;color:#c4114a;
+  border:1px solid #ffc9d6;display:flex;
+}
+.verify-status.success{
+  background:#e3fcef;color:#0e9f6e;
+  border:1px solid #b8f0d4;display:flex;
+}
+.verify-status.loading{
+  background:#eef3ff;color:#16409b;
+  border:1px solid #dbe6ff;display:flex;
+}
+.verify-status .spinner-v{
+  width:15px;height:15px;border:2px solid #16409b;
+  border-top-color:transparent;border-radius:50%;
+  animation:spin .75s linear infinite;flex-shrink:0;
+}
+
+.verify-actions{
+  display:flex;gap:10px;margin-top:20px;
+}
+.verify-btn{
+  flex:1;min-height:48px;border-radius:12px;
+  font-size:.95rem;font-weight:800;letter-spacing:.3px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  gap:8px;transition:all .2s ease;
+  border:2px solid transparent;padding:10px 16px;
+}
+.verify-btn:active{transform:scale(.97);}
+.verify-btn.primary{
+  background:linear-gradient(135deg,#0d2b6b 0%,#16409b 100%);
+  color:#fff;
+  box-shadow:0 6px 16px rgba(13,43,107,0.32);
+}
+.verify-btn.primary:hover{
+  background:linear-gradient(135deg,#16409b 0%,#1b4bb5 100%);
+  box-shadow:0 8px 22px rgba(13,43,107,0.42);
+  transform:translateY(-1px);
+}
+.verify-btn.ghost{
+  background:#ffffff;border-color:#e3e9f5;
+  color:#5f6f90;flex:0 0 auto;min-width:100px;
+}
+.verify-btn.ghost:hover{
+  background:#f5f8ff;border-color:#cfdcf5;color:#0d2b6b;
+}
+.verify-btn:disabled{opacity:.6;cursor:not-allowed;}
+
+.verify-hint{
+  font-size:.75rem;color:#8a95ae;
+  margin-top:8px;line-height:1.5;
+  display:flex;gap:6px;align-items:flex-start;
+}
+.verify-hint i{
+  color:#f7b500;font-size:.8rem;
+  margin-top:2px;flex-shrink:0;
+}
+
 @media(min-width:600px){
   body{font-size:15.5px}
   .page-head h2{font-size:23px}
@@ -354,7 +553,7 @@ main{flex:1 0 auto;padding-bottom:26px}
   .wrap{padding:0 11px}
   .brand h1{font-size:12.5px}
   .btn{font-size:12.5px;padding:9px 10px}
-  .ch-name{font-size:14px;}
+  .ch-name{font-size:13.5px;}
 }
 </style>
 </head>
@@ -385,15 +584,63 @@ main{flex:1 0 auto;padding-bottom:26px}
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<!-- 🆕 VERIFY POPUP — Roll No + Reg No -->
+<div class="verify-overlay" id="verifyOverlay" onclick="if(event.target===this) closeVerifyPopup()">
+  <div class="verify-box">
+    <div class="verify-header">
+      <button class="verify-close" onclick="closeVerifyPopup()" aria-label="Close">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="verify-icon"><i class="fas fa-shield-alt"></i></div>
+      <h3>Download Verification</h3>
+      <p>Is PDF ko download karne ke liye apna Roll No aur Registration No daalein</p>
+    </div>
+    <div class="verify-body">
+      <div class="verify-field">
+        <label>Roll Number</label>
+        <div class="verify-input-wrap">
+          <span class="vi-ico"><i class="fas fa-hashtag"></i></span>
+          <input type="text" id="verifyRoll" placeholder="e.g. 101" autocomplete="off"
+                 onkeypress="if(event.key==='Enter') submitVerify()">
+        </div>
+      </div>
+
+      <div class="verify-field">
+        <label>Registration / Admission Number</label>
+        <div class="verify-input-wrap">
+          <span class="vi-ico"><i class="fas fa-id-card"></i></span>
+          <input type="text" id="verifyAdm" placeholder="e.g. QCC/2026/1234" autocomplete="off"
+                 onkeypress="if(event.key==='Enter') submitVerify()">
+        </div>
+      </div>
+
+      <div class="verify-status" id="verifyStatus"></div>
+
+      <div class="verify-hint">
+        <i class="fas fa-info-circle"></i>
+        <span>Ye details aapke admission form me di gayi thi. Register nahi hai? Coaching se contact karein.</span>
+      </div>
+
+      <div class="verify-actions">
+        <button class="verify-btn ghost" onclick="closeVerifyPopup()">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+        <button class="verify-btn primary" id="verifySubmitBtn" onclick="submitVerify()">
+          <i class="fas fa-check-circle"></i> Verify & Download
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
 /* ============================================================
    QUEST COACHING — STUDY MATERIAL PORTAL
-   Nested structure:
-   study_materials/{classId}/subjects/{subjectId}/chapters/{chapterId}
-   Only shows what teacher uploads via admin-study.html
+   Nested: study_materials/{classId}/subjects/{subjectId}/chapters/{chapterId}
+   Multi content types: notes, pyqs, test, objective, subjective
    ============================================================ */
 
 const firebaseConfig = {
@@ -409,10 +656,20 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-/* 🆕 NESTED COLLECTIONS */
+/* Collections */
 const SM_COLLECTION = 'study_materials';
 const SUB_SUBCOLLECTION = 'subjects';
 const CH_SUBCOLLECTION = 'chapters';
+const ADMISSIONS_COLLECTION = 'admissions';
+
+/* 🆕 Content types */
+const CONTENT_TYPES = [
+  { key: 'notes',      label: 'Notes',       icon: '📘', short: 'Notes' },
+  { key: 'pyqs',       label: 'PYQs',        icon: '📝', short: 'PYQs' },
+  { key: 'test',       label: 'Test Paper',  icon: '📋', short: 'Test' },
+  { key: 'objective',  label: 'Objective',   icon: '🎯', short: 'Objective' },
+  { key: 'subjective', label: 'Subjective',  icon: '✍️', short: 'Subjective' }
+];
 
 const $  = (sel, root = document) => root.querySelector(sel);
 const app = $('#app');
@@ -439,8 +696,26 @@ const skeletonChapters = (n = 5) =>
   Array.from({ length: n }, () => '<div class="sk sk-chapter"></div>').join('');
 
 /* ============================================================
-   DATA SOURCE — Nested subcollections
-   Only reads what exists — no demo, no fallback
+   SESSION — Verified Roll No (download access)
+   ============================================================ */
+const SESSION_KEY = 'quest_verified_student';
+
+function getVerifiedStudent() {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) { return null; }
+}
+function setVerifiedStudent(data) {
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify(data));
+}
+function clearVerifiedStudent() {
+  sessionStorage.removeItem(SESSION_KEY);
+}
+
+/* ============================================================
+   DATA SOURCE — Nested read
    ============================================================ */
 const DataSource = {
   _cache: null,
@@ -461,11 +736,9 @@ const DataSource = {
           subjects: []
         };
 
-        // Load subjects
         const subjectsSnap = await db.collection(SM_COLLECTION).doc(classDoc.id)
           .collection(SUB_SUBCOLLECTION)
-          .orderBy('display_order')
-          .get();
+          .orderBy('display_order').get();
 
         for (const subjectDoc of subjectsSnap.docs) {
           const subjectData = subjectDoc.data();
@@ -477,17 +750,14 @@ const DataSource = {
             chapters: []
           };
 
-          // Load chapters
           const chaptersSnap = await db.collection(SM_COLLECTION).doc(classDoc.id)
             .collection(SUB_SUBCOLLECTION).doc(subjectDoc.id)
             .collection(CH_SUBCOLLECTION)
-            .orderBy('display_order')
-            .get();
+            .orderBy('display_order').get();
 
           chaptersSnap.forEach(chDoc => {
             const chData = chDoc.data();
-            // Only show published chapters (hide drafts)
-            if (chData.is_published === false) return;
+            if (chData.is_published === false) return;  // hide drafts
             subj.chapters.push({ id: chDoc.id, ...chData });
           });
 
@@ -576,28 +846,51 @@ const DataSource = {
 };
 
 /* ============================================================
-   PDF RESOLUTION — Supabase public URL stored in Firestore
-   🔥 FIX: ArrayBuffer copy return karta hai taaki detach na ho
+   HELPER — content type info from chapter
+   Legacy: ch.pdf_path → treated as notes
    ============================================================ */
-function resolvePdfUrl(chapter) {
-  if (chapter.pdf_path && /^https?:\/\//i.test(chapter.pdf_path)) return chapter.pdf_path;
+function getCtypeInfo(chapter, typeKey) {
+  const t = chapter[typeKey];
+  if (t && t.pdf_path) {
+    return {
+      pdf_path: t.pdf_path,
+      download_on: t.download_on !== false
+    };
+  }
+  // Legacy: purana pdf_path sirf notes me dikhta hai
+  if (typeKey === 'notes' && chapter.pdf_path) {
+    return {
+      pdf_path: chapter.pdf_path,
+      download_on: true
+    };
+  }
+  return null;
+}
+
+function getAvailableCtypes(chapter) {
+  return CONTENT_TYPES
+    .map(t => ({ ...t, info: getCtypeInfo(chapter, t.key) }))
+    .filter(t => t.info);
+}
+
+/* ============================================================
+   PDF RESOLUTION
+   ============================================================ */
+function resolvePdfUrl(pdfPath) {
+  if (!pdfPath) return null;
+  if (/^https?:\/\//i.test(pdfPath)) return pdfPath;
   return null;
 }
 
 const pdfDataCache = new Map();
-async function fetchPdfData(chapter) {
-  // Agar cache me hai → copy return karo (original safe rahe)
-  if (pdfDataCache.has(chapter.id)) {
-    return pdfDataCache.get(chapter.id).slice(0);
+async function fetchPdfData(cacheKey, url) {
+  if (pdfDataCache.has(cacheKey)) {
+    return pdfDataCache.get(cacheKey).slice(0);
   }
-  const url = resolvePdfUrl(chapter);
-  if (!url) throw new Error('Is chapter ka PDF abhi upload nahi hua hai.');
   const res = await fetch(url);
   if (!res.ok) throw new Error('PDF fetch failed: ' + res.status);
   const buffer = await res.arrayBuffer();
-  // Cache me original rakho (future use ke liye)
-  pdfDataCache.set(chapter.id, buffer);
-  // PDF.js ko copy do — taki wo detach na kar sake
+  pdfDataCache.set(cacheKey, buffer);
   return buffer.slice(0);
 }
 
@@ -607,8 +900,13 @@ async function fetchPdfData(chapter) {
 function parseRoute() {
   const raw = location.hash.replace(/^#\/?/, '');
   const p = raw.split('/').filter(Boolean);
+  // chapter route with type: #/class/X/subject/Y/chapter/Z?type=notes  (via hash we keep simple)
   if (p[0] === 'class' && p[2] === 'subject' && p[4] === 'chapter' && p[5]) {
-    return { name:'chapter', classId:p[1], subjectId:p[3], chapterId:p[5] };
+    return {
+      name:'chapter',
+      classId:p[1], subjectId:p[3], chapterId:p[5],
+      type: p[6] || null
+    };
   }
   if (p[0] === 'class' && p[2] === 'subject' && p[3]) {
     return { name:'subject', classId:p[1], subjectId:p[3] };
@@ -630,7 +928,7 @@ async function router() {
     if (route.name === 'home')         await renderHome();
     else if (route.name === 'class')   await renderClassPage(route.classId);
     else if (route.name === 'subject') await renderSubjectPage(route.classId, route.subjectId);
-    else                                await renderChapterPage(route.classId, route.subjectId, route.chapterId);
+    else                                await renderChapterPage(route.classId, route.subjectId, route.chapterId, route.type);
   } catch (err) {
     console.error('[Study Portal]', err);
     app.innerHTML = `<div class="page-head"><h2>Something went wrong</h2>
@@ -758,7 +1056,6 @@ async function renderClassPage(classId) {
       `<div class="empty" style="margin-top:16px">
         <span class="empty-ico"><i class="fas fa-school"></i></span>
         <strong>Class not found</strong>
-        Ye class abhi available nahi hai.
       </div>`;
     return;
   }
@@ -822,20 +1119,36 @@ async function renderSubjectPage(classId, subjectId) {
     <div class="section-label" style="margin-top:4px">Chapters</div>
     <div class="stack">
       ${chapters.length ? chapters.map(ch => {
-        const previewHref = `#/class/${cls.id}/subject/${subject.id}/chapter/${ch.id}`;
+        const availableTypes = getAvailableCtypes(ch);
+        const baseHref = `#/class/${cls.id}/subject/${subject.id}/chapter/${ch.id}`;
         return `
-          <div class="chapter-row" data-preview-href="${previewHref}">
-            <div class="ch-num" aria-hidden="true">${pad2(ch.chapter_number)}</div>
-            <div class="ch-body">
-              <div class="ch-name">${esc(ch.name)}</div>
-              <div class="ch-meta">
-                <span>Chapter ${pad2(ch.chapter_number)}</span>
-                ${ch.is_new ? '<span class="badge-new-inline">NEW</span>' : ''}
+          <div class="chapter-card">
+            <div class="ch-top">
+              <div class="ch-num">${pad2(ch.chapter_number)}</div>
+              <div class="ch-info">
+                <div class="ch-name">${esc(ch.name)}</div>
+                <div class="ch-sub">
+                  <span>Chapter ${pad2(ch.chapter_number)}</span>
+                  ${ch.is_new ? '<span class="badge-new-inline">NEW</span>' : ''}
+                </div>
               </div>
             </div>
-            <button class="ch-download" type="button" data-download="${ch.id}" aria-label="Download PDF">
-              <i class="fas fa-download"></i>
-            </button>
+            ${availableTypes.length ? `
+              <div class="ctype-chips">
+                ${availableTypes.map(t => {
+                  const isLocked = t.info.download_on === false;
+                  return `
+                    <a class="ctype-chip" href="${baseHref}/${t.key}">
+                      <span>${t.icon}</span>
+                      <span>${t.short}</span>
+                      ${isLocked ? '<span class="chiplock"><i class="fas fa-lock"></i></span>' : ''}
+                    </a>
+                  `;
+                }).join('')}
+              </div>
+            ` : `<div class="ctype-empty-note">
+              <i class="fas fa-info-circle"></i> Is chapter me abhi koi content upload nahi hua
+            </div>`}
           </div>
         `;
       }).join('') : `<div class="empty">
@@ -848,9 +1161,9 @@ async function renderSubjectPage(classId, subjectId) {
 }
 
 /* ============================================================
-   CHAPTER PAGE — PDF.js viewer
+   CHAPTER PAGE — with content type selection
    ============================================================ */
-async function renderChapterPage(classId, subjectId, chapterId) {
+async function renderChapterPage(classId, subjectId, chapterId, requestedType) {
   app.innerHTML = `
     ${crumbsHTML([{ label:'Home', href:'#/' }, { label:'Loading…' }])}
     <div class="sk" style="height:120px;border-radius:14px;margin-top:12px"></div>
@@ -866,9 +1179,10 @@ async function renderChapterPage(classId, subjectId, chapterId) {
   }
   const { chapter, subject, cls } = ctx;
   const subjectHref = `#/class/${cls.id}/subject/${subject.id}`;
+  const availableTypes = getAvailableCtypes(chapter);
 
-  // Agar PDF uploaded nahi hai
-  if (!resolvePdfUrl(chapter)) {
+  // No content uploaded
+  if (!availableTypes.length) {
     app.innerHTML = `
       ${crumbsHTML([
         { label:'Home', href:'#/' },
@@ -878,13 +1192,28 @@ async function renderChapterPage(classId, subjectId, chapterId) {
       ])}
       <div class="empty" style="margin-top:16px">
         <span class="empty-ico"><i class="fas fa-file-pdf"></i></span>
-        <strong>PDF abhi upload nahi hua</strong>
-        ${esc(chapter.name)} ka PDF abhi teacher ne upload nahi kiya hai.<br>
-        <small>Thodi der baad check karein.</small>
+        <strong>Content abhi upload nahi hua</strong>
+        ${esc(chapter.name)} me abhi koi PDF upload nahi hui hai.
       </div>
     `;
     return;
   }
+
+  // Determine active type
+  let activeType = requestedType;
+  if (!activeType || !availableTypes.find(t => t.key === activeType)) {
+    // Default to first available (prefer notes)
+    const notes = availableTypes.find(t => t.key === 'notes');
+    activeType = (notes || availableTypes[0]).key;
+    // Update URL
+    location.hash = `#/class/${cls.id}/subject/${subject.id}/chapter/${chapter.id}/${activeType}`;
+    return;
+  }
+
+  const activeTypeObj = availableTypes.find(t => t.key === activeType);
+  const activeInfo = activeTypeObj.info;
+  const pdfUrl = resolvePdfUrl(activeInfo.pdf_path);
+  const isLocked = activeInfo.download_on === false;
 
   app.innerHTML = `
     ${crumbsHTML([
@@ -893,6 +1222,34 @@ async function renderChapterPage(classId, subjectId, chapterId) {
       { label: subject.name, href: subjectHref },
       { label: `Ch ${pad2(chapter.chapter_number)}` }
     ])}
+
+    <!-- Content type tabs -->
+    <div class="ctype-chips" style="margin-top:14px;">
+      ${availableTypes.map(t => `
+        <a class="ctype-chip ${t.key === activeType ? 'active-chip' : ''}"
+           href="#/class/${cls.id}/subject/${subject.id}/chapter/${chapter.id}/${t.key}"
+           style="${t.key === activeType ? 'background:linear-gradient(135deg,#0d2b6b,#16409b);color:#fff;border-color:#0d2b6b;' : ''}">
+          <span>${t.icon}</span>
+          <span>${t.short}</span>
+          ${t.info.download_on === false ? '<span class="chiplock"><i class="fas fa-lock"></i></span>' : ''}
+        </a>
+      `).join('')}
+    </div>
+
+    <!-- Topbar with download -->
+    <div class="pdf-topbar">
+      <div class="pdf-topbar-info">
+        <h4>${esc(chapter.name)} — ${activeTypeObj.label}</h4>
+        <p>${esc(cls.name)} · ${esc(subject.name)} · Ch ${pad2(chapter.chapter_number)}</p>
+      </div>
+      <div class="pdf-topbar-actions">
+        <button class="btn btn-gold" id="downloadBtn" onclick="handleDownloadClick('${cls.id}', '${subject.id}', '${chapter.id}', '${activeType}')">
+          ${isLocked ? '<i class="fas fa-lock"></i> Download (Locked)' : '<i class="fas fa-download"></i> Download'}
+        </button>
+      </div>
+    </div>
+
+    <!-- PDF viewer -->
     <div class="pdfjs-viewer" id="pdfViewer">
       <div class="pdf-loading" id="pdfLoading">
         <div class="spinner-lg"></div>
@@ -901,16 +1258,29 @@ async function renderChapterPage(classId, subjectId, chapterId) {
     </div>
   `;
 
-  renderPdfPages(chapter);
+  renderPdfPages(cacheKeyFor(cls.id, subject.id, chapter.id, activeType), pdfUrl);
 }
 
-async function renderPdfPages(chapter) {
+function cacheKeyFor(classId, subjectId, chapterId, type) {
+  return `${classId}::${subjectId}::${chapterId}::${type}`;
+}
+
+async function renderPdfPages(cacheKey, pdfUrl) {
   const viewer = document.getElementById('pdfViewer');
   if (!viewer) return;
 
+  if (!pdfUrl) {
+    viewer.innerHTML = `
+      <div class="pdf-error">
+        <div>⚠️ PDF URL missing</div>
+      </div>
+    `;
+    return;
+  }
+
   try {
     if (!window.pdfjsLib) throw new Error('PDF.js library not loaded');
-    const buffer = await fetchPdfData(chapter);
+    const buffer = await fetchPdfData(cacheKey, pdfUrl);
     const loadingTask = pdfjsLib.getDocument({ data: buffer });
     const pdf = await loadingTask.promise;
 
@@ -952,15 +1322,14 @@ async function renderPdfPages(chapter) {
     }
   } catch (err) {
     console.error('[PDF.js] render failed:', err);
-    // 🔥 Cache clear — Retry pe fresh fetch hoga
-    pdfDataCache.delete(chapter.id);
+    pdfDataCache.delete(cacheKey);
     viewer.innerHTML = `
       <div class="pdf-error">
         <div>⚠️ PDF load nahi ho paya</div>
         <p style="margin-top:8px;font-weight:500;color:#7a2040;font-size:12.5px;">
           ${esc(err.message || 'Unknown error')}
         </p>
-        <button class="btn btn-navy" onclick="retryPdfRender('${chapter.id}')">
+        <button class="btn btn-navy" onclick="location.reload()">
           <i class="fas fa-redo"></i> Retry
         </button>
       </div>
@@ -968,84 +1337,196 @@ async function renderPdfPages(chapter) {
   }
 }
 
-window.retryPdfRender = function(chapterId) {
-  const route = parseRoute();
-  if (route.name !== 'chapter') return;
-  // 🔥 Cache clear karo — fresh fetch
-  pdfDataCache.delete(chapterId);
-  DataSource.getChapterContext(route.classId, route.subjectId, route.chapterId).then(ctx => {
-    if (ctx && ctx.chapter) {
-      const viewer = document.getElementById('pdfViewer');
-      if (viewer) {
-        viewer.innerHTML = `
-          <div class="pdf-loading" id="pdfLoading">
-            <div class="spinner-lg"></div>
-            <span>Loading PDF pages…</span>
-          </div>
-        `;
-      }
-      renderPdfPages(ctx.chapter);
+/* ============================================================
+   🆕 DOWNLOAD CLICK HANDLER
+   If download_on === true → direct
+   If download_on === false → verify popup (Roll No + Reg No)
+   ============================================================ */
+let pendingDownload = null;
+
+window.handleDownloadClick = async function(classId, subjectId, chapterId, type) {
+  try {
+    const ctx = await DataSource.getChapterContext(classId, subjectId, chapterId);
+    if (!ctx || !ctx.chapter) return toast('Chapter not found');
+    const info = getCtypeInfo(ctx.chapter, type);
+    if (!info || !info.pdf_path) return toast('PDF not uploaded yet');
+
+    // If download ON → check if user already verified this session
+    if (info.download_on !== false) {
+      // Direct download — no verification needed
+      triggerDownload(info.pdf_path, ctx.chapter.name, type);
+      return;
     }
-  });
+
+    // If download OFF → check session
+    const verified = getVerifiedStudent();
+    if (verified) {
+      triggerDownload(info.pdf_path, ctx.chapter.name, type);
+      toast('Download started ✓');
+      return;
+    }
+
+    // Show verification popup
+    pendingDownload = {
+      classId, subjectId, chapterId, type,
+      pdf_path: info.pdf_path,
+      chapterName: ctx.chapter.name
+    };
+    openVerifyPopup();
+  } catch (err) {
+    console.error('[Download]', err);
+    toast('Download failed. Please try again.');
+  }
 };
 
-let resizeTimer;
-window.addEventListener('resize', () => {
-  if (!location.hash.includes('/chapter/')) return;
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => {
-    const route = parseRoute();
-    if (route.name === 'chapter') renderChapterPage(route.classId, route.subjectId, route.chapterId);
-  }, 400);
-});
+function triggerDownload(pdfPath, chapterName, type) {
+  const url = resolvePdfUrl(pdfPath);
+  if (!url) return toast('PDF not found');
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = sanitizeFile(chapterName + '_' + type) + '.pdf';
+  link.target = '_blank';
+  link.rel = 'noopener';
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
 
 /* ============================================================
-   CLICK HANDLERS
+   🆕 VERIFY POPUP
    ============================================================ */
-document.addEventListener('click', e => {
-  const dlBtn = e.target.closest('[data-download]');
-  if (dlBtn) {
-    e.preventDefault();
-    e.stopPropagation();
-    handleDownload(dlBtn.dataset.download);
+function openVerifyPopup() {
+  $('#verifyRoll').value = '';
+  $('#verifyAdm').value = '';
+  $('#verifyStatus').className = 'verify-status';
+  $('#verifyStatus').innerHTML = '';
+  $('#verifyOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => $('#verifyRoll').focus(), 320);
+}
+
+window.closeVerifyPopup = function() {
+  $('#verifyOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  pendingDownload = null;
+};
+
+function verifySetStatus(type, message) {
+  const el = $('#verifyStatus');
+  el.className = 'verify-status ' + type;
+  if (type === 'loading') {
+    el.innerHTML = '<span class="spinner-v"></span><span>' + message + '</span>';
+  } else if (type === 'error') {
+    el.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>' + message + '</span>';
+  } else {
+    el.innerHTML = '<i class="fas fa-check-circle"></i><span>' + message + '</span>';
+  }
+}
+
+window.submitVerify = async function() {
+  const roll = $('#verifyRoll').value.trim();
+  const adm = $('#verifyAdm').value.trim();
+
+  if (!roll) {
+    verifySetStatus('error', 'Please enter Roll Number');
+    $('#verifyRoll').focus();
     return;
   }
-  const row = e.target.closest('.chapter-row[data-preview-href]');
-  if (row) {
-    e.preventDefault();
-    location.hash = row.dataset.previewHref.replace(/^#/, '');
+  if (!adm) {
+    verifySetStatus('error', 'Please enter Registration Number');
+    $('#verifyAdm').focus();
+    return;
   }
-});
 
-async function handleDownload(chapterId) {
+  verifySetStatus('loading', 'Verifying...');
+  const submitBtn = $('#verifySubmitBtn');
+  submitBtn.disabled = true;
+
   try {
-    let chapter = null;
-    const classes = await DataSource.getClasses();
-    outer:
-    for (const cls of classes) {
-      for (const s of (cls.subjects || [])) {
-        for (const ch of (s.chapters || [])) {
-          if (ch.id === chapterId) { chapter = ch; break outer; }
+    // Search in admissions by rollNumber
+    const rollSnap = await db.collection(ADMISSIONS_COLLECTION)
+      .where('rollNumber', '==', roll).get();
+
+    let found = null;
+
+    if (!rollSnap.empty) {
+      // Found by roll — now match admissionNo (case-insensitive)
+      const admLower = adm.toLowerCase();
+      for (const doc of rollSnap.docs) {
+        const data = doc.data();
+        const storedAdm = (data.admissionNo || '').toString().toLowerCase();
+        if (storedAdm === admLower) {
+          found = { id: doc.id, ...data };
+          break;
         }
       }
     }
-    if (!chapter) return toast('Chapter not found');
-    const url = resolvePdfUrl(chapter);
-    if (!url) return toast('PDF abhi upload nahi hua');
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = sanitizeFile(chapter.name) + '.pdf';
-    link.target = '_blank';
-    link.rel = 'noopener';
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    toast('Download started ✓');
+
+    // If not found by roll, try by admissionNo alone (backup)
+    if (!found) {
+      const admSnap = await db.collection(ADMISSIONS_COLLECTION)
+        .where('admissionNo', '==', adm).get();
+      if (!admSnap.empty) {
+        const data = admSnap.docs[0].data();
+        if ((data.rollNumber || '').toString() === roll) {
+          found = { id: admSnap.docs[0].id, ...data };
+        }
+      }
+    }
+
+    if (!found) {
+      verifySetStatus('error', 'Details match nahi hui. Roll No aur Registration No check karein.');
+      submitBtn.disabled = false;
+      return;
+    }
+
+    // Verified!
+    verifySetStatus('success', 'Verify ho gaya! Download start ho raha hai...');
+
+    // Save to session
+    setVerifiedStudent({
+      id: found.id,
+      rollNumber: found.rollNumber,
+      admissionNo: found.admissionNo,
+      studentName: found.studentName || '',
+      verifiedAt: Date.now()
+    });
+
+    // Trigger download
+    setTimeout(() => {
+      if (pendingDownload) {
+        triggerDownload(pendingDownload.pdf_path, pendingDownload.chapterName, pendingDownload.type);
+      }
+      closeVerifyPopup();
+      toast('Download started ✓');
+    }, 800);
+
   } catch (err) {
-    console.error('[Study Portal] download failed', err);
-    toast('Download failed. Please try again.');
+    console.error('Verify error:', err);
+    verifySetStatus('error', 'Error: ' + err.message);
+  } finally {
+    submitBtn.disabled = false;
   }
+};
+
+/* Overlay click + ESC to close */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeVerifyPopup();
+});
+
+/* ============================================================
+   SESSION INFO (optional — show verified badge)
+   ============================================================ */
+function showVerifiedBadge() {
+  const v = getVerifiedStudent();
+  if (!v) return;
+  // Add small badge to header (optional)
+  const pill = document.createElement('span');
+  pill.style.cssText = 'position:fixed;top:60px;right:14px;z-index:55;background:#e3fcef;color:#0e9f6e;border:1px solid #0e9f6e;padding:4px 10px;border-radius:20px;font-size:.7rem;font-weight:800;';
+  pill.innerHTML = '✓ Verified';
+  document.body.appendChild(pill);
+  setTimeout(() => pill.remove(), 3000);
 }
 
 /* ============================================================
