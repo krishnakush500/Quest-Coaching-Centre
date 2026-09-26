@@ -314,29 +314,6 @@
     font-size:.78rem;color:#0d2b6b;font-weight:700;
     display:inline-flex;align-items:center;gap:7px;
   }
-
-  .seed-banner {
-    background:linear-gradient(135deg, #fff5cc 0%, #ffe9a8 100%);
-    border:2px solid #f7b500;
-    border-radius:14px;
-    padding:16px 20px;
-    margin-bottom:18px;
-    display:flex;align-items:center;gap:14px;
-    box-shadow:0 6px 20px rgba(247,181,0,.22);
-    flex-wrap:wrap;
-  }
-  .seed-banner .ico {
-    width:44px;height:44px;flex:none;
-    background:linear-gradient(135deg,#ffd257,#f7b500);
-    color:#0d2b6b;border-radius:12px;
-    display:grid;place-items:center;font-size:20px;
-    box-shadow:0 4px 12px rgba(247,181,0,.4);
-  }
-  .seed-banner .txt { flex:1;min-width:200px; }
-  .seed-banner .txt strong {
-    display:block;font-size:.92rem;font-weight:800;color:#0d2b6b;margin-bottom:3px;
-  }
-  .seed-banner .txt span { font-size:.78rem;color:#7a5a00;font-weight:600;line-height:1.45; }
 </style>
 </head>
 <body>
@@ -369,15 +346,15 @@
     </span>
   </div>
 
-  <div class="seed-banner" id="seedBanner" style="display:none;">
-    <div class="ico"><i class="fas fa-magic"></i></div>
-    <div class="txt">
-      <strong>Study material khali hai!</strong>
-      <span>Ek click me saare classes (6th–12th tak) aur subjects auto-add karne ke liye button dabayein.</span>
+  <!-- Info banner (no auto-seed) -->
+  <div style="background:linear-gradient(135deg, #e8f5ff 0%, #dbe6ff 100%);border:2px solid #16409b;border-radius:14px;padding:16px 20px;margin-bottom:18px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 20px rgba(22,64,155,.15);">
+    <div style="width:44px;height:44px;flex:none;background:linear-gradient(135deg,#0d2b6b,#16409b);color:#fff;border-radius:12px;display:grid;place-items:center;font-size:20px;">
+      <i class="fas fa-info-circle"></i>
     </div>
-    <button class="btn-gold" onclick="autoSeed()" id="seedBtn">
-      <i class="fas fa-cloud-upload-alt"></i> Auto-Seed Now
-    </button>
+    <div style="flex:1;min-width:200px;">
+      <strong style="display:block;font-size:.92rem;font-weight:800;color:#0d2b6b;margin-bottom:3px;">Shuru se setup karein</strong>
+      <span style="font-size:.78rem;color:#3d5a9b;font-weight:600;line-height:1.45;">Pehle Class add karein → phir uske Subjects → phir har subject ke Chapters upload karein. Jo aap upload karenge wahi student portal me dikhega.</span>
+    </div>
   </div>
 
   <div class="sm-tabs">
@@ -625,136 +602,18 @@ const PDF_BUCKET = 'study_material';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* ============================================================
-   🆕 NESTED STRUCTURE:
-   study_materials (collection)
-     └── {classId} (document)
-          └── subjects (subcollection)
-               └── {subjectId} (document)
-                    └── chapters (subcollection)
-                         └── {chapterId} (document)
+   NESTED STRUCTURE:
+   study_materials/{classId}/subjects/{subjectId}/chapters/{chapterId}
    ============================================================ */
 const SM_COLLECTION = 'study_materials';
 const SUB_SUBCOLLECTION = 'subjects';
 const CH_SUBCOLLECTION = 'chapters';
 
 /* ============================================================
-   SEED DATA — Class names admission form wale
-   ============================================================ */
-const SEED_CLASSES = [
-  { id: '6th', name: '6th', display_order: 1 },
-  { id: '7th', name: '7th', display_order: 2 },
-  { id: '8th', name: '8th', display_order: 3 },
-  { id: '9th', name: '9th', display_order: 4 },
-  { id: '10th', name: '10th', display_order: 5 },
-  { id: '11th-science', name: '11th (Science)', display_order: 6 },
-  { id: '11th-commerce', name: '11th (Commerce)', display_order: 7 },
-  { id: '11th-arts', name: '11th (Arts)', display_order: 8 },
-  { id: '12th-science', name: '12th (Science)', display_order: 9 },
-  { id: '12th-commerce', name: '12th (Commerce)', display_order: 10 },
-  { id: '12th-arts', name: '12th (Arts)', display_order: 11 }
-];
-
-const SEED_SUBJECTS = {
-  '6th': [
-    { id: 'math', name: 'Mathematics', icon: '📘', display_order: 1 },
-    { id: 'science', name: 'Science', icon: '🔬', display_order: 2 },
-    { id: 'english', name: 'English', icon: '📖', display_order: 3 },
-    { id: 'sst', name: 'Social Science', icon: '🌍', display_order: 4 },
-    { id: 'hindi', name: 'Hindi', icon: '📕', display_order: 5 }
-  ],
-  '7th': [
-    { id: 'math', name: 'Mathematics', icon: '📘', display_order: 1 },
-    { id: 'science', name: 'Science', icon: '🔬', display_order: 2 },
-    { id: 'english', name: 'English', icon: '📖', display_order: 3 },
-    { id: 'sst', name: 'Social Science', icon: '🌍', display_order: 4 },
-    { id: 'hindi', name: 'Hindi', icon: '📕', display_order: 5 }
-  ],
-  '8th': [
-    { id: 'math', name: 'Mathematics', icon: '📘', display_order: 1 },
-    { id: 'science', name: 'Science', icon: '🔬', display_order: 2 },
-    { id: 'english', name: 'English', icon: '📖', display_order: 3 },
-    { id: 'sst', name: 'Social Science', icon: '🌍', display_order: 4 },
-    { id: 'hindi', name: 'Hindi', icon: '📕', display_order: 5 }
-  ],
-  '9th': [
-    { id: 'math', name: 'Mathematics', icon: '📘', display_order: 1 },
-    { id: 'science', name: 'Science', icon: '🔬', display_order: 2 },
-    { id: 'english', name: 'English', icon: '📖', display_order: 3 },
-    { id: 'sst', name: 'Social Science', icon: '🌍', display_order: 4 },
-    { id: 'hindi', name: 'Hindi', icon: '📕', display_order: 5 }
-  ],
-  '10th': [
-    { id: 'math', name: 'Mathematics', icon: '📘', display_order: 1 },
-    { id: 'science', name: 'Science', icon: '🔬', display_order: 2 },
-    { id: 'english', name: 'English', icon: '📖', display_order: 3 },
-    { id: 'sst', name: 'Social Science', icon: '🌍', display_order: 4 },
-    { id: 'hindi', name: 'Hindi', icon: '📕', display_order: 5 }
-  ],
-  '11th-science': [
-    { id: 'physics', name: 'Physics', icon: '⚛️', display_order: 1 },
-    { id: 'chemistry', name: 'Chemistry', icon: '🧪', display_order: 2 },
-    { id: 'math', name: 'Mathematics', icon: '📘', display_order: 3 },
-    { id: 'biology', name: 'Biology', icon: '🧬', display_order: 4 },
-    { id: 'english', name: 'English', icon: '📖', display_order: 5 }
-  ],
-  '11th-commerce': [
-    { id: 'accountancy', name: 'Accountancy', icon: '📊', display_order: 1 },
-    { id: 'business', name: 'Business Studies', icon: '💼', display_order: 2 },
-    { id: 'economics', name: 'Economics', icon: '📈', display_order: 3 },
-    { id: 'english', name: 'English', icon: '📖', display_order: 4 }
-  ],
-  '11th-arts': [
-    { id: 'history', name: 'History', icon: '🏛️', display_order: 1 },
-    { id: 'polsci', name: 'Political Science', icon: '🗳️', display_order: 2 },
-    { id: 'geo', name: 'Geography', icon: '🌍', display_order: 3 },
-    { id: 'english', name: 'English', icon: '📖', display_order: 4 }
-  ],
-  '12th-science': [
-    { id: 'physics', name: 'Physics', icon: '⚛️', display_order: 1 },
-    { id: 'chemistry', name: 'Chemistry', icon: '🧪', display_order: 2 },
-    { id: 'math', name: 'Mathematics', icon: '📘', display_order: 3 },
-    { id: 'biology', name: 'Biology', icon: '🧬', display_order: 4 },
-    { id: 'english', name: 'English', icon: '📖', display_order: 5 }
-  ],
-  '12th-commerce': [
-    { id: 'accountancy', name: 'Accountancy', icon: '📊', display_order: 1 },
-    { id: 'business', name: 'Business Studies', icon: '💼', display_order: 2 },
-    { id: 'economics', name: 'Economics', icon: '📈', display_order: 3 },
-    { id: 'english', name: 'English', icon: '📖', display_order: 4 }
-  ],
-  '12th-arts': [
-    { id: 'history', name: 'History', icon: '🏛️', display_order: 1 },
-    { id: 'polsci', name: 'Political Science', icon: '🗳️', display_order: 2 },
-    { id: 'geo', name: 'Geography', icon: '🌍', display_order: 3 },
-    { id: 'english', name: 'English', icon: '📖', display_order: 4 }
-  ]
-};
-
-const SEED_CHAPTERS = {
-  '10th|math': ['Real Numbers','Polynomials','Pair of Linear Equations in Two Variables','Quadratic Equations','Arithmetic Progressions','Triangles','Coordinate Geometry','Introduction to Trigonometry','Some Applications of Trigonometry','Circles','Areas Related to Circles','Surface Areas and Volumes','Statistics','Probability'],
-  '10th|science': ['Chemical Reactions and Equations','Acids, Bases and Salts','Metals and Non-metals','Carbon and its Compounds','Life Processes','Control and Coordination','How do Organisms Reproduce?','Heredity and Evolution','Light – Reflection and Refraction','The Human Eye and the Colourful World','Electricity','Magnetic Effects of Electric Current','Our Environment','Sustainable Management of Natural Resources'],
-  '10th|english': ['A Letter to God','Nelson Mandela: Long Walk to Freedom','Two Stories about Flying','From the Diary of Anne Frank','The Hundred Dresses – I','The Hundred Dresses – II','Glimpses of India','Mijbil the Otter','Madam Rides the Bus','The Sermon at Benares','The Proposal'],
-  '10th|sst': ['The Rise of Nationalism in Europe','Nationalism in India','The Making of a Global World','Resources and Development','Water Resources','Agriculture','Minerals and Energy Resources','Power Sharing','Federalism','Development'],
-  '10th|hindi': ['सूरदास के पद','राम-लक्ष्मण-परशुराम संवाद','नेताजी का चश्मा','बालगोबिन भगत','लखनवी अंदाज़','व्याकरण संकलन'],
-  '12th-science|physics': ['Electric Charges and Fields','Electrostatic Potential and Capacitance','Current Electricity','Moving Charges and Magnetism','Magnetism and Matter','Electromagnetic Induction','Alternating Current','Electromagnetic Waves','Ray Optics and Optical Instruments','Wave Optics','Dual Nature of Radiation and Matter','Atoms','Nuclei','Semiconductor Electronics'],
-  '12th-science|chemistry': ['Solutions','Electrochemistry','Chemical Kinetics','The d- and f-Block Elements','Coordination Compounds','Haloalkanes and Haloarenes','Alcohols, Phenols and Ethers','Aldehydes, Ketones and Carboxylic Acids','Amines','Biomolecules'],
-  '12th-science|math': ['Relations and Functions','Inverse Trigonometric Functions','Matrices','Determinants','Continuity and Differentiability','Application of Derivatives','Integrals','Application of Integrals','Differential Equations','Vector Algebra','Three Dimensional Geometry','Linear Programming','Probability'],
-  '12th-science|biology': ['Sexual Reproduction in Flowering Plants','Human Reproduction','Reproductive Health','Principles of Inheritance and Variation','Molecular Basis of Inheritance','Evolution','Human Health and Disease','Microbes in Human Welfare','Biotechnology: Principles and Processes','Biotechnology and its Applications','Organisms and Populations','Ecosystem','Biodiversity and Conservation']
-};
-
-const SEED_NEW = new Set([
-  '10th|science|Chemical Reactions and Equations',
-  '10th|math|Polynomials',
-  '12th-science|physics|Electric Charges and Fields',
-  '12th-science|chemistry|The d- and f-Block Elements',
-  '12th-science|biology|Sexual Reproduction in Flowering Plants'
-]);
-
-/* ============================================================
    STATE
    ============================================================ */
 const state = {
-  classes: [],       // [{ id, name, display_order, subjects: [{ id, name, icon, display_order, chapters: [...] }] }]
+  classes: [],
   editing: { class:null, subject:null, chapter:null, parentClassId:null, parentSubjectId:null },
   selectedPdfFile: null
 };
@@ -809,7 +668,7 @@ function updateLoader(text, sub='') {
   $('loaderSub').textContent = sub;
 }
 
-/* Class ka Firestore doc ID banao — spaces/special chars safe */
+/* Class ka Firestore doc ID banao */
 function classDocId(name) {
   return String(name || 'class')
     .toLowerCase()
@@ -848,7 +707,6 @@ async function loadAll() {
 
     if (classesSnap.empty) {
       state.classes = [];
-      $('seedBanner').style.display = 'flex';
       renderAll();
       refreshFilters();
       return;
@@ -864,7 +722,6 @@ async function loadAll() {
         subjects: []
       };
 
-      // Get subjects subcollection
       const subjectsSnap = await db
         .collection(SM_COLLECTION).doc(classDoc.id)
         .collection(SUB_SUBCOLLECTION)
@@ -881,7 +738,6 @@ async function loadAll() {
           chapters: []
         };
 
-        // Get chapters sub-subcollection
         const chaptersSnap = await db
           .collection(SM_COLLECTION).doc(classDoc.id)
           .collection(SUB_SUBCOLLECTION).doc(subjectDoc.id)
@@ -900,7 +756,6 @@ async function loadAll() {
     }
 
     state.classes = classes;
-    $('seedBanner').style.display = state.classes.length === 0 ? 'flex' : 'none';
     renderAll();
     refreshFilters();
   } catch (err) {
@@ -910,69 +765,6 @@ async function loadAll() {
     hideLoader();
   }
 }
-
-/* ============================================================
-   AUTO SEED — create nested structure
-   ============================================================ */
-window.autoSeed = async function() {
-  const btn = $('seedBtn');
-  const orig = btn.innerHTML;
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Seeding…';
-
-  showLoader('Seeding demo data…', 'Please wait 20-40 seconds');
-  try {
-    for (const cls of SEED_CLASSES) {
-      // Create class document
-      await db.collection(SM_COLLECTION).doc(cls.id).set({
-        name: cls.name,
-        display_order: cls.display_order,
-        created_at: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      const subs = SEED_SUBJECTS[cls.name] || [];
-      for (const sub of subs) {
-        // Create subject document
-        await db.collection(SM_COLLECTION).doc(cls.id)
-          .collection(SUB_SUBCOLLECTION).doc(sub.id).set({
-            name: sub.name,
-            icon: sub.icon,
-            display_order: sub.display_order,
-            created_at: firebase.firestore.FieldValue.serverTimestamp()
-          });
-
-        const chapKey = `${cls.name}|${sub.id}`;
-        const chapList = SEED_CHAPTERS[chapKey] || [];
-        for (let i = 0; i < chapList.length; i++) {
-          const chName = chapList[i];
-          const chapterId = `ch-${String(i+1).padStart(2, '0')}`;
-          const isNew = SEED_NEW.has(`${cls.name}|${sub.id}|${chName}`);
-          await db.collection(SM_COLLECTION).doc(cls.id)
-            .collection(SUB_SUBCOLLECTION).doc(sub.id)
-            .collection(CH_SUBCOLLECTION).doc(chapterId).set({
-              chapter_number: i + 1,
-              name: chName,
-              display_order: i + 1,
-              pdf_path: null,
-              is_new: isNew,
-              is_published: true,
-              created_at: firebase.firestore.FieldValue.serverTimestamp()
-            });
-        }
-      }
-    }
-
-    toast('✅ Seed complete!');
-    await loadAll();
-  } catch (err) {
-    console.error(err);
-    toast('Seed failed: ' + err.message, true);
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = orig;
-    hideLoader();
-  }
-};
 
 /* ============================================================
    RENDER
@@ -1002,7 +794,7 @@ function renderClasses() {
     box.innerHTML = `<div class="sm-empty">
       <div class="ico-big"><i class="fas fa-school"></i></div>
       <h4>No classes yet</h4>
-      <p>Use "Auto-Seed Now" or click "Add Class" to create one.</p>
+      <p>Click "Add Class" to create your first class.</p>
     </div>`;
     return;
   }
@@ -1153,9 +945,7 @@ document.addEventListener('DOMContentLoaded', () => {
   chapterModal = new bootstrap.Modal($('chapterModal'));
 });
 
-/* ============================================================
-   CLASS CRUD — nested
-   ============================================================ */
+/* CLASS CRUD */
 window.openClassModal = function() {
   state.editing.class = null;
   $('classModalTitle').textContent = 'Add Class';
@@ -1182,7 +972,6 @@ window.saveClass = async function() {
   showLoader('Saving class…');
   try {
     if (state.editing.class) {
-      // Update existing class doc (id stays same)
       await db.collection(SM_COLLECTION).doc(state.editing.class.id).update({
         name, display_order: order
       });
@@ -1191,7 +980,6 @@ window.saveClass = async function() {
       toast('Class updated ✓');
     } else {
       const newId = classDocId(name);
-      // Check duplicate
       const existing = await db.collection(SM_COLLECTION).doc(newId).get();
       if (existing.exists) {
         toast('Class with this name already exists', true);
@@ -1222,17 +1010,13 @@ window.deleteClass = async function(id) {
 
   showLoader('Deleting…');
   try {
-    // Delete PDFs from Supabase
     for (const s of (cls.subjects || [])) {
       for (const ch of (s.chapters || [])) {
         if (ch.pdf_path) await deletePdfFromSupabase(ch.pdf_path);
       }
     }
-    // Delete all subcollections (Firestore doesn't cascade)
-    // Subjects subcollection
     const subjectsSnap = await db.collection(SM_COLLECTION).doc(id).collection(SUB_SUBCOLLECTION).get();
     for (const sDoc of subjectsSnap.docs) {
-      // Chapters in this subject
       const chaptersSnap = await db.collection(SM_COLLECTION).doc(id)
         .collection(SUB_SUBCOLLECTION).doc(sDoc.id)
         .collection(CH_SUBCOLLECTION).get();
@@ -1241,7 +1025,6 @@ window.deleteClass = async function(id) {
       }
       await sDoc.ref.delete();
     }
-    // Finally delete class doc
     await db.collection(SM_COLLECTION).doc(id).delete();
 
     toast('Class + children deleted ✓');
@@ -1254,9 +1037,7 @@ window.deleteClass = async function(id) {
   }
 };
 
-/* ============================================================
-   SUBJECT CRUD — nested
-   ============================================================ */
+/* SUBJECT CRUD */
 window.openSubjectModal = function(presetClassId) {
   state.editing.subject = null;
   state.editing.parentClassId = null;
@@ -1299,17 +1080,13 @@ window.saveSubject = async function() {
       const oldSubjectId = state.editing.subject.id;
 
       if (oldClassId !== newClassId) {
-        // Moving to different class → copy chapters, delete from old
         const newSubjectId = subjectDocId(name);
-
-        // Create new subject doc
         await db.collection(SM_COLLECTION).doc(newClassId)
           .collection(SUB_SUBCOLLECTION).doc(newSubjectId).set({
             name, icon, display_order: order,
             created_at: firebase.firestore.FieldValue.serverTimestamp()
           });
 
-        // Copy chapters
         const oldChaptersSnap = await db.collection(SM_COLLECTION).doc(oldClassId)
           .collection(SUB_SUBCOLLECTION).doc(oldSubjectId)
           .collection(CH_SUBCOLLECTION).get();
@@ -1319,12 +1096,10 @@ window.saveSubject = async function() {
             .collection(CH_SUBCOLLECTION).doc(chDoc.id).set(chDoc.data());
         }
 
-        // Delete old subject + its chapters
         for (const chDoc of oldChaptersSnap.docs) await chDoc.ref.delete();
         await db.collection(SM_COLLECTION).doc(oldClassId)
           .collection(SUB_SUBCOLLECTION).doc(oldSubjectId).delete();
       } else {
-        // Same class — just update
         await db.collection(SM_COLLECTION).doc(oldClassId)
           .collection(SUB_SUBCOLLECTION).doc(oldSubjectId).update({
             name, icon, display_order: order
@@ -1365,16 +1140,13 @@ window.deleteSubject = async function(classId, subjectId) {
 
   showLoader('Deleting…');
   try {
-    // Delete PDFs
     for (const ch of (s.chapters || [])) {
       if (ch.pdf_path) await deletePdfFromSupabase(ch.pdf_path);
     }
-    // Delete chapters subcollection
     const chaptersSnap = await db.collection(SM_COLLECTION).doc(classId)
       .collection(SUB_SUBCOLLECTION).doc(subjectId)
       .collection(CH_SUBCOLLECTION).get();
     for (const chDoc of chaptersSnap.docs) await chDoc.ref.delete();
-    // Delete subject doc
     await db.collection(SM_COLLECTION).doc(classId)
       .collection(SUB_SUBCOLLECTION).doc(subjectId).delete();
     toast('Subject + chapters deleted ✓');
@@ -1388,7 +1160,7 @@ window.deleteSubject = async function(classId, subjectId) {
 };
 
 /* ============================================================
-   SUPABASE PDF UPLOAD / DELETE — filename safe
+   SUPABASE PDF UPLOAD / DELETE
    ============================================================ */
 function extractSupabasePath(pdfUrl) {
   if (!pdfUrl || typeof pdfUrl !== 'string') return null;
@@ -1399,7 +1171,6 @@ function extractSupabasePath(pdfUrl) {
 }
 
 async function uploadPdfToSupabase(file, chapterName) {
-  // Hindi/Devanagari aur special chars hatao — sirf ASCII safe
   let safeName = String(chapterName || 'chapter')
     .replace(/[^\w.\-]/g, '_')
     .replace(/_+/g, '_')
@@ -1449,7 +1220,7 @@ async function deletePdfFromSupabase(pdfUrlOrPath) {
 }
 
 /* ============================================================
-   CHAPTER CRUD — nested
+   CHAPTER CRUD
    ============================================================ */
 function refreshChapterFormSubjects() {
   const classId = $('chapterFormClass').value;
@@ -1606,12 +1377,10 @@ window.saveChapter = async function() {
       const chapterId = state.editing.chapter.id;
 
       if (oldClassId === targetClassId && oldSubjectId === targetSubjectId) {
-        // Same location — update
         await db.collection(SM_COLLECTION).doc(targetClassId)
           .collection(SUB_SUBCOLLECTION).doc(targetSubjectId)
           .collection(CH_SUBCOLLECTION).doc(chapterId).update(chapterData);
       } else {
-        // Moved → delete from old, create in new
         await db.collection(SM_COLLECTION).doc(oldClassId)
           .collection(SUB_SUBCOLLECTION).doc(oldSubjectId)
           .collection(CH_SUBCOLLECTION).doc(chapterId).delete();
@@ -1624,7 +1393,6 @@ window.saveChapter = async function() {
       }
       toast('Chapter updated ✓');
     } else {
-      // Auto-generate chapter ID
       const chapterRef = db.collection(SM_COLLECTION).doc(targetClassId)
         .collection(SUB_SUBCOLLECTION).doc(targetSubjectId)
         .collection(CH_SUBCOLLECTION).doc();
