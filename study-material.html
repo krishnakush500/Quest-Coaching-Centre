@@ -577,6 +577,7 @@ const DataSource = {
 
 /* ============================================================
    PDF RESOLUTION — Supabase public URL stored in Firestore
+   🔥 FIX: ArrayBuffer copy return karta hai taaki detach na ho
    ============================================================ */
 function resolvePdfUrl(chapter) {
   if (chapter.pdf_path && /^https?:\/\//i.test(chapter.pdf_path)) return chapter.pdf_path;
@@ -585,14 +586,19 @@ function resolvePdfUrl(chapter) {
 
 const pdfDataCache = new Map();
 async function fetchPdfData(chapter) {
-  if (pdfDataCache.has(chapter.id)) return pdfDataCache.get(chapter.id);
+  // Agar cache me hai → copy return karo (original safe rahe)
+  if (pdfDataCache.has(chapter.id)) {
+    return pdfDataCache.get(chapter.id).slice(0);
+  }
   const url = resolvePdfUrl(chapter);
   if (!url) throw new Error('Is chapter ka PDF abhi upload nahi hua hai.');
   const res = await fetch(url);
   if (!res.ok) throw new Error('PDF fetch failed: ' + res.status);
   const buffer = await res.arrayBuffer();
+  // Cache me original rakho (future use ke liye)
   pdfDataCache.set(chapter.id, buffer);
-  return buffer;
+  // PDF.js ko copy do — taki wo detach na kar sake
+  return buffer.slice(0);
 }
 
 /* ============================================================
@@ -946,6 +952,8 @@ async function renderPdfPages(chapter) {
     }
   } catch (err) {
     console.error('[PDF.js] render failed:', err);
+    // 🔥 Cache clear — Retry pe fresh fetch hoga
+    pdfDataCache.delete(chapter.id);
     viewer.innerHTML = `
       <div class="pdf-error">
         <div>⚠️ PDF load nahi ho paya</div>
@@ -963,6 +971,8 @@ async function renderPdfPages(chapter) {
 window.retryPdfRender = function(chapterId) {
   const route = parseRoute();
   if (route.name !== 'chapter') return;
+  // 🔥 Cache clear karo — fresh fetch
+  pdfDataCache.delete(chapterId);
   DataSource.getChapterContext(route.classId, route.subjectId, route.chapterId).then(ctx => {
     if (ctx && ctx.chapter) {
       const viewer = document.getElementById('pdfViewer');
