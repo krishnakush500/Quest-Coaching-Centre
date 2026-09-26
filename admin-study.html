@@ -8,12 +8,9 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-
-<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
 <style>
@@ -226,20 +223,78 @@
   .form-check-input:checked { background-color:#0d2b6b;border-color:#0d2b6b; }
   .form-check-label { font-size:.86rem;font-weight:600;color:#0f2452; }
 
-  .upload-drop {
-    border:2px dashed #dbe6ff;border-radius:12px;
-    padding:20px;text-align:center;
-    background:#fbfcff;cursor:pointer;
+  /* Content type upload rows */
+  .ctype-section {
+    background:#f9fbff;
+    border:1.5px solid #e3e9f5;
+    border-radius:14px;
+    padding:16px;
+    margin-top:14px;
+  }
+  .ctype-section-title {
+    font-size:.85rem;
+    font-weight:800;
+    color:#0d2b6b;
+    text-transform:uppercase;
+    letter-spacing:.8px;
+    margin-bottom:12px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .ctype-row {
+    background:#fff;
+    border:1.5px solid #e3e9f5;
+    border-radius:12px;
+    padding:12px 14px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:10px;
+    flex-wrap:wrap;
+  }
+  .ctype-row:last-child { margin-bottom:0; }
+  .ctype-row.has-file { border-color:#0e9f6e; background:#f0fdf7; }
+  .ctype-icon {
+    width:40px;height:40px;flex:none;
+    border-radius:10px;
+    display:grid;place-items:center;
+    font-size:1rem;font-weight:800;
+    background:linear-gradient(135deg,#eef3ff,#dde7ff);
+    color:#0d2b6b;
+    border:1px solid #dbe6ff;
+  }
+  .ctype-icon.pdf { background:linear-gradient(135deg,#fee2e2,#fecaca); color:#b91c1c; border-color:#fca5a5; }
+  .ctype-body { flex:1;min-width:150px; }
+  .ctype-body h5 {
+    font-size:.88rem;font-weight:800;color:#0d2b6b;margin-bottom:2px;
+  }
+  .ctype-body p {
+    font-size:.72rem;color:#64748b;font-weight:600;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .ctype-actions {
+    display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+  }
+  .download-toggle {
+    display:flex;align-items:center;gap:8px;
+    background:#fff;border:1.5px solid #dbe6ff;
+    padding:6px 12px;border-radius:9px;
+    cursor:pointer;
+    font-size:.75rem;font-weight:800;
+    color:#64748b;
+    user-select:none;
+  }
+  .download-toggle.on {
+    background:#e3fcef;border-color:#0e9f6e;color:#0e9f6e;
+  }
+  .download-toggle input { display:none; }
+  .download-toggle .toggle-dot {
+    width:12px;height:12px;border-radius:50%;
+    background:#cbd5e1;
     transition:all .2s;
   }
-  .upload-drop:hover { border-color:#16409b;background:#f1f5ff; }
-  .upload-drop .ico { font-size:1.8rem;color:#0d2b6b;margin-bottom:8px; }
-  .upload-drop .txt { font-size:.85rem;font-weight:700;color:#0d2b6b; }
-  .upload-drop .sub { font-size:.74rem;color:#8a95ae;margin-top:4px; }
-
-  .file-info {
-    margin-top:10px;font-size:.78rem;color:#0e9f6e;font-weight:700;
-    display:flex;align-items:center;gap:6px;
+  .download-toggle.on .toggle-dot { background:#0e9f6e; box-shadow:0 0 8px rgba(14,159,110,.5); }
+  .ctype-file-actions {
+    display:flex;gap:6px;flex-wrap:wrap;
   }
 
   .upload-progress {
@@ -333,7 +388,7 @@
       <span class="ico"><i class="fas fa-book-open"></i></span>
       Study Material Admin
     </h1>
-    <p>Manage classes · subjects · chapters · PDF uploads (Supabase Storage)</p>
+    <p>Notes · PYQs · Test Papers · Objective · Subjective — sab yahi se upload karein</p>
   </div>
 
   <div class="back-bar">
@@ -346,14 +401,13 @@
     </span>
   </div>
 
-  <!-- Info banner (no auto-seed) -->
   <div style="background:linear-gradient(135deg, #e8f5ff 0%, #dbe6ff 100%);border:2px solid #16409b;border-radius:14px;padding:16px 20px;margin-bottom:18px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 20px rgba(22,64,155,.15);">
     <div style="width:44px;height:44px;flex:none;background:linear-gradient(135deg,#0d2b6b,#16409b);color:#fff;border-radius:12px;display:grid;place-items:center;font-size:20px;">
       <i class="fas fa-info-circle"></i>
     </div>
     <div style="flex:1;min-width:200px;">
-      <strong style="display:block;font-size:.92rem;font-weight:800;color:#0d2b6b;margin-bottom:3px;">Shuru se setup karein</strong>
-      <span style="font-size:.78rem;color:#3d5a9b;font-weight:600;line-height:1.45;">Pehle Class add karein → phir uske Subjects → phir har subject ke Chapters upload karein. Jo aap upload karenge wahi student portal me dikhega.</span>
+      <strong style="display:block;font-size:.92rem;font-weight:800;color:#0d2b6b;margin-bottom:3px;">Har chapter me 5 tarah ka content</strong>
+      <span style="font-size:.78rem;color:#3d5a9b;font-weight:600;line-height:1.45;">Notes, PYQs, Test Paper, Objective, Subjective — har type ka alag PDF upload kar sakte hain. Download ON/OFF bhi set kar sakte hain.</span>
     </div>
   </div>
 
@@ -538,21 +592,137 @@
             </div>
           </div>
         </div>
-        <div class="mt-3">
-          <label class="form-label">PDF File (Upload to Supabase Storage)</label>
-          <div class="upload-drop" id="uploadDrop">
-            <input type="file" id="chapterFormPdf" accept="application/pdf" style="display:none;">
-            <div class="ico"><i class="fas fa-cloud-upload-alt"></i></div>
-            <div class="txt">Click to upload PDF</div>
-            <div class="sub">Max 20 MB · only .pdf files</div>
+
+        <!-- 🆕 CONTENT TYPES -->
+        <div class="ctype-section">
+          <div class="ctype-section-title">
+            <i class="fas fa-layer-group"></i> Content Types (har type ka alag PDF)
           </div>
-          <div class="file-info" id="fileInfo" style="display:none;">
-            <i class="fas fa-check-circle"></i>
-            <span id="fileName"></span>
-            <button class="btn-outline-soft ms-2" onclick="clearPdfSelection()" style="padding:3px 8px;font-size:.72rem;">
-              <i class="fas fa-times"></i> Remove
-            </button>
+
+          <!-- Notes -->
+          <div class="ctype-row" id="ctype-row-notes">
+            <div class="ctype-icon" id="ctype-icon-notes">📘</div>
+            <div class="ctype-body">
+              <h5>Notes</h5>
+              <p id="ctype-status-notes">No PDF uploaded</p>
+            </div>
+            <div class="ctype-actions">
+              <label class="download-toggle on" id="ctype-toggle-notes">
+                <input type="checkbox" id="ctype-dl-notes" checked>
+                <span class="toggle-dot"></span>
+                <span>Download ON</span>
+              </label>
+              <div class="ctype-file-actions">
+                <button type="button" class="btn-outline-soft" onclick="pickCtypeFile('notes')">
+                  <i class="fas fa-upload"></i> Upload
+                </button>
+                <button type="button" class="btn-danger-soft" onclick="removeCtypeFile('notes')" id="ctype-rm-notes" style="display:none;">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
           </div>
+
+          <!-- PYQs -->
+          <div class="ctype-row" id="ctype-row-pyqs">
+            <div class="ctype-icon" id="ctype-icon-pyqs">📝</div>
+            <div class="ctype-body">
+              <h5>PYQs (Previous Year Questions)</h5>
+              <p id="ctype-status-pyqs">No PDF uploaded</p>
+            </div>
+            <div class="ctype-actions">
+              <label class="download-toggle on" id="ctype-toggle-pyqs">
+                <input type="checkbox" id="ctype-dl-pyqs" checked>
+                <span class="toggle-dot"></span>
+                <span>Download ON</span>
+              </label>
+              <div class="ctype-file-actions">
+                <button type="button" class="btn-outline-soft" onclick="pickCtypeFile('pyqs')">
+                  <i class="fas fa-upload"></i> Upload
+                </button>
+                <button type="button" class="btn-danger-soft" onclick="removeCtypeFile('pyqs')" id="ctype-rm-pyqs" style="display:none;">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Test Paper -->
+          <div class="ctype-row" id="ctype-row-test">
+            <div class="ctype-icon" id="ctype-icon-test">📋</div>
+            <div class="ctype-body">
+              <h5>Test Paper</h5>
+              <p id="ctype-status-test">No PDF uploaded</p>
+            </div>
+            <div class="ctype-actions">
+              <label class="download-toggle on" id="ctype-toggle-test">
+                <input type="checkbox" id="ctype-dl-test" checked>
+                <span class="toggle-dot"></span>
+                <span>Download ON</span>
+              </label>
+              <div class="ctype-file-actions">
+                <button type="button" class="btn-outline-soft" onclick="pickCtypeFile('test')">
+                  <i class="fas fa-upload"></i> Upload
+                </button>
+                <button type="button" class="btn-danger-soft" onclick="removeCtypeFile('test')" id="ctype-rm-test" style="display:none;">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Objective -->
+          <div class="ctype-row" id="ctype-row-objective">
+            <div class="ctype-icon" id="ctype-icon-objective">🎯</div>
+            <div class="ctype-body">
+              <h5>Objective Questions</h5>
+              <p id="ctype-status-objective">No PDF uploaded</p>
+            </div>
+            <div class="ctype-actions">
+              <label class="download-toggle on" id="ctype-toggle-objective">
+                <input type="checkbox" id="ctype-dl-objective" checked>
+                <span class="toggle-dot"></span>
+                <span>Download ON</span>
+              </label>
+              <div class="ctype-file-actions">
+                <button type="button" class="btn-outline-soft" onclick="pickCtypeFile('objective')">
+                  <i class="fas fa-upload"></i> Upload
+                </button>
+                <button type="button" class="btn-danger-soft" onclick="removeCtypeFile('objective')" id="ctype-rm-objective" style="display:none;">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subjective -->
+          <div class="ctype-row" id="ctype-row-subjective">
+            <div class="ctype-icon" id="ctype-icon-subjective">✍️</div>
+            <div class="ctype-body">
+              <h5>Subjective Questions</h5>
+              <p id="ctype-status-subjective">No PDF uploaded</p>
+            </div>
+            <div class="ctype-actions">
+              <label class="download-toggle on" id="ctype-toggle-subjective">
+                <input type="checkbox" id="ctype-dl-subjective" checked>
+                <span class="toggle-dot"></span>
+                <span>Download ON</span>
+              </label>
+              <div class="ctype-file-actions">
+                <button type="button" class="btn-outline-soft" onclick="pickCtypeFile('subjective')">
+                  <i class="fas fa-upload"></i> Upload
+                </button>
+                <button type="button" class="btn-danger-soft" onclick="removeCtypeFile('subjective')" id="ctype-rm-subjective" style="display:none;">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hidden file input -->
+          <input type="file" id="ctypeFileInput" accept="application/pdf" style="display:none;">
+          <input type="hidden" id="ctypeCurrentType" value="">
+
           <div class="upload-progress" id="uploadProgress">
             <div class="label">
               <span id="uploadStatus">Uploading…</span>
@@ -561,6 +731,7 @@
             <div class="bar"><div class="fill" id="uploadFill"></div></div>
           </div>
         </div>
+
       </div>
       <div class="modal-footer" style="border-top:1px solid #eef2f9;padding:14px 20px;">
         <button class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:10px;font-weight:700;font-size:.85rem;">Cancel</button>
@@ -592,22 +763,25 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-/* ============================================================
-   SUPABASE INIT — PDF storage
-   ============================================================ */
+/* Supabase */
 const SUPABASE_URL = 'https://zjwvxqjmccqhyxsaeggw.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_6a_9nxKSSLUZMmSGleyycg_kQ4a4BtI';
 const PDF_BUCKET = 'study_material';
-
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* ============================================================
-   NESTED STRUCTURE:
-   study_materials/{classId}/subjects/{subjectId}/chapters/{chapterId}
-   ============================================================ */
+/* Collections */
 const SM_COLLECTION = 'study_materials';
 const SUB_SUBCOLLECTION = 'subjects';
 const CH_SUBCOLLECTION = 'chapters';
+
+/* Content types */
+const CONTENT_TYPES = [
+  { key: 'notes',      label: 'Notes',              icon: '📘' },
+  { key: 'pyqs',       label: 'PYQs',               icon: '📝' },
+  { key: 'test',       label: 'Test Paper',         icon: '📋' },
+  { key: 'objective',  label: 'Objective Questions',icon: '🎯' },
+  { key: 'subjective', label: 'Subjective Questions', icon: '✍️' }
+];
 
 /* ============================================================
    STATE
@@ -615,7 +789,10 @@ const CH_SUBCOLLECTION = 'chapters';
 const state = {
   classes: [],
   editing: { class:null, subject:null, chapter:null, parentClassId:null, parentSubjectId:null },
-  selectedPdfFile: null
+  ctypeFiles: {},       // { notes: File, pyqs: File, ... }
+  ctypeExisting: {},    // { notes: {pdf_path, download_on}, ... }
+  ctypeRemoved: {},     // { notes: true } if user removed existing
+  pendingUploadType: null
 };
 
 function getAllSubjects() {
@@ -668,24 +845,15 @@ function updateLoader(text, sub='') {
   $('loaderSub').textContent = sub;
 }
 
-/* Class ka Firestore doc ID banao */
 function classDocId(name) {
-  return String(name || 'class')
-    .toLowerCase()
-    .replace(/[^\w\-\u0900-\u097F]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+  return String(name || 'class').toLowerCase().replace(/[^\w\-\u0900-\u097F]+/g, '-').replace(/^-+|-+$/g, '');
 }
-
-/* Subject ka Firestore doc ID */
 function subjectDocId(name) {
-  return String(name || 'subject')
-    .toLowerCase()
-    .replace(/[^\w\-\u0900-\u097F]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+  return String(name || 'subject').toLowerCase().replace(/[^\w\-\u0900-\u097F]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
 /* ============================================================
-   AUTH CHECK
+   AUTH
    ============================================================ */
 auth.onAuthStateChanged((user) => {
   if (!user) {
@@ -698,7 +866,7 @@ auth.onAuthStateChanged((user) => {
 });
 
 /* ============================================================
-   LOAD DATA — read nested structure
+   LOAD DATA
    ============================================================ */
 async function loadAll() {
   showLoader('Loading…');
@@ -722,11 +890,8 @@ async function loadAll() {
         subjects: []
       };
 
-      const subjectsSnap = await db
-        .collection(SM_COLLECTION).doc(classDoc.id)
-        .collection(SUB_SUBCOLLECTION)
-        .orderBy('display_order')
-        .get();
+      const subjectsSnap = await db.collection(SM_COLLECTION).doc(classDoc.id)
+        .collection(SUB_SUBCOLLECTION).orderBy('display_order').get();
 
       for (const subjectDoc of subjectsSnap.docs) {
         const subjectData = subjectDoc.data();
@@ -738,12 +903,9 @@ async function loadAll() {
           chapters: []
         };
 
-        const chaptersSnap = await db
-          .collection(SM_COLLECTION).doc(classDoc.id)
+        const chaptersSnap = await db.collection(SM_COLLECTION).doc(classDoc.id)
           .collection(SUB_SUBCOLLECTION).doc(subjectDoc.id)
-          .collection(CH_SUBCOLLECTION)
-          .orderBy('display_order')
-          .get();
+          .collection(CH_SUBCOLLECTION).orderBy('display_order').get();
 
         chaptersSnap.forEach(chDoc => {
           subj.chapters.push({ id: chDoc.id, ...chDoc.data() });
@@ -776,10 +938,20 @@ function renderAll() {
   updateCounts();
 }
 
+function countCtypes(chapter) {
+  // Purana structure: pdf_path → notes
+  let count = 0;
+  CONTENT_TYPES.forEach(t => {
+    const c = chapter[t.key];
+    if (c && c.pdf_path) count++;
+    else if (t.key === 'notes' && chapter.pdf_path) count++;  // legacy
+  });
+  return count;
+}
+
 function updateCounts() {
   const allSubs = getAllSubjects();
   const allChs = getAllChapters();
-
   $('tabCountClasses').textContent = state.classes.length;
   $('tabCountSubjects').textContent = allSubs.length;
   $('tabCountChapters').textContent = allChs.length;
@@ -867,7 +1039,14 @@ function renderChapters() {
     return;
   }
   box.innerHTML = list.map(ch => {
-    const hasPdf = !!ch.pdf_path;
+    const typeCount = countCtypes(ch);
+    const badges = CONTENT_TYPES.map(t => {
+      const c = ch[t.key];
+      const hasFile = (c && c.pdf_path) || (t.key === 'notes' && ch.pdf_path);
+      if (!hasFile) return '';
+      const isOff = c && c.download_on === false;
+      return `<span class="badge-soft ${isOff ? 'badge-draft' : 'badge-pdf'}">${t.icon} ${t.label}${isOff ? ' 🔒' : ''}</span>`;
+    }).join('');
     return `
       <div class="sm-item">
         <div class="sm-item-icon" style="font-size:.9rem;font-weight:800;">${String(ch.chapter_number||0).padStart(2,'0')}</div>
@@ -878,7 +1057,7 @@ function renderChapters() {
             <span><i class="fas fa-book"></i> ${esc(ch.subject_name)}</span>
             ${ch.is_new ? '<span class="badge-soft badge-new">NEW</span>' : ''}
             ${ch.is_published === false ? '<span class="badge-soft badge-draft">Draft</span>' : '<span class="badge-soft badge-pub">Live</span>'}
-            ${hasPdf ? '<span class="badge-soft badge-pdf"><i class="fas fa-file-pdf"></i> PDF</span>' : '<span class="badge-soft badge-nopdf">No PDF</span>'}
+            ${typeCount ? badges : '<span class="badge-soft badge-nopdf">No PDF</span>'}
           </div>
         </div>
         <div class="sm-item-actions">
@@ -890,9 +1069,7 @@ function renderChapters() {
   }).join('');
 }
 
-/* ============================================================
-   FILTERS
-   ============================================================ */
+/* FILTERS */
 function refreshFilters() {
   const sc = $('subjectClassFilter');
   if (sc) {
@@ -923,9 +1100,7 @@ function updateChapterSubjectFilter() {
   ss.value = cur;
 }
 
-/* ============================================================
-   TABS
-   ============================================================ */
+/* TABS */
 document.querySelectorAll('.sm-tab').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.sm-tab').forEach(b => b.classList.remove('active'));
@@ -935,9 +1110,7 @@ document.querySelectorAll('.sm-tab').forEach(btn => {
   });
 });
 
-/* ============================================================
-   MODALS
-   ============================================================ */
+/* MODALS */
 let classModal, subjectModal, chapterModal;
 document.addEventListener('DOMContentLoaded', () => {
   classModal = new bootstrap.Modal($('classModal'));
@@ -945,7 +1118,9 @@ document.addEventListener('DOMContentLoaded', () => {
   chapterModal = new bootstrap.Modal($('chapterModal'));
 });
 
-/* CLASS CRUD */
+/* ============================================================
+   CLASS CRUD
+   ============================================================ */
 window.openClassModal = function() {
   state.editing.class = null;
   $('classModalTitle').textContent = 'Add Class';
@@ -968,24 +1143,15 @@ window.saveClass = async function() {
   const name = $('classFormName').value.trim();
   const order = parseInt($('classFormOrder').value, 10) || 0;
   if (!name) return toast('Class name required', true);
-
   showLoader('Saving class…');
   try {
     if (state.editing.class) {
-      await db.collection(SM_COLLECTION).doc(state.editing.class.id).update({
-        name, display_order: order
-      });
-      state.editing.class.name = name;
-      state.editing.class.display_order = order;
+      await db.collection(SM_COLLECTION).doc(state.editing.class.id).update({ name, display_order: order });
       toast('Class updated ✓');
     } else {
       const newId = classDocId(name);
       const existing = await db.collection(SM_COLLECTION).doc(newId).get();
-      if (existing.exists) {
-        toast('Class with this name already exists', true);
-        hideLoader();
-        return;
-      }
+      if (existing.exists) { toast('Class already exists', true); hideLoader(); return; }
       await db.collection(SM_COLLECTION).doc(newId).set({
         name, display_order: order,
         created_at: firebase.firestore.FieldValue.serverTimestamp()
@@ -994,53 +1160,43 @@ window.saveClass = async function() {
     }
     classModal.hide();
     await loadAll();
-  } catch (err) {
-    console.error(err);
-    toast('Save failed: ' + err.message, true);
-  } finally {
-    hideLoader();
-  }
+  } catch (err) { toast('Save failed: ' + err.message, true); }
+  finally { hideLoader(); }
 };
 
 window.deleteClass = async function(id) {
   const cls = findClass(id);
   if (!cls) return;
-  const subCount = (cls.subjects || []).length;
-  if (!confirm(subCount ? `Delete "${cls.name}" + ${subCount} subject(s) + all chapters?` : `Delete "${cls.name}"?`)) return;
-
+  if (!confirm(`Delete "${cls.name}" + all subjects + chapters?`)) return;
   showLoader('Deleting…');
   try {
     for (const s of (cls.subjects || [])) {
       for (const ch of (s.chapters || [])) {
+        for (const t of CONTENT_TYPES) {
+          const c = ch[t.key];
+          if (c && c.pdf_path) await deletePdfFromSupabase(c.pdf_path);
+        }
         if (ch.pdf_path) await deletePdfFromSupabase(ch.pdf_path);
       }
     }
     const subjectsSnap = await db.collection(SM_COLLECTION).doc(id).collection(SUB_SUBCOLLECTION).get();
     for (const sDoc of subjectsSnap.docs) {
-      const chaptersSnap = await db.collection(SM_COLLECTION).doc(id)
-        .collection(SUB_SUBCOLLECTION).doc(sDoc.id)
-        .collection(CH_SUBCOLLECTION).get();
-      for (const chDoc of chaptersSnap.docs) {
-        await chDoc.ref.delete();
-      }
+      const chaptersSnap = await db.collection(SM_COLLECTION).doc(id).collection(SUB_SUBCOLLECTION).doc(sDoc.id).collection(CH_SUBCOLLECTION).get();
+      for (const chDoc of chaptersSnap.docs) await chDoc.ref.delete();
       await sDoc.ref.delete();
     }
     await db.collection(SM_COLLECTION).doc(id).delete();
-
-    toast('Class + children deleted ✓');
+    toast('Class deleted ✓');
     await loadAll();
-  } catch (err) {
-    console.error(err);
-    toast('Delete failed: ' + err.message, true);
-  } finally {
-    hideLoader();
-  }
+  } catch (err) { toast('Delete failed: ' + err.message, true); }
+  finally { hideLoader(); }
 };
 
-/* SUBJECT CRUD */
+/* ============================================================
+   SUBJECT CRUD
+   ============================================================ */
 window.openSubjectModal = function(presetClassId) {
   state.editing.subject = null;
-  state.editing.parentClassId = null;
   $('subjectModalTitle').textContent = 'Add Subject';
   if (!state.classes.length) return toast('Add a class first!', true);
   $('subjectFormClass').innerHTML = state.classes.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
@@ -1070,97 +1226,67 @@ window.saveSubject = async function() {
   const name = $('subjectFormName').value.trim();
   const icon = $('subjectFormIcon').value.trim() || '📘';
   const order = parseInt($('subjectFormOrder').value, 10) || 0;
-  if (!newClassId) return toast('Select a class', true);
+  if (!newClassId) return toast('Select class', true);
   if (!name) return toast('Subject name required', true);
-
   showLoader('Saving subject…');
   try {
     if (state.editing.subject) {
       const oldClassId = state.editing.parentClassId;
       const oldSubjectId = state.editing.subject.id;
-
       if (oldClassId !== newClassId) {
         const newSubjectId = subjectDocId(name);
-        await db.collection(SM_COLLECTION).doc(newClassId)
-          .collection(SUB_SUBCOLLECTION).doc(newSubjectId).set({
-            name, icon, display_order: order,
-            created_at: firebase.firestore.FieldValue.serverTimestamp()
-          });
-
-        const oldChaptersSnap = await db.collection(SM_COLLECTION).doc(oldClassId)
-          .collection(SUB_SUBCOLLECTION).doc(oldSubjectId)
-          .collection(CH_SUBCOLLECTION).get();
-        for (const chDoc of oldChaptersSnap.docs) {
-          await db.collection(SM_COLLECTION).doc(newClassId)
-            .collection(SUB_SUBCOLLECTION).doc(newSubjectId)
-            .collection(CH_SUBCOLLECTION).doc(chDoc.id).set(chDoc.data());
+        await db.collection(SM_COLLECTION).doc(newClassId).collection(SUB_SUBCOLLECTION).doc(newSubjectId).set({
+          name, icon, display_order: order, created_at: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        const oldChSnap = await db.collection(SM_COLLECTION).doc(oldClassId).collection(SUB_SUBCOLLECTION).doc(oldSubjectId).collection(CH_SUBCOLLECTION).get();
+        for (const chDoc of oldChSnap.docs) {
+          await db.collection(SM_COLLECTION).doc(newClassId).collection(SUB_SUBCOLLECTION).doc(newSubjectId).collection(CH_SUBCOLLECTION).doc(chDoc.id).set(chDoc.data());
+          await chDoc.ref.delete();
         }
-
-        for (const chDoc of oldChaptersSnap.docs) await chDoc.ref.delete();
-        await db.collection(SM_COLLECTION).doc(oldClassId)
-          .collection(SUB_SUBCOLLECTION).doc(oldSubjectId).delete();
+        await db.collection(SM_COLLECTION).doc(oldClassId).collection(SUB_SUBCOLLECTION).doc(oldSubjectId).delete();
       } else {
-        await db.collection(SM_COLLECTION).doc(oldClassId)
-          .collection(SUB_SUBCOLLECTION).doc(oldSubjectId).update({
-            name, icon, display_order: order
-          });
+        await db.collection(SM_COLLECTION).doc(oldClassId).collection(SUB_SUBCOLLECTION).doc(oldSubjectId).update({ name, icon, display_order: order });
       }
       toast('Subject updated ✓');
     } else {
       const subjectId = subjectDocId(name);
-      const existing = await db.collection(SM_COLLECTION).doc(newClassId)
-        .collection(SUB_SUBCOLLECTION).doc(subjectId).get();
-      if (existing.exists) {
-        toast('Subject already exists in this class', true);
-        hideLoader();
-        return;
-      }
-      await db.collection(SM_COLLECTION).doc(newClassId)
-        .collection(SUB_SUBCOLLECTION).doc(subjectId).set({
-          name, icon, display_order: order,
-          created_at: firebase.firestore.FieldValue.serverTimestamp()
-        });
+      const existing = await db.collection(SM_COLLECTION).doc(newClassId).collection(SUB_SUBCOLLECTION).doc(subjectId).get();
+      if (existing.exists) { toast('Subject already exists', true); hideLoader(); return; }
+      await db.collection(SM_COLLECTION).doc(newClassId).collection(SUB_SUBCOLLECTION).doc(subjectId).set({
+        name, icon, display_order: order, created_at: firebase.firestore.FieldValue.serverTimestamp()
+      });
       toast('Subject added ✓');
     }
     subjectModal.hide();
     await loadAll();
-  } catch (err) {
-    console.error(err);
-    toast('Save failed: ' + err.message, true);
-  } finally {
-    hideLoader();
-  }
+  } catch (err) { toast('Save failed: ' + err.message, true); }
+  finally { hideLoader(); }
 };
 
 window.deleteSubject = async function(classId, subjectId) {
   const s = findSubject(classId, subjectId);
   if (!s) return;
-  const chCount = (s.chapters || []).length;
-  if (!confirm(chCount ? `Delete "${s.name}" + ${chCount} chapter(s)?` : `Delete "${s.name}"?`)) return;
-
+  if (!confirm(`Delete "${s.name}" + all chapters?`)) return;
   showLoader('Deleting…');
   try {
     for (const ch of (s.chapters || [])) {
+      for (const t of CONTENT_TYPES) {
+        const c = ch[t.key];
+        if (c && c.pdf_path) await deletePdfFromSupabase(c.pdf_path);
+      }
       if (ch.pdf_path) await deletePdfFromSupabase(ch.pdf_path);
     }
-    const chaptersSnap = await db.collection(SM_COLLECTION).doc(classId)
-      .collection(SUB_SUBCOLLECTION).doc(subjectId)
-      .collection(CH_SUBCOLLECTION).get();
+    const chaptersSnap = await db.collection(SM_COLLECTION).doc(classId).collection(SUB_SUBCOLLECTION).doc(subjectId).collection(CH_SUBCOLLECTION).get();
     for (const chDoc of chaptersSnap.docs) await chDoc.ref.delete();
-    await db.collection(SM_COLLECTION).doc(classId)
-      .collection(SUB_SUBCOLLECTION).doc(subjectId).delete();
-    toast('Subject + chapters deleted ✓');
+    await db.collection(SM_COLLECTION).doc(classId).collection(SUB_SUBCOLLECTION).doc(subjectId).delete();
+    toast('Subject deleted ✓');
     await loadAll();
-  } catch (err) {
-    console.error(err);
-    toast('Delete failed: ' + err.message, true);
-  } finally {
-    hideLoader();
-  }
+  } catch (err) { toast('Delete failed: ' + err.message, true); }
+  finally { hideLoader(); }
 };
 
 /* ============================================================
-   SUPABASE PDF UPLOAD / DELETE
+   SUPABASE
    ============================================================ */
 function extractSupabasePath(pdfUrl) {
   if (!pdfUrl || typeof pdfUrl !== 'string') return null;
@@ -1171,52 +1297,26 @@ function extractSupabasePath(pdfUrl) {
 }
 
 async function uploadPdfToSupabase(file, chapterName) {
-  let safeName = String(chapterName || 'chapter')
-    .replace(/[^\w.\-]/g, '_')
-    .replace(/_+/g, '_')
-    .replace(/^_|_$/g, '')
-    .slice(0, 50);
-
-  if (!safeName || safeName.length < 2) {
-    safeName = 'chapter';
-  }
-
+  let safeName = String(chapterName || 'chapter').replace(/[^\w.\-]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '').slice(0, 50);
+  if (!safeName || safeName.length < 2) safeName = 'chapter';
   const fileName = `${Date.now()}_${safeName}.pdf`;
-
   updateLoader('Uploading PDF to Supabase…', 'Please wait, don\'t close this window');
-
-  const { data, error } = await supabaseClient.storage
-    .from(PDF_BUCKET)
-    .upload(fileName, file, {
-      contentType: 'application/pdf',
-      cacheControl: '3600',
-      upsert: false
-    });
-
-  if (error) {
-    console.error('Supabase upload error:', error);
-    throw new Error('Supabase: ' + error.message);
-  }
-
-  const { data: urlData } = supabaseClient.storage
-    .from(PDF_BUCKET)
-    .getPublicUrl(fileName);
-
+  const { data, error } = await supabaseClient.storage.from(PDF_BUCKET).upload(fileName, file, {
+    contentType: 'application/pdf', cacheControl: '3600', upsert: false
+  });
+  if (error) throw new Error('Supabase: ' + error.message);
+  const { data: urlData } = supabaseClient.storage.from(PDF_BUCKET).getPublicUrl(fileName);
   return urlData.publicUrl;
 }
 
 async function deletePdfFromSupabase(pdfUrlOrPath) {
   try {
     let path = pdfUrlOrPath;
-    if (pdfUrlOrPath && pdfUrlOrPath.startsWith('http')) {
-      path = extractSupabasePath(pdfUrlOrPath);
-    }
+    if (pdfUrlOrPath && pdfUrlOrPath.startsWith('http')) path = extractSupabasePath(pdfUrlOrPath);
     if (!path) return;
     const { error } = await supabaseClient.storage.from(PDF_BUCKET).remove([path]);
     if (error) console.warn('Supabase delete failed:', error.message);
-  } catch (e) {
-    console.warn('Delete PDF error:', e.message);
-  }
+  } catch (e) { console.warn('Delete PDF error:', e.message); }
 }
 
 /* ============================================================
@@ -1231,11 +1331,86 @@ function refreshChapterFormSubjects() {
     : '<option value="">No subjects</option>';
 }
 
+function resetCtypeUI() {
+  state.ctypeFiles = {};
+  state.ctypeExisting = {};
+  state.ctypeRemoved = {};
+
+  CONTENT_TYPES.forEach(t => {
+    // Set default
+    state.ctypeExisting[t.key] = { pdf_path: null, download_on: true };
+    // Update UI
+    $('ctype-status-' + t.key).textContent = 'No PDF uploaded';
+    $('ctype-icon-' + t.key).classList.remove('pdf');
+    $('ctype-row-' + t.key).classList.remove('has-file');
+    $('ctype-rm-' + t.key).style.display = 'none';
+    $('ctype-dl-' + t.key).checked = true;
+    $('ctype-toggle-' + t.key).classList.add('on');
+    $('ctype-toggle-' + t.key).querySelector('span:last-child').textContent = 'Download ON';
+  });
+}
+
+window.pickCtypeFile = function(type) {
+  state.pendingUploadType = type;
+  $('ctypeCurrentType').value = type;
+  $('ctypeFileInput').value = '';
+  $('ctypeFileInput').click();
+};
+
+$('ctypeFileInput').addEventListener('change', (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const type = state.pendingUploadType;
+  if (!type) return;
+  if (f.type !== 'application/pdf' && !/\.pdf$/i.test(f.name)) return toast('Only PDF files allowed', true);
+  if (f.size > 20 * 1024 * 1024) return toast('PDF too large (max 20 MB)', true);
+
+  state.ctypeFiles[type] = f;
+  state.ctypeRemoved[type] = false;
+
+  const row = $('ctype-row-' + type);
+  const icon = $('ctype-icon-' + type);
+  const status = $('ctype-status-' + type);
+  const rm = $('ctype-rm-' + type);
+
+  row.classList.add('has-file');
+  icon.classList.add('pdf');
+  status.textContent = f.name + ' (' + (f.size/1024/1024).toFixed(2) + ' MB)';
+  rm.style.display = 'inline-flex';
+  toast('PDF selected — Save dabayein ✓');
+});
+
+window.removeCtypeFile = function(type) {
+  state.ctypeFiles[type] = null;
+  state.ctypeRemoved[type] = true;
+  const row = $('ctype-row-' + type);
+  const icon = $('ctype-icon-' + type);
+  const status = $('ctype-status-' + type);
+  const rm = $('ctype-rm-' + type);
+  row.classList.remove('has-file');
+  icon.classList.remove('pdf');
+  status.textContent = 'No PDF uploaded';
+  rm.style.display = 'none';
+  toast('PDF removed — Save dabayein');
+};
+
+/* Toggle on/off listeners */
+CONTENT_TYPES.forEach(t => {
+  $('ctype-dl-' + t.key).addEventListener('change', (e) => {
+    const checked = e.target.checked;
+    const label = $('ctype-toggle-' + t.key);
+    label.classList.toggle('on', checked);
+    label.querySelector('span:last-child').textContent = checked ? 'Download ON' : 'Download OFF';
+    if (!state.ctypeExisting[t.key]) state.ctypeExisting[t.key] = {};
+    state.ctypeExisting[t.key].download_on = checked;
+  });
+});
+
 window.openChapterModal = function() {
   state.editing.chapter = null;
   state.editing.parentClassId = null;
   state.editing.parentSubjectId = null;
-  state.selectedPdfFile = null;
+  resetCtypeUI();
 
   if (!state.classes.length) return toast('Add a class first!', true);
 
@@ -1249,9 +1424,6 @@ window.openChapterModal = function() {
   $('chapterFormOrder').value = 1;
   $('chapterFormIsNew').checked = false;
   $('chapterFormIsPublished').checked = true;
-  $('fileInfo').style.display = 'none';
-  $('fileName').textContent = '';
-  $('chapterFormPdf').value = '';
   $('uploadProgress').classList.remove('show');
 
   chapterModal.show();
@@ -1266,7 +1438,8 @@ window.editChapter = function(classId, subjectId, chapterId) {
   state.editing.chapter = ch;
   state.editing.parentClassId = classId;
   state.editing.parentSubjectId = subjectId;
-  state.selectedPdfFile = null;
+
+  resetCtypeUI();
 
   $('chapterModalTitle').textContent = 'Edit Chapter';
   $('chapterFormClass').innerHTML = state.classes.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
@@ -1279,16 +1452,39 @@ window.editChapter = function(classId, subjectId, chapterId) {
   $('chapterFormOrder').value = ch.display_order || 0;
   $('chapterFormIsNew').checked = !!ch.is_new;
   $('chapterFormIsPublished').checked = ch.is_published !== false;
-  $('chapterFormPdf').value = '';
   $('uploadProgress').classList.remove('show');
 
-  if (ch.pdf_path) {
-    $('fileInfo').style.display = 'flex';
-    const p = extractSupabasePath(ch.pdf_path) || ch.pdf_path;
-    $('fileName').textContent = 'Existing PDF: ' + p.split('/').pop();
-  } else {
-    $('fileInfo').style.display = 'none';
-  }
+  // Populate existing content types
+  CONTENT_TYPES.forEach(t => {
+    const c = ch[t.key];
+    let pdf_path = null;
+    let download_on = true;
+
+    if (c && c.pdf_path) {
+      pdf_path = c.pdf_path;
+      download_on = c.download_on !== false;
+    } else if (t.key === 'notes' && ch.pdf_path) {
+      // Legacy: purana pdf_path notes ke tarah
+      pdf_path = ch.pdf_path;
+      download_on = true;
+    }
+
+    if (pdf_path) {
+      state.ctypeExisting[t.key] = { pdf_path, download_on };
+      const row = $('ctype-row-' + t.key);
+      const icon = $('ctype-icon-' + t.key);
+      const status = $('ctype-status-' + t.key);
+      const rm = $('ctype-rm-' + t.key);
+      row.classList.add('has-file');
+      icon.classList.add('pdf');
+      const fname = (extractSupabasePath(pdf_path) || pdf_path).split('/').pop();
+      status.textContent = 'Existing: ' + fname;
+      rm.style.display = 'inline-flex';
+      $('ctype-dl-' + t.key).checked = download_on;
+      $('ctype-toggle-' + t.key).classList.toggle('on', download_on);
+      $('ctype-toggle-' + t.key).querySelector('span:last-child').textContent = download_on ? 'Download ON' : 'Download OFF';
+    }
+  });
 
   chapterModal.show();
 };
@@ -1296,30 +1492,6 @@ window.editChapter = function(classId, subjectId, chapterId) {
 document.addEventListener('change', (e) => {
   if (e.target && e.target.id === 'chapterFormClass') refreshChapterFormSubjects();
 });
-
-document.addEventListener('DOMContentLoaded', () => {
-  $('uploadDrop').addEventListener('click', () => $('chapterFormPdf').click());
-  $('chapterFormPdf').addEventListener('change', (e) => {
-    const f = e.target.files[0];
-    if (!f) return;
-    if (f.type !== 'application/pdf' && !/\.pdf$/i.test(f.name)) return toast('Only PDF files allowed', true);
-    if (f.size > 20 * 1024 * 1024) return toast('PDF too large (max 20 MB)', true);
-    state.selectedPdfFile = f;
-    $('fileInfo').style.display = 'flex';
-    $('fileName').textContent = f.name + ' (' + (f.size/1024/1024).toFixed(2) + ' MB)';
-  });
-});
-
-window.clearPdfSelection = function() {
-  state.selectedPdfFile = null;
-  $('chapterFormPdf').value = '';
-  if (state.editing.chapter && state.editing.chapter.pdf_path) {
-    const p = extractSupabasePath(state.editing.chapter.pdf_path) || state.editing.chapter.pdf_path;
-    $('fileName').textContent = 'Existing PDF: ' + p.split('/').pop();
-  } else {
-    $('fileInfo').style.display = 'none';
-  }
-};
 
 window.saveChapter = async function() {
   const targetClassId = $('chapterFormClass').value;
@@ -1330,45 +1502,67 @@ window.saveChapter = async function() {
   const is_new = $('chapterFormIsNew').checked;
   const is_published = $('chapterFormIsPublished').checked;
 
-  if (!targetSubjectId) return toast('Select a subject', true);
+  if (!targetSubjectId) return toast('Select subject', true);
   if (!name) return toast('Chapter name required', true);
 
   const saveBtn = $('saveChapterBtn');
   saveBtn.disabled = true;
 
-  let pdf_path = state.editing.chapter?.pdf_path || null;
-
   try {
-    if (state.selectedPdfFile) {
-      showLoader('Uploading PDF to Supabase…', 'Please wait, don\'t close this window');
-      $('uploadProgress').classList.add('show');
-      $('uploadStatus').textContent = 'Uploading to Supabase…';
-      $('uploadPercent').textContent = '30%';
-      $('uploadFill').style.width = '30%';
+    // Build content types data
+    const contentData = {};
 
-      const newUrl = await uploadPdfToSupabase(state.selectedPdfFile, name);
+    for (const t of CONTENT_TYPES) {
+      const existing = state.ctypeExisting[t.key] || {};
+      let pdf_path = existing.pdf_path || null;
+      const download_on = $('ctype-dl-' + t.key).checked;
 
-      $('uploadPercent').textContent = '80%';
-      $('uploadFill').style.width = '80%';
+      // New file uploaded?
+      if (state.ctypeFiles[t.key]) {
+        showLoader('Uploading ' + t.label + '…', 'Please wait…');
+        $('uploadProgress').classList.add('show');
+        $('uploadStatus').textContent = 'Uploading ' + t.label + '…';
+        $('uploadPercent').textContent = '50%';
+        $('uploadFill').style.width = '50%';
 
-      if (state.editing.chapter?.pdf_path) {
-        updateLoader('Removing old PDF…');
-        await deletePdfFromSupabase(state.editing.chapter.pdf_path);
+        const newUrl = await uploadPdfToSupabase(state.ctypeFiles[t.key], name + '_' + t.key);
+
+        // Delete old PDF if replacing
+        if (existing.pdf_path) {
+          await deletePdfFromSupabase(existing.pdf_path);
+        }
+        pdf_path = newUrl;
+        $('uploadPercent').textContent = '100%';
+        $('uploadFill').style.width = '100%';
       }
-      pdf_path = newUrl;
+      // Removed existing?
+      else if (state.ctypeRemoved[t.key] && existing.pdf_path) {
+        await deletePdfFromSupabase(existing.pdf_path);
+        pdf_path = null;
+      }
+
+      contentData[t.key] = { pdf_path, download_on };
     }
 
     updateLoader('Saving chapter…');
-    $('uploadPercent').textContent = '95%';
-    $('uploadFill').style.width = '95%';
+
+    // 🔥 Purana pdf_path field bhi notes ke saath sync rakh (legacy compat)
+    const legacy_pdf_path = contentData.notes?.pdf_path || null;
 
     const chapterData = {
       chapter_number: number,
       name,
       display_order: order,
-      pdf_path,
       is_new,
-      is_published
+      is_published,
+      // New multi-type fields
+      notes: contentData.notes,
+      pyqs: contentData.pyqs,
+      test: contentData.test,
+      objective: contentData.objective,
+      subjective: contentData.subjective,
+      // Legacy field (for old code compat)
+      pdf_path: legacy_pdf_path
     };
 
     if (state.editing.chapter) {
@@ -1393,22 +1587,18 @@ window.saveChapter = async function() {
       }
       toast('Chapter updated ✓');
     } else {
-      const chapterRef = db.collection(SM_COLLECTION).doc(targetClassId)
+      const ref = db.collection(SM_COLLECTION).doc(targetClassId)
         .collection(SUB_SUBCOLLECTION).doc(targetSubjectId)
         .collection(CH_SUBCOLLECTION).doc();
-      await chapterRef.set({
+      await ref.set({
         ...chapterData,
         created_at: firebase.firestore.FieldValue.serverTimestamp()
       });
       toast('Chapter added ✓');
     }
 
-    $('uploadPercent').textContent = '100%';
-    $('uploadFill').style.width = '100%';
-
     setTimeout(async () => {
       chapterModal.hide();
-      state.selectedPdfFile = null;
       await loadAll();
     }, 400);
   } catch (err) {
@@ -1427,21 +1617,20 @@ window.deleteChapter = async function(classId, subjectId, chapterId) {
   const ch = (s.chapters || []).find(c => c.id === chapterId);
   if (!ch) return;
   if (!confirm(`Delete chapter "${ch.name}"?`)) return;
-
   showLoader('Deleting…');
   try {
+    for (const t of CONTENT_TYPES) {
+      const c = ch[t.key];
+      if (c && c.pdf_path) await deletePdfFromSupabase(c.pdf_path);
+    }
     if (ch.pdf_path) await deletePdfFromSupabase(ch.pdf_path);
     await db.collection(SM_COLLECTION).doc(classId)
       .collection(SUB_SUBCOLLECTION).doc(subjectId)
       .collection(CH_SUBCOLLECTION).doc(chapterId).delete();
     toast('Chapter deleted ✓');
     await loadAll();
-  } catch (err) {
-    console.error(err);
-    toast('Delete failed: ' + err.message, true);
-  } finally {
-    hideLoader();
-  }
+  } catch (err) { toast('Delete failed: ' + err.message, true); }
+  finally { hideLoader(); }
 };
 
 /* ============================================================
