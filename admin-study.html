@@ -396,6 +396,42 @@
     font-size:.78rem;color:#0d2b6b;font-weight:700;
     display:inline-flex;align-items:center;gap:7px;
   }
+
+  /* Warning box for no subjects */
+  .subj-warning {
+    background:#fff5f8;
+    border:2px dashed #ffc9d6;
+    border-radius:12px;
+    padding:14px 16px;
+    margin-top:8px;
+    display:none;
+    align-items:center;
+    gap:12px;
+  }
+  .subj-warning.show { display:flex; }
+  .subj-warning .warn-ico {
+    width:36px;height:36px;flex:none;border-radius:10px;
+    background:#ffe3ea;color:#e0245e;
+    display:grid;place-items:center;font-size:1rem;
+  }
+  .subj-warning .warn-txt {
+    flex:1;min-width:0;
+  }
+  .subj-warning .warn-txt strong {
+    display:block;font-size:.85rem;font-weight:800;color:#e0245e;margin-bottom:2px;
+  }
+  .subj-warning .warn-txt small {
+    display:block;font-size:.74rem;color:#8a95ae;font-weight:600;line-height:1.4;
+  }
+  .subj-warning button {
+    background:linear-gradient(135deg,#ffd257,#f7b500);
+    color:#0d2b6b;font-weight:800;
+    border:none;border-radius:9px;
+    padding:8px 14px;font-size:.78rem;
+    cursor:pointer;flex-shrink:0;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .subj-warning button:hover { transform:scale(1.03); }
 </style>
 </head>
 <body>
@@ -627,12 +663,24 @@
         <div class="row g-3">
           <div class="col-md-6">
             <label class="form-label">Class *</label>
-            <select class="form-select" id="contentFormClass"></select>
+            <select class="form-select" id="contentFormClass" onchange="refreshContentFormSubjects()"></select>
           </div>
           <div class="col-md-6">
             <label class="form-label">Subject *</label>
             <select class="form-select" id="contentFormSubject"></select>
           </div>
+        </div>
+
+        <!-- Warning box -->
+        <div class="subj-warning" id="subjWarning">
+          <div class="warn-ico"><i class="fas fa-exclamation-triangle"></i></div>
+          <div class="warn-txt">
+            <strong>No subjects in this class</strong>
+            <small>Please add a subject first in the Subjects tab.</small>
+          </div>
+          <button type="button" onclick="quickAddSubject()">
+            <i class="fas fa-plus"></i> Add Subject
+          </button>
         </div>
 
         <div class="row g-3 mt-1">
@@ -768,10 +816,9 @@ const state = {
   medium: 'hindi',
   contentType: 'notes',
   classes: [],
-  editingClass: null,
-  editingSubject: null,
+  editing: { class:null, subject:null, parentClassId:null },
   editingContent: null,
-  editing: { parentClassId:null, parentSubjectId:null, chapterId:null },
+  editingInfo: { parentClassId: null, parentSubjectId: null, chapterId: null },
   selectedPdfFile: null,
   downloadLocked: false,
   modalMedium: 'hindi'
@@ -909,6 +956,7 @@ async function loadAll() {
 
         chaptersSnap.forEach(chDoc => {
           const chData = chDoc.data();
+
           if (chData.pdf_path && !chData.mediums) {
             chData.mediums = {
               hindi: {
@@ -919,6 +967,7 @@ async function loadAll() {
               }
             };
           }
+
           subj.chapters.push({
             id: chDoc.id,
             name: chData.name || '',
@@ -1192,7 +1241,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* CLASS CRUD */
 window.openClassModal = function() {
-  state.editingClass = null;
+  state.editing.class = null;
   $('classModalTitle').textContent = 'Add Class';
   $('classFormName').value = '';
   $('classFormOrder').value = state.classes.length + 1;
@@ -1202,7 +1251,7 @@ window.openClassModal = function() {
 window.editClass = function(id) {
   const c = findClass(id);
   if (!c) return;
-  state.editingClass = c;
+  state.editing.class = c;
   $('classModalTitle').textContent = 'Edit Class';
   $('classFormName').value = c.name || '';
   $('classFormOrder').value = c.display_order || 0;
@@ -1216,8 +1265,8 @@ window.saveClass = async function() {
 
   showLoader('Saving class…');
   try {
-    if (state.editingClass) {
-      await db.collection(SM_COLLECTION).doc(state.editingClass.id).update({ name, display_order: order });
+    if (state.editing.class) {
+      await db.collection(SM_COLLECTION).doc(state.editing.class.id).update({ name, display_order: order });
       toast('Class updated ✓');
     } else {
       const newId = classDocId(name);
@@ -1281,7 +1330,7 @@ window.deleteClass = async function(id) {
 
 /* SUBJECT CRUD */
 window.openSubjectModal = function(presetClassId) {
-  state.editingSubject = null;
+  state.editing.subject = null;
   state.editing.parentClassId = null;
   $('subjectModalTitle').textContent = 'Add Subject';
   if (!state.classes.length) return toast('Add a class first!', true);
@@ -1296,7 +1345,7 @@ window.openSubjectModal = function(presetClassId) {
 window.editSubject = function(classId, subjectId) {
   const s = findSubject(classId, subjectId);
   if (!s) return;
-  state.editingSubject = s;
+  state.editing.subject = s;
   state.editing.parentClassId = classId;
   $('subjectModalTitle').textContent = 'Edit Subject';
   $('subjectFormClass').innerHTML = state.classes.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
@@ -1317,9 +1366,9 @@ window.saveSubject = async function() {
 
   showLoader('Saving subject…');
   try {
-    if (state.editingSubject) {
+    if (state.editing.subject) {
       const oldClassId = state.editing.parentClassId;
-      const oldSubjectId = state.editingSubject.id;
+      const oldSubjectId = state.editing.subject.id;
       if (oldClassId !== newClassId) {
         const newSubjectId = subjectDocId(name);
         await db.collection(SM_COLLECTION).doc(newClassId)
@@ -1455,23 +1504,39 @@ async function deletePdfFromSupabase(pdfUrlOrPath) {
 }
 
 /* ============================================================
-   CONTENT (CHAPTER) MODAL
-   🔥 FIX: Ab class ke badle SAARE subjects dikhte hain
+   🔥 CONTENT (CHAPTER) MODAL — Fixed Subject Dropdown
    ============================================================ */
 function refreshContentFormSubjects() {
   const classId = $('contentFormClass').value;
   const cls = findClass(classId);
   const subs = cls ? (cls.subjects || []) : [];
-  
-  if (!subs.length) {
-    $('contentFormSubject').innerHTML = '<option value="">No subjects in this class. Add a subject first!</option>';
+  const subjSelect = $('contentFormSubject');
+  const warning = $('subjWarning');
+
+  if (subs.length === 0) {
+    subjSelect.innerHTML = '<option value="">⚠ No subjects in this class</option>';
+    subjSelect.style.borderColor = '#ffc9d6';
+    subjSelect.style.background = '#fff5f8';
+    subjSelect.disabled = true;
+    if (warning) warning.classList.add('show');
     return;
   }
-  
-  $('contentFormSubject').innerHTML = subs.map(s => 
+
+  subjSelect.style.borderColor = '';
+  subjSelect.style.background = '';
+  subjSelect.disabled = false;
+  if (warning) warning.classList.remove('show');
+  subjSelect.innerHTML = subs.map(s =>
     `<option value="${s.id}">${esc(s.name)}</option>`
   ).join('');
 }
+
+window.quickAddSubject = function() {
+  const classId = $('contentFormClass').value;
+  if (!classId) return toast('Select a class first', true);
+  contentModal.hide();
+  setTimeout(() => openSubjectModal(classId), 350);
+};
 
 window.setModalMedium = function(medium) {
   state.modalMedium = medium;
@@ -1487,9 +1552,7 @@ window.setDownloadLock = function(locked) {
 
 window.openContentModal = function() {
   state.editingContent = null;
-  state.editing.parentClassId = null;
-  state.editing.parentSubjectId = null;
-  state.editing.chapterId = null;
+  state.editingInfo = { parentClassId: null, parentSubjectId: null, chapterId: null };
   state.selectedPdfFile = null;
   state.modalMedium = state.medium;
   state.downloadLocked = false;
@@ -1499,8 +1562,18 @@ window.openContentModal = function() {
   const label = CONTENT_LABELS[state.contentType];
   $('contentModalTitle').textContent = 'Add ' + label;
 
-  $('contentFormClass').innerHTML = state.classes.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
-  $('contentFormClass').value = state.classes[0].id;
+  // 🔥 Find first class WITH subjects
+  const classWithSubjects = state.classes.find(c => (c.subjects || []).length > 0);
+
+  $('contentFormClass').innerHTML = state.classes.map(c => {
+    const subCount = (c.subjects || []).length;
+    const suffix = subCount === 0 ? ' — (no subjects)' : ` (${subCount} subjects)`;
+    return `<option value="${c.id}">${esc(c.name)}${suffix}</option>`;
+  }).join('');
+
+  // Auto-select class with subjects (else first class)
+  $('contentFormClass').value = classWithSubjects ? classWithSubjects.id : state.classes[0].id;
+
   refreshContentFormSubjects();
 
   $('contentFormNumber').value = 1;
@@ -1525,16 +1598,18 @@ window.editContent = function(classId, subjectId, chapterId) {
   if (!ch) return;
 
   state.editingContent = ch;
-  state.editing.parentClassId = classId;
-  state.editing.parentSubjectId = subjectId;
-  state.editing.chapterId = chapterId;
+  state.editingInfo = { parentClassId: classId, parentSubjectId: subjectId, chapterId };
   state.selectedPdfFile = null;
   state.modalMedium = state.medium;
 
   const label = CONTENT_LABELS[state.contentType];
   $('contentModalTitle').textContent = 'Edit ' + label;
 
-  $('contentFormClass').innerHTML = state.classes.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  $('contentFormClass').innerHTML = state.classes.map(c => {
+    const subCount = (c.subjects || []).length;
+    const suffix = subCount === 0 ? ' — (no subjects)' : ` (${subCount} subjects)`;
+    return `<option value="${c.id}">${esc(c.name)}${suffix}</option>`;
+  }).join('');
   $('contentFormClass').value = classId;
   refreshContentFormSubjects();
   $('contentFormSubject').value = subjectId;
@@ -1601,7 +1676,9 @@ window.saveContent = async function() {
   const contentType = state.contentType;
   const downloadLocked = state.downloadLocked;
 
-  if (!targetSubjectId) return toast('Select a subject', true);
+  if (!targetSubjectId) {
+    return toast('Please add a subject in this class first!', true);
+  }
   if (!name) return toast('Chapter name required', true);
 
   const saveBtn = $('saveContentBtn');
@@ -1656,9 +1733,9 @@ window.saveContent = async function() {
     };
 
     if (chapter) {
-      const oldClassId = state.editing.parentClassId;
-      const oldSubjectId = state.editing.parentSubjectId;
-      const chId = state.editing.chapterId;
+      const oldClassId = state.editingInfo.parentClassId;
+      const oldSubjectId = state.editingInfo.parentSubjectId;
+      const chId = state.editingInfo.chapterId;
 
       if (oldClassId === targetClassId && oldSubjectId === targetSubjectId) {
         await db.collection(SM_COLLECTION).doc(targetClassId)
