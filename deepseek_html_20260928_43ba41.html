@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>About & Toppers Admin · Quest Coaching</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:#f0f2f5;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding:20px;
+    min-height:100vh;
+  }
+  .admin-container { max-width:1100px; margin:0 auto; }
+
+  .page-header {
+    background:linear-gradient(135deg, #0d2b6b 0%, #16409b 100%);
+    border-radius:20px;
+    padding:22px 26px;
+    color:#fff;
+    margin-bottom:20px;
+    box-shadow:0 10px 30px rgba(13,43,107,.25);
+    border-bottom:4px solid #ffc42e;
+    position:relative;
+    overflow:hidden;
+  }
+  .page-header::before {
+    content:"";position:absolute;top:-60%;right:-10%;width:50%;height:220%;
+    background:radial-gradient(circle, rgba(255,196,46,.18) 0%, transparent 70%);
+    pointer-events:none;
+  }
+  .page-header h1 {
+    font-size:1.6rem;font-weight:800;letter-spacing:.4px;
+    display:flex;align-items:center;gap:12px;
+    position:relative;z-index:2;
+  }
+  .page-header h1 .ico {
+    width:46px;height:46px;border-radius:12px;
+    background:linear-gradient(135deg,#ffd257,#f7b500);
+    color:#0d2b6b;display:grid;place-items:center;font-size:22px;
+    box-shadow:0 4px 12px rgba(247,181,0,.4);
+  }
+  .page-header p {
+    font-size:.88rem;color:#c3d2f2;margin-top:6px;
+    position:relative;z-index:2;
+  }
+
+  .sm-tabs {
+    display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;
+    background:#fff;padding:8px;border-radius:14px;
+    box-shadow:0 4px 14px rgba(13,43,107,.06);
+  }
+  .sm-tab {
+    flex:1;min-width:140px;
+    padding:12px 16px;border-radius:10px;
+    background:transparent;border:none;
+    font-size:.92rem;font-weight:700;color:#64748b;
+    cursor:pointer;transition:all .2s;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .sm-tab:hover { background:#f1f5ff;color:#0d2b6b; }
+  .sm-tab.active {
+    background:linear-gradient(135deg,#0d2b6b,#16409b);
+    color:#fff;box-shadow:0 4px 12px rgba(13,43,107,.28);
+  }
+
+  .sm-panel { display:none; }
+  .sm-panel.active { display:block; animation:fade .3s ease; }
+  @keyframes fade { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
+
+  .sm-card {
+    background:#fff;border-radius:18px;
+    padding:24px;box-shadow:0 4px 16px rgba(13,43,107,.06);
+    border:1px solid #eef2f9;margin-bottom:18px;
+  }
+  .sm-card-header {
+    display:flex;align-items:center;justify-content:space-between;
+    flex-wrap:wrap;gap:12px;margin-bottom:18px;
+    padding-bottom:14px;border-bottom:1px solid #eef2f9;
+  }
+  .sm-card-header h2 {
+    font-size:1.15rem;font-weight:800;color:#0d2b6b;
+    display:flex;align-items:center;gap:10px;
+  }
+  .sm-card-header h2 i{color:#ffc42e;}
+
+  .btn-gold {
+    background:linear-gradient(135deg,#ffd257,#f7b500);
+    color:#0d2b6b;font-weight:800;
+    border:none;border-radius:10px;
+    padding:10px 18px;font-size:.88rem;
+    box-shadow:0 3px 10px rgba(247,181,0,.32);
+    display:inline-flex;align-items:center;gap:7px;
+    transition:all .2s;
+  }
+  .btn-gold:hover { transform:translateY(-1px);box-shadow:0 6px 16px rgba(247,181,0,.45);color:#0d2b6b; }
+  .btn-gold:disabled { opacity:.6;cursor:not-allowed; }
+
+  .btn-navy {
+    background:linear-gradient(135deg,#0d2b6b,#16409b);
+    color:#fff;font-weight:800;
+    border:none;border-radius:10px;
+    padding:10px 18px;font-size:.88rem;
+    box-shadow:0 3px 10px rgba(13,43,107,.32);
+    display:inline-flex;align-items:center;gap:7px;
+    transition:all .2s;
+  }
+  .btn-navy:hover { transform:translateY(-1px);color:#fff; }
+
+  .btn-outline-soft {
+    background:#fff;border:1.5px solid #dbe6ff;color:#0d2b6b;
+    font-weight:700;border-radius:9px;
+    padding:6px 12px;font-size:.8rem;
+    transition:all .2s;
+  }
+  .btn-outline-soft:hover { background:#f1f5ff;border-color:#0d2b6b;color:#0d2b6b; }
+
+  .btn-danger-soft {
+    background:#fff;border:1.5px solid #ffd3de;color:#e0245e;
+    font-weight:700;border-radius:9px;
+    padding:6px 12px;font-size:.8rem;
+    transition:all .2s;
+  }
+  .btn-danger-soft:hover { background:#ffe3ea;border-color:#e0245e;color:#e0245e; }
+
+  .form-label { font-size:.78rem;font-weight:800;color:#5f6f90;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px; }
+  .form-control, .form-select, textarea {
+    border:1.5px solid #dbe6ff;border-radius:10px;
+    padding:10px 12px;font-size:.9rem;
+    transition:all .15s;
+    width:100%;
+  }
+  .form-control:focus, .form-select:focus, textarea:focus {
+    border-color:#16409b;box-shadow:0 0 0 3px rgba(22,64,155,.12);
+    outline:none;
+  }
+  textarea { resize:vertical; min-height:120px; font-family:inherit; }
+
+  .upload-drop {
+    border:2px dashed #dbe6ff;border-radius:12px;
+    padding:20px;text-align:center;
+    background:#fbfcff;cursor:pointer;
+    transition:all .2s;
+  }
+  .upload-drop:hover { border-color:#16409b;background:#f1f5ff; }
+  .upload-drop .ico { font-size:1.8rem;color:#0d2b6b;margin-bottom:8px; }
+  .upload-drop .txt { font-size:.85rem;font-weight:700;color:#0d2b6b; }
+  .upload-drop .sub { font-size:.74rem;color:#8a95ae;margin-top:4px; }
+
+  .file-info {
+    margin-top:10px;font-size:.78rem;color:#0e9f6e;font-weight:700;
+    display:flex;align-items:center;gap:6px;
+  }
+
+  .upload-progress {
+    margin-top:12px;background:#f1f5ff;
+    border-radius:10px;padding:12px 14px;
+    border:1px solid #dbe6ff;display:none;
+  }
+  .upload-progress.show { display:block; }
+  .upload-progress .bar {
+    width:100%;height:8px;background:#dbe6ff;border-radius:20px;overflow:hidden;
+    margin-top:8px;
+  }
+  .upload-progress .fill {
+    height:100%;width:0%;background:linear-gradient(90deg,#0d2b6b,#f7b500);
+    border-radius:20px;transition:width .3s ease;
+  }
+
+  /* Preview card */
+  .about-preview {
+    background:linear-gradient(135deg,#f1f5ff,#e4edff);
+    border:1.5px solid #dbe6ff;
+    border-radius:14px;
+    padding:18px;
+    text-align:center;
+    margin-bottom:16px;
+  }
+  .about-preview img{
+    width:100px;height:100px;border-radius:50%;
+    border:3px solid #ffc42e;
+    object-fit:cover;
+    margin:0 auto 10px;
+    box-shadow:0 4px 12px rgba(13,43,107,.15);
+  }
+  .about-preview h3{
+    font-size:1.05rem;font-weight:800;color:#0d2b6b;margin-bottom:4px;
+  }
+  .about-preview .role{
+    font-size:.72rem;font-weight:800;
+    letter-spacing:1px;text-transform:uppercase;
+    color:#f7b500;margin-bottom:8px;
+  }
+  .about-preview .phone{
+    display:inline-flex;align-items:center;gap:6px;
+    background:#fff;border:1.5px solid #dbe6ff;
+    padding:6px 14px;border-radius:20px;
+    font-size:.82rem;font-weight:700;color:#0d2b6b;
+  }
+
+  /* Toppers list */
+  .topper-item {
+    display:flex;align-items:center;gap:14px;
+    background:#f9fbff;border:1.5px solid #e3e9f5;
+    border-radius:14px;padding:14px;
+    margin-bottom:10px;
+    transition:all .2s;
+  }
+  .topper-item:hover { border-color:#cfdcf5;box-shadow:0 4px 12px rgba(13,43,107,.08); }
+  .topper-item .topper-img{
+    width:60px;height:60px;border-radius:50%;
+    border:2px solid #ffc42e;
+    overflow:hidden;flex-shrink:0;
+    background:#eef3ff;
+  }
+  .topper-item .topper-img img{width:100%;height:100%;object-fit:cover;}
+  .topper-item .topper-info{flex:1;min-width:0;}
+  .topper-item .topper-info h4{
+    font-size:.95rem;font-weight:800;color:#0d2b6b;margin-bottom:4px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .topper-item .topper-info .meta{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+    font-size:.75rem;color:#64748b;font-weight:600;
+  }
+  .topper-item .topper-info .badge-soft {
+    padding:2px 8px;border-radius:20px;
+    font-size:.62rem;font-weight:800;letter-spacing:.4px;
+    text-transform:uppercase;
+  }
+  .badge-rank { background:#fef3c7;color:#b45309; }
+  .badge-marks { background:#e0f2fe;color:#0369a1; }
+
+  .sm-item-actions { display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0; }
+  @media(max-width:600px){
+    .topper-item { flex-wrap:wrap; }
+    .sm-item-actions { width:100%;justify-content:flex-end;margin-top:6px; }
+  }
+
+  .sm-empty {
+    text-align:center;padding:40px 20px;
+    background:#fbfcff;border:2px dashed #dbe6ff;
+    border-radius:14px;color:#64748b;
+  }
+  .sm-empty .ico-big { font-size:2.6rem;color:#cfdcf5;margin-bottom:12px; }
+
+  /* Toast */
+  .sm-toast {
+    position:fixed;bottom:24px;left:50%;transform:translate(-50%,90px);
+    background:#081f52;color:#fff;
+    padding:12px 20px;border-radius:12px;
+    font-size:.88rem;font-weight:700;
+    box-shadow:0 12px 32px rgba(8,31,82,.4);
+    border-left:4px solid #ffc42e;
+    opacity:0;pointer-events:none;transition:all .28s;
+    z-index:9999;max-width:90vw;text-align:center;
+  }
+  .sm-toast.show { opacity:1;transform:translate(-50%,0); }
+  .sm-toast.error { border-left-color:#e0245e; }
+
+  /* Loader */
+  .sm-loader-overlay {
+    position:fixed;inset:0;background:rgba(8,31,82,.55);
+    backdrop-filter:blur(3px);z-index:9998;
+    display:none;align-items:center;justify-content:center;
+  }
+  .sm-loader-overlay.show { display:flex; }
+  .sm-loader-box {
+    background:#fff;border-radius:16px;padding:24px 30px;
+    text-align:center;box-shadow:0 20px 60px rgba(8,31,82,.35);
+    min-width:240px;
+  }
+  .sm-loader-box .spinner {
+    width:38px;height:38px;border:3px solid #e3e9f5;
+    border-top-color:#0d2b6b;border-radius:50%;
+    animation:spin .75s linear infinite;margin:0 auto 12px;
+  }
+  @keyframes spin { to{transform:rotate(360deg);} }
+  .sm-loader-box p { font-size:.86rem;font-weight:700;color:#0d2b6b; }
+
+  .back-bar {
+    display:flex;align-items:center;justify-content:space-between;
+    flex-wrap:wrap;gap:10px;margin-bottom:16px;
+  }
+  .back-btn {
+    background:#fff;border:1.5px solid #dbe6ff;color:#0d2b6b;
+    border-radius:10px;padding:8px 14px;
+    font-size:.84rem;font-weight:700;
+    display:inline-flex;align-items:center;gap:7px;
+    transition:all .2s;text-decoration:none;
+  }
+  .back-btn:hover { background:#f1f5ff;border-color:#0d2b6b;color:#0d2b6b; }
+
+  .user-pill {
+    background:#f1f5ff;border:1.5px solid #dbe6ff;
+    padding:7px 14px;border-radius:50px;
+    font-size:.78rem;color:#0d2b6b;font-weight:700;
+    display:inline-flex;align-items:center;gap:7px;
+  }
+</style>
+</head>
+<body>
+
+<div class="sm-loader-overlay" id="loaderOverlay">
+  <div class="sm-loader-box">
+    <div class="spinner"></div>
+    <p id="loaderText">Saving…</p>
+  </div>
+</div>
+
+<div class="admin-container">
+
+  <div class="page-header">
+    <h1>
+      <span class="ico"><i class="fas fa-info-circle"></i></span>
+      About & Toppers Admin
+    </h1>
+    <p>Manage About Us page and Our Toppers section</p>
+  </div>
+
+  <div class="back-bar">
+    <a href="admin.html" class="back-btn">
+      <i class="fas fa-arrow-left"></i> Back to Admin Panel
+    </a>
+    <span class="user-pill" id="userPill">
+      <i class="fas fa-user-shield"></i>
+      <span id="userEmail">--</span>
+    </span>
+  </div>
+
+  <div class="sm-tabs">
+    <button class="sm-tab active" data-tab="about">
+      <i class="fas fa-school"></i> About Us
+    </button>
+    <button class="sm-tab" data-tab="toppers">
+      <i class="fas fa-trophy"></i> Our Toppers
+    </button>
+  </div>
+
+  <!-- ABOUT PANEL -->
+  <div class="sm-panel active" id="panel-about">
+    <div class="sm-card">
+      <div class="sm-card-header">
+        <h2><i class="fas fa-school"></i> About Coaching</h2>
+        <button class="btn-navy" onclick="saveAbout()" id="saveAboutBtn">
+          <i class="fas fa-save"></i> Save
+        </button>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Director Name</label>
+          <input type="text" class="form-control" id="aboutDirectorName" placeholder="MR. RAVI SIR">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Director Phone</label>
+          <input type="tel" class="form-control" id="aboutDirectorPhone" placeholder="+91 9708442525">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Location</label>
+          <input type="text" class="form-control" id="aboutLocation" placeholder="Gopalganj, Bihar">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Established Year</label>
+          <input type="text" class="form-control" id="aboutYear" placeholder="2015">
+        </div>
+        <div class="col-12">
+          <label class="form-label">About Text</label>
+          <textarea id="aboutText" placeholder="Write about your coaching..."></textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Director Photo</label>
+          <div class="upload-drop" id="aboutPhotoDrop">
+            <input type="file" id="aboutPhotoInput" accept="image/*" style="display:none;">
+            <div class="ico"><i class="fas fa-cloud-upload-alt"></i></div>
+            <div class="txt">Click to upload director photo</div>
+            <div class="sub">Max 5 MB · JPG / PNG</div>
+          </div>
+          <div class="file-info" id="aboutPhotoInfo" style="display:none;">
+            <i class="fas fa-check-circle"></i>
+            <span id="aboutPhotoName"></span>
+            <button class="btn-outline-soft ms-2" onclick="clearAboutPhoto()" style="padding:3px 8px;font-size:.72rem;">
+              <i class="fas fa-times"></i> Remove
+            </button>
+          </div>
+          <div class="upload-progress" id="aboutUploadProgress">
+            <div style="display:flex;justify-content:space-between;font-size:.78rem;font-weight:700;color:#0d2b6b;">
+              <span>Uploading…</span>
+            </div>
+            <div class="bar"><div class="fill" id="aboutUploadFill"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Preview -->
+      <div style="margin-top:24px;">
+        <label class="form-label">Live Preview</label>
+        <div class="about-preview" id="aboutPreview">
+          <img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" id="previewPhoto">
+          <h3 id="previewName">MR. RAVI SIR</h3>
+          <div class="role">Director & Founder</div>
+          <div class="phone">
+            <i class="fas fa-phone"></i>
+            <span id="previewPhone">+91 9708442525</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOPPERS PANEL -->
+  <div class="sm-panel" id="panel-toppers">
+    <div class="sm-card">
+      <div class="sm-card-header">
+        <h2><i class="fas fa-trophy"></i> Our Toppers <span style="background:#e8eafe;color:#1a237e;font-size:.72rem;font-weight:800;padding:3px 9px;border-radius:20px;" id="topperCount">0</span></h2>
+        <button class="btn-gold" onclick="openTopperModal()">
+          <i class="fas fa-plus"></i> Add Topper
+        </button>
+      </div>
+      <div id="toppersList">
+        <div class="sm-empty">
+          <div class="ico-big"><i class="fas fa-spinner fa-spin"></i></div>
+          <p>Loading toppers…</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TOPPER MODAL -->
+<div class="modal fade" id="topperModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="border:none;border-radius:18px;overflow:hidden;">
+      <div class="modal-header" style="background:linear-gradient(135deg,#0d2b6b,#16409b);color:#fff;border-bottom:3px solid #ffc42e;padding:16px 20px;">
+        <h5 class="modal-title" style="font-weight:800;font-size:1rem;">
+          <i class="fas fa-trophy"></i> <span id="topperModalTitle">Add Topper</span>
+        </h5>
+        <button class="btn-close" data-bs-dismiss="modal" style="filter:brightness(0) invert(1);"></button>
+      </div>
+      <div class="modal-body" style="padding:22px;">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Student Name *</label>
+            <input type="text" class="form-control" id="topperName" placeholder="e.g. Rinki Kumari">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Class *</label>
+            <input type="text" class="form-control" id="topperClass" placeholder="e.g. Class 10">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Rank *</label>
+            <input type="text" class="form-control" id="topperRank" placeholder="e.g. 1st">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Total Marks *</label>
+            <input type="text" class="form-control" id="topperMarks" placeholder="e.g. 469 / 500">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Year</label>
+            <input type="text" class="form-control" id="topperYear" placeholder="e.g. 2025">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Display Order</label>
+            <input type="number" class="form-control" id="topperOrder" value="1" min="0">
+          </div>
+          <div class="col-md-8">
+            <label class="form-label">Student Photo</label>
+            <div class="upload-drop" id="topperPhotoDrop" style="padding:14px;">
+              <input type="file" id="topperPhotoInput" accept="image/*" style="display:none;">
+              <div class="ico" style="font-size:1.4rem;margin-bottom:6px;"><i class="fas fa-camera"></i></div>
+              <div class="txt" style="font-size:.78rem;">Click to upload photo</div>
+              <div class="sub" style="font-size:.7rem;">JPG / PNG · Max 5 MB</div>
+            </div>
+            <div class="file-info" id="topperPhotoInfo" style="display:none;">
+              <i class="fas fa-check-circle"></i>
+              <span id="topperPhotoName"></span>
+              <button class="btn-outline-soft ms-2" onclick="clearTopperPhoto()" style="padding:3px 8px;font-size:.72rem;">
+                <i class="fas fa-times"></i> Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="border-top:1px solid #eef2f9;padding:14px 20px;">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:10px;font-weight:700;font-size:.85rem;">Cancel</button>
+        <button class="btn-gold" onclick="saveTopper()" id="saveTopperBtn">
+          <i class="fas fa-save"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sm-toast" id="smToast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ============================================================
+   INIT
+   ============================================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
+  authDomain: "quest-coaching.firebaseapp.com",
+  databaseURL: "https://quest-coaching-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "quest-coaching",
+  storageBucket: "quest-coaching.firebasestorage.app",
+  messagingSenderId: "131948734089",
+  appId: "1:131948734089:web:f4ba25110c8b1298360858"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const SUPABASE_URL = 'https://zjwvxqjmccqhyxsaeggw.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_6a_9nxKSSLUZMmSGleyycg_kQ4a4BtI';
+const IMG_BUCKET = 'study_material';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const $ = (id) => document.getElementById(id);
+const esc = (s='') => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+let toastTimer;
+function toast(msg, isError=false) {
+  const el = $('smToast');
+  el.textContent = msg;
+  el.className = 'sm-toast show' + (isError ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+function showLoader(text='Saving…') {
+  $('loaderText').textContent = text;
+  $('loaderOverlay').classList.add('show');
+}
+function hideLoader() { $('loaderOverlay').classList.remove('show'); }
+
+const state = {
+  toppers: [],
+  editingTopper: null,
+  aboutPhotoFile: null,
+  topperPhotoFile: null,
+  existingAboutPhotoUrl: null,
+  existingTopperPhotoUrl: null
+};
+
+/* ============================================================
+   AUTH
+   ============================================================ */
+auth.onAuthStateChanged((user) => {
+  if (!user) {
+    alert('Please login from main page first!');
+    window.location.href = 'index.html';
+    return;
+  }
+  $('userEmail').textContent = user.email || 'Admin';
+  loadAbout();
+  loadToppers();
+});
+
+/* ============================================================
+   TABS
+   ============================================================ */
+document.querySelectorAll('.sm-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sm-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.sm-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    $('panel-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ============================================================
+   SUPABASE IMAGE UPLOAD
+   ============================================================ */
+async function uploadImageToSupabase(file, baseName) {
+  let safeName = String(baseName || 'file')
+    .replace(/[^\w.\-]/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_|_$/g, '')
+    .slice(0, 40);
+  if (!safeName || safeName.length < 2) safeName = 'image';
+
+  const fileName = `${Date.now()}_${safeName}.jpg`;
+
+  const { data, error } = await supabaseClient.storage
+    .from(IMG_BUCKET)
+    .upload(fileName, file, {
+      contentType: file.type || 'image/jpeg',
+      cacheControl: '3600',
+      upsert: false
+    });
+
+  if (error) throw new Error('Upload failed: ' + error.message);
+
+  const { data: urlData } = supabaseClient.storage
+    .from(IMG_BUCKET)
+    .getPublicUrl(fileName);
+
+  return urlData.publicUrl;
+}
+
+/* ============================================================
+   ABOUT
+   ============================================================ */
+async function loadAbout() {
+  try {
+    const snap = await db.collection('settings').doc('about_us').get();
+    if (snap.exists) {
+      const data = snap.data();
+      $('aboutDirectorName').value = data.directorName || '';
+      $('aboutDirectorPhone').value = data.directorPhone || '';
+      $('aboutLocation').value = data.location || '';
+      $('aboutYear').value = data.year || '';
+      $('aboutText').value = data.aboutText || '';
+      state.existingAboutPhotoUrl = data.photoUrl || null;
+      updateAboutPreview();
+    } else {
+      updateAboutPreview();
+    }
+  } catch (err) {
+    console.error('Load about failed:', err);
+    toast('Failed to load about data', true);
+  }
+}
+
+function updateAboutPreview() {
+  const name = $('aboutDirectorName').value.trim() || 'MR. RAVI SIR';
+  const phone = $('aboutDirectorPhone').value.trim() || '+91 9708442525';
+  $('previewName').textContent = name;
+  $('previewPhone').textContent = phone;
+  if (state.aboutPhotoFile) {
+    $('previewPhoto').src = URL.createObjectURL(state.aboutPhotoFile);
+  } else if (state.existingAboutPhotoUrl) {
+    $('previewPhoto').src = state.existingAboutPhotoUrl;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Live preview update
+  ['aboutDirectorName', 'aboutDirectorPhone'].forEach(id => {
+    $(id).addEventListener('input', updateAboutPreview);
+  });
+
+  // About photo upload
+  $('aboutPhotoDrop').addEventListener('click', () => $('aboutPhotoInput').click());
+  $('aboutPhotoInput').addEventListener('change', (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    if (!f.type.startsWith('image/')) return toast('Only image files allowed', true);
+    if (f.size > 5 * 1024 * 1024) return toast('Image too large (max 5 MB)', true);
+    state.aboutPhotoFile = f;
+    $('aboutPhotoInfo').style.display = 'flex';
+    $('aboutPhotoName').textContent = f.name + ' (' + (f.size/1024/1024).toFixed(2) + ' MB)';
+    updateAboutPreview();
+  });
+
+  // Topper photo upload
+  $('topperPhotoDrop').addEventListener('click', () => $('topperPhotoInput').click());
+  $('topperPhotoInput').addEventListener('change', (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    if (!f.type.startsWith('image/')) return toast('Only image files allowed', true);
+    if (f.size > 5 * 1024 * 1024) return toast('Image too large (max 5 MB)', true);
+    state.topperPhotoFile = f;
+    $('topperPhotoInfo').style.display = 'flex';
+    $('topperPhotoName').textContent = f.name + ' (' + (f.size/1024/1024).toFixed(2) + ' MB)';
+  });
+});
+
+window.clearAboutPhoto = function() {
+  state.aboutPhotoFile = null;
+  $('aboutPhotoInput').value = '';
+  $('aboutPhotoInfo').style.display = 'none';
+  updateAboutPreview();
+};
+
+window.clearTopperPhoto = function() {
+  state.topperPhotoFile = null;
+  state.existingTopperPhotoUrl = null;
+  $('topperPhotoInput').value = '';
+  $('topperPhotoInfo').style.display = 'none';
+};
+
+window.saveAbout = async function() {
+  const directorName = $('aboutDirectorName').value.trim();
+  const directorPhone = $('aboutDirectorPhone').value.trim();
+  const location = $('aboutLocation').value.trim();
+  const year = $('aboutYear').value.trim();
+  const aboutText = $('aboutText').value.trim();
+
+  const saveBtn = $('saveAboutBtn');
+  saveBtn.disabled = true;
+
+  try {
+    let photoUrl = state.existingAboutPhotoUrl;
+
+    if (state.aboutPhotoFile) {
+      showLoader('Uploading photo…');
+      $('aboutUploadProgress').classList.add('show');
+      $('aboutUploadFill').style.width = '40%';
+
+      photoUrl = await uploadImageToSupabase(state.aboutPhotoFile, 'director_photo');
+
+      $('aboutUploadFill').style.width = '100%';
+    }
+
+    showLoader('Saving…');
+    await db.collection('settings').doc('about_us').set({
+      photoUrl: photoUrl || '',
+      directorName,
+      directorPhone,
+      location,
+      year,
+      aboutText,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    state.existingAboutPhotoUrl = photoUrl;
+    state.aboutPhotoFile = null;
+    $('aboutPhotoInput').value = '';
+    $('aboutPhotoInfo').style.display = 'none';
+    $('aboutUploadProgress').classList.remove('show');
+
+    toast('About saved ✓');
+  } catch (err) {
+    console.error(err);
+    toast('Save failed: ' + err.message, true);
+  } finally {
+    saveBtn.disabled = false;
+    hideLoader();
+  }
+};
+
+/* ============================================================
+   TOPPERS
+   ============================================================ */
+async function loadToppers() {
+  try {
+    const snap = await db.collection('toppers').orderBy('display_order').get();
+    state.toppers = [];
+    snap.forEach(doc => state.toppers.push({ id: doc.id, ...doc.data() }));
+    renderToppers();
+  } catch (err) {
+    console.error('Load toppers failed:', err);
+    $('toppersList').innerHTML = `<div class="sm-empty">
+      <div class="ico-big"><i class="fas fa-exclamation-triangle"></i></div>
+      <p>Failed to load toppers</p>
+    </div>`;
+  }
+}
+
+function renderToppers() {
+  $('topperCount').textContent = state.toppers.length;
+  const box = $('toppersList');
+
+  if (!state.toppers.length) {
+    box.innerHTML = `<div class="sm-empty">
+      <div class="ico-big"><i class="fas fa-trophy"></i></div>
+      <h4 style="color:#0d2b6b;font-weight:800;font-size:.98rem;margin-bottom:6px;">No toppers yet</h4>
+      <p style="font-size:.84rem;color:#8a95ae;">Click "Add Topper" to add your first student.</p>
+    </div>`;
+    return;
+  }
+
+  box.innerHTML = state.toppers.map(t => {
+    const photo = t.photoUrl || 'https://i.ibb.co/hF9tmnpB/20250903-202922.jpg';
+    return `
+      <div class="topper-item">
+        <div class="topper-img">
+          <img src="${esc(photo)}" alt="${esc(t.name || '')}" onerror="this.src='https://i.ibb.co/hF9tmnpB/20250903-202922.jpg'">
+        </div>
+        <div class="topper-info">
+          <h4>${esc(t.name || 'Student')}</h4>
+          <div class="meta">
+            ${t.rank ? `<span class="badge-soft badge-rank"><i class="fas fa-medal"></i> ${esc(t.rank)}</span>` : ''}
+            ${t.class ? `<span><i class="fas fa-graduation-cap"></i> ${esc(t.class)}</span>` : ''}
+            ${t.marks ? `<span class="badge-soft badge-marks"><i class="fas fa-star"></i> ${esc(t.marks)}</span>` : ''}
+            ${t.year ? `<span><i class="fas fa-calendar"></i> ${esc(t.year)}</span>` : ''}
+          </div>
+        </div>
+        <div class="sm-item-actions">
+          <button class="btn-outline-soft" onclick="editTopper('${t.id}')"><i class="fas fa-pen"></i> Edit</button>
+          <button class="btn-danger-soft" onclick="deleteTopper('${t.id}')"><i class="fas fa-trash"></i> Delete</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+let topperModal;
+document.addEventListener('DOMContentLoaded', () => {
+  topperModal = new bootstrap.Modal($('topperModal'));
+});
+
+window.openTopperModal = function() {
+  state.editingTopper = null;
+  state.topperPhotoFile = null;
+  state.existingTopperPhotoUrl = null;
+
+  $('topperModalTitle').textContent = 'Add Topper';
+  $('topperName').value = '';
+  $('topperClass').value = '';
+  $('topperRank').value = '';
+  $('topperMarks').value = '';
+  $('topperYear').value = '';
+  $('topperOrder').value = state.toppers.length + 1;
+  $('topperPhotoInput').value = '';
+  $('topperPhotoInfo').style.display = 'none';
+
+  topperModal.show();
+};
+
+window.editTopper = function(id) {
+  const t = state.toppers.find(x => x.id === id);
+  if (!t) return;
+
+  state.editingTopper = t;
+  state.topperPhotoFile = null;
+  state.existingTopperPhotoUrl = t.photoUrl || null;
+
+  $('topperModalTitle').textContent = 'Edit Topper';
+  $('topperName').value = t.name || '';
+  $('topperClass').value = t.class || '';
+  $('topperRank').value = t.rank || '';
+  $('topperMarks').value = t.marks || '';
+  $('topperYear').value = t.year || '';
+  $('topperOrder').value = t.display_order || 0;
+  $('topperPhotoInput').value = '';
+  $('topperPhotoInfo').style.display = 'none';
+
+  topperModal.show();
+};
+
+window.saveTopper = async function() {
+  const name = $('topperName').value.trim();
+  const cls = $('topperClass').value.trim();
+  const rank = $('topperRank').value.trim();
+  const marks = $('topperMarks').value.trim();
+  const year = $('topperYear').value.trim();
+  const order = parseInt($('topperOrder').value, 10) || 0;
+
+  if (!name) return toast('Student name required', true);
+  if (!cls) return toast('Class required', true);
+  if (!rank) return toast('Rank required', true);
+  if (!marks) return toast('Marks required', true);
+
+  const saveBtn = $('saveTopperBtn');
+  saveBtn.disabled = true;
+
+  try {
+    let photoUrl = state.existingTopperPhotoUrl;
+
+    if (state.topperPhotoFile) {
+      showLoader('Uploading photo…');
+      photoUrl = await uploadImageToSupabase(state.topperPhotoFile, name);
+    }
+
+    showLoader('Saving…');
+
+    const topperData = {
+      name,
+      class: cls,
+      rank,
+      marks,
+      year,
+      display_order: order,
+      photoUrl: photoUrl || '',
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    if (state.editingTopper) {
+      await db.collection('toppers').doc(state.editingTopper.id).update(topperData);
+      toast('Topper updated ✓');
+    } else {
+      await db.collection('toppers').add({
+        ...topperData,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      toast('Topper added ✓');
+    }
+
+    topperModal.hide();
+    state.topperPhotoFile = null;
+    await loadToppers();
+  } catch (err) {
+    console.error(err);
+    toast('Save failed: ' + err.message, true);
+  } finally {
+    saveBtn.disabled = false;
+    hideLoader();
+  }
+};
+
+window.deleteTopper = async function(id) {
+  const t = state.toppers.find(x => x.id === id);
+  if (!t) return;
+  if (!confirm(`Delete topper "${t.name}"?`)) return;
+
+  showLoader('Deleting…');
+  try {
+    await db.collection('toppers').doc(id).delete();
+    toast('Deleted ✓');
+    await loadToppers();
+  } catch (err) {
+    console.error(err);
+    toast('Delete failed: ' + err.message, true);
+  } finally {
+    hideLoader();
+  }
+};
+</script>
+</body>
+</html>
