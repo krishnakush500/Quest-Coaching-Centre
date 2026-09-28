@@ -55,7 +55,6 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 input{font:inherit}
 .wrap{width:100%;max-width:820px;margin:0 auto;padding:0 14px}
 
-/* Header */
 .app-header{
   position:sticky;top:0;z-index:60;
   background:linear-gradient(135deg,#0d2b6b 0%,#16409b 100%);
@@ -327,7 +326,6 @@ main{flex:1 0 auto;padding-bottom:26px}
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 
-/* PDF viewer */
 .pdfjs-viewer{
   margin-top:12px;display:flex;flex-direction:column;
   gap:14px;padding-bottom:24px;
@@ -412,7 +410,7 @@ main{flex:1 0 auto;padding-bottom:26px}
 }
 .toast.show{opacity:1;transform:translate(-50%,0);}
 
-/* WhatsApp Contact Popup */
+/* WhatsApp Popup */
 .popup-overlay{
   position:fixed;inset:0;
   background:rgba(8,31,82,.62);
@@ -428,6 +426,8 @@ main{flex:1 0 auto;padding-bottom:26px}
   box-shadow:0 25px 70px rgba(8,31,82,.42);
   transform:translateY(18px) scale(.96);
   transition:transform .32s cubic-bezier(.25,.8,.25,1);
+  max-height:92vh;
+  display:flex;flex-direction:column;
 }
 .popup-overlay.open .popup-box{transform:translateY(0) scale(1);}
 
@@ -436,6 +436,7 @@ main{flex:1 0 auto;padding-bottom:26px}
   color:#fff;padding:26px 24px 22px;
   position:relative;border-bottom:3px solid #ffc42e;
   text-align:center;
+  flex-shrink:0;
 }
 .popup-header::before{
   content:"";position:absolute;top:-60%;left:-20%;width:60%;height:220%;
@@ -477,7 +478,9 @@ main{flex:1 0 auto;padding-bottom:26px}
   background:#ffc42e;color:#1a237e;border-color:#ffc42e;
   transform:rotate(90deg);
 }
-.popup-body{padding:24px;}
+.popup-body{
+  padding:24px;overflow-y:auto;flex:1;
+}
 
 .contact-box{
   background:linear-gradient(135deg,#f1f5ff,#e4edff);
@@ -658,7 +661,6 @@ main{flex:1 0 auto;padding-bottom:26px}
 <script>
 /* ============================================================
    QUEST COACHING — STUDY MATERIAL PORTAL
-   Nested structure with medium + 5 content types
    ============================================================ */
 
 const firebaseConfig = {
@@ -688,7 +690,7 @@ const CONTENT_LABELS = {
 };
 
 /* WhatsApp Contact */
-const DIRECTOR_PHONE = '919708442525'; // with country code
+const DIRECTOR_PHONE = '919708442525';
 const DIRECTOR_PHONE_DISPLAY = '+91 9708442525';
 const WHATSAPP_MESSAGE = 'Namaste Sir, mujhe aapke notes ke bare me kuch jankari chahiye. Kripya details bhej dijiye.';
 
@@ -699,6 +701,8 @@ const esc = (str = '') => String(str).replace(/[&<>"']/g, ch => (
   { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch]
 ));
 const pad2 = n => String(n).padStart(2, '0');
+const sanitizeFile = (str = 'document') =>
+  str.replace(/[^\w\s\u0900-\u097F-]/g, '').trim().replace(/\s+/g, '_').slice(0, 70) || 'document';
 
 let toastTimer;
 function toast(message) {
@@ -718,8 +722,8 @@ const skeletonChapters = (n = 5) =>
    STATE
    ============================================================ */
 const state = {
-  medium: 'hindi',           // auto-selected
-  contentType: 'notes'       // auto-selected
+  medium: 'hindi',
+  contentType: 'notes'
 };
 
 /* ============================================================
@@ -1218,7 +1222,7 @@ async function renderSubjectPage(classId, subjectId) {
         const previewHref = `#/class/${cls.id}/subject/${subject.id}/chapter/${ch.id}`;
         const locked = isDownloadLocked(ch);
         return `
-          <div class="chapter-row" data-preview-href="${previewHref}">
+          <div class="chapter-row" data-preview-href="${previewHref}" data-locked="${locked}">
             <div class="ch-num" aria-hidden="true">${pad2(ch.chapter_number)}</div>
             <div class="ch-body">
               <div class="ch-name">${esc(ch.name)}</div>
@@ -1283,6 +1287,36 @@ async function renderChapterPage(classId, subjectId, chapterId) {
   const contentLabel = CONTENT_LABELS[state.contentType];
   const mediumLabel = state.medium === 'hindi' ? 'हिंदी मीडियम' : 'English Medium';
 
+  // 🔥 LOCKED — sirf popup, no preview, no PDF
+  if (locked) {
+    app.innerHTML = `
+      ${crumbsHTML([
+        { label:'Home', href:'#/' },
+        { label: cls.name, href:`#/class/${cls.id}` },
+        { label: subject.name, href: subjectHref },
+        { label: `Ch ${pad2(chapter.chapter_number)}` }
+      ])}
+      <div class="page-head" style="padding:12px 0 10px;">
+        <h2 style="font-size:17px;">${esc(chapter.name)}</h2>
+        <p>${contentLabel} · ${mediumLabel}</p>
+      </div>
+      <div class="empty" style="margin-top:16px;padding:34px 20px;">
+        <span class="empty-ico" style="color:#f7b500;"><i class="fas fa-lock"></i></span>
+        <strong style="font-size:16px;">Premium Content</strong>
+        <div style="font-size:13.5px;color:#5f6f90;margin-top:8px;line-height:1.6;">
+          Ye notes sirf paid students ke liye hain.<br>
+          Notes paane ke liye WhatsApp par sampark karein.
+        </div>
+        <button class="btn btn-whatsapp btn-lg" style="margin-top:18px;min-width:220px;" onclick="openWhatsappPopup()">
+          <i class="fab fa-whatsapp"></i> Contact on WhatsApp
+        </button>
+      </div>
+    `;
+    setTimeout(() => openWhatsappPopup(), 350);
+    return;
+  }
+
+  // UNLOCKED — normal preview
   app.innerHTML = `
     ${crumbsHTML([
       { label:'Home', href:'#/' },
@@ -1295,9 +1329,8 @@ async function renderChapterPage(classId, subjectId, chapterId) {
       <p>${contentLabel} · ${mediumLabel}</p>
     </div>
     <div style="margin-bottom:14px;">
-      <button class="btn ${locked ? 'btn-gold' : 'btn-gold'} btn-block btn-lg" onclick="handleDownloadClick('${chapter.id}')">
-        <i class="fas fa-${locked ? 'lock' : 'download'}"></i>
-        ${locked ? 'Get Premium Notes' : 'DOWNLOAD PDF'}
+      <button class="btn btn-gold btn-block btn-lg" onclick="handleDownloadClick('${chapter.id}')">
+        <i class="fas fa-download"></i> DOWNLOAD PDF
       </button>
     </div>
     <div class="pdfjs-viewer" id="pdfViewer">
@@ -1405,9 +1438,10 @@ window.addEventListener('resize', () => {
 });
 
 /* ============================================================
-   DOWNLOAD HANDLERS
+   CLICK HANDLERS
    ============================================================ */
 document.addEventListener('click', e => {
+  // Download button
   const dlBtn = e.target.closest('[data-download]');
   if (dlBtn) {
     e.preventDefault();
@@ -1415,9 +1449,15 @@ document.addEventListener('click', e => {
     handleDownloadClick(dlBtn.dataset.download);
     return;
   }
+
+  // Chapter row click — 🔥 locked hai to popup, else preview
   const row = e.target.closest('.chapter-row[data-preview-href]');
   if (row) {
     e.preventDefault();
+    if (row.dataset.locked === 'true') {
+      openWhatsappPopup();
+      return;
+    }
     location.hash = row.dataset.previewHref.replace(/^#/, '');
   }
 });
@@ -1443,12 +1483,12 @@ window.handleDownloadClick = async function(chapterId) {
     const locked = isDownloadLocked(chapter);
 
     if (locked) {
-      // Show WhatsApp popup — no direct download
-      openWhatsappPopup(chapter);
+      // Locked → only WhatsApp popup
+      openWhatsappPopup();
       return;
     }
 
-    // Unlocked — direct download
+    // Unlocked → direct download
     triggerDownload(url, filename);
     toast('Download started ✓');
   } catch (err) {
@@ -1472,7 +1512,7 @@ function triggerDownload(url, filename) {
 /* ============================================================
    WHATSAPP POPUP
    ============================================================ */
-function openWhatsappPopup(chapter) {
+function openWhatsappPopup() {
   document.getElementById('whatsappPopup').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -1494,9 +1534,7 @@ window.copyPhone = function() {
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(phone).then(() => {
       toast('Number copied ✓');
-    }).catch(() => {
-      fallbackCopy(phone);
-    });
+    }).catch(() => fallbackCopy(phone));
   } else {
     fallbackCopy(phone);
   }
