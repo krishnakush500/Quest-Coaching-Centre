@@ -105,8 +105,10 @@
         .card-5 .card-icon { background: #f3e8ff; color: #8b5cf6; }
         /* Attendance Card Color */
         .card-6 .card-icon { background: #fef3c7; color: #d97706; }
-        /* 🆕 Study Material Card Color — Royal Blue + Gold theme */
+        /* Study Material Card Color — Royal Blue + Gold theme */
         .card-7 .card-icon { background: linear-gradient(135deg, #ffd257, #f7b500); color: #0d2b6b; }
+        /* 🆕 About & Toppers Card Color */
+        .card-8 .card-icon { background: linear-gradient(135deg, #e0f2fe, #bae6fd); color: #0369a1; }
         
         .card-title {
             font-size: 1.1rem;
@@ -140,11 +142,12 @@
         .card-4:hover .card-btn { background: #0ea5e9; }
         .card-5:hover .card-btn { background: #8b5cf6; }
         .card-6:hover .card-btn { background: #d97706; }
-        /* 🆕 Study Material hover */
         .card-7:hover .card-btn { background: #0d2b6b; color: #ffd257; }
         .card-7:hover .card-icon { box-shadow: 0 8px 20px rgba(247,181,0,0.4); }
+        .card-8:hover .card-btn { background: #0369a1; color: #fff; }
+        .card-8:hover .card-icon { box-shadow: 0 8px 20px rgba(14,165,233,0.3); }
 
-        /* 🆕 NEW badge for Study Material card */
+        /* NEW badge for Study Material card */
         .card-new-badge {
             position: absolute;
             top: 12px;
@@ -313,12 +316,20 @@
             <button class="card-btn">Open →</button>
         </div>
 
-        <!-- 🆕 Card 7: STUDY MATERIAL (NEW) -->
+        <!-- Card 7: STUDY MATERIAL -->
         <div class="admin-card card-7" id="studyMaterialCard">
             <span class="card-new-badge">NEW</span>
             <div class="card-icon"><i class="fas fa-book-open"></i></div>
             <h3 class="card-title">📚 Study Material</h3>
             <p class="card-desc">Manage classes, subjects, chapters & PDFs</p>
+            <button class="card-btn">Open →</button>
+        </div>
+
+        <!-- 🆕 Card 8: ABOUT & TOPPERS -->
+        <div class="admin-card card-8" id="aboutToppersCard">
+            <div class="card-icon"><i class="fas fa-info-circle"></i></div>
+            <h3 class="card-title">🏫 About & Toppers</h3>
+            <p class="card-desc">Manage about page & toppers list</p>
             <button class="card-btn">Open →</button>
         </div>
     </div>
@@ -352,10 +363,14 @@
                     <div class="help-step"><strong>💻 Online Test</strong><div class="simple-instruction">Create and publish online tests for students</div></div>
                     <div class="help-step"><strong>🎫 Admit Card Generator</strong><div class="simple-instruction">Generate professional admit cards (enter exam details & roll number)</div></div>
                     <div class="help-step"><strong>📋 Attendance Management</strong><div class="simple-instruction">Mark daily attendance (Present/Absent/Leave), view reports, download PDF</div></div>
-                    <!-- 🆕 Study Material help -->
                     <div class="help-step" style="border-left-color:#f7b500;background:#fffbea;">
                         <strong>📚 Study Material</strong>
                         <div class="simple-instruction">Add classes, subjects & chapters. Upload PDFs from your device → Students can view & download them instantly from the Study Material portal.</div>
+                    </div>
+                    <!-- 🆕 About & Toppers Help -->
+                    <div class="help-step" style="border-left-color:#0ea5e9;background:#f0f9ff;">
+                        <strong>🏫 About & Toppers</strong>
+                        <div class="simple-instruction">Manage your coaching's About Us page (director photo, name, phone, description) and add student toppers with their photo, name, class, marks & rank.</div>
                     </div>
                 </div>
                 <div id="hindiInstructions" style="display:none;">
@@ -365,10 +380,14 @@
                     <div class="help-step"><strong>💻 ऑनलाइन टेस्ट</strong><div class="simple-instruction">ऑनलाइन टेस्ट बनाएं और प्रकाशित करें</div></div>
                     <div class="help-step"><strong>🎫 एडमिट कार्ड</strong><div class="simple-instruction">परीक्षा विवरण और रोल नंबर भरकर एडमिट कार्ड बनाएं</div></div>
                     <div class="help-step"><strong>📋 अटेंडेंस प्रबंधन</strong><div class="simple-instruction">दैनिक अटेंडेंस (Present/Absent/Leave) मार्क करें, रिपोर्ट देखें, PDF डाउनलोड करें</div></div>
-                    <!-- 🆕 Study Material help (Hindi) -->
                     <div class="help-step" style="border-left-color:#f7b500;background:#fffbea;">
                         <strong>📚 स्टडी मटेरियल</strong>
                         <div class="simple-instruction">क्लास, सब्जेक्ट और चैप्टर जोड़ें। अपने डिवाइस से PDF अपलोड करें → छात्र तुरंत स्टडी मटेरियल पोर्टल से देख और डाउनलोड कर सकते हैं।</div>
+                    </div>
+                    <!-- 🆕 About & Toppers Help (Hindi) -->
+                    <div class="help-step" style="border-left-color:#0ea5e9;background:#f0f9ff;">
+                        <strong>🏫 अबाउट और टॉपर्स</strong>
+                        <div class="simple-instruction">अपनी कोचिंग के "About Us" पेज को मैनेज करें (डायरेक्टर की फोटो, नाम, फोन, विवरण) और छात्रों के टॉपर्स जोड़ें (फोटो, नाम, क्लास, मार्क्स और रैंक)।</div>
                     </div>
                 </div>
             </div>
@@ -418,7 +437,8 @@
     const onlineTestCard = document.getElementById('onlineTestCard');
     const admitCardCard = document.getElementById('admitCardCard');
     const attendanceCard = document.getElementById('attendanceCard');
-    const studyMaterialCard = document.getElementById('studyMaterialCard'); // 🆕
+    const studyMaterialCard = document.getElementById('studyMaterialCard');
+    const aboutToppersCard = document.getElementById('aboutToppersCard'); // 🆕
 
     // Authentication & Fetch Coaching Details
     onAuthStateChanged(auth, async (user) => {
@@ -469,9 +489,14 @@
         window.location.href = 'attendance.html';
     });
 
-    // 🆕 Study Material Card Navigation
+    // Study Material Card Navigation
     studyMaterialCard.addEventListener('click', () => {
         window.open('admin-study.html', '_blank');
+    });
+
+    // 🆕 About & Toppers Card Navigation
+    aboutToppersCard.addEventListener('click', () => {
+        window.open('admin-about.html', '_blank');
     });
 
     // Logout
