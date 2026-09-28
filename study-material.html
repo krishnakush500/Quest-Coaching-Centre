@@ -49,6 +49,13 @@ body{
   min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden;
   -webkit-tap-highlight-color:transparent;
 }
+body.no-select{
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
 img{max-width:100%;display:block}
 a{text-decoration:none;color:inherit}
 button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
@@ -141,13 +148,6 @@ main{flex:1 0 auto;padding-bottom:26px}
   background:linear-gradient(135deg,#0d2b6b,#16409b);
   color:#fff;box-shadow:0 3px 10px rgba(13,43,107,.28);
 }
-.content-tab .cnt{
-  background:rgba(255,255,255,.22);
-  font-size:.6rem;font-weight:800;
-  padding:1px 5px;border-radius:20px;
-  min-width:18px;text-align:center;
-}
-.content-tab.active .cnt{background:#ffc42e;color:#0d2b6b;}
 
 .section-label{
   font-size:11px;font-weight:800;letter-spacing:1px;
@@ -262,6 +262,13 @@ main{flex:1 0 auto;padding-bottom:26px}
   padding:1.5px 5px;border-radius:4px;
   display:inline-flex;align-items:center;gap:3px;
   border:1px solid #ffe9a8;
+}
+.ch-meta .badge-preview-inline{
+  background:#e0f2fe;color:#0369a1;
+  font-size:9px;font-weight:800;letter-spacing:.5px;
+  padding:1.5px 5px;border-radius:4px;
+  display:inline-flex;align-items:center;gap:3px;
+  border:1px solid #bae6fd;
 }
 .ch-download{
   width:38px;height:38px;flex:none;border-radius:11px;
@@ -572,7 +579,6 @@ main{flex:1 0 auto;padding-bottom:26px}
   .medium-btn{font-size:.74rem;padding:9px 6px;}
   .content-tab{font-size:.72rem;padding:8px 5px;}
   .content-tab i{font-size:.76rem;}
-  .content-tab .cnt{font-size:.55rem;}
 }
 @media(max-width:359px){
   .wrap{padding:0 11px}
@@ -658,6 +664,7 @@ main{flex:1 0 auto;padding-bottom:26px}
 <script>
 /* ============================================================
    QUEST COACHING — STUDY MATERIAL PORTAL
+   Supports 3 download modes: public / whatsapp / preview_only
    ============================================================ */
 
 const firebaseConfig = {
@@ -686,7 +693,6 @@ const CONTENT_LABELS = {
   subjective: 'Subjective'
 };
 
-/* WhatsApp Contact */
 const DIRECTOR_PHONE = '919708442525';
 const DIRECTOR_PHONE_DISPLAY = '+91 9708442525';
 const WHATSAPP_MESSAGE = 'Hello Sir, I would like to know more about your notes. Please share the details.';
@@ -722,6 +728,22 @@ const state = {
   medium: 'hindi',
   contentType: 'notes'
 };
+
+/* ============================================================
+   MIGRATION: old download_locked → new download_mode
+   ============================================================ */
+function migrateContent(content) {
+  if (!content) return content;
+  if (content.download_mode && ['public','whatsapp','preview_only'].includes(content.download_mode)) {
+    return content;
+  }
+  if (typeof content.download_locked === 'boolean') {
+    content.download_mode = content.download_locked ? 'whatsapp' : 'public';
+  } else {
+    content.download_mode = 'public';
+  }
+  return content;
+}
 
 /* ============================================================
    DATA SOURCE
@@ -770,17 +792,24 @@ const DataSource = {
             const chData = chDoc.data();
             if (chData.is_published === false) return;
 
-            // Migration: purana pdf_path → mediums.hindi.notes
+            // Migrate old top-level pdf_path
             if (chData.pdf_path && !chData.mediums) {
               chData.mediums = {
                 hindi: {
                   notes: {
                     pdf_path: chData.pdf_path,
-                    download_locked: false
+                    download_mode: chData.download_locked ? 'whatsapp' : 'public'
                   }
                 }
               };
             }
+
+            // Migrate each medium's content
+            Object.keys(chData.mediums || {}).forEach(med => {
+              Object.keys(chData.mediums[med] || {}).forEach(ct => {
+                chData.mediums[med][ct] = migrateContent(chData.mediums[med][ct]);
+              });
+            });
 
             subj.chapters.push({
               id: chDoc.id,
@@ -884,21 +913,21 @@ const DataSource = {
 };
 
 /* ============================================================
-   PDF RESOLUTION
+   CONTENT HELPERS
    ============================================================ */
 function getChapterContent(chapter) {
   return chapter?.mediums?.[state.medium]?.[state.contentType] || null;
+}
+
+function getChapterMode(chapter) {
+  const content = getChapterContent(chapter);
+  return content?.download_mode || 'public';
 }
 
 function resolvePdfUrl(chapter) {
   const content = getChapterContent(chapter);
   if (content?.pdf_path && /^https?:\/\//i.test(content.pdf_path)) return content.pdf_path;
   return null;
-}
-
-function isDownloadLocked(chapter) {
-  const content = getChapterContent(chapter);
-  return content?.download_locked === true;
 }
 
 const pdfDataCache = new Map();
@@ -936,6 +965,10 @@ function parseRoute() {
 async function router() {
   const route = parseRoute();
   window.scrollTo(0, 0);
+
+  // Reset right-click block
+  document.body.classList.remove('no-select');
+
   const backBtn = $('#headerBackBtn');
   if (route.name === 'home') backBtn.classList.add('hidden');
   else backBtn.classList.remove('hidden');
@@ -1217,20 +1250,28 @@ async function renderSubjectPage(classId, subjectId) {
     <div class="stack">
       ${chapters.length ? chapters.map(ch => {
         const previewHref = `#/class/${cls.id}/subject/${subject.id}/chapter/${ch.id}`;
-        const locked = isDownloadLocked(ch);
+        const mode = getChapterMode(ch);
+        let modeBadge = '';
+        if (mode === 'whatsapp') {
+          modeBadge = '<span class="badge-lock-inline"><i class="fas fa-lock"></i> Premium</span>';
+        } else if (mode === 'preview_only') {
+          modeBadge = '<span class="badge-preview-inline"><i class="fas fa-eye"></i> Preview Only</span>';
+        }
         return `
-          <div class="chapter-row" data-preview-href="${previewHref}" data-locked="${locked}">
+          <div class="chapter-row"
+               data-preview-href="${previewHref}"
+               data-mode="${mode}">
             <div class="ch-num" aria-hidden="true">${pad2(ch.chapter_number)}</div>
             <div class="ch-body">
               <div class="ch-name">${esc(ch.name)}</div>
               <div class="ch-meta">
                 <span>Chapter ${pad2(ch.chapter_number)}</span>
                 ${ch.is_new ? '<span class="badge-new-inline">NEW</span>' : ''}
-                ${locked ? '<span class="badge-lock-inline"><i class="fas fa-lock"></i> Premium</span>' : ''}
+                ${modeBadge}
               </div>
             </div>
             <button class="ch-download" type="button" data-download="${ch.id}" aria-label="Download PDF">
-              <i class="fas fa-${locked ? 'lock' : 'download'}"></i>
+              <i class="fas fa-${mode === 'public' ? 'download' : 'lock'}"></i>
             </button>
           </div>
         `;
@@ -1262,6 +1303,7 @@ async function renderChapterPage(classId, subjectId, chapterId) {
   }
   const { chapter, subject, cls } = ctx;
   const subjectHref = `#/class/${cls.id}/subject/${subject.id}`;
+  const mode = getChapterMode(chapter);
 
   if (!resolvePdfUrl(chapter)) {
     app.innerHTML = `
@@ -1280,12 +1322,11 @@ async function renderChapterPage(classId, subjectId, chapterId) {
     return;
   }
 
-  const locked = isDownloadLocked(chapter);
   const contentLabel = CONTENT_LABELS[state.contentType];
   const mediumLabel = state.medium === 'hindi' ? 'हिंदी मीडियम' : 'English Medium';
 
-  // LOCKED — only popup, no preview
-  if (locked) {
+  /* 🔒 LOCK MODE — no preview, only popup */
+  if (mode === 'whatsapp') {
     app.innerHTML = `
       ${crumbsHTML([
         { label:'Home', href:'#/' },
@@ -1313,7 +1354,9 @@ async function renderChapterPage(classId, subjectId, chapterId) {
     return;
   }
 
-  // UNLOCKED — normal preview
+  /* 🔓 UNLOCK or 👁️ PREVIEW ONLY — show PDF preview */
+  const isPreviewOnly = mode === 'preview_only';
+
   app.innerHTML = `
     ${crumbsHTML([
       { label:'Home', href:'#/' },
@@ -1323,11 +1366,12 @@ async function renderChapterPage(classId, subjectId, chapterId) {
     ])}
     <div class="page-head" style="padding:12px 0 10px;">
       <h2 style="font-size:17px;">${esc(chapter.name)}</h2>
-      <p>${contentLabel} · ${mediumLabel}</p>
+      <p>${contentLabel} · ${mediumLabel}${isPreviewOnly ? ' · <span style="color:#0369a1;font-weight:800;">Preview Only</span>' : ''}</p>
     </div>
     <div style="margin-bottom:14px;">
-      <button class="btn btn-gold btn-block btn-lg" onclick="handleDownloadClick('${chapter.id}')">
-        <i class="fas fa-download"></i> DOWNLOAD PDF
+      <button class="btn ${isPreviewOnly ? 'btn-whatsapp' : 'btn-gold'} btn-block btn-lg" onclick="handleDownloadClick('${chapter.id}')">
+        <i class="fas fa-${isPreviewOnly ? 'lock' : 'download'}"></i>
+        ${isPreviewOnly ? 'Download Requires WhatsApp' : 'DOWNLOAD PDF'}
       </button>
     </div>
     <div class="pdfjs-viewer" id="pdfViewer">
@@ -1337,6 +1381,11 @@ async function renderChapterPage(classId, subjectId, chapterId) {
       </div>
     </div>
   `;
+
+  // 🔥 Right-click block on preview-only page
+  if (isPreviewOnly) {
+    document.body.classList.add('no-select');
+  }
 
   renderPdfPages(chapter);
 }
@@ -1445,13 +1494,17 @@ document.addEventListener('click', e => {
     handleDownloadClick(dlBtn.dataset.download);
     return;
   }
+
   const row = e.target.closest('.chapter-row[data-preview-href]');
   if (row) {
     e.preventDefault();
-    if (row.dataset.locked === 'true') {
+    const mode = row.dataset.mode;
+    if (mode === 'whatsapp') {
+      // Lock → only popup, no preview
       openWhatsappPopup();
       return;
     }
+    // Preview only or public → open preview
     location.hash = row.dataset.previewHref.replace(/^#/, '');
   }
 });
@@ -1474,13 +1527,15 @@ window.handleDownloadClick = async function(chapterId) {
     if (!url) return toast('PDF not uploaded yet');
 
     const filename = sanitizeFile(chapter.name) + '.pdf';
-    const locked = isDownloadLocked(chapter);
+    const mode = getChapterMode(chapter);
 
-    if (locked) {
+    // 🔒 Lock or 👁️ Preview Only → WhatsApp popup
+    if (mode === 'whatsapp' || mode === 'preview_only') {
       openWhatsappPopup();
       return;
     }
 
+    // 🔓 Public → direct download
     triggerDownload(url, filename);
     toast('Download started ✓');
   } catch (err) {
@@ -1543,6 +1598,44 @@ function fallbackCopy(text) {
   catch(e) { toast('Copy failed'); }
   document.body.removeChild(ta);
 }
+
+/* ============================================================
+   RIGHT-CLICK & COPY BLOCK (on preview-only pages)
+   ============================================================ */
+document.addEventListener('contextmenu', e => {
+  if (document.body.classList.contains('no-select')) {
+    // Only block inside pdf viewer area
+    if (e.target.closest('#pdfViewer') || e.target.closest('.pdf-page')) {
+      e.preventDefault();
+      toast('Right-click is disabled on this page');
+      return false;
+    }
+  }
+});
+
+document.addEventListener('copy', e => {
+  if (document.body.classList.contains('no-select')) {
+    e.preventDefault();
+    return false;
+  }
+});
+
+document.addEventListener('dragstart', e => {
+  if (document.body.classList.contains('no-select')) {
+    e.preventDefault();
+    return false;
+  }
+});
+
+// Prevent long-press save image on mobile (mostly for iOS Safari)
+document.addEventListener('touchstart', e => {
+  if (document.body.classList.contains('no-select')) {
+    if (e.target.tagName === 'CANVAS' || e.target.tagName === 'IMG') {
+      // Prevent image save
+      e.target.style.webkitTouchCallout = 'none';
+    }
+  }
+}, { passive: true });
 
 /* ============================================================
    BOOT
