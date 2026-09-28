@@ -102,7 +102,6 @@ main{flex:1 0 auto;padding-bottom:26px}
 }
 .page-head p{font-size:12.5px;color:var(--muted);margin-top:7px}
 
-/* Medium Switch */
 .medium-switch{
   display:flex;gap:8px;margin-bottom:14px;
   background:var(--card);padding:8px;border-radius:12px;
@@ -122,7 +121,6 @@ main{flex:1 0 auto;padding-bottom:26px}
   box-shadow:0 3px 10px rgba(13,43,107,.28);
 }
 
-/* Content Type Tabs */
 .content-tabs{
   display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;
   background:var(--card);padding:6px;border-radius:12px;
@@ -410,7 +408,6 @@ main{flex:1 0 auto;padding-bottom:26px}
 }
 .toast.show{opacity:1;transform:translate(-50%,0);}
 
-/* WhatsApp Popup */
 .popup-overlay{
   position:fixed;inset:0;
   background:rgba(8,31,82,.62);
@@ -621,7 +618,7 @@ main{flex:1 0 auto;padding-bottom:26px}
       </button>
       <div class="popup-icon"><i class="fas fa-lock"></i></div>
       <h3>Premium Notes</h3>
-      <p>Ye notes paane ke liye WhatsApp par sampark karein</p>
+      <p>Contact us on WhatsApp to get these notes</p>
     </div>
     <div class="popup-body">
 
@@ -639,7 +636,7 @@ main{flex:1 0 auto;padding-bottom:26px}
 
       <div class="popup-hint">
         <i class="fas fa-info-circle"></i>
-        <span>Niche wale WhatsApp button par click karke direct message bhejein. Aap turant reply paayenge.</span>
+        <span>Click the WhatsApp button below to send us a direct message. You will get an instant reply.</span>
       </div>
 
       <div class="popup-actions">
@@ -692,7 +689,7 @@ const CONTENT_LABELS = {
 /* WhatsApp Contact */
 const DIRECTOR_PHONE = '919708442525';
 const DIRECTOR_PHONE_DISPLAY = '+91 9708442525';
-const WHATSAPP_MESSAGE = 'Namaste Sir, mujhe aapke notes ke bare me kuch jankari chahiye. Kripya details bhej dijiye.';
+const WHATSAPP_MESSAGE = 'Hello Sir, I would like to know more about your notes. Please share the details.';
 
 const $  = (sel, root = document) => root.querySelector(sel);
 const app = $('#app');
@@ -1247,7 +1244,7 @@ async function renderSubjectPage(classId, subjectId) {
 }
 
 /* ============================================================
-   CHAPTER PAGE — PDF.js viewer
+   CHAPTER PAGE
    ============================================================ */
 async function renderChapterPage(classId, subjectId, chapterId) {
   app.innerHTML = `
@@ -1287,7 +1284,7 @@ async function renderChapterPage(classId, subjectId, chapterId) {
   const contentLabel = CONTENT_LABELS[state.contentType];
   const mediumLabel = state.medium === 'hindi' ? 'हिंदी मीडियम' : 'English Medium';
 
-  // 🔥 LOCKED — sirf popup, no preview, no PDF
+  // LOCKED — only popup, no preview
   if (locked) {
     app.innerHTML = `
       ${crumbsHTML([
@@ -1304,8 +1301,8 @@ async function renderChapterPage(classId, subjectId, chapterId) {
         <span class="empty-ico" style="color:#f7b500;"><i class="fas fa-lock"></i></span>
         <strong style="font-size:16px;">Premium Content</strong>
         <div style="font-size:13.5px;color:#5f6f90;margin-top:8px;line-height:1.6;">
-          Ye notes sirf paid students ke liye hain.<br>
-          Notes paane ke liye WhatsApp par sampark karein.
+          These notes are only for paid students.<br>
+          Contact us on WhatsApp to get these notes.
         </div>
         <button class="btn btn-whatsapp btn-lg" style="margin-top:18px;min-width:220px;" onclick="openWhatsappPopup()">
           <i class="fab fa-whatsapp"></i> Contact on WhatsApp
@@ -1441,7 +1438,6 @@ window.addEventListener('resize', () => {
    CLICK HANDLERS
    ============================================================ */
 document.addEventListener('click', e => {
-  // Download button
   const dlBtn = e.target.closest('[data-download]');
   if (dlBtn) {
     e.preventDefault();
@@ -1449,8 +1445,6 @@ document.addEventListener('click', e => {
     handleDownloadClick(dlBtn.dataset.download);
     return;
   }
-
-  // Chapter row click — 🔥 locked hai to popup, else preview
   const row = e.target.closest('.chapter-row[data-preview-href]');
   if (row) {
     e.preventDefault();
@@ -1483,12 +1477,10 @@ window.handleDownloadClick = async function(chapterId) {
     const locked = isDownloadLocked(chapter);
 
     if (locked) {
-      // Locked → only WhatsApp popup
       openWhatsappPopup();
       return;
     }
 
-    // Unlocked → direct download
     triggerDownload(url, filename);
     toast('Download started ✓');
   } catch (err) {
