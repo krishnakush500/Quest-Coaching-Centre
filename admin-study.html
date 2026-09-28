@@ -228,6 +228,7 @@
   .badge-nopdf { background:#fef3c7;color:#b45309; }
   .badge-locked { background:#ffe3ea;color:#e0245e; }
   .badge-unlocked { background:#e3fcef;color:#0e9f6e; }
+  .badge-preview { background:#e0f2fe;color:#0369a1; }
   .badge-hindi { background:#fef3c7;color:#b45309; }
   .badge-english { background:#dbeafe;color:#16409b; }
 
@@ -319,30 +320,34 @@
     border-radius:20px;transition:width .3s ease;
   }
 
-  .lock-toggle {
-    display:flex;gap:10px;margin-top:6px;
+  /* 3 Download Modes */
+  .mode-toggle {
+    display:flex;gap:10px;margin-top:6px;flex-wrap:wrap;
   }
-  .lock-opt {
-    flex:1;padding:12px 14px;
+  .mode-opt {
+    flex:1;min-width:150px;
+    padding:12px 14px;
     border:2px solid #dbe6ff;border-radius:12px;
     background:#fbfcff;cursor:pointer;
     display:flex;align-items:center;gap:10px;
     transition:all .2s;
   }
-  .lock-opt:hover { border-color:#16409b;background:#f1f5ff; }
-  .lock-opt.selected { border-color:#0d2b6b;background:#e8f0fe; }
-  .lock-opt .lock-ico {
+  .mode-opt:hover { border-color:#16409b;background:#f1f5ff; }
+  .mode-opt.selected { border-color:#0d2b6b;background:#e8f0fe; }
+  .mode-opt .mode-ico {
     width:36px;height:36px;flex:none;border-radius:10px;
     display:grid;place-items:center;font-size:1rem;
     background:#fff;border:1px solid #dbe6ff;
   }
-  .lock-opt.unlock.selected .lock-ico { background:#e3fcef;color:#0e9f6e;border-color:#b8f0d4; }
-  .lock-opt.lock.selected .lock-ico { background:#ffe3ea;color:#e0245e;border-color:#ffc9d6; }
-  .lock-opt .lock-txt strong {
+  .mode-opt.unlock.selected .mode-ico { background:#e3fcef;color:#0e9f6e;border-color:#b8f0d4; }
+  .mode-opt.lock.selected .mode-ico { background:#ffe3ea;color:#e0245e;border-color:#ffc9d6; }
+  .mode-opt.preview.selected .mode-ico { background:#e0f2fe;color:#0369a1;border-color:#bae6fd; }
+  .mode-opt .mode-txt strong {
     display:block;font-size:.82rem;font-weight:800;color:#0d2b6b;
   }
-  .lock-opt .lock-txt small {
+  .mode-opt .mode-txt small {
     display:block;font-size:.7rem;color:#8a95ae;margin-top:2px;font-weight:600;
+    line-height:1.3;
   }
 
   .sm-toast {
@@ -397,7 +402,6 @@
     display:inline-flex;align-items:center;gap:7px;
   }
 
-  /* Warning box for no subjects */
   .subj-warning {
     background:#fff5f8;
     border:2px dashed #ffc9d6;
@@ -414,9 +418,7 @@
     background:#ffe3ea;color:#e0245e;
     display:grid;place-items:center;font-size:1rem;
   }
-  .subj-warning .warn-txt {
-    flex:1;min-width:0;
-  }
+  .subj-warning .warn-txt { flex:1;min-width:0; }
   .subj-warning .warn-txt strong {
     display:block;font-size:.85rem;font-weight:800;color:#e0245e;margin-bottom:2px;
   }
@@ -464,7 +466,6 @@
     </span>
   </div>
 
-  <!-- MEDIUM SWITCH -->
   <div class="medium-switch">
     <span class="label"><i class="fas fa-language"></i> Medium:</span>
     <button class="medium-btn active" id="mediumHindi" onclick="setMedium('hindi')">
@@ -475,7 +476,6 @@
     </button>
   </div>
 
-  <!-- CONTENT TYPE TABS -->
   <div class="content-tabs" id="contentTabs">
     <button class="content-tab active" data-content="notes">
       <i class="fas fa-book"></i> Notes
@@ -499,7 +499,6 @@
     </button>
   </div>
 
-  <!-- STRUCTURE TABS -->
   <div class="sm-tabs">
     <button class="sm-tab active" data-tab="classes">
       <i class="fas fa-school"></i> Classes
@@ -515,7 +514,6 @@
     </button>
   </div>
 
-  <!-- Classes Panel -->
   <div class="sm-panel active" id="panel-classes">
     <div class="sm-card">
       <div class="sm-card-header">
@@ -530,7 +528,6 @@
     </div>
   </div>
 
-  <!-- Subjects Panel -->
   <div class="sm-panel" id="panel-subjects">
     <div class="sm-card">
       <div class="sm-card-header">
@@ -550,7 +547,6 @@
     </div>
   </div>
 
-  <!-- Chapters Panel -->
   <div class="sm-panel" id="panel-chapters">
     <div class="sm-card">
       <div class="sm-card-header">
@@ -647,7 +643,6 @@
       </div>
       <div class="modal-body">
 
-        <!-- Medium -->
         <div class="mb-3">
           <label class="form-label">Medium *</label>
           <div style="display:flex;gap:10px;">
@@ -671,7 +666,6 @@
           </div>
         </div>
 
-        <!-- Warning box -->
         <div class="subj-warning" id="subjWarning">
           <div class="warn-ico"><i class="fas fa-exclamation-triangle"></i></div>
           <div class="warn-txt">
@@ -713,28 +707,34 @@
           </div>
         </div>
 
-        <!-- Download Lock -->
+        <!-- 🔥 3 Download Modes -->
         <div class="mt-3">
-          <label class="form-label">Download Access *</label>
-          <div class="lock-toggle">
-            <div class="lock-opt unlock selected" id="lockOptUnlock" onclick="setDownloadLock(false)">
-              <div class="lock-ico"><i class="fas fa-unlock"></i></div>
-              <div class="lock-txt">
+          <label class="form-label">Content Access *</label>
+          <div class="mode-toggle">
+            <div class="mode-opt unlock selected" id="modeOptUnlock" onclick="setDownloadMode('public')">
+              <div class="mode-ico"><i class="fas fa-unlock"></i></div>
+              <div class="mode-txt">
                 <strong>🔓 Unlock</strong>
-                <small>Anyone can download this PDF</small>
+                <small>Anyone can view & download</small>
               </div>
             </div>
-            <div class="lock-opt lock" id="lockOptLock" onclick="setDownloadLock(true)">
-              <div class="lock-ico"><i class="fas fa-lock"></i></div>
-              <div class="lock-txt">
+            <div class="mode-opt lock" id="modeOptLock" onclick="setDownloadMode('whatsapp')">
+              <div class="mode-ico"><i class="fas fa-lock"></i></div>
+              <div class="mode-txt">
                 <strong>🔒 Lock</strong>
-                <small>Only paid students (WhatsApp contact)</small>
+                <small>No preview. WhatsApp contact for notes</small>
+              </div>
+            </div>
+            <div class="mode-opt preview" id="modeOptPreview" onclick="setDownloadMode('preview_only')">
+              <div class="mode-ico"><i class="fas fa-eye"></i></div>
+              <div class="mode-txt">
+                <strong>👁️ Preview Only</strong>
+                <small>Can read online, download requires WhatsApp</small>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- PDF Upload -->
         <div class="mt-3">
           <label class="form-label">PDF File *</label>
           <div class="upload-drop" id="uploadDrop">
@@ -809,6 +809,18 @@ const CONTENT_LABELS = {
   subjective: 'Subjective'
 };
 
+/* Download Modes:
+   'public'       → anyone can view & download
+   'whatsapp'     → no preview, WhatsApp popup for download
+   'preview_only' → can preview, download = WhatsApp popup
+*/
+const DOWNLOAD_MODES = ['public', 'whatsapp', 'preview_only'];
+const MODE_LABELS = {
+  public: 'Unlock',
+  whatsapp: 'Lock',
+  preview_only: 'Preview Only'
+};
+
 /* ============================================================
    STATE
    ============================================================ */
@@ -820,7 +832,7 @@ const state = {
   editingContent: null,
   editingInfo: { parentClassId: null, parentSubjectId: null, chapterId: null },
   selectedPdfFile: null,
-  downloadLocked: false,
+  downloadMode: 'public',
   modalMedium: 'hindi'
 };
 
@@ -878,8 +890,6 @@ function updateLoader(text, sub='') {
   $('loaderSub').textContent = sub;
 }
 
-const uid = () => 'id_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
-
 function classDocId(name) {
   return String(name || 'class')
     .toLowerCase()
@@ -891,6 +901,24 @@ function subjectDocId(name) {
     .toLowerCase()
     .replace(/[^\w\-\u0900-\u097F]+/g, '-')
     .replace(/^-+|-+$/g, '');
+}
+
+/* ============================================================
+   MIGRATE content — old download_locked → new download_mode
+   ============================================================ */
+function migrateContent(content) {
+  if (!content) return content;
+  // Agar naya download_mode hai to wahi use karo
+  if (content.download_mode && DOWNLOAD_MODES.includes(content.download_mode)) {
+    return content;
+  }
+  // Warna purana download_locked check karo
+  if (typeof content.download_locked === 'boolean') {
+    content.download_mode = content.download_locked ? 'whatsapp' : 'public';
+  } else {
+    content.download_mode = 'public';
+  }
+  return content;
 }
 
 /* ============================================================
@@ -957,16 +985,24 @@ async function loadAll() {
         chaptersSnap.forEach(chDoc => {
           const chData = chDoc.data();
 
+          // Migrate old pdf_path → mediums.hindi.notes
           if (chData.pdf_path && !chData.mediums) {
             chData.mediums = {
               hindi: {
                 notes: {
                   pdf_path: chData.pdf_path,
-                  download_locked: false
+                  download_mode: chData.download_locked ? 'whatsapp' : 'public'
                 }
               }
             };
           }
+
+          // Migrate each medium's content
+          Object.keys(chData.mediums || {}).forEach(med => {
+            Object.keys(chData.mediums[med] || {}).forEach(ct => {
+              chData.mediums[med][ct] = migrateContent(chData.mediums[med][ct]);
+            });
+          });
 
           subj.chapters.push({
             id: chDoc.id,
@@ -1030,6 +1066,21 @@ function getContent(chapter, medium, type) {
 function hasContent(chapter) {
   const c = getContent(chapter, state.medium, state.contentType);
   return c && c.pdf_path;
+}
+
+function getModeBadge(content) {
+  if (!content) return '';
+  const mode = content.download_mode || 'public';
+  if (mode === 'public') {
+    return '<span class="badge-soft badge-unlocked"><i class="fas fa-unlock"></i> Unlock</span>';
+  }
+  if (mode === 'whatsapp') {
+    return '<span class="badge-soft badge-locked"><i class="fas fa-lock"></i> Lock</span>';
+  }
+  if (mode === 'preview_only') {
+    return '<span class="badge-soft badge-preview"><i class="fas fa-eye"></i> Preview Only</span>';
+  }
+  return '';
 }
 
 /* ============================================================
@@ -1159,7 +1210,6 @@ function renderChapters() {
 
   box.innerHTML = list.map(ch => {
     const content = getContent(ch, state.medium, state.contentType);
-    const locked = content?.download_locked;
     return `
       <div class="sm-item">
         <div class="sm-item-icon" style="font-size:.9rem;font-weight:800;">${String(ch.chapter_number||0).padStart(2,'0')}</div>
@@ -1170,7 +1220,7 @@ function renderChapters() {
             <span><i class="fas fa-book"></i> ${esc(ch.subject_name)}</span>
             ${mediumBadge}
             <span class="badge-soft badge-pdf"><i class="fas fa-file-pdf"></i> ${CONTENT_LABELS[state.contentType]}</span>
-            ${locked ? '<span class="badge-soft badge-locked"><i class="fas fa-lock"></i> Locked</span>' : '<span class="badge-soft badge-unlocked"><i class="fas fa-unlock"></i> Unlocked</span>'}
+            ${getModeBadge(content)}
             ${ch.is_new ? '<span class="badge-soft badge-new">NEW</span>' : ''}
             ${ch.is_published === false ? '<span class="badge-soft badge-draft">Draft</span>' : ''}
           </div>
@@ -1504,7 +1554,7 @@ async function deletePdfFromSupabase(pdfUrlOrPath) {
 }
 
 /* ============================================================
-   🔥 CONTENT (CHAPTER) MODAL — Fixed Subject Dropdown
+   CONTENT (CHAPTER) MODAL
    ============================================================ */
 function refreshContentFormSubjects() {
   const classId = $('contentFormClass').value;
@@ -1544,10 +1594,11 @@ window.setModalMedium = function(medium) {
   $('modalMediumEnglish').classList.toggle('active', medium === 'english');
 };
 
-window.setDownloadLock = function(locked) {
-  state.downloadLocked = locked;
-  $('lockOptUnlock').classList.toggle('selected', !locked);
-  $('lockOptLock').classList.toggle('selected', locked);
+window.setDownloadMode = function(mode) {
+  state.downloadMode = mode;
+  $('modeOptUnlock').classList.toggle('selected', mode === 'public');
+  $('modeOptLock').classList.toggle('selected', mode === 'whatsapp');
+  $('modeOptPreview').classList.toggle('selected', mode === 'preview_only');
 };
 
 window.openContentModal = function() {
@@ -1555,14 +1606,13 @@ window.openContentModal = function() {
   state.editingInfo = { parentClassId: null, parentSubjectId: null, chapterId: null };
   state.selectedPdfFile = null;
   state.modalMedium = state.medium;
-  state.downloadLocked = false;
+  state.downloadMode = 'public';
 
   if (!state.classes.length) return toast('Add a class first!', true);
 
   const label = CONTENT_LABELS[state.contentType];
   $('contentModalTitle').textContent = 'Add ' + label;
 
-  // 🔥 Find first class WITH subjects
   const classWithSubjects = state.classes.find(c => (c.subjects || []).length > 0);
 
   $('contentFormClass').innerHTML = state.classes.map(c => {
@@ -1571,7 +1621,6 @@ window.openContentModal = function() {
     return `<option value="${c.id}">${esc(c.name)}${suffix}</option>`;
   }).join('');
 
-  // Auto-select class with subjects (else first class)
   $('contentFormClass').value = classWithSubjects ? classWithSubjects.id : state.classes[0].id;
 
   refreshContentFormSubjects();
@@ -1583,7 +1632,7 @@ window.openContentModal = function() {
   $('contentFormIsPublished').checked = true;
 
   setModalMedium(state.modalMedium);
-  setDownloadLock(false);
+  setDownloadMode('public');
 
   $('fileInfo').style.display = 'none';
   $('fileName').textContent = '';
@@ -1624,14 +1673,14 @@ window.editContent = function(classId, subjectId, chapterId) {
 
   const existing = getContent(ch, state.medium, state.contentType);
   if (existing) {
-    setDownloadLock(!!existing.download_locked);
+    setDownloadMode(existing.download_mode || 'public');
     if (existing.pdf_path) {
       $('fileInfo').style.display = 'flex';
       const p = extractSupabasePath(existing.pdf_path) || existing.pdf_path;
       $('fileName').textContent = 'Existing: ' + p.split('/').pop();
     }
   } else {
-    setDownloadLock(false);
+    setDownloadMode('public');
   }
 
   $('contentFormPdf').value = '';
@@ -1674,7 +1723,7 @@ window.saveContent = async function() {
   const is_published = $('contentFormIsPublished').checked;
   const targetMedium = state.modalMedium;
   const contentType = state.contentType;
-  const downloadLocked = state.downloadLocked;
+  const downloadMode = state.downloadMode;
 
   if (!targetSubjectId) {
     return toast('Please add a subject in this class first!', true);
@@ -1729,7 +1778,7 @@ window.saveContent = async function() {
     if (!chapterData.mediums[targetMedium]) chapterData.mediums[targetMedium] = {};
     chapterData.mediums[targetMedium][contentType] = {
       pdf_path,
-      download_locked: downloadLocked
+      download_mode: downloadMode
     };
 
     if (chapter) {
