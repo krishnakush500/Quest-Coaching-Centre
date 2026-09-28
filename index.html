@@ -141,7 +141,7 @@
     }
     .drawer.open { transform: translateX(0); }
 
-    /* Drawer header — sirf naam */
+    /* Drawer header */
     .drawer-header {
       background: linear-gradient(135deg, #0d2b6b 0%, #16409b 100%);
       color: #fff;
@@ -322,7 +322,7 @@
     }
 
     /* ============================================================
-       ATTRACTIVE MODAL POPUP — Check Registration
+       POPUP MODAL — Check Registration
        ============================================================ */
     .popup-overlay {
       position: fixed;
@@ -361,7 +361,6 @@
       transform: translateY(0) scale(1);
     }
 
-    /* Popup header */
     .popup-header {
       background: linear-gradient(135deg, #0d2b6b 0%, #16409b 100%);
       color: #fff;
@@ -445,7 +444,6 @@
       transform: rotate(90deg);
     }
 
-    /* Popup body */
     .popup-body {
       padding: 22px;
       overflow-y: auto;
@@ -500,14 +498,6 @@
       color: #9aa8c4;
       font-weight: 500;
     }
-    .popup-input-wrap input::-webkit-outer-spin-button,
-    .popup-input-wrap input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    .popup-input-wrap input[type=number] {
-      -moz-appearance: textfield;
-    }
 
     .popup-actions {
       display: flex;
@@ -541,16 +531,6 @@
       box-shadow: 0 8px 22px rgba(13,43,107,0.42);
       transform: translateY(-1px);
     }
-    .popup-btn.gold {
-      background: linear-gradient(135deg, #ffd257 0%, #f7b500 100%);
-      color: #0d2b6b;
-      box-shadow: 0 6px 16px rgba(247,181,0,0.38);
-    }
-    .popup-btn.gold:hover {
-      background: linear-gradient(135deg, #ffdf7a 0%, #ffc42e 100%);
-      box-shadow: 0 8px 22px rgba(247,181,0,0.55);
-      transform: translateY(-1px);
-    }
     .popup-btn.ghost {
       background: #ffffff;
       border-color: #e3e9f5;
@@ -564,7 +544,6 @@
       color: #0d2b6b;
     }
 
-    /* Status messages */
     .popup-status {
       padding: 12px 14px;
       border-radius: 10px;
@@ -607,7 +586,6 @@
       to { transform: rotate(360deg); }
     }
 
-    /* Helper text */
     .popup-hint {
       font-size: 0.75rem;
       color: #8a95ae;
@@ -678,7 +656,6 @@
     }
     .tab-btn i { font-size: 1.1rem; }
 
-    /* Content Sections */
     .tab-content { display: none; padding: 0; min-height: 400px; }
     .tab-content.active { display: block; }
 
@@ -856,19 +833,6 @@
       margin-bottom: 12px;
       display: block;
     }
-    .live-badge {
-      position: absolute;
-      top: -8px; right: -8px;
-      background: #ff4757;
-      color: white;
-      padding: 4px 12px;
-      font-size: 0.75rem;
-      font-weight: bold;
-      border-radius: 15px;
-      transform: rotate(10deg);
-      box-shadow: 0 2px 8px rgba(255,71,87,0.3);
-      z-index: 10;
-    }
 
     /* Promo Section */
     .promo-section {
@@ -1000,9 +964,7 @@
   </style>
 </head>
 <body>
-  <!-- ============================================================
-       PASSWORD MODAL (only for director photo click)
-       ============================================================ -->
+  <!-- PASSWORD MODAL -->
   <div class="password-modal" id="passwordModal">
     <div class="password-box">
       <h3><i class="fas fa-lock"></i> Admin Login</h3>
@@ -1017,9 +979,7 @@
     </div>
   </div>
 
-  <!-- ============================================================
-       POPUP MODAL — Check Registration (Aadhaar/Mobile)
-       ============================================================ -->
+  <!-- CHECK REGISTRATION POPUP -->
   <div class="popup-overlay" id="regPopupOverlay" onclick="if(event.target===this) closeRegPopup()">
     <div class="popup-box">
       <div class="popup-header">
@@ -1061,9 +1021,7 @@
     </div>
   </div>
 
-  <!-- ============================================================
-       SIDE DRAWER
-       ============================================================ -->
+  <!-- SIDE DRAWER -->
   <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
   <aside class="drawer" id="sideDrawer" aria-hidden="true">
     <div class="drawer-header">
@@ -1089,7 +1047,7 @@
         <span class="di-arrow"><i class="fas fa-chevron-right"></i></span>
       </a>
 
-      <!-- Check Registration (Popup) -->
+      <!-- Check Registration -->
       <button class="drawer-item" onclick="openRegPopup()">
         <span class="di-icon">📌</span>
         <span class="di-text">
@@ -1098,7 +1056,7 @@
         <span class="di-arrow"><i class="fas fa-chevron-right"></i></span>
       </button>
 
-      <!-- Download Admit Card (pehle jaisa — seedha page) -->
+      <!-- Download Admit Card -->
       <button class="drawer-item" onclick="openAdmitCardDirect()">
         <span class="di-icon">📥</span>
         <span class="di-text">
@@ -1106,8 +1064,6 @@
         </span>
         <span class="di-arrow"><i class="fas fa-chevron-right"></i></span>
       </button>
-
-      <div class="drawer-section-label">More</div>
 
       <!-- Online Test -->
       <button class="drawer-item" onclick="openOnlineTest(); closeDrawer();">
@@ -1117,6 +1073,24 @@
         </span>
         <span class="di-arrow"><i class="fas fa-chevron-right"></i></span>
       </button>
+
+      <!-- About Us (NEW) -->
+      <a href="about-us.html" class="drawer-item" onclick="closeDrawer()">
+        <span class="di-icon">🏫</span>
+        <span class="di-text">
+          <strong>About Us</strong>
+        </span>
+        <span class="di-arrow"><i class="fas fa-chevron-right"></i></span>
+      </a>
+
+      <!-- Our Toppers (NEW) -->
+      <a href="toppers.html" class="drawer-item" onclick="closeDrawer()">
+        <span class="di-icon">🏆</span>
+        <span class="di-text">
+          <strong>Our Toppers</strong>
+        </span>
+        <span class="di-arrow"><i class="fas fa-chevron-right"></i></span>
+      </a>
     </div>
 
     <div class="drawer-footer">
@@ -1124,7 +1098,6 @@
       <small>© 2026 · All Rights Reserved</small>
     </div>
   </aside>
-  <!-- END DRAWER -->
 
   <div class="container">
     <div class="header">
@@ -1294,7 +1267,7 @@
     })();
 
     // ============================================================
-    // 🆕 POPUP — CHECK REGISTRATION
+    // POPUP — CHECK REGISTRATION
     // ============================================================
     function openRegPopup() {
       closeDrawer();
@@ -1369,11 +1342,10 @@
     }
 
     // ============================================================
-    // DOWNLOAD ADMIT CARD — PEHLE JAISA (seedha page khule)
+    // DOWNLOAD ADMIT CARD
     // ============================================================
     function openAdmitCardDirect() {
       closeDrawer();
-      // Pehle jaisa behaviour — seedha download-admit.html open
       window.open('download-admit.html', '_blank');
     }
 
@@ -1522,7 +1494,7 @@
     }
 
     // ============================================================
-    // Admin Login (only triggered by director photo click)
+    // Admin Login
     // ============================================================
     function openPasswordModal() {
       document.getElementById('passwordModal').style.display = 'flex';
