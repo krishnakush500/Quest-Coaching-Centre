@@ -34,6 +34,8 @@
   --red-bg:#ffe3ea;
   --green:#0e9f6e;
   --green-bg:#e3fcef;
+  --whatsapp:#25d366;
+  --whatsapp-dark:#1da851;
   --radius:14px;
   --shadow:0 2px 10px rgba(13,43,107,.07);
   --shadow-hover:0 10px 26px rgba(13,43,107,.14);
@@ -110,7 +112,7 @@ main{flex:1 0 auto;padding-bottom:26px}
 .medium-btn{
   flex:1;padding:10px 12px;border-radius:9px;
   background:#f1f5ff;border:1.5px solid #dbe6ff;
-  font-size:.85rem;font-weight:800;color:#64748b;
+  font-size:.82rem;font-weight:800;color:#64748b;
   cursor:pointer;transition:all .2s;
   display:flex;align-items:center;justify-content:center;gap:6px;
 }
@@ -149,7 +151,6 @@ main{flex:1 0 auto;padding-bottom:26px}
   min-width:18px;text-align:center;
 }
 .content-tab.active .cnt{background:#ffc42e;color:#0d2b6b;}
-.content-tab.hidden-tab{display:none;}
 
 .section-label{
   font-size:11px;font-weight:800;letter-spacing:1px;
@@ -259,10 +260,11 @@ main{flex:1 0 auto;padding-bottom:26px}
   padding:1.5px 5px;border-radius:4px;
 }
 .ch-meta .badge-lock-inline{
-  background:#ffe3ea;color:#e0245e;
+  background:#fff5cc;color:#7a5a00;
   font-size:9px;font-weight:800;letter-spacing:.5px;
   padding:1.5px 5px;border-radius:4px;
   display:inline-flex;align-items:center;gap:3px;
+  border:1px solid #ffe9a8;
 }
 .ch-download{
   width:38px;height:38px;flex:none;border-radius:11px;
@@ -304,6 +306,11 @@ main{flex:1 0 auto;padding-bottom:26px}
   color:var(--gold-ink);
   box-shadow:0 2px 8px rgba(247,181,0,.32);
   border-color:#f0ad00;
+}
+.btn-whatsapp{
+  background:linear-gradient(135deg,#25d366,#1da851);
+  color:#fff;
+  box-shadow:0 2px 8px rgba(37,211,102,.32);
 }
 .btn-block{width:100%;}
 .btn-lg{min-height:46px;font-size:13.5px;}
@@ -405,7 +412,7 @@ main{flex:1 0 auto;padding-bottom:26px}
 }
 .toast.show{opacity:1;transform:translate(-50%,0);}
 
-/* Download Lock Popup */
+/* WhatsApp Contact Popup */
 .popup-overlay{
   position:fixed;inset:0;
   background:rgba(8,31,82,.62);
@@ -416,39 +423,46 @@ main{flex:1 0 auto;padding-bottom:26px}
 }
 .popup-overlay.open{opacity:1;pointer-events:auto;}
 .popup-box{
-  width:100%;max-width:420px;background:#fff;
-  border-radius:20px;overflow:hidden;
+  width:100%;max-width:440px;background:#fff;
+  border-radius:22px;overflow:hidden;
   box-shadow:0 25px 70px rgba(8,31,82,.42);
   transform:translateY(18px) scale(.96);
   transition:transform .32s cubic-bezier(.25,.8,.25,1);
 }
 .popup-overlay.open .popup-box{transform:translateY(0) scale(1);}
+
 .popup-header{
   background:linear-gradient(135deg,#0d2b6b,#16409b);
-  color:#fff;padding:22px 22px 20px;
+  color:#fff;padding:26px 24px 22px;
   position:relative;border-bottom:3px solid #ffc42e;
+  text-align:center;
 }
 .popup-header::before{
   content:"";position:absolute;top:-60%;left:-20%;width:60%;height:220%;
   background:radial-gradient(circle,rgba(255,196,46,.18) 0%,transparent 70%);
   pointer-events:none;
 }
+.popup-header::after{
+  content:"";position:absolute;bottom:-60%;right:-20%;width:60%;height:220%;
+  background:radial-gradient(circle,rgba(37,211,102,.12) 0%,transparent 70%);
+  pointer-events:none;
+}
 .popup-icon{
-  width:52px;height:52px;border-radius:14px;
+  width:64px;height:64px;border-radius:18px;
   background:linear-gradient(135deg,#ffd257,#f7b500);
-  color:#0d2b6b;display:grid;place-items:center;font-size:1.5rem;
-  margin-bottom:12px;position:relative;z-index:2;
-  box-shadow:0 6px 16px rgba(247,181,0,.42);
+  color:#0d2b6b;display:grid;place-items:center;font-size:1.8rem;
+  margin:0 auto 14px;position:relative;z-index:2;
+  box-shadow:0 8px 20px rgba(247,181,0,.45);
   border:1px solid rgba(255,255,255,.35);
 }
 .popup-header h3{
-  font-size:1.15rem;font-weight:800;
-  letter-spacing:.3px;line-height:1.3;
+  font-size:1.22rem;font-weight:800;
+  letter-spacing:.2px;line-height:1.3;
   position:relative;z-index:2;
 }
 .popup-header p{
-  font-size:.8rem;color:#c3d2f2;margin-top:5px;
-  position:relative;z-index:2;line-height:1.4;
+  font-size:.82rem;color:#c3d2f2;margin-top:7px;
+  position:relative;z-index:2;line-height:1.5;
 }
 .popup-close-x{
   position:absolute;top:14px;right:14px;
@@ -463,84 +477,85 @@ main{flex:1 0 auto;padding-bottom:26px}
   background:#ffc42e;color:#1a237e;border-color:#ffc42e;
   transform:rotate(90deg);
 }
-.popup-body{padding:22px;}
-.popup-field{margin-bottom:14px;}
-.popup-field label{
-  display:block;font-size:.72rem;font-weight:800;
-  letter-spacing:.9px;text-transform:uppercase;
-  color:#5f6f90;margin-bottom:7px;
-}
-.popup-input-wrap{
-  position:relative;display:flex;align-items:center;
-  border:2px solid #e3e9f5;border-radius:12px;
-  background:#f9fbff;transition:all .2s ease;
-}
-.popup-input-wrap:focus-within{
-  border-color:#16409b;background:#fff;
-  box-shadow:0 0 0 4px rgba(22,64,155,.10);
-}
-.popup-input-wrap .pi-ico{
-  padding:0 14px;font-size:1rem;color:#8a95ae;flex-shrink:0;
-}
-.popup-input-wrap input{
-  flex:1;min-width:0;padding:14px 14px 14px 0;
-  border:none;outline:none;background:transparent;
-  font-size:.95rem;color:#0f2452;font-weight:600;
-}
-.popup-input-wrap input::placeholder{color:#9aa8c4;font-weight:500;}
+.popup-body{padding:24px;}
 
-.popup-status{
-  padding:12px 14px;border-radius:10px;
-  font-size:.85rem;font-weight:650;
-  margin-top:14px;display:none;
-  align-items:center;gap:8px;line-height:1.4;
+.contact-box{
+  background:linear-gradient(135deg,#f1f5ff,#e4edff);
+  border:1.5px solid #dbe6ff;
+  border-radius:16px;
+  padding:18px;
+  text-align:center;
+  margin-bottom:18px;
 }
-.popup-status.error{
-  background:#ffe3ea;color:#c4114a;
-  border:1px solid #ffc9d6;display:flex;
+.contact-box .director-label{
+  font-size:.72rem;font-weight:800;
+  letter-spacing:1px;text-transform:uppercase;
+  color:#8a95ae;margin-bottom:6px;
 }
-.popup-status.success{
-  background:#e3fcef;color:#0e9f6e;
-  border:1px solid #b8f0d4;display:flex;
+.contact-box .director-name{
+  font-size:.95rem;font-weight:800;color:#0d2b6b;
+  margin-bottom:8px;
 }
-.popup-status.loading{
-  background:#eef3ff;color:#16409b;
-  border:1px solid #dbe6ff;display:flex;
+.contact-box .phone-wrap{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  background:#fff;border-radius:12px;
+  padding:12px 16px;border:1.5px solid #dbe6ff;
+  margin-bottom:4px;
 }
-.popup-status .spinner{
-  width:15px;height:15px;
-  border:2px solid #16409b;
-  border-top-color:transparent;
-  border-radius:50%;
-  animation:spin .75s linear infinite;
-  flex-shrink:0;
+.contact-box .phone-wrap i{
+  color:#25d366;font-size:1.1rem;
 }
+.contact-box .phone-number{
+  font-size:1.05rem;font-weight:800;
+  color:#0d2b6b;letter-spacing:.5px;
+}
+.contact-box .phone-copy{
+  margin-left:auto;
+  background:transparent;border:none;
+  color:#0d2b6b;font-size:.85rem;
+  cursor:pointer;padding:4px 8px;
+  border-radius:6px;
+  transition:background .2s;
+}
+.contact-box .phone-copy:hover{background:#f1f5ff;}
+
 .popup-hint{
-  font-size:.75rem;color:#8a95ae;
-  margin-top:8px;line-height:1.5;
-  display:flex;gap:6px;align-items:flex-start;
+  font-size:.78rem;color:#5f6f90;
+  margin-bottom:18px;line-height:1.6;
+  text-align:center;
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  background:#fffbea;
+  border:1px solid #ffe9a8;
+  border-radius:10px;
+  padding:12px 14px;
 }
-.popup-hint i{color:#f7b500;font-size:.8rem;margin-top:2px;flex-shrink:0;}
-.popup-actions{display:flex;gap:10px;margin-top:18px;}
+.popup-hint i{color:#f7b500;font-size:.9rem;margin-top:2px;flex-shrink:0;}
+.popup-hint span{text-align:left;}
+
+.popup-actions{display:flex;flex-direction:column;gap:10px;}
 .popup-btn{
-  flex:1;min-height:46px;border-radius:12px;
-  font-size:.92rem;font-weight:800;letter-spacing:.3px;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  min-height:50px;border-radius:12px;
+  font-size:.95rem;font-weight:800;letter-spacing:.3px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
   transition:all .2s ease;border:2px solid transparent;
+  padding:0 16px;
 }
 .popup-btn:active{transform:scale(.97);}
-.popup-btn.primary{
-  background:linear-gradient(135deg,#0d2b6b,#16409b);
+.popup-btn.whatsapp{
+  background:linear-gradient(135deg,#25d366,#1da851);
   color:#fff;
-  box-shadow:0 6px 16px rgba(13,43,107,.32);
+  box-shadow:0 6px 18px rgba(37,211,102,.4);
 }
-.popup-btn.primary:hover{
-  background:linear-gradient(135deg,#16409b,#1b4bb5);
+.popup-btn.whatsapp:hover{
   transform:translateY(-1px);
+  box-shadow:0 8px 22px rgba(37,211,102,.55);
 }
+.popup-btn.whatsapp i{font-size:1.2rem;}
 .popup-btn.ghost{
   background:#fff;border-color:#e3e9f5;
-  color:#5f6f90;flex:0 0 auto;min-width:100px;
+  color:#5f6f90;
 }
 .popup-btn.ghost:hover{
   background:#f5f8ff;border-color:#cfdcf5;color:#0d2b6b;
@@ -554,9 +569,9 @@ main{flex:1 0 auto;padding-bottom:26px}
   .card-text h3{font-size:15.5px}
 }
 @media(max-width:400px){
-  .medium-btn{font-size:.78rem;padding:9px 8px;}
-  .content-tab{font-size:.72rem;padding:8px 6px;}
-  .content-tab i{font-size:.78rem;}
+  .medium-btn{font-size:.74rem;padding:9px 6px;}
+  .content-tab{font-size:.72rem;padding:8px 5px;}
+  .content-tab i{font-size:.76rem;}
   .content-tab .cnt{font-size:.55rem;}
 }
 @media(max-width:359px){
@@ -594,47 +609,45 @@ main{flex:1 0 auto;padding-bottom:26px}
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<!-- 🆕 Download Lock Popup -->
-<div class="popup-overlay" id="lockPopup" onclick="if(event.target===this) closeLockPopup()">
+<!-- WhatsApp Contact Popup -->
+<div class="popup-overlay" id="whatsappPopup" onclick="if(event.target===this) closeWhatsappPopup()">
   <div class="popup-box">
     <div class="popup-header">
-      <button class="popup-close-x" onclick="closeLockPopup()" aria-label="Close">
+      <button class="popup-close-x" onclick="closeWhatsappPopup()" aria-label="Close">
         <i class="fas fa-times"></i>
       </button>
       <div class="popup-icon"><i class="fas fa-lock"></i></div>
-      <h3>Verify Your Identity</h3>
-      <p>Ye PDF download karne ke liye apni details daalein</p>
+      <h3>Premium Notes</h3>
+      <p>Ye notes paane ke liye WhatsApp par sampark karein</p>
     </div>
     <div class="popup-body">
-      <div class="popup-field">
-        <label>Roll Number</label>
-        <div class="popup-input-wrap">
-          <span class="pi-ico"><i class="fas fa-hashtag"></i></span>
-          <input type="text" id="lockRollInput" placeholder="Enter your Roll Number" autocomplete="off"
-                 onkeypress="if(event.key==='Enter') submitLockVerification()">
+
+      <div class="contact-box">
+        <div class="director-label">Director</div>
+        <div class="director-name">MR. RAVI SIR</div>
+        <div class="phone-wrap">
+          <i class="fab fa-whatsapp"></i>
+          <span class="phone-number">+91 9708442525</span>
+          <button class="phone-copy" onclick="copyPhone()" title="Copy number">
+            <i class="fas fa-copy"></i>
+          </button>
         </div>
       </div>
-      <div class="popup-field">
-        <label>Registration Number</label>
-        <div class="popup-input-wrap">
-          <span class="pi-ico"><i class="fas fa-id-card"></i></span>
-          <input type="text" id="lockRegInput" placeholder="QCC/2026/XXXX" autocomplete="off"
-                 onkeypress="if(event.key==='Enter') submitLockVerification()">
-        </div>
-      </div>
-      <div class="popup-status" id="lockStatus"></div>
+
       <div class="popup-hint">
         <i class="fas fa-info-circle"></i>
-        <span>Jo Roll No aur Reg No aapke admission form me tha wahi daalein.</span>
+        <span>Niche wale WhatsApp button par click karke direct message bhejein. Aap turant reply paayenge.</span>
       </div>
+
       <div class="popup-actions">
-        <button class="popup-btn ghost" onclick="closeLockPopup()">
-          <i class="fas fa-times"></i> Cancel
+        <button class="popup-btn whatsapp" onclick="openWhatsApp()">
+          <i class="fab fa-whatsapp"></i> Message on WhatsApp
         </button>
-        <button class="popup-btn primary" id="lockSubmitBtn" onclick="submitLockVerification()">
-          <i class="fas fa-download"></i> Verify & Download
+        <button class="popup-btn ghost" onclick="closeWhatsappPopup()">
+          <i class="fas fa-times"></i> Close
         </button>
       </div>
+
     </div>
   </div>
 </div>
@@ -674,6 +687,11 @@ const CONTENT_LABELS = {
   subjective: 'Subjective'
 };
 
+/* WhatsApp Contact */
+const DIRECTOR_PHONE = '919708442525'; // with country code
+const DIRECTOR_PHONE_DISPLAY = '+91 9708442525';
+const WHATSAPP_MESSAGE = 'Namaste Sir, mujhe aapke notes ke bare me kuch jankari chahiye. Kripya details bhej dijiye.';
+
 const $  = (sel, root = document) => root.querySelector(sel);
 const app = $('#app');
 
@@ -681,8 +699,6 @@ const esc = (str = '') => String(str).replace(/[&<>"']/g, ch => (
   { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch]
 ));
 const pad2 = n => String(n).padStart(2, '0');
-const sanitizeFile = (str = 'document') =>
-  str.replace(/[^\w\s\u0900-\u097F-]/g, '').trim().replace(/\s+/g, '_').slice(0, 70) || 'document';
 
 let toastTimer;
 function toast(message) {
@@ -703,18 +719,8 @@ const skeletonChapters = (n = 5) =>
    ============================================================ */
 const state = {
   medium: 'hindi',           // auto-selected
-  contentType: 'notes',      // auto-selected
-  pendingDownload: null,     // { chapterId, url, filename }
-  verifiedStudent: null      // session me verify hone ke baad save hoga
+  contentType: 'notes'       // auto-selected
 };
-
-/* Load verified student from sessionStorage */
-(function restoreSession() {
-  try {
-    const s = sessionStorage.getItem('qcc_student_verified');
-    if (s) state.verifiedStudent = JSON.parse(s);
-  } catch(e) {}
-})();
 
 /* ============================================================
    DATA SOURCE
@@ -763,7 +769,7 @@ const DataSource = {
             const chData = chDoc.data();
             if (chData.is_published === false) return;
 
-            // 🔥 Migration: purana pdf_path ko mediums.hindi.notes me convert
+            // Migration: purana pdf_path → mediums.hindi.notes
             if (chData.pdf_path && !chData.mediums) {
               chData.mediums = {
                 hindi: {
@@ -834,7 +840,6 @@ const DataSource = {
   async getChaptersBySubject(classId, subjectId) {
     const s = await this.getSubject(classId, subjectId);
     if (!s) return [];
-    // Only chapters that have content for current medium + type
     return [...(s.chapters || [])]
       .filter(ch => ch.mediums?.[state.medium]?.[state.contentType]?.pdf_path)
       .sort((a,b) => (a.display_order||0) - (b.display_order||0));
@@ -858,7 +863,6 @@ const DataSource = {
     classes.forEach(cls => {
       (cls.subjects || []).forEach(subject => {
         (subject.chapters || []).forEach(ch => {
-          // Only if current medium + type has content
           const content = ch.mediums?.[state.medium]?.[state.contentType];
           if (!content || !content.pdf_path) return;
           const nameHit = ch.name.toLowerCase().includes(q);
@@ -902,7 +906,7 @@ async function fetchPdfData(chapter) {
     return pdfDataCache.get(chapter.id).slice(0);
   }
   const url = resolvePdfUrl(chapter);
-  if (!url) throw new Error('Is chapter ka PDF abhi upload nahi hua hai.');
+  if (!url) throw new Error('No PDF uploaded for this chapter yet.');
   const res = await fetch(url);
   if (!res.ok) throw new Error('PDF fetch failed: ' + res.status);
   const buffer = await res.arrayBuffer();
@@ -967,16 +971,16 @@ function crumbsHTML(items) {
 }
 
 /* ============================================================
-   MEDIUM & CONTENT SWITCH HELPERS
+   MEDIUM & CONTENT SWITCH
    ============================================================ */
 function mediumSwitchHTML() {
   return `
     <div class="medium-switch">
       <button class="medium-btn ${state.medium==='hindi'?'active':''}" onclick="setMedium('hindi')">
-        <i class="fas fa-om"></i> हिंदी
+        <i class="fas fa-om"></i> हिंदी मीडियम
       </button>
       <button class="medium-btn ${state.medium==='english'?'active':''}" onclick="setMedium('english')">
-        <i class="fas fa-globe"></i> English
+        <i class="fas fa-globe"></i> English Medium
       </button>
     </div>
   `;
@@ -1007,7 +1011,6 @@ function contentIcon(t) {
 window.setMedium = function(m) {
   if (state.medium === m) return;
   state.medium = m;
-  // Clear PDF cache (medium change se different PDFs)
   pdfDataCache.clear();
   router();
 };
@@ -1046,7 +1049,6 @@ async function renderHome() {
   const list = $('#classList');
   if (!list) return;
 
-  // Filter classes that have at least 1 chapter with current medium+type content
   const classesWithContent = [];
   for (const cls of classes) {
     let hasAny = false;
@@ -1065,18 +1067,20 @@ async function renderHome() {
     list.innerHTML = `<div class="empty">
       <span class="empty-ico"><i class="fas fa-book-open"></i></span>
       <strong>${CONTENT_LABELS[state.contentType]} Coming Soon</strong>
-      Abhi is medium me ${CONTENT_LABELS[state.contentType]} upload nahi hua hai.<br>
-      <small>Thodi der baad check karein ya doosra content type try karein.</small>
+      No ${CONTENT_LABELS[state.contentType]} has been uploaded in this medium yet.<br>
+      <small>Please check back later or try another content type.</small>
     </div>`;
     return;
   }
+
+  const mediumLabel = state.medium === 'hindi' ? 'हिंदी मीडियम' : 'English Medium';
 
   list.innerHTML = classesWithContent.map(cls => `
     <a class="class-card" href="#/class/${cls.id}">
       <div class="card-icon" aria-hidden="true">📚</div>
       <div class="card-text">
         <h3>${esc(cls.name)}</h3>
-        <span>${CONTENT_LABELS[state.contentType]} · ${state.medium === 'hindi' ? 'हिंदी' : 'English'}</span>
+        <span>${CONTENT_LABELS[state.contentType]} · ${mediumLabel}</span>
       </div>
       <div class="card-arrow" aria-hidden="true">→</div>
     </a>
@@ -1106,7 +1110,7 @@ async function runSearch(query) {
   if (!results.length) {
     resultsBox.innerHTML = `<div class="empty">
       <strong>No results found</strong>
-      Nothing matched "${esc(query)}". Try another name.
+      Nothing matched "${esc(query)}". Please try another name.
     </div>`;
     return;
   }
@@ -1143,6 +1147,7 @@ async function renderClassPage(classId) {
     return;
   }
   const subjects = await DataSource.getSubjectsWithCounts(classId);
+  const visibleSubjects = subjects.filter(s => s.chapter_count > 0);
 
   app.innerHTML = `
     ${crumbsHTML([{ label:'Home', href:'#/' }, { label: cls.name }])}
@@ -1153,7 +1158,7 @@ async function renderClassPage(classId) {
       <p>${CONTENT_LABELS[state.contentType]} · Select a subject</p>
     </div>
     <div class="stack">
-      ${subjects.filter(s => s.chapter_count > 0).length ? subjects.filter(s => s.chapter_count > 0).map(s => `
+      ${visibleSubjects.length ? visibleSubjects.map(s => `
         <a class="item-card" href="#/class/${cls.id}/subject/${s.id}">
           <div class="card-icon" aria-hidden="true">${s.icon || '📘'}</div>
           <div class="card-text">
@@ -1165,7 +1170,7 @@ async function renderClassPage(classId) {
       `).join('') : `<div class="empty">
         <span class="empty-ico"><i class="fas fa-book"></i></span>
         <strong>No ${CONTENT_LABELS[state.contentType]} yet</strong>
-        Is class me abhi ${CONTENT_LABELS[state.contentType]} upload nahi hua.
+        No ${CONTENT_LABELS[state.contentType]} has been uploaded in this class yet.
       </div>`}
     </div>
   `;
@@ -1220,18 +1225,18 @@ async function renderSubjectPage(classId, subjectId) {
               <div class="ch-meta">
                 <span>Chapter ${pad2(ch.chapter_number)}</span>
                 ${ch.is_new ? '<span class="badge-new-inline">NEW</span>' : ''}
-                ${locked ? '<span class="badge-lock-inline"><i class="fas fa-lock"></i> Locked</span>' : ''}
+                ${locked ? '<span class="badge-lock-inline"><i class="fas fa-lock"></i> Premium</span>' : ''}
               </div>
             </div>
             <button class="ch-download" type="button" data-download="${ch.id}" aria-label="Download PDF">
-              <i class="fas fa-download"></i>
+              <i class="fas fa-${locked ? 'lock' : 'download'}"></i>
             </button>
           </div>
         `;
       }).join('') : `<div class="empty">
         <span class="empty-ico"><i class="fas fa-file-alt"></i></span>
         <strong>No ${CONTENT_LABELS[state.contentType]} yet</strong>
-        Is subject me abhi upload nahi hua.
+        No ${CONTENT_LABELS[state.contentType]} has been uploaded in this subject yet.
       </div>`}
     </div>
   `;
@@ -1267,8 +1272,8 @@ async function renderChapterPage(classId, subjectId, chapterId) {
       ])}
       <div class="empty" style="margin-top:16px">
         <span class="empty-ico"><i class="fas fa-file-pdf"></i></span>
-        <strong>PDF abhi upload nahi hua</strong>
-        ${esc(chapter.name)} ka PDF abhi upload nahi kiya gaya.
+        <strong>PDF not uploaded yet</strong>
+        PDF for ${esc(chapter.name)} has not been uploaded yet.
       </div>
     `;
     return;
@@ -1290,9 +1295,9 @@ async function renderChapterPage(classId, subjectId, chapterId) {
       <p>${contentLabel} · ${mediumLabel}</p>
     </div>
     <div style="margin-bottom:14px;">
-      <button class="btn btn-gold btn-block btn-lg" onclick="handleDownloadClick('${chapter.id}')">
+      <button class="btn ${locked ? 'btn-gold' : 'btn-gold'} btn-block btn-lg" onclick="handleDownloadClick('${chapter.id}')">
         <i class="fas fa-${locked ? 'lock' : 'download'}"></i>
-        ${locked ? 'Verify & Download PDF' : 'DOWNLOAD PDF'}
+        ${locked ? 'Get Premium Notes' : 'DOWNLOAD PDF'}
       </button>
     </div>
     <div class="pdfjs-viewer" id="pdfViewer">
@@ -1357,7 +1362,7 @@ async function renderPdfPages(chapter) {
     pdfDataCache.delete(chapter.id);
     viewer.innerHTML = `
       <div class="pdf-error">
-        <div>⚠️ PDF load nahi ho paya</div>
+        <div>⚠️ PDF could not be loaded</div>
         <p style="margin-top:8px;font-weight:500;color:#7a2040;font-size:12.5px;">
           ${esc(err.message || 'Unknown error')}
         </p>
@@ -1419,7 +1424,6 @@ document.addEventListener('click', e => {
 
 window.handleDownloadClick = async function(chapterId) {
   try {
-    // Find chapter
     let chapter = null;
     const classes = await DataSource.getClasses();
     outer:
@@ -1433,29 +1437,20 @@ window.handleDownloadClick = async function(chapterId) {
     if (!chapter) return toast('Chapter not found');
 
     const url = resolvePdfUrl(chapter);
-    if (!url) return toast('PDF abhi upload nahi hua');
+    if (!url) return toast('PDF not uploaded yet');
 
     const filename = sanitizeFile(chapter.name) + '.pdf';
     const locked = isDownloadLocked(chapter);
 
-    if (!locked) {
-      // Direct download
-      triggerDownload(url, filename);
-      toast('Download started ✓');
+    if (locked) {
+      // Show WhatsApp popup — no direct download
+      openWhatsappPopup(chapter);
       return;
     }
 
-    // Locked — check session first
-    if (state.verifiedStudent) {
-      // Already verified in this session
-      triggerDownload(url, filename);
-      toast('Download started ✓');
-      return;
-    }
-
-    // Need to open lock popup
-    state.pendingDownload = { chapterId, url, filename };
-    openLockPopup();
+    // Unlocked — direct download
+    triggerDownload(url, filename);
+    toast('Download started ✓');
   } catch (err) {
     console.error('[Download]', err);
     toast('Download failed. Please try again.');
@@ -1475,102 +1470,49 @@ function triggerDownload(url, filename) {
 }
 
 /* ============================================================
-   LOCK POPUP — Roll + Reg verification
+   WHATSAPP POPUP
    ============================================================ */
-function openLockPopup() {
-  document.getElementById('lockPopup').classList.add('open');
-  document.getElementById('lockRollInput').value = '';
-  document.getElementById('lockRegInput').value = '';
-  document.getElementById('lockStatus').className = 'popup-status';
-  document.getElementById('lockStatus').textContent = '';
+function openWhatsappPopup(chapter) {
+  document.getElementById('whatsappPopup').classList.add('open');
   document.body.style.overflow = 'hidden';
-  setTimeout(() => document.getElementById('lockRollInput').focus(), 320);
 }
 
-function closeLockPopup() {
-  document.getElementById('lockPopup').classList.remove('open');
+window.openWhatsappPopup = openWhatsappPopup;
+
+window.closeWhatsappPopup = function() {
+  document.getElementById('whatsappPopup').classList.remove('open');
   document.body.style.overflow = '';
-  state.pendingDownload = null;
-}
+};
 
-window.openLockPopup = openLockPopup;
-window.closeLockPopup = closeLockPopup;
+window.openWhatsApp = function() {
+  const url = `https://wa.me/${DIRECTOR_PHONE}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
+  window.open(url, '_blank', 'noopener');
+};
 
-function setLockStatus(type, message) {
-  const el = document.getElementById('lockStatus');
-  el.className = 'popup-status ' + type;
-  if (type === 'loading') {
-    el.innerHTML = '<span class="spinner"></span><span>' + message + '</span>';
+window.copyPhone = function() {
+  const phone = DIRECTOR_PHONE_DISPLAY;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(phone).then(() => {
+      toast('Number copied ✓');
+    }).catch(() => {
+      fallbackCopy(phone);
+    });
   } else {
-    const icon = type === 'error' ? 'exclamation-circle' : 'check-circle';
-    el.innerHTML = `<i class="fas fa-${icon}"></i><span>${message}</span>`;
-  }
-}
-
-window.submitLockVerification = async function() {
-  const roll = document.getElementById('lockRollInput').value.trim();
-  const reg = document.getElementById('lockRegInput').value.trim();
-
-  if (!roll) {
-    setLockStatus('error', 'Please enter Roll Number');
-    document.getElementById('lockRollInput').focus();
-    return;
-  }
-  if (!reg) {
-    setLockStatus('error', 'Please enter Registration Number');
-    document.getElementById('lockRegInput').focus();
-    return;
-  }
-
-  setLockStatus('loading', 'Verifying your details…');
-  const btn = document.getElementById('lockSubmitBtn');
-  btn.disabled = true;
-
-  try {
-    // Query admissions collection
-    const snap = await db.collection('admissions')
-      .where('rollNumber', '==', roll)
-      .where('admissionNo', '==', reg)
-      .limit(1)
-      .get();
-
-    if (snap.empty) {
-      setLockStatus('error', 'Details match nahi hui. Roll No aur Reg No sahi check karein.');
-      btn.disabled = false;
-      return;
-    }
-
-    const studentData = snap.docs[0].data();
-
-    // Save to session
-    state.verifiedStudent = {
-      rollNumber: roll,
-      admissionNo: reg,
-      name: studentData.studentName || '',
-      verifiedAt: Date.now()
-    };
-    try {
-      sessionStorage.setItem('qcc_student_verified', JSON.stringify(state.verifiedStudent));
-    } catch(e) {}
-
-    setLockStatus('success', `✓ Verified! ${studentData.studentName || 'Welcome'}`);
-
-    // Trigger download after short delay
-    const pending = state.pendingDownload;
-    setTimeout(() => {
-      closeLockPopup();
-      if (pending) {
-        triggerDownload(pending.url, pending.filename);
-        toast('Download started ✓');
-      }
-    }, 800);
-  } catch (err) {
-    console.error('Verification error:', err);
-    setLockStatus('error', 'Verification failed. Please try again.');
-  } finally {
-    btn.disabled = false;
+    fallbackCopy(phone);
   }
 };
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); toast('Number copied ✓'); }
+  catch(e) { toast('Copy failed'); }
+  document.body.removeChild(ta);
+}
 
 /* ============================================================
    BOOT
