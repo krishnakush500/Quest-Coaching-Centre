@@ -40,7 +40,6 @@
       overflow:hidden; 
     }
     
-    /* HAMBURGER BUTTON (top-right) */
     .hamburger-btn {
       position: absolute;
       top: 14px;
@@ -141,7 +140,6 @@
     }
     .drawer.open { transform: translateX(0); }
 
-    /* Drawer header */
     .drawer-header {
       background: linear-gradient(135deg, #0d2b6b 0%, #16409b 100%);
       color: #fff;
@@ -191,7 +189,6 @@
       border-color: #ffc107;
     }
 
-    /* Drawer body */
     .drawer-body {
       flex: 1;
       overflow-y: auto;
@@ -292,7 +289,6 @@
       flex-shrink: 0;
     }
 
-    /* Drawer footer */
     .drawer-footer {
       padding: 14px 16px calc(16px + env(safe-area-inset-bottom));
       border-top: 1px solid #e3e9f5;
@@ -482,8 +478,7 @@
       color: #8a95ae;
       flex-shrink: 0;
     }
-    .popup-input-wrap input,
-    .popup-input-wrap select {
+    .popup-input-wrap input {
       flex: 1;
       min-width: 0;
       padding: 14px 14px 14px 0;
@@ -510,7 +505,6 @@
       border-radius: 12px;
       font-size: 0.95rem;
       font-weight: 800;
-      letter-spacing: 0.3px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -834,6 +828,208 @@
       display: block;
     }
 
+    /* ============================================================
+       🆕 TOPPERS SECTION (Firestore se dynamic)
+       ============================================================ */
+    .toppers-section {
+      padding: 25px 15px;
+      background: linear-gradient(135deg, #f5f7ff 0%, #eef2ff 100%);
+      text-align: center;
+    }
+    .toppers-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .toppers-header h2 {
+      font-size: 1.6rem;
+      color: #1a237e;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      padding-bottom: 12px;
+    }
+    .toppers-header h2 i {
+      color: #f7b500;
+      font-size: 1.5rem;
+    }
+    .toppers-header h2::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, #ffd257, #f7b500);
+      border-radius: 2px;
+    }
+    .toppers-header p {
+      font-size: 0.9rem;
+      color: #5f6f90;
+      margin-top: 12px;
+      font-weight: 500;
+    }
+
+    .toppers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 14px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .topper-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 16px 12px 14px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(13,43,107,0.06);
+      border: 1px solid #e3e9f5;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .topper-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(13,43,107,0.14);
+      border-color: #cfdcf5;
+    }
+
+    .topper-rank-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: linear-gradient(135deg, #ffd257, #f7b500);
+      color: #0d2b6b;
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.4px;
+      box-shadow: 0 3px 8px rgba(247,181,0,0.35);
+      text-transform: uppercase;
+    }
+    .topper-rank-badge.top1 {
+      background: linear-gradient(135deg, #ffd700, #ff9d00);
+      color: #fff;
+    }
+    .topper-rank-badge.top2 {
+      background: linear-gradient(135deg, #c0c0c0, #a0a0a0);
+      color: #fff;
+    }
+    .topper-rank-badge.top3 {
+      background: linear-gradient(135deg, #cd7f32, #a05a1f);
+      color: #fff;
+    }
+
+    .topper-photo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin: 4px auto 10px;
+      overflow: hidden;
+      border: 3px solid #ffc42e;
+      box-shadow: 0 4px 12px rgba(13,43,107,0.15);
+      background: #f0f4fb;
+      flex-shrink: 0;
+    }
+    .topper-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .topper-name {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #0d2b6b;
+      line-height: 1.3;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 0 4px;
+    }
+
+    .topper-class {
+      font-size: 0.72rem;
+      color: #8a95ae;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .topper-marks {
+      background: linear-gradient(135deg, #eef3ff, #dde7ff);
+      border: 1px solid #dbe6ff;
+      color: #0d2b6b;
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 5px 10px;
+      border-radius: 20px;
+      display: inline-block;
+      letter-spacing: 0.3px;
+    }
+    .topper-marks i {
+      color: #f7b500;
+      margin-right: 3px;
+    }
+
+    /* Toppers loading skeleton */
+    .topper-sk {
+      border-radius: 14px;
+      background: linear-gradient(90deg, #eef2f9 25%, #e2e9f6 37%, #eef2f9 63%);
+      background-size: 400% 100%;
+      animation: topperShimmer 1.25s ease-in-out infinite;
+      height: 200px;
+    }
+    @keyframes topperShimmer {
+      0% { background-position: 100% 50%; }
+      100% { background-position: 0 50%; }
+    }
+
+    .toppers-empty {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      background: #fff;
+      border-radius: 16px;
+      border: 2px dashed #cfdcf5;
+      text-align: center;
+    }
+    .toppers-empty i {
+      font-size: 3rem;
+      color: #cfdcf5;
+      display: block;
+      margin-bottom: 14px;
+    }
+    .toppers-empty h3 {
+      font-size: 1.15rem;
+      color: #0d2b6b;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .toppers-empty p {
+      font-size: 0.88rem;
+      color: #8a95ae;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 600px) {
+      .toppers-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 10px;
+      }
+      .topper-card { padding: 12px 8px 10px; }
+      .topper-photo { width: 66px; height: 66px; }
+      .topper-name { font-size: 0.78rem; }
+      .topper-class { font-size: 0.66rem; }
+      .topper-marks { font-size: 0.7rem; padding: 4px 8px; }
+      .toppers-header h2 { font-size: 1.3rem; }
+    }
+
     /* Promo Section */
     .promo-section {
       padding: 18px 15px;
@@ -990,7 +1186,7 @@
           <i class="fas fa-id-card"></i>
         </div>
         <h3>Check Your Registration</h3>
-        <p>Aadhaar ya Mobile Number daal kar apni registration dekhein</p>
+        <p>Enter your Aadhaar or Mobile Number to view your registration</p>
       </div>
       <div class="popup-body">
         <div class="popup-field">
@@ -1006,7 +1202,7 @@
 
         <div class="popup-hint">
           <i class="fas fa-info-circle"></i>
-          <span>Jo number aapne admission form me diya tha wahi daalein.</span>
+          <span>Please enter the same number you provided during admission.</span>
         </div>
 
         <div class="popup-actions">
@@ -1074,7 +1270,7 @@
         <span class="di-arrow"><i class="fas fa-chevron-right"></i></span>
       </button>
 
-      <!-- About Us (NEW) -->
+      <!-- About Us -->
       <a href="about-us.html" class="drawer-item" onclick="closeDrawer()">
         <span class="di-icon">🏫</span>
         <span class="di-text">
@@ -1083,11 +1279,20 @@
         <span class="di-arrow"><i class="fas fa-chevron-right"></i></span>
       </a>
 
-      <!-- Our Toppers (NEW) -->
+      <!-- Our Toppers -->
       <a href="toppers.html" class="drawer-item" onclick="closeDrawer()">
         <span class="di-icon">🏆</span>
         <span class="di-text">
           <strong>Our Toppers</strong>
+        </span>
+        <span class="di-arrow"><i class="fas fa-chevron-right"></i></span>
+      </a>
+
+      <!-- 🆕 Gallery -->
+      <a href="gallery.html" class="drawer-item" onclick="closeDrawer()">
+        <span class="di-icon">🖼️</span>
+        <span class="di-text">
+          <strong>Gallery</strong>
         </span>
         <span class="di-arrow"><i class="fas fa-chevron-right"></i></span>
       </a>
@@ -1176,6 +1381,24 @@
       </div>
     </div>
 
+    <!-- ============================================================
+         🆕 TOPPERS SECTION (Firestore se dynamic, usi order me)
+         ============================================================ -->
+    <div class="toppers-section">
+      <div class="toppers-header">
+        <h2><i class="fas fa-trophy"></i> Our Toppers</h2>
+        <p>Meet our best students who made us proud</p>
+      </div>
+      <div class="toppers-grid" id="toppersGrid">
+        <div class="topper-sk"></div>
+        <div class="topper-sk"></div>
+        <div class="topper-sk"></div>
+        <div class="topper-sk"></div>
+        <div class="topper-sk"></div>
+        <div class="topper-sk"></div>
+      </div>
+    </div>
+
     <!-- Promo Section -->
     <div class="promo-section">
       <div class="promo-text">
@@ -1248,7 +1471,6 @@
       document.body.style.overflow = '';
     }
 
-    // ESC key closes drawer + popups
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         closeDrawer();
@@ -1257,7 +1479,6 @@
       }
     });
 
-    // Swipe-right to close drawer
     (function enableSwipeClose() {
       let startX = 0, currentX = 0;
       const drawer = document.getElementById('sideDrawer');
@@ -1557,8 +1778,84 @@
       if (e.target.id === 'passwordModal') closePasswordModal();
     });
 
+    // ============================================================
+    // 🆕 TOPPERS — Firestore se dynamic load
+    // ============================================================
+    const DEFAULT_TOPPER_PHOTO = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23eef3ff"/><circle cx="50" cy="38" r="20" fill="%23cfdcf5"/><ellipse cx="50" cy="90" rx="32" ry="26" fill="%23cfdcf5"/></svg>';
+
+    function getRankClass(rank) {
+      if (!rank) return '';
+      const r = String(rank).toLowerCase();
+      if (r.includes('1') || r === 'first') return 'top1';
+      if (r.includes('2') || r === 'second') return 'top2';
+      if (r.includes('3') || r === 'third') return 'top3';
+      return '';
+    }
+
+    async function loadToppers() {
+      const grid = document.getElementById('toppersGrid');
+      if (!grid) return;
+
+      try {
+        const snap = await db.collection('toppers').orderBy('display_order').get();
+
+        if (snap.empty) {
+          grid.outerHTML = `
+            <div class="toppers-empty">
+              <i class="fas fa-trophy"></i>
+              <h3>Toppers Coming Soon</h3>
+              <p>Our toppers list will be updated shortly. Please check back later.</p>
+            </div>
+          `;
+          return;
+        }
+
+        const toppers = [];
+        snap.forEach(doc => toppers.push({ id: doc.id, ...doc.data() }));
+
+        grid.innerHTML = toppers.map(t => {
+          const photo = t.photoUrl || DEFAULT_TOPPER_PHOTO;
+          const rank = t.rank || '';
+          const rankCls = getRankClass(rank);
+          const marks = t.marks || '';
+          const cls = t.class || '';
+
+          return `
+            <div class="topper-card">
+              ${rank ? `<div class="topper-rank-badge ${rankCls}">${esc(t.rank)}</div>` : ''}
+              <div class="topper-photo">
+                <img src="${esc(photo)}" alt="${esc(t.name || 'Topper')}" onerror="this.src='${DEFAULT_TOPPER_PHOTO}'">
+              </div>
+              <div class="topper-name">${esc(t.name || 'Student')}</div>
+              ${cls ? `<div class="topper-class"><i class="fas fa-graduation-cap"></i> ${esc(cls)}</div>` : ''}
+              ${marks ? `<div class="topper-marks"><i class="fas fa-star"></i>${esc(marks)}</div>` : ''}
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error('Toppers load failed:', err);
+        grid.outerHTML = `
+          <div class="toppers-empty">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Unable to load toppers</h3>
+            <p>Please check your internet connection and try again.</p>
+          </div>
+        `;
+      }
+    }
+
+    function esc(str) {
+      return String(str).replace(/[&<>"']/g, c => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[c]));
+    }
+
+    // ============================================================
+    // BOOT
+    // ============================================================
     document.addEventListener('DOMContentLoaded', function() {
       fetchAllResults();
+      loadToppers();
     });
   </script>
 </body>
