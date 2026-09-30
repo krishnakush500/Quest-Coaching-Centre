@@ -164,35 +164,94 @@
     display:flex;align-items:center;gap:6px;
   }
 
+  /* Person card */
+  .person-card {
+    background:#f9fbff;
+    border:1.5px solid #e3e9f5;
+    border-radius:16px;
+    padding:20px;
+    margin-bottom:16px;
+    position:relative;
+    overflow:hidden;
+  }
+  .person-card::before {
+    content:"";
+    position:absolute;
+    top:0;left:0;right:0;height:4px;
+  }
+  .person-card.ceo::before {
+    background:linear-gradient(90deg,#ffd257,#f7b500);
+  }
+  .person-card.cao::before {
+    background:linear-gradient(90deg,#0d6efd,#0ea5e9);
+  }
+  .person-badge {
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:.7rem;font-weight:800;
+    letter-spacing:.8px;text-transform:uppercase;
+    padding:4px 12px;border-radius:20px;
+    margin-bottom:14px;
+  }
+  .person-badge.ceo {
+    background:linear-gradient(135deg,#ffd257,#f7b500);
+    color:#0d2b6b;
+  }
+  .person-badge.cao {
+    background:linear-gradient(135deg,#0d6efd,#0ea5e9);
+    color:#fff;
+  }
+
   /* About preview */
-  .about-preview {
+  .persons-preview {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-bottom:16px;
+  }
+  @media(max-width:600px) {
+    .persons-preview { grid-template-columns:1fr; }
+  }
+  .person-preview-card {
     background:linear-gradient(135deg,#f1f5ff,#e4edff);
     border:1.5px solid #dbe6ff;
     border-radius:14px;
     padding:18px;
     text-align:center;
-    margin-bottom:16px;
   }
-  .about-preview img{
-    width:100px;height:100px;border-radius:50%;
+  .person-preview-card.ceo {
+    background:linear-gradient(135deg,#fffbea,#fff5cc);
+    border-color:#ffe9a8;
+  }
+  .person-preview-card.cao {
+    background:linear-gradient(135deg,#eff6ff,#dbeafe);
+    border-color:#bae6fd;
+  }
+  .person-preview-card img{
+    width:90px;height:90px;border-radius:50%;
     border:3px solid #ffc42e;
     object-fit:cover;
     margin:0 auto 10px;
     box-shadow:0 4px 12px rgba(13,43,107,.15);
+    display:block;
   }
-  .about-preview h3{
-    font-size:1.05rem;font-weight:800;color:#0d2b6b;margin-bottom:4px;
+  .person-preview-card.cao img {
+    border-color:#0ea5e9;
   }
-  .about-preview .role{
-    font-size:.72rem;font-weight:800;
-    letter-spacing:1px;text-transform:uppercase;
-    color:#f7b500;margin-bottom:8px;
+  .person-preview-card h4{
+    font-size:.95rem;font-weight:800;color:#0d2b6b;margin-bottom:4px;
   }
-  .about-preview .phone{
-    display:inline-flex;align-items:center;gap:6px;
+  .person-preview-card .role{
+    font-size:.68rem;font-weight:800;
+    letter-spacing:.8px;text-transform:uppercase;
+    color:#8a95ae;margin-bottom:8px;
+  }
+  .person-preview-card.ceo .role { color:#b45309; }
+  .person-preview-card.cao .role { color:#0369a1; }
+  .person-preview-card .phone{
+    display:inline-flex;align-items:center;gap:5px;
     background:#fff;border:1.5px solid #dbe6ff;
-    padding:6px 14px;border-radius:20px;
-    font-size:.82rem;font-weight:700;color:#0d2b6b;
+    padding:4px 10px;border-radius:20px;
+    font-size:.74rem;font-weight:700;color:#0d2b6b;
   }
 
   /* Toppers list */
@@ -506,7 +565,7 @@
       <span class="ico"><i class="fas fa-info-circle"></i></span>
       About · Toppers · Gallery
     </h1>
-    <p>Manage About Us page, Our Toppers section & Gallery</p>
+    <p>Manage Institute info (CEO + CAO), Our Toppers section & Gallery</p>
   </div>
 
   <div class="back-bar">
@@ -535,21 +594,76 @@
   <div class="sm-panel active" id="panel-about">
     <div class="sm-card">
       <div class="sm-card-header">
-        <h2><i class="fas fa-school"></i> About Coaching</h2>
+        <h2><i class="fas fa-school"></i> About Our Institute</h2>
         <button class="btn-navy" onclick="saveAbout()" id="saveAboutBtn">
-          <i class="fas fa-save"></i> Save
+          <i class="fas fa-save"></i> Save All
         </button>
       </div>
 
-      <div class="row g-3">
-        <div class="col-md-6">
-          <label class="form-label">Director Name</label>
-          <input type="text" class="form-control" id="aboutDirectorName" placeholder="MR. RAVI SIR">
+      <!-- CEO Card -->
+      <div class="person-card ceo">
+        <span class="person-badge ceo"><i class="fas fa-crown"></i> CEO</span>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">CEO Name</label>
+            <input type="text" class="form-control" id="ceoName" placeholder="MR. RAVI SIR">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">CEO Phone</label>
+            <input type="tel" class="form-control" id="ceoPhone" placeholder="+91 9708442525">
+          </div>
+          <div class="col-12">
+            <label class="form-label">CEO Photo</label>
+            <div class="upload-drop" id="ceoPhotoDrop">
+              <input type="file" id="ceoPhotoInput" accept="image/*" style="display:none;">
+              <div class="ico"><i class="fas fa-cloud-upload-alt"></i></div>
+              <div class="txt">Click to upload CEO photo</div>
+              <div class="sub">Max 5 MB · JPG / PNG</div>
+            </div>
+            <div class="file-info" id="ceoPhotoInfo" style="display:none;">
+              <i class="fas fa-check-circle"></i>
+              <span id="ceoPhotoName"></span>
+              <button class="btn-outline-soft ms-2" onclick="clearPersonPhoto('ceo')" style="padding:3px 8px;font-size:.72rem;">
+                <i class="fas fa-times"></i> Remove
+              </button>
+            </div>
+          </div>
         </div>
-        <div class="col-md-6">
-          <label class="form-label">Director Phone</label>
-          <input type="tel" class="form-control" id="aboutDirectorPhone" placeholder="+91 9708442525">
+      </div>
+
+      <!-- CAO Card -->
+      <div class="person-card cao">
+        <span class="person-badge cao"><i class="fas fa-user-tie"></i> CAO</span>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">CAO Name</label>
+            <input type="text" class="form-control" id="caoName" placeholder="MR. PRINCE SIR">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">CAO Phone</label>
+            <input type="tel" class="form-control" id="caoPhone" placeholder="+91 98XXXXXXXX">
+          </div>
+          <div class="col-12">
+            <label class="form-label">CAO Photo</label>
+            <div class="upload-drop" id="caoPhotoDrop">
+              <input type="file" id="caoPhotoInput" accept="image/*" style="display:none;">
+              <div class="ico"><i class="fas fa-cloud-upload-alt"></i></div>
+              <div class="txt">Click to upload CAO photo</div>
+              <div class="sub">Max 5 MB · JPG / PNG</div>
+            </div>
+            <div class="file-info" id="caoPhotoInfo" style="display:none;">
+              <i class="fas fa-check-circle"></i>
+              <span id="caoPhotoName"></span>
+              <button class="btn-outline-soft ms-2" onclick="clearPersonPhoto('cao')" style="padding:3px 8px;font-size:.72rem;">
+                <i class="fas fa-times"></i> Remove
+              </button>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <!-- Common Info -->
+      <div class="row g-3 mt-2">
         <div class="col-md-6">
           <label class="form-label">Location</label>
           <input type="text" class="form-control" id="aboutLocation" placeholder="Gopalganj, Bihar">
@@ -559,36 +673,32 @@
           <input type="text" class="form-control" id="aboutYear" placeholder="2015">
         </div>
         <div class="col-12">
-          <label class="form-label">About Text</label>
-          <textarea id="aboutText" placeholder="Write about your coaching..."></textarea>
-        </div>
-        <div class="col-12">
-          <label class="form-label">Director Photo</label>
-          <div class="upload-drop" id="aboutPhotoDrop">
-            <input type="file" id="aboutPhotoInput" accept="image/*" style="display:none;">
-            <div class="ico"><i class="fas fa-cloud-upload-alt"></i></div>
-            <div class="txt">Click to upload director photo</div>
-            <div class="sub">Max 5 MB · JPG / PNG</div>
-          </div>
-          <div class="file-info" id="aboutPhotoInfo" style="display:none;">
-            <i class="fas fa-check-circle"></i>
-            <span id="aboutPhotoName"></span>
-            <button class="btn-outline-soft ms-2" onclick="clearAboutPhoto()" style="padding:3px 8px;font-size:.72rem;">
-              <i class="fas fa-times"></i> Remove
-            </button>
-          </div>
+          <label class="form-label">About Our Institute</label>
+          <textarea id="aboutText" placeholder="Write about your institute..."></textarea>
         </div>
       </div>
 
+      <!-- Live Preview -->
       <div style="margin-top:24px;">
         <label class="form-label">Live Preview</label>
-        <div class="about-preview" id="aboutPreview">
-          <img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" id="previewPhoto">
-          <h3 id="previewName">MR. RAVI SIR</h3>
-          <div class="role">Director & Founder</div>
-          <div class="phone">
-            <i class="fas fa-phone"></i>
-            <span id="previewPhone">+91 9708442525</span>
+        <div class="persons-preview">
+          <div class="person-preview-card ceo">
+            <img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" id="ceoPreviewPhoto">
+            <h4 id="ceoPreviewName">MR. RAVI SIR</h4>
+            <div class="role">CEO (Chief Executive Officer)</div>
+            <div class="phone">
+              <i class="fas fa-phone"></i>
+              <span id="ceoPreviewPhone">+91 9708442525</span>
+            </div>
+          </div>
+          <div class="person-preview-card cao">
+            <img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" id="caoPreviewPhoto">
+            <h4 id="caoPreviewName">MR. PRINCE SIR</h4>
+            <div class="role">CAO (Chief Academic Officer)</div>
+            <div class="phone">
+              <i class="fas fa-phone"></i>
+              <span id="caoPreviewPhone">+91 98XXXXXXXX</span>
+            </div>
           </div>
         </div>
       </div>
@@ -737,7 +847,7 @@
         <div class="mt-3" style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:12px 14px;">
           <div style="font-size:.78rem;color:#0369a1;font-weight:700;display:flex;align-items:flex-start;gap:8px;">
             <i class="fas fa-info-circle" style="margin-top:2px;"></i>
-            <span>Date automatically add hogi — photo upload karne ki date ke saath. Aapko manually date nahi daalni.</span>
+            <span>Date automatically add hogi — photo upload karne ki date ke saath.</span>
           </div>
         </div>
       </div>
@@ -796,9 +906,7 @@ function showLoader(text='Saving…') {
 }
 function hideLoader() { $('loaderOverlay').classList.remove('show'); }
 
-/* ============================================================
-   🆕 UPLOAD PROGRESS OVERLAY
-   ============================================================ */
+/* Upload progress */
 function showUploadProgress(title = 'Uploading Photo…', sub = 'Please wait, don\'t close this window') {
   document.querySelector('.upload-progress-title').textContent = title;
   $('uploadProgressSub').textContent = sub;
@@ -817,6 +925,27 @@ function hideUploadProgress() {
   $('uploadProgressOverlay').classList.remove('show');
 }
 
+function startFakeProgress() {
+  let p = 0;
+  showUploadProgress();
+  const timer = setInterval(() => {
+    p = Math.min(p + Math.random() * 12, 88);
+    updateUploadProgress(p);
+  }, 180);
+  return timer;
+}
+
+function completeFakeProgress(timer) {
+  if (timer) clearInterval(timer);
+  updateUploadProgress(100, 'Upload complete!');
+  setTimeout(() => hideUploadProgress(), 600);
+}
+
+function failFakeProgress(timer) {
+  if (timer) clearInterval(timer);
+  hideUploadProgress();
+}
+
 /* ============================================================
    STATE
    ============================================================ */
@@ -825,10 +954,12 @@ const state = {
   gallery: [],
   editingTopper: null,
   editingGallery: null,
-  aboutPhotoFile: null,
+  ceoPhotoFile: null,
+  caoPhotoFile: null,
   topperPhotoFile: null,
   galleryPhotoFile: null,
-  existingAboutPhotoUrl: null,
+  existingCeoPhotoUrl: null,
+  existingCaoPhotoUrl: null,
   existingTopperPhotoUrl: null,
   existingGalleryPhotoUrl: null
 };
@@ -861,10 +992,9 @@ document.querySelectorAll('.sm-tab').forEach(btn => {
 });
 
 /* ============================================================
-   🆕 SUPABASE IMAGE UPLOAD — FIXED
+   SUPABASE IMAGE UPLOAD
    ============================================================ */
 async function uploadImageToSupabase(file, baseName) {
-  // Detect actual file extension
   const rawExt = (file.name.split('.').pop() || 'jpg').toLowerCase();
   const validExt = ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(rawExt) ? rawExt : 'jpg';
   const mimeType = file.type || (validExt === 'png' ? 'image/png' : 'image/jpeg');
@@ -878,7 +1008,7 @@ async function uploadImageToSupabase(file, baseName) {
 
   const fileName = `${Date.now()}_${safeName}.${validExt}`;
 
-  console.log('🔼 Uploading to Supabase:', fileName, '|', mimeType, '|', (file.size/1024).toFixed(1) + ' KB');
+  console.log('🔼 Uploading:', fileName, '|', mimeType, '|', (file.size/1024).toFixed(1) + ' KB');
 
   const { data, error } = await supabaseClient.storage
     .from(IMG_BUCKET)
@@ -889,7 +1019,7 @@ async function uploadImageToSupabase(file, baseName) {
     });
 
   if (error) {
-    console.error('❌ Supabase upload error:', error);
+    console.error('❌ Upload error:', error);
     throw new Error(error.message || 'Upload failed');
   }
 
@@ -897,30 +1027,8 @@ async function uploadImageToSupabase(file, baseName) {
     .from(IMG_BUCKET)
     .getPublicUrl(fileName);
 
-  console.log('✅ Uploaded URL:', urlData.publicUrl);
+  console.log('✅ URL:', urlData.publicUrl);
   return urlData.publicUrl;
-}
-
-/* Simulated progress — chalta rahega jab tak upload ho raha hai */
-function startFakeProgress() {
-  let p = 0;
-  showUploadProgress();
-  const timer = setInterval(() => {
-    p = Math.min(p + Math.random() * 12, 88);
-    updateUploadProgress(p);
-  }, 180);
-  return timer;
-}
-
-function completeFakeProgress(timer) {
-  if (timer) clearInterval(timer);
-  updateUploadProgress(100, 'Upload complete!');
-  setTimeout(() => hideUploadProgress(), 600);
-}
-
-function failFakeProgress(timer) {
-  if (timer) clearInterval(timer);
-  hideUploadProgress();
 }
 
 /* ============================================================
@@ -931,12 +1039,23 @@ async function loadAbout() {
     const snap = await db.collection('settings').doc('about_us').get();
     if (snap.exists) {
       const data = snap.data();
-      $('aboutDirectorName').value = data.directorName || '';
-      $('aboutDirectorPhone').value = data.directorPhone || '';
+
+      // 🔥 MIGRATION: purana data → naya
+      const ceoName = data.ceoName || data.directorName || '';
+      const ceoPhone = data.ceoPhone || data.directorPhone || '';
+      const ceoPhotoUrl = data.ceoPhotoUrl || data.photoUrl || '';
+
+      $('ceoName').value = ceoName;
+      $('ceoPhone').value = ceoPhone;
+      state.existingCeoPhotoUrl = ceoPhotoUrl || null;
+
+      $('caoName').value = data.caoName || '';
+      $('caoPhone').value = data.caoPhone || '';
+      state.existingCaoPhotoUrl = data.caoPhotoUrl || null;
+
       $('aboutLocation').value = data.location || '';
       $('aboutYear').value = data.year || '';
       $('aboutText').value = data.aboutText || '';
-      state.existingAboutPhotoUrl = data.photoUrl || null;
     }
     updateAboutPreview();
   } catch (err) {
@@ -945,27 +1064,47 @@ async function loadAbout() {
 }
 
 function updateAboutPreview() {
-  const name = $('aboutDirectorName').value.trim() || 'MR. RAVI SIR';
-  const phone = $('aboutDirectorPhone').value.trim() || '+91 9708442525';
-  $('previewName').textContent = name;
-  $('previewPhone').textContent = phone;
-  if (state.aboutPhotoFile) {
-    $('previewPhoto').src = URL.createObjectURL(state.aboutPhotoFile);
-  } else if (state.existingAboutPhotoUrl) {
-    $('previewPhoto').src = state.existingAboutPhotoUrl;
+  // CEO Preview
+  const ceoName = $('ceoName').value.trim() || 'MR. RAVI SIR';
+  const ceoPhone = $('ceoPhone').value.trim() || '+91 9708442525';
+  $('ceoPreviewName').textContent = ceoName;
+  $('ceoPreviewPhone').textContent = ceoPhone;
+  if (state.ceoPhotoFile) {
+    $('ceoPreviewPhoto').src = URL.createObjectURL(state.ceoPhotoFile);
+  } else if (state.existingCeoPhotoUrl) {
+    $('ceoPreviewPhoto').src = state.existingCeoPhotoUrl;
+  }
+
+  // CAO Preview
+  const caoName = $('caoName').value.trim() || 'MR. PRINCE SIR';
+  const caoPhone = $('caoPhone').value.trim() || '+91 98XXXXXXXX';
+  $('caoPreviewName').textContent = caoName;
+  $('caoPreviewPhone').textContent = caoPhone;
+  if (state.caoPhotoFile) {
+    $('caoPreviewPhoto').src = URL.createObjectURL(state.caoPhotoFile);
+  } else if (state.existingCaoPhotoUrl) {
+    $('caoPreviewPhoto').src = state.existingCaoPhotoUrl;
   }
 }
 
-window.clearAboutPhoto = function() {
-  state.aboutPhotoFile = null;
-  $('aboutPhotoInput').value = '';
-  $('aboutPhotoInfo').style.display = 'none';
+window.clearPersonPhoto = function(type) {
+  if (type === 'ceo') {
+    state.ceoPhotoFile = null;
+    $('ceoPhotoInput').value = '';
+    $('ceoPhotoInfo').style.display = 'none';
+  } else if (type === 'cao') {
+    state.caoPhotoFile = null;
+    $('caoPhotoInput').value = '';
+    $('caoPhotoInfo').style.display = 'none';
+  }
   updateAboutPreview();
 };
 
 window.saveAbout = async function() {
-  const directorName = $('aboutDirectorName').value.trim();
-  const directorPhone = $('aboutDirectorPhone').value.trim();
+  const ceoName = $('ceoName').value.trim();
+  const ceoPhone = $('ceoPhone').value.trim();
+  const caoName = $('caoName').value.trim();
+  const caoPhone = $('caoPhone').value.trim();
   const location = $('aboutLocation').value.trim();
   const year = $('aboutYear').value.trim();
   const aboutText = $('aboutText').value.trim();
@@ -976,24 +1115,44 @@ window.saveAbout = async function() {
   let progressTimer = null;
 
   try {
-    let photoUrl = state.existingAboutPhotoUrl;
-    if (state.aboutPhotoFile) {
+    let ceoPhotoUrl = state.existingCeoPhotoUrl;
+    let caoPhotoUrl = state.existingCaoPhotoUrl;
+
+    // Upload CEO photo
+    if (state.ceoPhotoFile) {
       progressTimer = startFakeProgress();
-      photoUrl = await uploadImageToSupabase(state.aboutPhotoFile, 'director_photo');
+      document.querySelector('.upload-progress-title').textContent = 'Uploading CEO Photo…';
+      ceoPhotoUrl = await uploadImageToSupabase(state.ceoPhotoFile, 'ceo_' + (ceoName || 'photo'));
+      completeFakeProgress(progressTimer);
+    }
+
+    // Upload CAO photo
+    if (state.caoPhotoFile) {
+      progressTimer = startFakeProgress();
+      document.querySelector('.upload-progress-title').textContent = 'Uploading CAO Photo…';
+      caoPhotoUrl = await uploadImageToSupabase(state.caoPhotoFile, 'cao_' + (caoName || 'photo'));
       completeFakeProgress(progressTimer);
     }
 
     showLoader('Saving…');
     await db.collection('settings').doc('about_us').set({
-      photoUrl: photoUrl || '',
-      directorName, directorPhone, location, year, aboutText,
+      ceoName, ceoPhone,
+      ceoPhotoUrl: ceoPhotoUrl || '',
+      caoName, caoPhone,
+      caoPhotoUrl: caoPhotoUrl || '',
+      location, year, aboutText,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
-    state.existingAboutPhotoUrl = photoUrl;
-    state.aboutPhotoFile = null;
-    $('aboutPhotoInput').value = '';
-    $('aboutPhotoInfo').style.display = 'none';
+    state.existingCeoPhotoUrl = ceoPhotoUrl;
+    state.existingCaoPhotoUrl = caoPhotoUrl;
+    state.ceoPhotoFile = null;
+    state.caoPhotoFile = null;
+    $('ceoPhotoInput').value = '';
+    $('caoPhotoInput').value = '';
+    $('ceoPhotoInfo').style.display = 'none';
+    $('caoPhotoInfo').style.display = 'none';
+
     toast('About saved ✓');
   } catch (err) {
     console.error(err);
@@ -1063,21 +1222,34 @@ document.addEventListener('DOMContentLoaded', () => {
   topperModal = new bootstrap.Modal($('topperModal'));
   galleryModal = new bootstrap.Modal($('galleryModal'));
 
-  // About preview updates
-  ['aboutDirectorName', 'aboutDirectorPhone'].forEach(id => {
+  // Live preview updates
+  ['ceoName', 'ceoPhone', 'caoName', 'caoPhone'].forEach(id => {
     $(id).addEventListener('input', updateAboutPreview);
   });
 
-  // About photo
-  $('aboutPhotoDrop').addEventListener('click', () => $('aboutPhotoInput').click());
-  $('aboutPhotoInput').addEventListener('change', (e) => {
+  // CEO photo
+  $('ceoPhotoDrop').addEventListener('click', () => $('ceoPhotoInput').click());
+  $('ceoPhotoInput').addEventListener('change', (e) => {
     const f = e.target.files[0];
     if (!f) return;
     if (!f.type.startsWith('image/')) return toast('Only image files allowed', true);
     if (f.size > 5 * 1024 * 1024) return toast('Image too large (max 5 MB)', true);
-    state.aboutPhotoFile = f;
-    $('aboutPhotoInfo').style.display = 'flex';
-    $('aboutPhotoName').textContent = f.name + ' (' + (f.size/1024/1024).toFixed(2) + ' MB)';
+    state.ceoPhotoFile = f;
+    $('ceoPhotoInfo').style.display = 'flex';
+    $('ceoPhotoName').textContent = f.name + ' (' + (f.size/1024/1024).toFixed(2) + ' MB)';
+    updateAboutPreview();
+  });
+
+  // CAO photo
+  $('caoPhotoDrop').addEventListener('click', () => $('caoPhotoInput').click());
+  $('caoPhotoInput').addEventListener('change', (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    if (!f.type.startsWith('image/')) return toast('Only image files allowed', true);
+    if (f.size > 5 * 1024 * 1024) return toast('Image too large (max 5 MB)', true);
+    state.caoPhotoFile = f;
+    $('caoPhotoInfo').style.display = 'flex';
+    $('caoPhotoName').textContent = f.name + ' (' + (f.size/1024/1024).toFixed(2) + ' MB)';
     updateAboutPreview();
   });
 
@@ -1174,6 +1346,7 @@ window.saveTopper = async function() {
     let photoUrl = state.existingTopperPhotoUrl;
     if (state.topperPhotoFile) {
       progressTimer = startFakeProgress();
+      document.querySelector('.upload-progress-title').textContent = 'Uploading Topper Photo…';
       photoUrl = await uploadImageToSupabase(state.topperPhotoFile, name);
       completeFakeProgress(progressTimer);
     }
@@ -1356,6 +1529,7 @@ window.saveGalleryPhoto = async function() {
     let photoUrl = state.existingGalleryPhotoUrl;
     if (state.galleryPhotoFile) {
       progressTimer = startFakeProgress();
+      document.querySelector('.upload-progress-title').textContent = 'Uploading Photo…';
       photoUrl = await uploadImageToSupabase(state.galleryPhotoFile, caption);
       completeFakeProgress(progressTimer);
     }
