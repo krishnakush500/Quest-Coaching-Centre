@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0d2b6b" />
+<title>Gallery · Quest Coaching Centre</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root{
+  --navy:#0d2b6b;
+  --navy-2:#16409b;
+  --gold:#ffc42e;
+  --gold-2:#f7b500;
+  --gold-ink:#3a2a00;
+  --bg:#f2f5fb;
+  --card:#ffffff;
+  --text:#0f2452;
+  --muted:#5f6f90;
+  --border:#e3e9f5;
+  --radius:14px;
+  --shadow:0 2px 10px rgba(13,43,107,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  font-family:"Segoe UI",system-ui,-apple-system,"Roboto","Helvetica Neue",Arial,sans-serif;
+  background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;
+  min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;
+}
+img{max-width:100%;display:block}
+a{text-decoration:none;color:inherit}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+.wrap{width:100%;max-width:1000px;margin:0 auto;padding:0 14px}
+
+/* HEADER */
+.app-header{
+  position:sticky;top:0;z-index:60;
+  background:linear-gradient(135deg,#0d2b6b 0%,#16409b 100%);
+  border-bottom:3px solid var(--gold);
+  box-shadow:0 2px 12px rgba(8,31,82,.20);
+}
+.header-inner{
+  display:flex;align-items:center;gap:10px;
+  min-height:56px;padding:7px 0;
+}
+.back-header-btn{
+  width:34px;height:34px;flex:none;border-radius:9px;
+  background:rgba(255,255,255,0.14);
+  border:1px solid rgba(255,255,255,0.26);
+  color:#fff;font-size:14px;display:grid;place-items:center;cursor:pointer;
+  transition:all .2s;
+}
+.back-header-btn:hover{background:var(--gold);color:var(--navy);border-color:var(--gold);}
+.back-header-btn:active{transform:scale(.94);}
+.brand{flex:1;min-width:0;text-align:center;}
+.brand h1{
+  font-size:14px;font-weight:800;color:#fff;letter-spacing:.7px;line-height:1.2;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.brand p{
+  font-size:11px;color:#c3d2f2;line-height:1.35;
+}
+.header-tag{
+  flex:none;font-size:10px;font-weight:800;letter-spacing:.6px;
+  color:var(--gold-ink);
+  background:linear-gradient(135deg,#ffd257,#f7b500);
+  padding:4px 9px;border-radius:20px;text-transform:uppercase;
+  box-shadow:0 1px 4px rgba(0,0,0,.18);
+}
+
+main{flex:1 0 auto;padding-bottom:26px}
+
+/* PAGE HEAD */
+.page-head{
+  padding:22px 0 16px;
+  text-align:center;
+}
+.page-head h2{
+  font-size:1.5rem;font-weight:800;color:var(--navy);
+  letter-spacing:-.2px;
+  display:inline-flex;align-items:center;gap:10px;
+}
+.page-head h2 i{color:var(--gold);}
+.page-head p{
+  font-size:13px;color:var(--muted);margin-top:6px;
+}
+.page-head::after{
+  content:"";display:block;width:50px;height:3px;
+  background:linear-gradient(90deg,var(--gold),var(--gold-2));
+  border-radius:2px;
+  margin:12px auto 0;
+}
+
+/* GALLERY GRID */
+.gallery-grid{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:12px;
+  padding-bottom:20px;
+}
+@media(min-width:600px){
+  .gallery-grid{grid-template-columns:repeat(3, 1fr);gap:16px;}
+}
+@media(min-width:900px){
+  .gallery-grid{grid-template-columns:repeat(4, 1fr);}
+}
+
+/* GALLERY CARD */
+.gallery-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  transition:all .25s ease;
+  cursor:pointer;
+}
+.gallery-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 28px rgba(13,43,107,.14);
+  border-color:#cfdcf5;
+}
+
+.gallery-photo{
+  width:100%;
+  aspect-ratio:1/1;
+  overflow:hidden;
+  background:#f0f4fb;
+  position:relative;
+}
+.gallery-photo img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .4s ease;
+  display:block;
+}
+.gallery-card:hover .gallery-photo img{
+  transform:scale(1.06);
+}
+
+.gallery-info{
+  padding:10px 12px 12px;
+}
+.gallery-caption{
+  font-size:.85rem;
+  font-weight:800;
+  color:var(--navy);
+  line-height:1.3;
+  margin-bottom:5px;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  word-break:break-word;
+}
+.gallery-date{
+  font-size:.7rem;
+  color:var(--muted);
+  font-weight:600;
+  display:flex;align-items:center;gap:5px;
+}
+.gallery-date i{
+  color:var(--gold);
+  font-size:.72rem;
+}
+
+/* LOADING SKELETON */
+.sk{
+  border-radius:16px;
+  background:linear-gradient(90deg,#eef2f9 25%,#e2e9f6 37%,#eef2f9 63%);
+  background-size:400% 100%;
+  animation:shimmer 1.25s ease-in-out infinite;
+  height:260px;
+}
+@keyframes shimmer{0%{background-position:100% 50%}100%{background-position:0 50%}}
+
+/* EMPTY */
+.gallery-empty{
+  max-width:500px;
+  margin:0 auto;
+  padding:50px 24px;
+  background:#fff;
+  border-radius:18px;
+  border:2px dashed #cfdcf5;
+  text-align:center;
+}
+.gallery-empty .empty-ico{
+  font-size:3.5rem;
+  color:#cfdcf5;
+  display:block;
+  margin-bottom:16px;
+}
+.gallery-empty h3{
+  font-size:1.15rem;
+  color:var(--navy);
+  font-weight:800;
+  margin-bottom:8px;
+}
+.gallery-empty p{
+  font-size:.88rem;
+  color:var(--muted);
+  line-height:1.5;
+}
+
+/* LIGHTBOX */
+.lightbox{
+  position:fixed;
+  inset:0;
+  background:rgba(8,31,82,.92);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .28s ease;
+}
+.lightbox.open{
+  opacity:1;
+  pointer-events:auto;
+}
+.lightbox-content{
+  position:relative;
+  max-width:900px;
+  width:100%;
+  max-height:90vh;
+  display:flex;
+  flex-direction:column;
+  transform:scale(.95);
+  transition:transform .28s ease;
+}
+.lightbox.open .lightbox-content{
+  transform:scale(1);
+}
+.lightbox-image-wrap{
+  background:#fff;
+  border-radius:14px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  max-height:75vh;
+}
+.lightbox-image-wrap img{
+  max-width:100%;
+  max-height:75vh;
+  object-fit:contain;
+  display:block;
+}
+.lightbox-caption{
+  margin-top:14px;
+  text-align:center;
+  color:#fff;
+}
+.lightbox-caption h4{
+  font-size:1.05rem;
+  font-weight:800;
+  letter-spacing:.3px;
+  line-height:1.3;
+}
+.lightbox-caption p{
+  font-size:.85rem;
+  color:#c3d2f2;
+  margin-top:6px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.lightbox-caption p i{color:var(--gold);}
+.lightbox-close{
+  position:absolute;
+  top:-46px;
+  right:0;
+  width:38px;height:38px;
+  border-radius:10px;
+  background:rgba(255,255,255,0.15);
+  border:1px solid rgba(255,255,255,0.28);
+  color:#fff;
+  font-size:1rem;
+  display:grid;place-items:center;
+  cursor:pointer;
+  transition:all .2s;
+}
+.lightbox-close:hover{
+  background:var(--gold);
+  color:var(--navy);
+  border-color:var(--gold);
+  transform:rotate(90deg);
+}
+@media(max-width:600px){
+  .lightbox-close{
+    top:-42px;
+    right:0;
+  }
+  .lightbox-image-wrap{max-height:70vh;}
+  .lightbox-image-wrap img{max-height:70vh;}
+}
+
+/* FOOTER */
+.app-footer{
+  flex:none;margin-top:auto;
+  background:#fff;border-top:1px solid var(--border);
+  padding:18px 14px calc(20px + env(safe-area-inset-bottom));
+  text-align:center;
+}
+.app-footer strong{
+  display:block;font-size:12.5px;font-weight:800;
+  color:var(--navy);letter-spacing:.7px;
+}
+.app-footer span{display:block;font-size:11.5px;color:var(--muted);margin-top:4px;}
+.app-footer small{display:block;font-size:11px;color:#93a1bd;margin-top:8px;}
+
+@media(max-width:359px){
+  .gallery-info{padding:8px 10px 10px;}
+  .gallery-caption{font-size:.78rem;}
+  .gallery-date{font-size:.65rem;}
+}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="wrap header-inner">
+    <button class="back-header-btn" onclick="history.back()" aria-label="Back">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <div class="brand">
+      <h1>QUEST COACHING CENTRE</h1>
+      <p>Gallery</p>
+    </div>
+    <span class="header-tag">Gallery</span>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="page-head">
+      <h2><i class="fas fa-images"></i> Our Gallery</h2>
+      <p>Moments from our coaching</p>
+    </div>
+
+    <div class="gallery-grid" id="galleryGrid">
+      <div class="sk"></div>
+      <div class="sk"></div>
+      <div class="sk"></div>
+      <div class="sk"></div>
+    </div>
+  </div>
+</main>
+
+<footer class="app-footer">
+  <strong>QUEST COACHING CENTRE</strong>
+  <span>Director: Mr. Ravi Sir</span>
+  <small>© 2026 Quest Coaching Centre</small>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="if(event.target===this) closeLightbox()">
+  <div class="lightbox-content">
+    <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close">
+      <i class="fas fa-times"></i>
+    </button>
+    <div class="lightbox-image-wrap">
+      <img id="lightboxImg" src="" alt="">
+    </div>
+    <div class="lightbox-caption">
+      <h4 id="lightboxCaption"></h4>
+      <p>
+        <i class="fas fa-calendar-alt"></i>
+        <span id="lightboxDate"></span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<script>
+/* ============================================================
+   QUEST COACHING — GALLERY
+   Firestore se photos load karta hai
+   ============================================================ */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
+  authDomain: "quest-coaching.firebaseapp.com",
+  databaseURL: "https://quest-coaching-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "quest-coaching",
+  storageBucket: "quest-coaching.firebasestorage.app",
+  messagingSenderId: "131948734089",
+  appId: "1:131948734089:web:f4ba25110c8b1298360858"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+const esc = (s='') => String(s).replace(/[&<>"']/g, c => (
+  { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]
+));
+
+const grid = document.getElementById('galleryGrid');
+let allPhotos = [];
+
+/* Format date nicely */
+function formatDate(timestamp) {
+  if (!timestamp) return 'Date not available';
+  try {
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return date.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  } catch(e) {
+    return 'Date not available';
+  }
+}
+
+/* Load gallery photos */
+async function loadGallery() {
+  try {
+    const snap = await db.collection('gallery').orderBy('display_order').get();
+
+    if (snap.empty) {
+      grid.outerHTML = `
+        <div class="gallery-empty">
+          <span class="empty-ico"><i class="fas fa-images"></i></span>
+          <h3>Gallery Coming Soon</h3>
+          <p>Our gallery will be updated shortly. Please check back later.</p>
+        </div>
+      `;
+      return;
+    }
+
+    allPhotos = [];
+    snap.forEach(doc => allPhotos.push({ id: doc.id, ...doc.data() }));
+
+    grid.innerHTML = allPhotos.map((g, index) => {
+      const photo = g.photoUrl || '';
+      const caption = g.caption || 'Untitled';
+      const dateStr = formatDate(g.createdAt);
+
+      return `
+        <div class="gallery-card" onclick="openLightbox(${index})">
+          <div class="gallery-photo">
+            <img src="${esc(photo)}" alt="${esc(caption)}" loading="lazy">
+          </div>
+          <div class="gallery-info">
+            <div class="gallery-caption">${esc(caption)}</div>
+            <div class="gallery-date">
+              <i class="fas fa-calendar-alt"></i>
+              <span>${esc(dateStr)}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+  } catch (err) {
+    console.error('Gallery load failed:', err);
+    grid.outerHTML = `
+      <div class="gallery-empty">
+        <span class="empty-ico"><i class="fas fa-exclamation-triangle"></i></span>
+        <h3>Unable to load gallery</h3>
+        <p>Please check your internet connection and try again.</p>
+      </div>
+    `;
+  }
+}
+
+/* Lightbox */
+function openLightbox(index) {
+  const photo = allPhotos[index];
+  if (!photo) return;
+
+  document.getElementById('lightboxImg').src = photo.photoUrl || '';
+  document.getElementById('lightboxImg').alt = photo.caption || '';
+  document.getElementById('lightboxCaption').textContent = photo.caption || 'Untitled';
+  document.getElementById('lightboxDate').textContent = formatDate(photo.createdAt);
+
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ESC to close lightbox */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeLightbox();
+});
+
+/* Swipe down to close lightbox (mobile) */
+(function enableSwipeClose() {
+  let startY = 0, currentY = 0;
+  const lb = document.getElementById('lightbox');
+  lb.addEventListener('touchstart', function(e) {
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+  lb.addEventListener('touchmove', function(e) {
+    currentY = e.touches[0].clientY;
+  }, { passive: true });
+  lb.addEventListener('touchend', function() {
+    if (currentY - startY > 80) closeLightbox();
+  }, { passive: true });
+})();
+
+/* Boot */
+document.addEventListener('DOMContentLoaded', loadGallery);
+</script>
+</body>
+</html>
