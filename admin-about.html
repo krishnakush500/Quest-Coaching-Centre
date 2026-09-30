@@ -117,6 +117,7 @@
     transition:all .2s;
   }
   .btn-navy:hover { transform:translateY(-1px);color:#fff; }
+  .btn-navy:disabled { opacity:.6;cursor:not-allowed; }
 
   .btn-outline-soft {
     background:#fff;border:1.5px solid #dbe6ff;color:#0d2b6b;
@@ -161,21 +162,6 @@
   .file-info {
     margin-top:10px;font-size:.78rem;color:#0e9f6e;font-weight:700;
     display:flex;align-items:center;gap:6px;
-  }
-
-  .upload-progress {
-    margin-top:12px;background:#f1f5ff;
-    border-radius:10px;padding:12px 14px;
-    border:1px solid #dbe6ff;display:none;
-  }
-  .upload-progress.show { display:block; }
-  .upload-progress .bar {
-    width:100%;height:8px;background:#dbe6ff;border-radius:20px;overflow:hidden;
-    margin-top:8px;
-  }
-  .upload-progress .fill {
-    height:100%;width:0%;background:linear-gradient(90deg,#0d2b6b,#f7b500);
-    border-radius:20px;transition:width .3s ease;
   }
 
   /* About preview */
@@ -380,6 +366,88 @@
   @keyframes spin { to{transform:rotate(360deg);} }
   .sm-loader-box p { font-size:.86rem;font-weight:700;color:#0d2b6b; }
 
+  /* Upload progress overlay */
+  .upload-progress-overlay {
+    position:fixed;
+    inset:0;
+    background:rgba(8,31,82,.55);
+    backdrop-filter:blur(4px);
+    -webkit-backdrop-filter:blur(4px);
+    z-index:99999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .25s ease;
+  }
+  .upload-progress-overlay.show {
+    opacity:1;
+    pointer-events:auto;
+  }
+  .upload-progress-box {
+    background:#fff;
+    border-radius:18px;
+    padding:26px 28px;
+    box-shadow:0 25px 70px rgba(8,31,82,.42);
+    min-width:280px;
+    max-width:340px;
+    width:100%;
+    text-align:center;
+    transform:scale(.94);
+    transition:transform .28s ease;
+  }
+  .upload-progress-overlay.show .upload-progress-box {
+    transform:scale(1);
+  }
+  .upload-progress-icon {
+    width:56px;height:56px;border-radius:16px;
+    background:linear-gradient(135deg,#ffd257,#f7b500);
+    color:#0d2b6b;
+    display:grid;place-items:center;
+    font-size:26px;
+    margin:0 auto 14px;
+    box-shadow:0 6px 18px rgba(247,181,0,.4);
+    animation:uploadBounce 1.4s ease-in-out infinite;
+  }
+  @keyframes uploadBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+  .upload-progress-title {
+    font-size:1rem;
+    font-weight:800;
+    color:#0d2b6b;
+    margin-bottom:4px;
+  }
+  .upload-progress-sub {
+    font-size:.75rem;
+    color:#8a95ae;
+    font-weight:600;
+    margin-bottom:16px;
+  }
+  .upload-progress-bar {
+    width:100%;
+    height:10px;
+    background:#dbe6ff;
+    border-radius:20px;
+    overflow:hidden;
+    margin-bottom:10px;
+  }
+  .upload-progress-fill {
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#0d2b6b,#f7b500);
+    border-radius:20px;
+    transition:width .3s ease;
+  }
+  .upload-progress-percent {
+    font-size:.9rem;
+    font-weight:800;
+    color:#0d2b6b;
+  }
+
   .back-bar {
     display:flex;align-items:center;justify-content:space-between;
     flex-wrap:wrap;gap:10px;margin-bottom:16px;
@@ -413,6 +481,21 @@
   <div class="sm-loader-box">
     <div class="spinner"></div>
     <p id="loaderText">Saving…</p>
+  </div>
+</div>
+
+<!-- Upload Progress Overlay -->
+<div class="upload-progress-overlay" id="uploadProgressOverlay">
+  <div class="upload-progress-box">
+    <div class="upload-progress-icon">
+      <i class="fas fa-cloud-upload-alt"></i>
+    </div>
+    <div class="upload-progress-title">Uploading Photo…</div>
+    <div class="upload-progress-sub" id="uploadProgressSub">Please wait, don't close this window</div>
+    <div class="upload-progress-bar">
+      <div class="upload-progress-fill" id="uploadProgressFill"></div>
+    </div>
+    <div class="upload-progress-percent" id="uploadProgressPercent">0%</div>
   </div>
 </div>
 
@@ -713,6 +796,30 @@ function showLoader(text='Saving…') {
 }
 function hideLoader() { $('loaderOverlay').classList.remove('show'); }
 
+/* ============================================================
+   🆕 UPLOAD PROGRESS OVERLAY
+   ============================================================ */
+function showUploadProgress(title = 'Uploading Photo…', sub = 'Please wait, don\'t close this window') {
+  document.querySelector('.upload-progress-title').textContent = title;
+  $('uploadProgressSub').textContent = sub;
+  $('uploadProgressFill').style.width = '0%';
+  $('uploadProgressPercent').textContent = '0%';
+  $('uploadProgressOverlay').classList.add('show');
+}
+
+function updateUploadProgress(percent, label = null) {
+  $('uploadProgressFill').style.width = percent + '%';
+  $('uploadProgressPercent').textContent = Math.round(percent) + '%';
+  if (label) $('uploadProgressSub').textContent = label;
+}
+
+function hideUploadProgress() {
+  $('uploadProgressOverlay').classList.remove('show');
+}
+
+/* ============================================================
+   STATE
+   ============================================================ */
 const state = {
   toppers: [],
   gallery: [],
@@ -754,9 +861,14 @@ document.querySelectorAll('.sm-tab').forEach(btn => {
 });
 
 /* ============================================================
-   SUPABASE IMAGE UPLOAD
+   🆕 SUPABASE IMAGE UPLOAD — FIXED
    ============================================================ */
 async function uploadImageToSupabase(file, baseName) {
+  // Detect actual file extension
+  const rawExt = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  const validExt = ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(rawExt) ? rawExt : 'jpg';
+  const mimeType = file.type || (validExt === 'png' ? 'image/png' : 'image/jpeg');
+
   let safeName = String(baseName || 'file')
     .replace(/[^\w.\-]/g, '_')
     .replace(/_+/g, '_')
@@ -764,23 +876,51 @@ async function uploadImageToSupabase(file, baseName) {
     .slice(0, 40);
   if (!safeName || safeName.length < 2) safeName = 'image';
 
-  const fileName = `${Date.now()}_${safeName}.jpg`;
+  const fileName = `${Date.now()}_${safeName}.${validExt}`;
+
+  console.log('🔼 Uploading to Supabase:', fileName, '|', mimeType, '|', (file.size/1024).toFixed(1) + ' KB');
 
   const { data, error } = await supabaseClient.storage
     .from(IMG_BUCKET)
     .upload(fileName, file, {
-      contentType: file.type || 'image/jpeg',
+      contentType: mimeType,
       cacheControl: '3600',
       upsert: false
     });
 
-  if (error) throw new Error('Upload failed: ' + error.message);
+  if (error) {
+    console.error('❌ Supabase upload error:', error);
+    throw new Error(error.message || 'Upload failed');
+  }
 
   const { data: urlData } = supabaseClient.storage
     .from(IMG_BUCKET)
     .getPublicUrl(fileName);
 
+  console.log('✅ Uploaded URL:', urlData.publicUrl);
   return urlData.publicUrl;
+}
+
+/* Simulated progress — chalta rahega jab tak upload ho raha hai */
+function startFakeProgress() {
+  let p = 0;
+  showUploadProgress();
+  const timer = setInterval(() => {
+    p = Math.min(p + Math.random() * 12, 88);
+    updateUploadProgress(p);
+  }, 180);
+  return timer;
+}
+
+function completeFakeProgress(timer) {
+  if (timer) clearInterval(timer);
+  updateUploadProgress(100, 'Upload complete!');
+  setTimeout(() => hideUploadProgress(), 600);
+}
+
+function failFakeProgress(timer) {
+  if (timer) clearInterval(timer);
+  hideUploadProgress();
 }
 
 /* ============================================================
@@ -833,11 +973,14 @@ window.saveAbout = async function() {
   const saveBtn = $('saveAboutBtn');
   saveBtn.disabled = true;
 
+  let progressTimer = null;
+
   try {
     let photoUrl = state.existingAboutPhotoUrl;
     if (state.aboutPhotoFile) {
-      showLoader('Uploading photo…');
+      progressTimer = startFakeProgress();
       photoUrl = await uploadImageToSupabase(state.aboutPhotoFile, 'director_photo');
+      completeFakeProgress(progressTimer);
     }
 
     showLoader('Saving…');
@@ -854,7 +997,8 @@ window.saveAbout = async function() {
     toast('About saved ✓');
   } catch (err) {
     console.error(err);
-    toast('Save failed: ' + err.message, true);
+    failFakeProgress(progressTimer);
+    toast('Save failed: ' + (err.message || 'Unknown'), true);
   } finally {
     saveBtn.disabled = false;
     hideLoader();
@@ -1024,11 +1168,14 @@ window.saveTopper = async function() {
   const saveBtn = $('saveTopperBtn');
   saveBtn.disabled = true;
 
+  let progressTimer = null;
+
   try {
     let photoUrl = state.existingTopperPhotoUrl;
     if (state.topperPhotoFile) {
-      showLoader('Uploading photo…');
+      progressTimer = startFakeProgress();
       photoUrl = await uploadImageToSupabase(state.topperPhotoFile, name);
+      completeFakeProgress(progressTimer);
     }
 
     showLoader('Saving…');
@@ -1055,7 +1202,8 @@ window.saveTopper = async function() {
     await loadToppers();
   } catch (err) {
     console.error(err);
-    toast('Save failed: ' + err.message, true);
+    failFakeProgress(progressTimer);
+    toast('Save failed: ' + (err.message || 'Unknown'), true);
   } finally {
     saveBtn.disabled = false;
     hideLoader();
@@ -1195,8 +1343,6 @@ window.saveGalleryPhoto = async function() {
   const order = parseInt($('galleryOrder').value, 10) || 0;
 
   if (!caption) return toast('Caption required', true);
-
-  // Agar naya photo upload nahi kiya aur editing bhi nahi hai → error
   if (!state.galleryPhotoFile && !state.existingGalleryPhotoUrl) {
     return toast('Please upload a photo', true);
   }
@@ -1204,17 +1350,19 @@ window.saveGalleryPhoto = async function() {
   const saveBtn = $('saveGalleryBtn');
   saveBtn.disabled = true;
 
+  let progressTimer = null;
+
   try {
     let photoUrl = state.existingGalleryPhotoUrl;
     if (state.galleryPhotoFile) {
-      showLoader('Uploading photo…');
+      progressTimer = startFakeProgress();
       photoUrl = await uploadImageToSupabase(state.galleryPhotoFile, caption);
+      completeFakeProgress(progressTimer);
     }
 
     showLoader('Saving…');
 
     if (state.editingGallery) {
-      // Edit — photoUrl optional change
       const updateData = {
         caption,
         display_order: order,
@@ -1225,7 +1373,6 @@ window.saveGalleryPhoto = async function() {
       await db.collection('gallery').doc(state.editingGallery.id).update(updateData);
       toast('Photo updated ✓');
     } else {
-      // New — date auto save hoga
       await db.collection('gallery').add({
         caption,
         display_order: order,
@@ -1240,7 +1387,8 @@ window.saveGalleryPhoto = async function() {
     await loadGallery();
   } catch (err) {
     console.error(err);
-    toast('Save failed: ' + err.message, true);
+    failFakeProgress(progressTimer);
+    toast('Save failed: ' + (err.message || 'Unknown'), true);
   } finally {
     saveBtn.disabled = false;
     hideLoader();
