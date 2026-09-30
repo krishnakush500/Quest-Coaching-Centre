@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>About & Toppers Admin · Quest Coaching</title>
+<title>About & Toppers & Gallery Admin · Quest Coaching</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -62,10 +62,10 @@
     box-shadow:0 4px 14px rgba(13,43,107,.06);
   }
   .sm-tab {
-    flex:1;min-width:130px;
-    padding:12px 14px;border-radius:10px;
+    flex:1;min-width:120px;
+    padding:12px 16px;border-radius:10px;
     background:transparent;border:none;
-    font-size:.92rem;font-weight:700;color:#64748b;
+    font-size:.9rem;font-weight:700;color:#64748b;
     cursor:pointer;transition:all .2s;
     display:flex;align-items:center;justify-content:center;gap:8px;
   }
@@ -248,15 +248,17 @@
     .sm-item-actions { width:100%;justify-content:flex-end;margin-top:6px; }
   }
 
-  /* Gallery Grid */
+  /* Gallery grid */
   .gallery-grid {
     display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
     gap:14px;
-    margin-top:6px;
+  }
+  @media(max-width:500px){
+    .gallery-grid { grid-template-columns:repeat(2, 1fr); gap:10px; }
   }
   .gallery-item {
-    background:#f9fbff;
+    background:#fff;
     border:1.5px solid #e3e9f5;
     border-radius:14px;
     overflow:hidden;
@@ -265,50 +267,76 @@
   }
   .gallery-item:hover {
     border-color:#cfdcf5;
-    box-shadow:0 6px 16px rgba(13,43,107,.10);
+    box-shadow:0 6px 18px rgba(13,43,107,.10);
     transform:translateY(-2px);
   }
-  .gallery-photo {
+  .gallery-item .g-img {
     width:100%;
-    height:150px;
-    background:#eef3ff;
+    aspect-ratio:1/1;
     overflow:hidden;
+    background:#f0f4fb;
     position:relative;
   }
-  .gallery-photo img {
+  .gallery-item .g-img img {
     width:100%;height:100%;object-fit:cover;
+    transition:transform .3s ease;
   }
-  .gallery-date-badge {
-    position:absolute;
-    top:8px;right:8px;
-    background:rgba(13,43,107,.88);
-    color:#fff;
-    font-size:.68rem;
+  .gallery-item:hover .g-img img {
+    transform:scale(1.05);
+  }
+  .gallery-item .g-info {
+    padding:10px 12px;
+  }
+  .gallery-item .g-caption {
+    font-size:.85rem;
     font-weight:800;
-    padding:4px 9px;
-    border-radius:20px;
-    letter-spacing:.3px;
-    backdrop-filter:blur(4px);
-  }
-  .gallery-body {
-    padding:10px 12px 12px;
-  }
-  .gallery-caption {
-    font-size:.82rem;
-    font-weight:700;
     color:#0d2b6b;
-    line-height:1.35;
-    margin-bottom:8px;
-    min-height:34px;
+    line-height:1.3;
+    margin-bottom:4px;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
     word-break:break-word;
   }
-  .gallery-actions {
-    display:flex;gap:6px;justify-content:flex-end;
+  .gallery-item .g-date {
+    font-size:.7rem;
+    color:#8a95ae;
+    font-weight:600;
+    display:flex;align-items:center;gap:4px;
   }
-  @media(max-width:600px){
-    .gallery-grid { grid-template-columns:repeat(2, 1fr); gap:10px; }
-    .gallery-photo { height:110px; }
-    .gallery-caption { font-size:.75rem; }
+  .gallery-item .g-date i {
+    color:#f7b500;
+    font-size:.72rem;
+  }
+  .gallery-item .g-actions {
+    position:absolute;
+    top:8px;right:8px;
+    display:flex;gap:4px;
+    opacity:0;
+    transition:opacity .2s;
+    z-index:2;
+  }
+  .gallery-item:hover .g-actions { opacity:1; }
+  @media(max-width:600px) {
+    .gallery-item .g-actions { opacity:1; }
+  }
+  .g-action-btn {
+    width:30px;height:30px;border-radius:8px;
+    background:rgba(255,255,255,0.92);
+    border:1px solid #dbe6ff;
+    color:#0d2b6b;
+    display:grid;place-items:center;
+    font-size:.72rem;
+    cursor:pointer;
+    transition:all .2s;
+    box-shadow:0 2px 6px rgba(13,43,107,.15);
+  }
+  .g-action-btn:hover {
+    background:#0d2b6b;color:#fff;border-color:#0d2b6b;
+  }
+  .g-action-btn.delete:hover {
+    background:#e0245e;border-color:#e0245e;
   }
 
   .sm-empty {
@@ -332,6 +360,7 @@
   .sm-toast.show { opacity:1;transform:translate(-50%,0); }
   .sm-toast.error { border-left-color:#e0245e; }
 
+  /* Loader */
   .sm-loader-overlay {
     position:fixed;inset:0;background:rgba(8,31,82,.55);
     backdrop-filter:blur(3px);z-index:9998;
@@ -370,6 +399,12 @@
     font-size:.78rem;color:#0d2b6b;font-weight:700;
     display:inline-flex;align-items:center;gap:7px;
   }
+
+  .badge-count {
+    background:#e8eafe;color:#1a237e;
+    font-size:.72rem;font-weight:800;
+    padding:3px 9px;border-radius:20px;
+  }
 </style>
 </head>
 <body>
@@ -388,7 +423,7 @@
       <span class="ico"><i class="fas fa-info-circle"></i></span>
       About · Toppers · Gallery
     </h1>
-    <p>Manage About Us page, Our Toppers, and Photo Gallery</p>
+    <p>Manage About Us page, Our Toppers section & Gallery</p>
   </div>
 
   <div class="back-bar">
@@ -406,16 +441,14 @@
       <i class="fas fa-school"></i> About Us
     </button>
     <button class="sm-tab" data-tab="toppers">
-      <i class="fas fa-trophy"></i> Toppers
+      <i class="fas fa-trophy"></i> Our Toppers
     </button>
     <button class="sm-tab" data-tab="gallery">
       <i class="fas fa-images"></i> Gallery
     </button>
   </div>
 
-  <!-- ============================================================
-       ABOUT PANEL
-       ============================================================ -->
+  <!-- ================= ABOUT PANEL ================= -->
   <div class="sm-panel active" id="panel-about">
     <div class="sm-card">
       <div class="sm-card-header">
@@ -461,12 +494,6 @@
               <i class="fas fa-times"></i> Remove
             </button>
           </div>
-          <div class="upload-progress" id="aboutUploadProgress">
-            <div style="display:flex;justify-content:space-between;font-size:.78rem;font-weight:700;color:#0d2b6b;">
-              <span>Uploading…</span>
-            </div>
-            <div class="bar"><div class="fill" id="aboutUploadFill"></div></div>
-          </div>
         </div>
       </div>
 
@@ -485,13 +512,11 @@
     </div>
   </div>
 
-  <!-- ============================================================
-       TOPPERS PANEL
-       ============================================================ -->
+  <!-- ================= TOPPERS PANEL ================= -->
   <div class="sm-panel" id="panel-toppers">
     <div class="sm-card">
       <div class="sm-card-header">
-        <h2><i class="fas fa-trophy"></i> Toppers <span style="background:#e8eafe;color:#1a237e;font-size:.72rem;font-weight:800;padding:3px 9px;border-radius:20px;" id="topperCount">0</span></h2>
+        <h2><i class="fas fa-trophy"></i> Our Toppers <span class="badge-count" id="topperCount">0</span></h2>
         <button class="btn-gold" onclick="openTopperModal()">
           <i class="fas fa-plus"></i> Add Topper
         </button>
@@ -505,19 +530,17 @@
     </div>
   </div>
 
-  <!-- ============================================================
-       GALLERY PANEL
-       ============================================================ -->
+  <!-- ================= GALLERY PANEL ================= -->
   <div class="sm-panel" id="panel-gallery">
     <div class="sm-card">
       <div class="sm-card-header">
-        <h2><i class="fas fa-images"></i> Photo Gallery <span style="background:#e8eafe;color:#1a237e;font-size:.72rem;font-weight:800;padding:3px 9px;border-radius:20px;" id="galleryCount">0</span></h2>
+        <h2><i class="fas fa-images"></i> Gallery <span class="badge-count" id="galleryCount">0</span></h2>
         <button class="btn-gold" onclick="openGalleryModal()">
           <i class="fas fa-plus"></i> Add Photo
         </button>
       </div>
-      <div id="galleryList">
-        <div class="sm-empty">
+      <div class="gallery-grid" id="galleryGrid">
+        <div class="sm-empty" style="grid-column:1/-1;">
           <div class="ico-big"><i class="fas fa-spinner fa-spin"></i></div>
           <p>Loading gallery…</p>
         </div>
@@ -527,9 +550,7 @@
 
 </div>
 
-<!-- ============================================================
-     TOPPER MODAL
-     ============================================================ -->
+<!-- ==================== TOPPER MODAL ==================== -->
 <div class="modal fade" id="topperModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
     <div class="modal-content" style="border:none;border-radius:18px;overflow:hidden;">
@@ -555,7 +576,7 @@
           </div>
           <div class="col-md-4">
             <label class="form-label">Total Marks *</label>
-            <input type="text" class="form-control" id="topperMarks" placeholder="e.g. 469 / 500">
+            <input type="text" class="form-control" id="topperMarks" placeholder="e.g. 469 अंक">
           </div>
           <div class="col-md-4">
             <label class="form-label">Year</label>
@@ -593,62 +614,54 @@
   </div>
 </div>
 
-<!-- ============================================================
-     GALLERY MODAL
-     ============================================================ -->
+<!-- ==================== GALLERY MODAL ==================== -->
 <div class="modal fade" id="galleryModal" tabindex="-1">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content" style="border:none;border-radius:18px;overflow:hidden;">
       <div class="modal-header" style="background:linear-gradient(135deg,#0d2b6b,#16409b);color:#fff;border-bottom:3px solid #ffc42e;padding:16px 20px;">
         <h5 class="modal-title" style="font-weight:800;font-size:1rem;">
-          <i class="fas fa-images"></i> <span id="galleryModalTitle">Add Gallery Photo</span>
+          <i class="fas fa-images"></i> <span id="galleryModalTitle">Add Photo</span>
         </h5>
         <button class="btn-close" data-bs-dismiss="modal" style="filter:brightness(0) invert(1);"></button>
       </div>
       <div class="modal-body" style="padding:22px;">
-
-        <div class="mb-3">
-          <label class="form-label">Photo *</label>
-          <div class="upload-drop" id="galleryPhotoDrop">
-            <input type="file" id="galleryPhotoInput" accept="image/*" style="display:none;">
-            <div class="ico"><i class="fas fa-camera"></i></div>
-            <div class="txt">Click to upload photo</div>
-            <div class="sub">JPG / PNG · Max 5 MB</div>
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="form-label">Caption *</label>
+            <input type="text" class="form-control" id="galleryCaption" placeholder="e.g. Annual Function 2025">
           </div>
-          <div class="file-info" id="galleryPhotoInfo" style="display:none;">
-            <i class="fas fa-check-circle"></i>
-            <span id="galleryPhotoName"></span>
-            <button class="btn-outline-soft ms-2" onclick="clearGalleryPhoto()" style="padding:3px 8px;font-size:.72rem;">
-              <i class="fas fa-times"></i> Remove
-            </button>
+          <div class="col-md-4">
+            <label class="form-label">Display Order</label>
+            <input type="number" class="form-control" id="galleryOrder" value="1" min="0">
           </div>
-          <div class="upload-progress" id="galleryUploadProgress">
-            <div style="display:flex;justify-content:space-between;font-size:.78rem;font-weight:700;color:#0d2b6b;">
-              <span>Uploading…</span>
+          <div class="col-12">
+            <label class="form-label">Photo *</label>
+            <div class="upload-drop" id="galleryPhotoDrop">
+              <input type="file" id="galleryPhotoInput" accept="image/*" style="display:none;">
+              <div class="ico"><i class="fas fa-cloud-upload-alt"></i></div>
+              <div class="txt">Click to upload photo</div>
+              <div class="sub">Max 5 MB · JPG / PNG</div>
             </div>
-            <div class="bar"><div class="fill" id="galleryUploadFill"></div></div>
+            <div class="file-info" id="galleryPhotoInfo" style="display:none;">
+              <i class="fas fa-check-circle"></i>
+              <span id="galleryPhotoName"></span>
+              <button class="btn-outline-soft ms-2" onclick="clearGalleryPhoto()" style="padding:3px 8px;font-size:.72rem;">
+                <i class="fas fa-times"></i> Remove
+              </button>
+            </div>
           </div>
         </div>
-
-        <div class="mb-3">
-          <label class="form-label">Date *</label>
-          <input type="text" class="form-control" id="galleryDate" placeholder="e.g. 15 January 2025">
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Caption *</label>
-          <input type="text" class="form-control" id="galleryCaption" placeholder="e.g. Annual Function 2025" maxlength="80">
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Display Order</label>
-          <input type="number" class="form-control" id="galleryOrder" value="1" min="0">
+        <div class="mt-3" style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:12px 14px;">
+          <div style="font-size:.78rem;color:#0369a1;font-weight:700;display:flex;align-items:flex-start;gap:8px;">
+            <i class="fas fa-info-circle" style="margin-top:2px;"></i>
+            <span>Date automatically add hogi — photo upload karne ki date ke saath. Aapko manually date nahi daalni.</span>
+          </div>
         </div>
       </div>
       <div class="modal-footer" style="border-top:1px solid #eef2f9;padding:14px 20px;">
         <button class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius:10px;font-weight:700;font-size:.85rem;">Cancel</button>
         <button class="btn-gold" onclick="saveGalleryPhoto()" id="saveGalleryBtn">
-          <i class="fas fa-save"></i> Save Photo
+          <i class="fas fa-save"></i> Save
         </button>
       </div>
     </div>
@@ -744,7 +757,7 @@ document.querySelectorAll('.sm-tab').forEach(btn => {
    SUPABASE IMAGE UPLOAD
    ============================================================ */
 async function uploadImageToSupabase(file, baseName) {
-  let safeName = String(baseName || 'image')
+  let safeName = String(baseName || 'file')
     .replace(/[^\w.\-]/g, '_')
     .replace(/_+/g, '_')
     .replace(/^_|_$/g, '')
@@ -784,10 +797,8 @@ async function loadAbout() {
       $('aboutYear').value = data.year || '';
       $('aboutText').value = data.aboutText || '';
       state.existingAboutPhotoUrl = data.photoUrl || null;
-      updateAboutPreview();
-    } else {
-      updateAboutPreview();
     }
+    updateAboutPreview();
   } catch (err) {
     console.error('Load about failed:', err);
   }
@@ -805,7 +816,110 @@ function updateAboutPreview() {
   }
 }
 
+window.clearAboutPhoto = function() {
+  state.aboutPhotoFile = null;
+  $('aboutPhotoInput').value = '';
+  $('aboutPhotoInfo').style.display = 'none';
+  updateAboutPreview();
+};
+
+window.saveAbout = async function() {
+  const directorName = $('aboutDirectorName').value.trim();
+  const directorPhone = $('aboutDirectorPhone').value.trim();
+  const location = $('aboutLocation').value.trim();
+  const year = $('aboutYear').value.trim();
+  const aboutText = $('aboutText').value.trim();
+
+  const saveBtn = $('saveAboutBtn');
+  saveBtn.disabled = true;
+
+  try {
+    let photoUrl = state.existingAboutPhotoUrl;
+    if (state.aboutPhotoFile) {
+      showLoader('Uploading photo…');
+      photoUrl = await uploadImageToSupabase(state.aboutPhotoFile, 'director_photo');
+    }
+
+    showLoader('Saving…');
+    await db.collection('settings').doc('about_us').set({
+      photoUrl: photoUrl || '',
+      directorName, directorPhone, location, year, aboutText,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    state.existingAboutPhotoUrl = photoUrl;
+    state.aboutPhotoFile = null;
+    $('aboutPhotoInput').value = '';
+    $('aboutPhotoInfo').style.display = 'none';
+    toast('About saved ✓');
+  } catch (err) {
+    console.error(err);
+    toast('Save failed: ' + err.message, true);
+  } finally {
+    saveBtn.disabled = false;
+    hideLoader();
+  }
+};
+
+/* ============================================================
+   TOPPERS
+   ============================================================ */
+async function loadToppers() {
+  try {
+    const snap = await db.collection('toppers').orderBy('display_order').get();
+    state.toppers = [];
+    snap.forEach(doc => state.toppers.push({ id: doc.id, ...doc.data() }));
+    renderToppers();
+  } catch (err) {
+    console.error('Load toppers failed:', err);
+    $('toppersList').innerHTML = `<div class="sm-empty"><div class="ico-big"><i class="fas fa-exclamation-triangle"></i></div><p>Failed to load toppers</p></div>`;
+  }
+}
+
+function renderToppers() {
+  $('topperCount').textContent = state.toppers.length;
+  const box = $('toppersList');
+
+  if (!state.toppers.length) {
+    box.innerHTML = `<div class="sm-empty">
+      <div class="ico-big"><i class="fas fa-trophy"></i></div>
+      <h4 style="color:#0d2b6b;font-weight:800;font-size:.98rem;margin-bottom:6px;">No toppers yet</h4>
+      <p style="font-size:.84rem;color:#8a95ae;">Click "Add Topper" to add your first student.</p>
+    </div>`;
+    return;
+  }
+
+  box.innerHTML = state.toppers.map(t => {
+    const photo = t.photoUrl || 'https://i.ibb.co/hF9tmnpB/20250903-202922.jpg';
+    return `
+      <div class="topper-item">
+        <div class="topper-img">
+          <img src="${esc(photo)}" alt="${esc(t.name || '')}" onerror="this.src='https://i.ibb.co/hF9tmnpB/20250903-202922.jpg'">
+        </div>
+        <div class="topper-info">
+          <h4>${esc(t.name || 'Student')}</h4>
+          <div class="meta">
+            ${t.rank ? `<span class="badge-soft badge-rank"><i class="fas fa-medal"></i> ${esc(t.rank)}</span>` : ''}
+            ${t.class ? `<span><i class="fas fa-graduation-cap"></i> ${esc(t.class)}</span>` : ''}
+            ${t.marks ? `<span class="badge-soft badge-marks"><i class="fas fa-star"></i> ${esc(t.marks)}</span>` : ''}
+            ${t.year ? `<span><i class="fas fa-calendar"></i> ${esc(t.year)}</span>` : ''}
+          </div>
+        </div>
+        <div class="sm-item-actions">
+          <button class="btn-outline-soft" onclick="editTopper('${t.id}')"><i class="fas fa-pen"></i> Edit</button>
+          <button class="btn-danger-soft" onclick="deleteTopper('${t.id}')"><i class="fas fa-trash"></i> Delete</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+let topperModal, galleryModal;
 document.addEventListener('DOMContentLoaded', () => {
+  topperModal = new bootstrap.Modal($('topperModal'));
+  galleryModal = new bootstrap.Modal($('galleryModal'));
+
+  // About preview updates
   ['aboutDirectorName', 'aboutDirectorPhone'].forEach(id => {
     $(id).addEventListener('input', updateAboutPreview);
   });
@@ -848,134 +962,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-window.clearAboutPhoto = function() {
-  state.aboutPhotoFile = null;
-  $('aboutPhotoInput').value = '';
-  $('aboutPhotoInfo').style.display = 'none';
-  updateAboutPreview();
-};
-
 window.clearTopperPhoto = function() {
   state.topperPhotoFile = null;
   state.existingTopperPhotoUrl = null;
   $('topperPhotoInput').value = '';
   $('topperPhotoInfo').style.display = 'none';
 };
-
-window.clearGalleryPhoto = function() {
-  state.galleryPhotoFile = null;
-  $('galleryPhotoInput').value = '';
-  $('galleryPhotoInfo').style.display = 'none';
-};
-
-window.saveAbout = async function() {
-  const directorName = $('aboutDirectorName').value.trim();
-  const directorPhone = $('aboutDirectorPhone').value.trim();
-  const location = $('aboutLocation').value.trim();
-  const year = $('aboutYear').value.trim();
-  const aboutText = $('aboutText').value.trim();
-
-  const saveBtn = $('saveAboutBtn');
-  saveBtn.disabled = true;
-
-  try {
-    let photoUrl = state.existingAboutPhotoUrl;
-
-    if (state.aboutPhotoFile) {
-      showLoader('Uploading photo…');
-      $('aboutUploadProgress').classList.add('show');
-      $('aboutUploadFill').style.width = '40%';
-      photoUrl = await uploadImageToSupabase(state.aboutPhotoFile, 'director_photo');
-      $('aboutUploadFill').style.width = '100%';
-    }
-
-    showLoader('Saving…');
-    await db.collection('settings').doc('about_us').set({
-      photoUrl: photoUrl || '',
-      directorName,
-      directorPhone,
-      location,
-      year,
-      aboutText,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-
-    state.existingAboutPhotoUrl = photoUrl;
-    state.aboutPhotoFile = null;
-    $('aboutPhotoInput').value = '';
-    $('aboutPhotoInfo').style.display = 'none';
-    $('aboutUploadProgress').classList.remove('show');
-
-    toast('About saved ✓');
-  } catch (err) {
-    console.error(err);
-    toast('Save failed: ' + err.message, true);
-  } finally {
-    saveBtn.disabled = false;
-    hideLoader();
-  }
-};
-
-/* ============================================================
-   TOPPERS
-   ============================================================ */
-async function loadToppers() {
-  try {
-    const snap = await db.collection('toppers').orderBy('display_order').get();
-    state.toppers = [];
-    snap.forEach(doc => state.toppers.push({ id: doc.id, ...doc.data() }));
-    renderToppers();
-  } catch (err) {
-    console.error('Load toppers failed:', err);
-    $('toppersList').innerHTML = `<div class="sm-empty">
-      <div class="ico-big"><i class="fas fa-exclamation-triangle"></i></div>
-      <p>Failed to load toppers</p>
-    </div>`;
-  }
-}
-
-function renderToppers() {
-  $('topperCount').textContent = state.toppers.length;
-  const box = $('toppersList');
-
-  if (!state.toppers.length) {
-    box.innerHTML = `<div class="sm-empty">
-      <div class="ico-big"><i class="fas fa-trophy"></i></div>
-      <h4 style="color:#0d2b6b;font-weight:800;font-size:.98rem;margin-bottom:6px;">No toppers yet</h4>
-      <p style="font-size:.84rem;color:#8a95ae;">Click "Add Topper" to add your first student.</p>
-    </div>`;
-    return;
-  }
-
-  box.innerHTML = state.toppers.map(t => {
-    const photo = t.photoUrl || 'https://i.ibb.co/hF9tmnpB/20250903-202922.jpg';
-    return `
-      <div class="topper-item">
-        <div class="topper-img">
-          <img src="${esc(photo)}" alt="${esc(t.name || '')}" onerror="this.src='https://i.ibb.co/hF9tmnpB/20250903-202922.jpg'">
-        </div>
-        <div class="topper-info">
-          <h4>${esc(t.name || 'Student')}</h4>
-          <div class="meta">
-            ${t.rank ? `<span class="badge-soft badge-rank"><i class="fas fa-medal"></i> ${esc(t.rank)}</span>` : ''}
-            ${t.class ? `<span><i class="fas fa-graduation-cap"></i> ${esc(t.class)}</span>` : ''}
-            ${t.marks ? `<span class="badge-soft badge-marks"><i class="fas fa-star"></i> ${esc(t.marks)}</span>` : ''}
-            ${t.year ? `<span><i class="fas fa-calendar"></i> ${esc(t.year)}</span>` : ''}
-          </div>
-        </div>
-        <div class="sm-item-actions">
-          <button class="btn-outline-soft" onclick="editTopper('${t.id}')"><i class="fas fa-pen"></i> Edit</button>
-          <button class="btn-danger-soft" onclick="deleteTopper('${t.id}')"><i class="fas fa-trash"></i> Delete</button>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-let topperModal;
-document.addEventListener('DOMContentLoaded', () => {
-  topperModal = new bootstrap.Modal($('topperModal'));
-});
 
 window.openTopperModal = function() {
   state.editingTopper = null;
@@ -1034,14 +1026,12 @@ window.saveTopper = async function() {
 
   try {
     let photoUrl = state.existingTopperPhotoUrl;
-
     if (state.topperPhotoFile) {
       showLoader('Uploading photo…');
       photoUrl = await uploadImageToSupabase(state.topperPhotoFile, name);
     }
 
     showLoader('Saving…');
-
     const topperData = {
       name, class: cls, rank, marks, year,
       display_order: order,
@@ -1101,69 +1091,83 @@ async function loadGallery() {
     renderGallery();
   } catch (err) {
     console.error('Load gallery failed:', err);
-    $('galleryList').innerHTML = `<div class="sm-empty">
-      <div class="ico-big"><i class="fas fa-exclamation-triangle"></i></div>
-      <p>Failed to load gallery</p>
-    </div>`;
+    $('galleryGrid').innerHTML = `<div class="sm-empty" style="grid-column:1/-1;"><div class="ico-big"><i class="fas fa-exclamation-triangle"></i></div><p>Failed to load gallery</p></div>`;
+  }
+}
+
+function formatDate(timestamp) {
+  if (!timestamp) return '—';
+  try {
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+  } catch(e) {
+    return '—';
   }
 }
 
 function renderGallery() {
   $('galleryCount').textContent = state.gallery.length;
-  const box = $('galleryList');
+  const grid = $('galleryGrid');
 
   if (!state.gallery.length) {
-    box.innerHTML = `<div class="sm-empty">
+    grid.innerHTML = `<div class="sm-empty" style="grid-column:1/-1;">
       <div class="ico-big"><i class="fas fa-images"></i></div>
       <h4 style="color:#0d2b6b;font-weight:800;font-size:.98rem;margin-bottom:6px;">No photos yet</h4>
-      <p style="font-size:.84rem;color:#8a95ae;">Click "Add Photo" to upload your first gallery image.</p>
+      <p style="font-size:.84rem;color:#8a95ae;">Click "Add Photo" to upload your first gallery photo.</p>
     </div>`;
     return;
   }
 
-  box.innerHTML = `
-    <div class="gallery-grid">
-      ${state.gallery.map(g => `
-        <div class="gallery-item">
-          <div class="gallery-photo">
-            <img src="${esc(g.photoUrl || '')}" alt="${esc(g.caption || '')}" onerror="this.style.display='none'">
-            ${g.date ? `<div class="gallery-date-badge"><i class="fas fa-calendar"></i> ${esc(g.date)}</div>` : ''}
-          </div>
-          <div class="gallery-body">
-            <div class="gallery-caption">${esc(g.caption || 'Untitled')}</div>
-            <div class="gallery-actions">
-              <button class="btn-outline-soft" onclick="editGallery('${g.id}')"><i class="fas fa-pen"></i></button>
-              <button class="btn-danger-soft" onclick="deleteGallery('${g.id}')"><i class="fas fa-trash"></i></button>
-            </div>
+  grid.innerHTML = state.gallery.map(g => {
+    const photo = g.photoUrl || '';
+    const dateStr = formatDate(g.createdAt);
+    return `
+      <div class="gallery-item">
+        <div class="g-actions">
+          <button class="g-action-btn" onclick="editGalleryPhoto('${g.id}')" title="Edit">
+            <i class="fas fa-pen"></i>
+          </button>
+          <button class="g-action-btn delete" onclick="deleteGalleryPhoto('${g.id}')" title="Delete">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+        <div class="g-img">
+          <img src="${esc(photo)}" alt="${esc(g.caption || 'Photo')}" loading="lazy">
+        </div>
+        <div class="g-info">
+          <div class="g-caption">${esc(g.caption || 'Untitled')}</div>
+          <div class="g-date">
+            <i class="fas fa-calendar-alt"></i>
+            <span>${esc(dateStr)}</span>
           </div>
         </div>
-      `).join('')}
-    </div>
-  `;
+      </div>
+    `;
+  }).join('');
 }
 
-let galleryModal;
-document.addEventListener('DOMContentLoaded', () => {
-  galleryModal = new bootstrap.Modal($('galleryModal'));
-});
+window.clearGalleryPhoto = function() {
+  state.galleryPhotoFile = null;
+  state.existingGalleryPhotoUrl = null;
+  $('galleryPhotoInput').value = '';
+  $('galleryPhotoInfo').style.display = 'none';
+};
 
 window.openGalleryModal = function() {
   state.editingGallery = null;
   state.galleryPhotoFile = null;
   state.existingGalleryPhotoUrl = null;
 
-  $('galleryModalTitle').textContent = 'Add Gallery Photo';
-  $('galleryPhotoInput').value = '';
-  $('galleryPhotoInfo').style.display = 'none';
-  $('galleryUploadProgress').classList.remove('show');
-  $('galleryDate').value = '';
+  $('galleryModalTitle').textContent = 'Add Photo';
   $('galleryCaption').value = '';
   $('galleryOrder').value = state.gallery.length + 1;
+  $('galleryPhotoInput').value = '';
+  $('galleryPhotoInfo').style.display = 'none';
 
   galleryModal.show();
 };
 
-window.editGallery = function(id) {
+window.editGalleryPhoto = function(id) {
   const g = state.gallery.find(x => x.id === id);
   if (!g) return;
 
@@ -1171,32 +1175,29 @@ window.editGallery = function(id) {
   state.galleryPhotoFile = null;
   state.existingGalleryPhotoUrl = g.photoUrl || null;
 
-  $('galleryModalTitle').textContent = 'Edit Gallery Photo';
-  $('galleryPhotoInput').value = '';
-  $('galleryPhotoInfo').style.display = 'none';
-  $('galleryUploadProgress').classList.remove('show');
-  $('galleryDate').value = g.date || '';
+  $('galleryModalTitle').textContent = 'Edit Photo';
   $('galleryCaption').value = g.caption || '';
   $('galleryOrder').value = g.display_order || 0;
+  $('galleryPhotoInput').value = '';
 
   if (g.photoUrl) {
     $('galleryPhotoInfo').style.display = 'flex';
-    $('galleryPhotoName').textContent = 'Existing: ' + String(g.photoUrl).split('/').pop();
+    $('galleryPhotoName').textContent = 'Current: ' + g.photoUrl.split('/').pop();
+  } else {
+    $('galleryPhotoInfo').style.display = 'none';
   }
 
   galleryModal.show();
 };
 
 window.saveGalleryPhoto = async function() {
-  const date = $('galleryDate').value.trim();
   const caption = $('galleryCaption').value.trim();
   const order = parseInt($('galleryOrder').value, 10) || 0;
 
-  if (!date) return toast('Date required', true);
   if (!caption) return toast('Caption required', true);
 
-  // Photo required for new entries
-  if (!state.editingGallery && !state.galleryPhotoFile) {
+  // Agar naya photo upload nahi kiya aur editing bhi nahi hai → error
+  if (!state.galleryPhotoFile && !state.existingGalleryPhotoUrl) {
     return toast('Please upload a photo', true);
   }
 
@@ -1205,38 +1206,30 @@ window.saveGalleryPhoto = async function() {
 
   try {
     let photoUrl = state.existingGalleryPhotoUrl;
-
     if (state.galleryPhotoFile) {
       showLoader('Uploading photo…');
-      $('galleryUploadProgress').classList.add('show');
-      $('galleryUploadFill').style.width = '40%';
-      photoUrl = await uploadImageToSupabase(state.galleryPhotoFile, 'gallery');
-      $('galleryUploadFill').style.width = '100%';
-    }
-
-    if (!photoUrl) {
-      saveBtn.disabled = false;
-      toast('Photo is required', true);
-      $('galleryUploadProgress').classList.remove('show');
-      return;
+      photoUrl = await uploadImageToSupabase(state.galleryPhotoFile, caption);
     }
 
     showLoader('Saving…');
 
-    const photoData = {
-      photoUrl,
-      date,
-      caption,
-      display_order: order,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
     if (state.editingGallery) {
-      await db.collection('gallery').doc(state.editingGallery.id).update(photoData);
+      // Edit — photoUrl optional change
+      const updateData = {
+        caption,
+        display_order: order,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      if (photoUrl) updateData.photoUrl = photoUrl;
+
+      await db.collection('gallery').doc(state.editingGallery.id).update(updateData);
       toast('Photo updated ✓');
     } else {
+      // New — date auto save hoga
       await db.collection('gallery').add({
-        ...photoData,
+        caption,
+        display_order: order,
+        photoUrl: photoUrl || '',
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       toast('Photo added ✓');
@@ -1244,22 +1237,20 @@ window.saveGalleryPhoto = async function() {
 
     galleryModal.hide();
     state.galleryPhotoFile = null;
-    $('galleryUploadProgress').classList.remove('show');
     await loadGallery();
   } catch (err) {
     console.error(err);
     toast('Save failed: ' + err.message, true);
-    $('galleryUploadProgress').classList.remove('show');
   } finally {
     saveBtn.disabled = false;
     hideLoader();
   }
 };
 
-window.deleteGallery = async function(id) {
+window.deleteGalleryPhoto = async function(id) {
   const g = state.gallery.find(x => x.id === id);
   if (!g) return;
-  if (!confirm(`Delete this gallery photo?`)) return;
+  if (!confirm(`Delete photo "${g.caption || 'Untitled'}"?`)) return;
 
   showLoader('Deleting…');
   try {
