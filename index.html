@@ -27,7 +27,6 @@
       min-height:100vh;
     }
 
-    /* HEADER */
     .header { 
       background:linear-gradient(to right,#1a237e,#283593,#303f9f); 
       color:white; 
@@ -103,7 +102,6 @@
     .director-details h3{ font-size:1rem; margin-bottom:4px; color: white; cursor: default; }
     .director-details p{ font-size:0.85rem; }
 
-    /* DRAWER */
     .drawer-overlay {
       position: fixed;
       inset: 0;
@@ -150,9 +148,7 @@
       font-size: 1rem; font-weight: 800; letter-spacing: 0.6px;
       line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .drawer-brand p {
-      font-size: 0.72rem; color: #c3d2f2; margin-top: 3px;
-    }
+    .drawer-brand p { font-size: 0.72rem; color: #c3d2f2; margin-top: 3px; }
     .drawer-close {
       width: 36px; height: 36px; border-radius: 9px;
       background: rgba(255,255,255,0.15);
@@ -230,7 +226,6 @@
       .location { padding: 0 50px; }
     }
 
-    /* POPUP MODAL — Check Registration */
     .popup-overlay {
       position: fixed; inset: 0;
       background: rgba(8,31,82,0.62);
@@ -318,9 +313,7 @@
       border: none; outline: none; background: transparent;
       font-size: 0.95rem; color: #0f2452; font-weight: 600;
     }
-    .popup-input-wrap input::placeholder {
-      color: #9aa8c4; font-weight: 500;
-    }
+    .popup-input-wrap input::placeholder { color: #9aa8c4; font-weight: 500; }
 
     .popup-actions { display: flex; gap: 10px; margin-top: 20px; }
     .popup-btn {
@@ -366,7 +359,6 @@
     }
     .popup-hint i { color: #f7b500; font-size: 0.8rem; margin-top: 2px; flex-shrink: 0; }
 
-    /* Marquee */
     .marquee-container {
       background:#ffc107; overflow:hidden;
       position:relative; height:45px; display:flex; align-items:center;
@@ -380,7 +372,6 @@
       100% { transform: translateX(-100%); }
     }
 
-    /* Main Tabs */
     .main-tabs {
       display: flex; background: white;
       border-bottom: 2px solid #1a237e;
@@ -402,7 +393,6 @@
     .tab-content { display: none; padding: 0; min-height: 400px; }
     .tab-content.active { display: block; }
 
-    /* Results */
     .results-section { padding: 20px 15px; background: #f9f9f9; min-height: 500px; }
     .section-title {
       font-size: 1.4rem; color: #1a237e; text-align: center;
@@ -469,7 +459,6 @@
       border-radius: 5px; margin: 12px 0;
     }
 
-    /* Tests */
     .tests-section { padding: 20px 15px; background: #f9f9f9; min-height: 500px; }
     .tests-list {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -520,17 +509,28 @@
       display: none;
       padding: 0;
       margin: 0;
-      line-height: 0;
+      background: #f5f7ff;
     }
     .banner-section.show {
-      display: block;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 15px;
     }
     .banner-section img {
       width: 100%;
+      max-width: 100%;
       height: auto;
       display: block;
-      max-height: 320px;
-      object-fit: cover;
+      object-fit: contain;  /* 🔥 Fix: poora image dikhega, kuch nahi katta */
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(13,43,107,0.12);
+      border: 3px solid #fff;
+    }
+    @media(min-width: 900px) {
+      .banner-section img {
+        max-width: 900px;
+      }
     }
 
     .promo-section {
@@ -538,9 +538,7 @@
       background: linear-gradient(135deg, #f5f7ff 0%, #eef2ff 100%);
       display: none;
     }
-    .promo-section.show {
-      display: block;
-    }
+    .promo-section.show { display: block; }
     .promo-text {
       font-size: 0.95rem;
       line-height: 1.75;
@@ -556,14 +554,12 @@
       .promo-text { font-size: 0.85rem; padding: 0 4px; }
     }
 
-    /* Footer */
     .footer {
       background: #1a237e; color: white; text-align: center;
       padding: 12px; font-size: 0.85rem;
       border-top: 1px solid rgba(255,255,255,0.1);
     }
     
-    /* Developer Contact */
     .developer-contact {
       background: #f8f9fa; padding: 15px; text-align: center;
       border-top: 2px solid #1a237e; margin-top: 15px;
@@ -580,7 +576,6 @@
     .contact-item:hover { transform: translateY(-2px); }
     .contact-item i { color: #1a237e; font-size: 1rem; }
     
-    /* Password Modal */
     .password-modal {
       position: fixed; top: 0; left: 0;
       width: 100%; height: 100%;
@@ -623,6 +618,7 @@
       .tests-list, .results-list { grid-template-columns: 1fr; }
       .contact-info { flex-direction: column; gap: 8px; }
       .contact-item { padding: 8px 12px; }
+      .banner-section { padding: 14px 10px; }
     }
     
     @media (max-width: 480px) {
@@ -835,7 +831,7 @@
 
     <!-- 🆕 BANNER SECTION (Firestore se dynamic) -->
     <div class="banner-section" id="bannerSection">
-      <img id="bannerImage" src="" alt="Banner">
+      <img id="bannerImage" src="" alt="Coaching Banner">
     </div>
 
     <!-- 🆕 PROMO SECTION (Firestore se dynamic) -->
@@ -881,7 +877,6 @@
     let showAllResults = false;
     let viewedResults = [];
 
-    // DRAWER
     function openDrawer() {
       document.getElementById('sideDrawer').classList.add('open');
       document.getElementById('drawerOverlay').classList.add('open');
@@ -903,7 +898,6 @@
       drawer.addEventListener('touchend', function() { if (currentX - startX > 60) closeDrawer(); }, { passive: true });
     })();
 
-    // REGISTRATION POPUP
     function openRegPopup() {
       closeDrawer();
       document.getElementById('regPopupOverlay').classList.add('open');
@@ -968,7 +962,6 @@
       window.open('download-admit.html', '_blank');
     }
 
-    // Results
     function loadViewedResults() {
       const stored = localStorage.getItem('quest_viewed_results');
       viewedResults = stored ? JSON.parse(stored) : [];
@@ -1084,7 +1077,6 @@
     }
     function openOnlineTest() { window.open('onlinetest.html', '_blank'); }
 
-    // Admin Login
     function openPasswordModal() {
       document.getElementById('passwordModal').style.display = 'flex';
       document.getElementById('adminEmail').value = '';
@@ -1144,12 +1136,7 @@
     async function loadBannerAndPromo() {
       try {
         const snap = await db.collection('settings').doc('promo').get();
-
-        if (!snap.exists) {
-          // Kuch nahi — show nothing
-          return;
-        }
-
+        if (!snap.exists) return;
         const data = snap.data();
 
         // Banner
@@ -1177,7 +1164,6 @@
       }
     }
 
-    // BOOT
     document.addEventListener('DOMContentLoaded', function() {
       fetchAllResults();
       loadBannerAndPromo();
