@@ -391,8 +391,8 @@
   }
   .banner-preview img {
     width:100%;
-    max-height:220px;
-    object-fit:cover;
+    max-height:300px;
+    object-fit:contain;
     border-radius:10px;
     border:2px solid #ffc42e;
     box-shadow:0 4px 12px rgba(13,43,107,.15);
@@ -406,6 +406,9 @@
     font-size:.82rem;
     font-weight:600;
   }
+  .poster-editor-list { display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:14px; }
+  .poster-editor-card { background:#fff;border:1px solid #dbe6ff;border-radius:12px;padding:12px;text-align:left; }
+  .poster-editor-card img { width:100%;height:180px;object-fit:contain;background:#f8faff;margin-bottom:10px; }
 
   .promo-preview {
     background:linear-gradient(135deg,#f5f7ff,#eef2ff);
@@ -841,20 +844,14 @@
 
       <div class="row g-3">
         <div class="col-12">
-          <label class="form-label">Banner Image (Optional)</label>
+          <label class="form-label">Promo Posters</label>
           <div class="upload-drop" id="bannerPhotoDrop">
-            <input type="file" id="bannerPhotoInput" accept="image/*" style="display:none;">
-            <div class="ico"><i class="fas fa-image"></i></div>
-            <div class="txt">Click to upload banner image</div>
-            <div class="sub">Thumbnail size · Max 5 MB · JPG / PNG</div>
+            <input type="file" id="bannerPhotoInput" accept="image/*" multiple style="display:none;">
+            <div class="ico"><i class="fas fa-images"></i></div>
+            <div class="txt">Click to choose one or more posters</div>
+            <div class="sub">JPG / PNG · Max 5 MB each. Add a description for every poster below.</div>
           </div>
-          <div class="file-info" id="bannerPhotoInfo" style="display:none;">
-            <i class="fas fa-check-circle"></i>
-            <span id="bannerPhotoName"></span>
-            <button class="btn-outline-soft ms-2" onclick="clearBannerPhoto()" style="padding:3px 8px;font-size:.72rem;">
-              <i class="fas fa-times"></i> Remove
-            </button>
-          </div>
+          <div id="posterListEditor" class="poster-editor-list"></div>
         </div>
 
         <div class="col-12">
@@ -870,12 +867,10 @@ Example:
         </div>
       </div>
 
-      <!-- Banner Preview -->
+      <!-- Poster Preview -->
       <div class="banner-preview" id="bannerPreview">
-        <div class="banner-label"><i class="fas fa-image"></i> Banner Preview</div>
-        <div id="bannerPreviewContent">
-          <div class="banner-empty">No banner uploaded yet</div>
-        </div>
+        <div class="banner-label"><i class="fas fa-images"></i> Posters Preview</div>
+        <div id="bannerPreviewContent"><div class="banner-empty">No posters uploaded yet</div></div>
       </div>
 
       <!-- Promo Preview -->
@@ -1094,6 +1089,7 @@ const state = {
   topperPhotoFile: null,
   galleryPhotoFile: null,
   bannerPhotoFile: null,
+  promoPosters: [],
   existingCeoPhotoUrl: null,
   existingCaoPhotoUrl: null,
   existingTopperPhotoUrl: null,
@@ -1399,17 +1395,17 @@ document.addEventListener('DOMContentLoaded', () => {
     $('galleryPhotoName').textContent = f.name + ' (' + (f.size/1024/1024).toFixed(2) + ' MB)';
   });
 
-  // 🆕 Banner photo
+  // Promo posters (multiple files)
   $('bannerPhotoDrop').addEventListener('click', () => $('bannerPhotoInput').click());
   $('bannerPhotoInput').addEventListener('change', (e) => {
-    const f = e.target.files[0];
-    if (!f) return;
-    if (!f.type.startsWith('image/')) return toast('Only image files allowed', true);
-    if (f.size > 5 * 1024 * 1024) return toast('Image too large (max 5 MB)', true);
-    state.bannerPhotoFile = f;
-    $('bannerPhotoInfo').style.display = 'flex';
-    $('bannerPhotoName').textContent = f.name + ' (' + (f.size/1024/1024).toFixed(2) + ' MB)';
-    updateBannerPreview();
+    const files = [...e.target.files];
+    for (const f of files) {
+      if (!f.type.startsWith('image/')) { toast(`${f.name}: only image files are allowed`, true); continue; }
+      if (f.size > 5 * 1024 * 1024) { toast(`${f.name}: image is larger than 5 MB`, true); continue; }
+      state.promoPosters.push({ file: f, description: '' });
+    }
+    e.target.value = '';
+    renderPromoPosters();
   });
 
   // 🆕 Promo text live preview
@@ -1823,30 +1819,53 @@ async function loadPromo() {
     if (snap.exists) {
       const data = snap.data();
       $('promoTextInput').value = data.promoText || '';
-      state.existingBannerUrl = data.bannerUrl || null;
+      const posters = Array.isArray(data.posters) ? data.posters : [];
+      state.promoPosters = posters.length
+        ? posters.map(p => ({ url: p.url || '', description: p.description || '' })).filter(p => p.url)
+        : (data.bannerUrl ? [{ url: data.bannerUrl, description: data.bannerDescription || '' }] : []);
     } else {
       // First time — default promo text daal do
       $('promoTextInput').value = DEFAULT_PROMO_TEXT;
+      state.promoPosters = [];
     }
-    updateBannerPreview();
+    renderPromoPosters();
     updatePromoPreview();
   } catch (err) {
     console.error('Load promo failed:', err);
     $('promoTextInput').value = DEFAULT_PROMO_TEXT;
-    updateBannerPreview();
+    state.promoPosters = [];
+    renderPromoPosters();
     updatePromoPreview();
   }
 }
 
 function updateBannerPreview() {
   const content = $('bannerPreviewContent');
-  if (state.bannerPhotoFile) {
-    content.innerHTML = `<img src="${URL.createObjectURL(state.bannerPhotoFile)}" alt="Banner preview">`;
-  } else if (state.existingBannerUrl) {
-    content.innerHTML = `<img src="${esc(state.existingBannerUrl)}" alt="Banner preview">`;
-  } else {
-    content.innerHTML = `<div class="banner-empty">No banner uploaded yet</div>`;
-  }
+  if (!state.promoPosters.length) return content.innerHTML = '<div class="banner-empty">No posters uploaded yet</div>';
+  content.innerHTML = `<div class="poster-editor-list">${state.promoPosters.map(p => {
+    const src = p.file ? URL.createObjectURL(p.file) : esc(p.url);
+    return `<div class="poster-editor-card"><img src="${src}" alt="Promo poster preview"><div class="small text-muted">${esc(p.description || 'No description added yet')}</div></div>`;
+  }).join('')}</div>`;
+}
+
+function renderPromoPosters() {
+  const editor = $('posterListEditor');
+  if (!state.promoPosters.length) editor.innerHTML = '<p class="text-muted small">No posters added yet.</p>';
+  else editor.innerHTML = state.promoPosters.map((p, i) => {
+    const src = p.file ? URL.createObjectURL(p.file) : esc(p.url);
+    const filename = p.file ? esc(p.file.name) : `Poster ${i + 1}`;
+    return `<div class="poster-editor-card"><img src="${src}" alt="${filename}">
+      <div class="small fw-bold mb-2">${filename}</div>
+      <label class="form-label small" for="posterDescription${i}">Poster details (shown below the image)</label>
+      <textarea class="form-control poster-description" id="posterDescription${i}" data-poster-index="${i}" rows="3" placeholder="Write details about this poster">${esc(p.description || '')}</textarea>
+      <button type="button" class="btn btn-outline-danger btn-sm mt-2" onclick="removePromoPoster(${i})"><i class="fas fa-trash"></i> Remove poster</button>
+    </div>`;
+  }).join('');
+  editor.querySelectorAll('.poster-description').forEach(input => input.addEventListener('input', e => {
+    state.promoPosters[Number(e.target.dataset.posterIndex)].description = e.target.value;
+    updateBannerPreview();
+  }));
+  updateBannerPreview();
 }
 
 function updatePromoPreview() {
@@ -1862,10 +1881,19 @@ function updatePromoPreview() {
 }
 
 window.clearBannerPhoto = function() {
-  state.bannerPhotoFile = null;
+  state.promoPosters = [];
   $('bannerPhotoInput').value = '';
-  $('bannerPhotoInfo').style.display = 'none';
-  updateBannerPreview();
+  renderPromoPosters();
+};
+
+window.removePromoPoster = function(index) {
+  state.promoPosters.splice(index, 1);
+  renderPromoPosters();
+};
+
+window.clearPromoPosters = function() {
+  state.promoPosters = [];
+  renderPromoPosters();
 };
 
 window.savePromo = async function() {
@@ -1875,27 +1903,41 @@ window.savePromo = async function() {
   let progressTimer = null;
 
   try {
-    let bannerUrl = state.existingBannerUrl;
-
-    if (state.bannerPhotoFile) {
-      progressTimer = startFakeProgress();
-      document.querySelector('.upload-progress-title').textContent = 'Uploading Banner…';
-      bannerUrl = await uploadImageToSupabase(state.bannerPhotoFile, 'coaching_banner');
-      completeFakeProgress(progressTimer);
+    document.querySelectorAll('.poster-description').forEach(input => {
+      const poster = state.promoPosters[Number(input.dataset.posterIndex)];
+      if (poster) poster.description = input.value.trim();
+    });
+    if (state.promoPosters.some(poster => !poster.description.trim())) {
+      toast('Please add details for every poster before saving.', true);
+      document.querySelector('.poster-description:placeholder-shown')?.focus();
+      saveBtn.disabled = false;
+      return;
     }
+    const posters = [];
+    for (let i = 0; i < state.promoPosters.length; i++) {
+      const poster = state.promoPosters[i];
+      let url = poster.url || '';
+      if (poster.file) {
+        if (!progressTimer) progressTimer = startFakeProgress();
+        document.querySelector('.upload-progress-title').textContent = `Uploading Poster ${i + 1} of ${state.promoPosters.length}…`;
+        updateUploadProgress(Math.min(88, 8 + (i / state.promoPosters.length) * 78), `Uploading ${poster.file.name}`);
+        url = await uploadImageToSupabase(poster.file, `promo_poster_${i + 1}`);
+      }
+      if (url) posters.push({ url, description: poster.description || '' });
+    }
+    if (progressTimer) completeFakeProgress(progressTimer);
 
-    showLoader('Saving…');
+    showLoader('Saving Promo…');
     await db.collection('settings').doc('promo').set({
       promoText: promoText || '',
-      bannerUrl: bannerUrl || '',
+      posters,
+      bannerUrl: posters[0]?.url || '',
+      bannerDescription: posters[0]?.description || '',
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
 
-    state.existingBannerUrl = bannerUrl;
-    state.bannerPhotoFile = null;
-    $('bannerPhotoInput').value = '';
-    $('bannerPhotoInfo').style.display = 'none';
-    updateBannerPreview();
+    state.promoPosters = posters;
+    renderPromoPosters();
     toast('Promo saved ✓');
   } catch (err) {
     console.error(err);
