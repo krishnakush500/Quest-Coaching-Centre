@@ -945,27 +945,27 @@
     </div>
 
     <!-- Demo achievements: replace these sample names and marks with verified results. -->
-    <section class="achievements-section" aria-labelledby="achievements-title">
-      <h2 class="content-section-heading" id="achievements-title"><i class="fas fa-trophy" aria-hidden="true"></i> Our Achievements</h2>
-      <p class="content-section-subtitle">Celebrating the hard work and progress of our students.</p>
-      <p class="demo-notice"><i class="fas fa-info-circle" aria-hidden="true"></i> Sample demo data — update with verified results</p>
-      <div class="achievement-stats" aria-label="Sample achievement statistics">
+    <section class="achievements-section" id="achievementsSection" aria-labelledby="achievements-title">
+      <h2 class="content-section-heading" id="achievements-title"><i class="fas fa-trophy" aria-hidden="true"></i> <span id="achievementHeadingText">Our Achievements</span></h2>
+      <p class="content-section-subtitle" id="achievementSubtitleText">Celebrating the hard work and progress of our students.</p>
+      <p class="demo-notice" id="achievementDemoNotice"><i class="fas fa-info-circle" aria-hidden="true"></i> Sample demo data — update with verified results</p>
+      <div class="achievement-stats" id="achievementStats" aria-label="Sample achievement statistics">
         <div class="achievement-stat"><strong>12</strong><span>School Toppers</span><small>Sample count</small></div>
         <div class="achievement-stat"><strong>38</strong><span>Students Above 90%</span><small>Sample count</small></div>
         <div class="achievement-stat"><strong>96.4%</strong><span>Highest Score</span><small>Sample result</small></div>
         <div class="achievement-stat"><strong>85+</strong><span>Students Improved</span><small>Sample count</small></div>
       </div>
-      <div class="achievement-students">
+      <div class="achievement-students" id="achievementStudents">
         <article class="achievement-card"><i class="fas fa-medal" aria-hidden="true"></i><h3>Aarav Kumar</h3><p>Class 10 · Annual Examination</p><span class="achievement-score">96.4%</span></article>
         <article class="achievement-card"><i class="fas fa-medal" aria-hidden="true"></i><h3>Priya Kumari</h3><p>Class 12 · Science Stream</p><span class="achievement-score">94.8%</span></article>
         <article class="achievement-card"><i class="fas fa-medal" aria-hidden="true"></i><h3>Rohan Singh</h3><p>Class 9 · Annual Examination</p><span class="achievement-score">92.6%</span></article>
       </div>
     </section>
 
-    <section class="faq-section" aria-labelledby="faq-title">
-      <h2 class="content-section-heading" id="faq-title"><i class="fas fa-circle-question" aria-hidden="true"></i> Frequently Asked Questions</h2>
-      <p class="content-section-subtitle">Quick answers about classes, tests, results and admissions.</p>
-      <div class="faq-list">
+    <section class="faq-section" id="faqSection" aria-labelledby="faq-title">
+      <h2 class="content-section-heading" id="faq-title"><i class="fas fa-circle-question" aria-hidden="true"></i> <span id="faqHeadingText">Frequently Asked Questions</span></h2>
+      <p class="content-section-subtitle" id="faqSubtitleText">Quick answers about classes, tests, results and admissions.</p>
+      <div class="faq-list" id="faqList">
         <details class="faq-item"><summary>Which classes can join Quest Coaching Centre?</summary><div class="faq-answer">Admissions are currently open for students from Class 6 to Class 12. Please contact the centre to confirm the available batches.</div></details>
         <details class="faq-item"><summary>How can I check my exam result online?</summary><div class="faq-answer">Open the Check Results tab, choose the available examination, and enter your roll number to view your result.</div></details>
         <details class="faq-item"><summary>Are online tests available for students?</summary><div class="faq-answer">Available tests are listed under Online Tests. Sign in or follow the instructions shown on the test card to participate.</div></details>
@@ -1299,9 +1299,38 @@
       }
     }
 
+    function escapeSectionText(value) {
+      return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    }
+
+    async function loadAchievementsFaq() {
+      try {
+        const snap = await db.collection('settings').doc('achievements_faq').get();
+        if (!snap.exists) return;
+        const data = snap.data();
+        document.getElementById('achievementHeadingText').textContent = data.achievementTitle || '';
+        document.getElementById('achievementSubtitleText').textContent = data.achievementSubtitle || '';
+        document.getElementById('faqHeadingText').textContent = data.faqTitle || '';
+        document.getElementById('faqSubtitleText').textContent = data.faqSubtitle || '';
+        document.getElementById('achievementDemoNotice').style.display = data.showDemoNotice === false ? 'none' : 'table';
+        document.getElementById('achievementStats').innerHTML = (data.stats || []).map(item =>
+          `<div class="achievement-stat"><strong>${escapeSectionText(item.value)}</strong><span>${escapeSectionText(item.label)}</span><small>${escapeSectionText(item.note)}</small></div>`
+        ).join('');
+        document.getElementById('achievementStudents').innerHTML = (data.students || []).map(item =>
+          `<article class="achievement-card"><i class="fas fa-medal" aria-hidden="true"></i><h3>${escapeSectionText(item.name)}</h3><p>${escapeSectionText(item.detail)}</p><span class="achievement-score">${escapeSectionText(item.score)}</span></article>`
+        ).join('');
+        document.getElementById('faqList').innerHTML = (data.faqs || []).map(item =>
+          `<details class="faq-item"><summary>${escapeSectionText(item.question)}</summary><div class="faq-answer">${escapeSectionText(item.answer).replace(/\n/g, '<br>')}</div></details>`
+        ).join('');
+      } catch (err) {
+        console.error('Achievements/FAQ load failed:', err);
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       fetchAllResults();
       loadBannerAndPromo();
+      loadAchievementsFaq();
     });
   </script>
 </body>
