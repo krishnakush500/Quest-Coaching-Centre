@@ -634,6 +634,9 @@
     <button class="sm-tab" data-tab="promo">
       <i class="fas fa-bullhorn"></i> Promo
     </button>
+    <button class="sm-tab" data-tab="achievements-faq">
+      <i class="fas fa-trophy"></i> Achievements & FAQ
+    </button>
   </div>
 
   <!-- ================= ABOUT PANEL ================= -->
@@ -784,6 +787,45 @@
           <p>Loading gallery…</p>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ================= ACHIEVEMENTS & FAQ PANEL ================= -->
+  <div class="sm-panel" id="panel-achievements-faq">
+    <div class="sm-card">
+      <div class="sm-card-header">
+        <h2><i class="fas fa-trophy"></i> Achievements & Frequently Asked Questions</h2>
+        <button class="btn-navy" onclick="saveAchievementsFaq()" id="saveAchievementsFaqBtn"><i class="fas fa-save"></i> Save Changes</button>
+      </div>
+      <div class="alert alert-info">यह जानकारी वेबसाइट के होम पेज पर दिखेगी। छात्र के नाम और अंक प्रकाशित करने से पहले सही जानकारी जाँच लें।</div>
+      <h3 class="h5 mt-3">Achievements सेक्शन</h3>
+      <div class="row g-3 mb-3">
+        <div class="col-md-6"><label class="form-label">Section Heading</label><input class="form-control" id="achTitle"></div>
+        <div class="col-md-6"><label class="form-label">Subtitle</label><input class="form-control" id="achSubtitle"></div>
+      </div>
+      <div class="form-check mb-3"><input class="form-check-input" type="checkbox" id="showDemoNotice" checked><label class="form-check-label" for="showDemoNotice">Show “sample demo data” note on website</label></div>
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 mb-2">
+        <h4 class="h6 mb-0">Achievement Numbers</h4>
+        <button class="btn-outline-soft" type="button" onclick="addAchievementStat()"><i class="fas fa-plus"></i> Add number</button>
+      </div>
+      <div id="achievementStatsEditor" class="vstack gap-2"></div>
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-4 mb-2">
+        <h4 class="h6 mb-0">Student Results</h4>
+        <button class="btn-outline-soft" type="button" onclick="addAchievementStudent()"><i class="fas fa-plus"></i> Add student</button>
+      </div>
+      <div id="achievementStudentsEditor" class="vstack gap-2"></div>
+      <hr class="my-4">
+      <h3 class="h5">FAQ सेक्शन</h3>
+      <div class="row g-3 mb-3">
+        <div class="col-md-6"><label class="form-label">Section Heading</label><input class="form-control" id="faqTitle"></div>
+        <div class="col-md-6"><label class="form-label">Subtitle</label><input class="form-control" id="faqSubtitle"></div>
+      </div>
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 mb-2">
+        <h4 class="h6 mb-0">Questions and Answers</h4>
+        <button class="btn-outline-soft" type="button" onclick="addFaqItem()"><i class="fas fa-plus"></i> Add question</button>
+      </div>
+      <div id="faqEditor" class="vstack gap-2"></div>
+      <div class="text-end mt-4"><button class="btn-navy" onclick="saveAchievementsFaq()"><i class="fas fa-save"></i> Save Changes</button></div>
     </div>
   </div>
 
@@ -1044,6 +1086,7 @@ function failFakeProgress(timer) {
 const state = {
   toppers: [],
   gallery: [],
+  achievementsFaq: null,
   editingTopper: null,
   editingGallery: null,
   ceoPhotoFile: null,
@@ -1072,6 +1115,7 @@ auth.onAuthStateChanged((user) => {
   loadToppers();
   loadGallery();
   loadPromo();
+  loadAchievementsFaq();
 });
 
 /* ============================================================
@@ -1651,6 +1695,108 @@ window.deleteGalleryPhoto = async function(id) {
     console.error(err);
     toast('Delete failed: ' + err.message, true);
   } finally {
+    hideLoader();
+  }
+};
+
+const defaultAchievementsFaq = {
+  achievementTitle: 'Our Achievements', achievementSubtitle: 'Celebrating the hard work and progress of our students.',
+  faqTitle: 'Frequently Asked Questions', faqSubtitle: 'Quick answers about classes, tests, results and admissions.',
+  showDemoNotice: true,
+  stats: [
+    { value: '12', label: 'School Toppers', note: 'Sample count' },
+    { value: '38', label: 'Students Above 90%', note: 'Sample count' },
+    { value: '96.4%', label: 'Highest Score', note: 'Sample result' },
+    { value: '85+', label: 'Students Improved', note: 'Sample count' }
+  ],
+  students: [
+    { name: 'Aarav Kumar', detail: 'Class 10 · Annual Examination', score: '96.4%' },
+    { name: 'Priya Kumari', detail: 'Class 12 · Science Stream', score: '94.8%' },
+    { name: 'Rohan Singh', detail: 'Class 9 · Annual Examination', score: '92.6%' }
+  ],
+  faqs: [
+    { question: 'Which classes can join Quest Coaching Centre?', answer: 'Admissions are currently open for students from Class 6 to Class 12. Please contact the centre to confirm the available batches.' },
+    { question: 'How can I check my exam result online?', answer: 'Open the Check Results tab, choose the available examination, and enter your roll number to view your result.' },
+    { question: 'Are online tests available for students?', answer: 'Available tests are listed under Online Tests. Sign in or follow the instructions shown on the test card to participate.' },
+    { question: 'Where can I find study materials?', answer: 'Students can use the Study Material section from the website menu. Materials shown there depend on what the teachers have published.' },
+    { question: 'How do I ask about admission and class timings?', answer: 'Please contact Quest Coaching Centre directly for current admission details, batch timings, and fee information.' }
+  ]
+};
+
+async function loadAchievementsFaq() {
+  try {
+    const snap = await db.collection('settings').doc('achievements_faq').get();
+    state.achievementsFaq = snap.exists ? { ...defaultAchievementsFaq, ...snap.data() } : JSON.parse(JSON.stringify(defaultAchievementsFaq));
+    $('achTitle').value = state.achievementsFaq.achievementTitle || '';
+    $('achSubtitle').value = state.achievementsFaq.achievementSubtitle || '';
+    $('faqTitle').value = state.achievementsFaq.faqTitle || '';
+    $('faqSubtitle').value = state.achievementsFaq.faqSubtitle || '';
+    $('showDemoNotice').checked = state.achievementsFaq.showDemoNotice !== false;
+    renderAchievementsFaqEditor();
+  } catch (err) {
+    console.error('Load achievements and FAQ failed:', err);
+    toast('Could not load Achievements & FAQ: ' + (err.message || 'Unknown error'), true);
+  }
+}
+
+function renderAchievementsFaqEditor() {
+  const data = state.achievementsFaq || defaultAchievementsFaq;
+  $('achievementStatsEditor').innerHTML = (data.stats || []).map((item, i) => `
+    <div class="row g-2 align-items-end border rounded p-2 mx-0">
+      <div class="col-sm-3"><label class="form-label small">Number / Value</label><input class="form-control stat-value" value="${esc(item.value)}"></div>
+      <div class="col-sm-4"><label class="form-label small">Label</label><input class="form-control stat-label" value="${esc(item.label)}"></div>
+      <div class="col-sm-4"><label class="form-label small">Small note</label><input class="form-control stat-note" value="${esc(item.note)}"></div>
+      <div class="col-sm-1"><button class="btn btn-outline-danger w-100" type="button" onclick="removeAchievementStat(${i})" aria-label="Delete number"><i class="fas fa-trash"></i></button></div>
+    </div>`).join('') || '<p class="text-muted small">No achievement numbers yet.</p>';
+  $('achievementStudentsEditor').innerHTML = (data.students || []).map((item, i) => `
+    <div class="row g-2 align-items-end border rounded p-2 mx-0">
+      <div class="col-md-4"><label class="form-label small">Student Name</label><input class="form-control student-name" value="${esc(item.name)}"></div>
+      <div class="col-md-4"><label class="form-label small">Class / Exam</label><input class="form-control student-detail" value="${esc(item.detail)}"></div>
+      <div class="col-md-3"><label class="form-label small">Marks / Score</label><input class="form-control student-score" value="${esc(item.score)}"></div>
+      <div class="col-md-1"><button class="btn btn-outline-danger w-100" type="button" onclick="removeAchievementStudent(${i})" aria-label="Delete student"><i class="fas fa-trash"></i></button></div>
+    </div>`).join('') || '<p class="text-muted small">No student results yet.</p>';
+  $('faqEditor').innerHTML = (data.faqs || []).map((item, i) => `
+    <div class="border rounded p-3">
+      <div class="d-flex justify-content-between align-items-center gap-2 mb-2"><strong>Question ${i + 1}</strong><button class="btn btn-outline-danger btn-sm" type="button" onclick="removeFaqItem(${i})"><i class="fas fa-trash"></i> Delete</button></div>
+      <label class="form-label small">Question</label><input class="form-control faq-question mb-2" value="${esc(item.question)}">
+      <label class="form-label small">Answer</label><textarea class="form-control faq-answer" rows="3">${esc(item.answer)}</textarea>
+    </div>`).join('') || '<p class="text-muted small">No FAQ questions yet.</p>';
+}
+
+function addAchievementStat() { state.achievementsFaq.stats.push({ value: '', label: '', note: '' }); renderAchievementsFaqEditor(); }
+function removeAchievementStat(i) { state.achievementsFaq.stats.splice(i, 1); renderAchievementsFaqEditor(); }
+function addAchievementStudent() { state.achievementsFaq.students.push({ name: '', detail: '', score: '' }); renderAchievementsFaqEditor(); }
+function removeAchievementStudent(i) { state.achievementsFaq.students.splice(i, 1); renderAchievementsFaqEditor(); }
+function addFaqItem() { state.achievementsFaq.faqs.push({ question: '', answer: '' }); renderAchievementsFaqEditor(); }
+function removeFaqItem(i) { state.achievementsFaq.faqs.splice(i, 1); renderAchievementsFaqEditor(); }
+
+window.saveAchievementsFaq = async function() {
+  const saveBtn = $('saveAchievementsFaqBtn');
+  saveBtn.disabled = true;
+  try {
+    const data = {
+      achievementTitle: $('achTitle').value.trim(), achievementSubtitle: $('achSubtitle').value.trim(),
+      faqTitle: $('faqTitle').value.trim(), faqSubtitle: $('faqSubtitle').value.trim(),
+      showDemoNotice: $('showDemoNotice').checked,
+      stats: [...document.querySelectorAll('#achievementStatsEditor > .row')].map(row => ({
+        value: row.querySelector('.stat-value').value.trim(), label: row.querySelector('.stat-label').value.trim(), note: row.querySelector('.stat-note').value.trim()
+      })),
+      students: [...document.querySelectorAll('#achievementStudentsEditor > .row')].map(row => ({
+        name: row.querySelector('.student-name').value.trim(), detail: row.querySelector('.student-detail').value.trim(), score: row.querySelector('.student-score').value.trim()
+      })),
+      faqs: [...document.querySelectorAll('#faqEditor > .border')].map(row => ({
+        question: row.querySelector('.faq-question').value.trim(), answer: row.querySelector('.faq-answer').value.trim()
+      }))
+    };
+    showLoader('Saving Achievements & FAQ…');
+    await db.collection('settings').doc('achievements_faq').set({ ...data, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    state.achievementsFaq = data;
+    toast('Achievements & FAQ saved ✓');
+  } catch (err) {
+    console.error(err);
+    toast('Save failed: ' + (err.message || 'Unknown'), true);
+  } finally {
+    saveBtn.disabled = false;
     hideLoader();
   }
 };
