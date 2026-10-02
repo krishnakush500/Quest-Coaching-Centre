@@ -554,6 +554,111 @@
       .promo-text { font-size: 0.85rem; padding: 0 4px; }
     }
 
+    /* Achievements and FAQs: styled to match the existing indigo and gold theme. */
+    .achievements-section, .faq-section {
+      padding: 34px 20px;
+      background: #fff;
+    }
+    .achievements-section {
+      background: linear-gradient(135deg, #f5f7ff 0%, #eef2ff 100%);
+    }
+    .content-section-heading {
+      color: #1a237e;
+      text-align: center;
+      font-size: 1.65rem;
+      margin: 0 0 8px;
+    }
+    .content-section-subtitle {
+      color: #5f6680;
+      text-align: center;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin: 0 auto 22px;
+      max-width: 680px;
+    }
+    .demo-notice {
+      display: table;
+      margin: 0 auto 20px;
+      padding: 7px 12px;
+      border-radius: 20px;
+      background: #fff4cc;
+      color: #725500;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-align: center;
+    }
+    .achievement-stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 1000px;
+      margin: 0 auto 22px;
+      padding: 20px 14px;
+      border-radius: 16px;
+      background: linear-gradient(120deg, #039be5, #03a9f4);
+      box-shadow: 0 8px 22px rgba(13, 43, 107, 0.16);
+      color: #fff;
+      text-align: center;
+    }
+    .achievement-stat { padding: 4px 8px; }
+    .achievement-stat + .achievement-stat { border-left: 1px solid rgba(255,255,255,0.35); }
+    .achievement-stat strong { display: block; font-size: clamp(1.7rem, 4vw, 2.6rem); line-height: 1.1; }
+    .achievement-stat span { display: block; margin-top: 6px; font-size: 0.85rem; font-weight: 600; line-height: 1.35; }
+    .achievement-stat small { display: block; margin-top: 4px; font-size: 0.68rem; opacity: 0.9; }
+    .achievement-students {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .achievement-card {
+      padding: 18px;
+      border-radius: 12px;
+      background: #fff;
+      border-top: 4px solid #ffc107;
+      box-shadow: 0 4px 14px rgba(26, 35, 126, 0.1);
+      text-align: center;
+    }
+    .achievement-card i { color: #ffc107; font-size: 1.4rem; }
+    .achievement-card h3 { margin: 8px 0 4px; color: #1a237e; font-size: 1.05rem; }
+    .achievement-card p { color: #666; font-size: 0.85rem; line-height: 1.5; }
+    .achievement-score { display: inline-block; margin-top: 10px; color: #039be5; font-size: 1.25rem; font-weight: 700; }
+    .faq-list { max-width: 850px; margin: 0 auto; }
+    .faq-item {
+      margin: 10px 0;
+      border: 1px solid #e3e7f5;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 3px 10px rgba(26, 35, 126, 0.06);
+      overflow: hidden;
+    }
+    .faq-item summary {
+      position: relative;
+      padding: 15px 44px 15px 16px;
+      color: #1a237e;
+      font-weight: 700;
+      line-height: 1.5;
+      cursor: pointer;
+      list-style: none;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; position: absolute; right: 17px; top: 50%; transform: translateY(-50%); color: #039be5; font-size: 1.35rem; }
+    .faq-item[open] summary::after { content: '−'; }
+    .faq-answer { padding: 0 16px 16px; color: #555; font-size: 0.93rem; line-height: 1.7; }
+    @media(max-width: 600px) {
+      .achievements-section, .faq-section { padding: 26px 14px; }
+      .content-section-heading { font-size: 1.4rem; }
+      .achievement-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; padding: 14px 8px; }
+      .achievement-stat { padding: 12px 6px; }
+      .achievement-stat + .achievement-stat { border-left: 0; }
+      .achievement-stat:nth-child(even) { border-left: 1px solid rgba(255,255,255,0.35); }
+      .achievement-stat:nth-child(n+3) { border-top: 1px solid rgba(255,255,255,0.35); }
+      .achievement-students { grid-template-columns: 1fr; }
+      .faq-item summary { padding: 13px 40px 13px 13px; font-size: 0.92rem; }
+      .faq-answer { padding: 0 13px 14px; font-size: 0.88rem; }
+    }
+
     .footer {
       background: #1a237e; color: white; text-align: center;
       padding: 12px; font-size: 0.85rem;
@@ -838,6 +943,36 @@
     <div class="promo-section" id="promoSection">
       <div class="promo-text" id="promoText"></div>
     </div>
+
+    <!-- Demo achievements: replace these sample names and marks with verified results. -->
+    <section class="achievements-section" aria-labelledby="achievements-title">
+      <h2 class="content-section-heading" id="achievements-title"><i class="fas fa-trophy" aria-hidden="true"></i> Our Achievements</h2>
+      <p class="content-section-subtitle">Celebrating the hard work and progress of our students.</p>
+      <p class="demo-notice"><i class="fas fa-info-circle" aria-hidden="true"></i> Sample demo data — update with verified results</p>
+      <div class="achievement-stats" aria-label="Sample achievement statistics">
+        <div class="achievement-stat"><strong>12</strong><span>School Toppers</span><small>Sample count</small></div>
+        <div class="achievement-stat"><strong>38</strong><span>Students Above 90%</span><small>Sample count</small></div>
+        <div class="achievement-stat"><strong>96.4%</strong><span>Highest Score</span><small>Sample result</small></div>
+        <div class="achievement-stat"><strong>85+</strong><span>Students Improved</span><small>Sample count</small></div>
+      </div>
+      <div class="achievement-students">
+        <article class="achievement-card"><i class="fas fa-medal" aria-hidden="true"></i><h3>Aarav Kumar</h3><p>Class 10 · Annual Examination</p><span class="achievement-score">96.4%</span></article>
+        <article class="achievement-card"><i class="fas fa-medal" aria-hidden="true"></i><h3>Priya Kumari</h3><p>Class 12 · Science Stream</p><span class="achievement-score">94.8%</span></article>
+        <article class="achievement-card"><i class="fas fa-medal" aria-hidden="true"></i><h3>Rohan Singh</h3><p>Class 9 · Annual Examination</p><span class="achievement-score">92.6%</span></article>
+      </div>
+    </section>
+
+    <section class="faq-section" aria-labelledby="faq-title">
+      <h2 class="content-section-heading" id="faq-title"><i class="fas fa-circle-question" aria-hidden="true"></i> Frequently Asked Questions</h2>
+      <p class="content-section-subtitle">Quick answers about classes, tests, results and admissions.</p>
+      <div class="faq-list">
+        <details class="faq-item"><summary>Which classes can join Quest Coaching Centre?</summary><div class="faq-answer">Admissions are currently open for students from Class 6 to Class 12. Please contact the centre to confirm the available batches.</div></details>
+        <details class="faq-item"><summary>How can I check my exam result online?</summary><div class="faq-answer">Open the Check Results tab, choose the available examination, and enter your roll number to view your result.</div></details>
+        <details class="faq-item"><summary>Are online tests available for students?</summary><div class="faq-answer">Available tests are listed under Online Tests. Sign in or follow the instructions shown on the test card to participate.</div></details>
+        <details class="faq-item"><summary>Where can I find study materials?</summary><div class="faq-answer">Students can use the Study Material section from the website menu. Materials shown there depend on what the teachers have published.</div></details>
+        <details class="faq-item"><summary>How do I ask about admission and class timings?</summary><div class="faq-answer">Please contact Quest Coaching Centre directly for current admission details, batch timings, and fee information.</div></details>
+      </div>
+    </section>
 
     <div class="developer-contact">
       <h3><i class="fas fa-laptop-code"></i> Website Development Contact</h3>
