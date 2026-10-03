@@ -754,8 +754,9 @@ const DataSource = {
   async _load() {
     if (this._cache) return this._cache;
     try {
-      const classesSnap = await db.collection(SM_COLLECTION)
-        .orderBy('display_order').get();
+      // Read without Firestore orderBy: orderBy excludes older documents that
+      // do not have display_order. The portal applies its own fallback sort below.
+      const classesSnap = await db.collection(SM_COLLECTION).get();
 
       const classes = [];
       for (const classDoc of classesSnap.docs) {
@@ -769,7 +770,6 @@ const DataSource = {
 
         const subjectsSnap = await db.collection(SM_COLLECTION).doc(classDoc.id)
           .collection(SUB_SUBCOLLECTION)
-          .orderBy('display_order')
           .get();
 
         for (const subjectDoc of subjectsSnap.docs) {
@@ -785,7 +785,6 @@ const DataSource = {
           const chaptersSnap = await db.collection(SM_COLLECTION).doc(classDoc.id)
             .collection(SUB_SUBCOLLECTION).doc(subjectDoc.id)
             .collection(CH_SUBCOLLECTION)
-            .orderBy('display_order')
             .get();
 
           chaptersSnap.forEach(chDoc => {
@@ -949,7 +948,12 @@ async function fetchPdfData(chapter) {
    ============================================================ */
 function parseRoute() {
   const raw = location.hash.replace(/^#\/?/, '');
-  const p = raw.split('/').filter(Boolean);
+  // Browser URLs percent-encode Devanagari and other non-ASCII document IDs.
+  // Decode each route segment before comparing it with Firestore document IDs.
+  const p = raw.split('/').filter(Boolean).map(segment => {
+    try { return decodeURIComponent(segment); }
+    catch (_) { return segment; }
+  });
   if (p[0] === 'class' && p[2] === 'subject' && p[4] === 'chapter' && p[5]) {
     return { name:'chapter', classId:p[1], subjectId:p[3], chapterId:p[5] };
   }
