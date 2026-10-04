@@ -6,6 +6,8 @@
 <meta name="theme-color" content="#0d2b6b" />
 <title>Our Toppers · Quest Coaching Centre</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <style>
 :root{
@@ -125,6 +127,18 @@ main{flex:1 0 auto;padding-bottom:26px}
   box-shadow:0 12px 28px rgba(13,43,107,.14);
   border-color:#cfdcf5;
 }
+.topper-state{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  min-height:180px;padding:24px;text-align:center;
+  color:var(--muted);background:#fff;border:1px solid var(--border);
+  border-radius:16px;box-shadow:var(--shadow);margin-bottom:20px;
+}
+.topper-state[hidden],.toppers-grid[hidden]{display:none!important}
+.topper-state>i{font-size:2rem;color:var(--gold-2)}
+.topper-state strong{font-size:1rem;color:var(--navy)}
+.topper-error>i{color:#e0245e}
+.topper-photo-placeholder{display:grid;place-items:center;width:100%;height:100%;color:var(--navy);font-size:2rem;background:linear-gradient(135deg,#eef3ff,#dde7ff)}
+.topper-class{color:var(--muted);font-size:.78rem;font-weight:600;margin:-3px 0 8px}
 
 .topper-rank{
   position:absolute;
@@ -235,312 +249,13 @@ main{flex:1 0 auto;padding-bottom:26px}
   <div class="wrap">
     <div class="page-head">
       <h2><i class="fas fa-trophy"></i> Our Toppers</h2>
-      <p>Meet our best students who made us proud</p>
+      <p>From Quest Coaching Centre: Keep learning, keep working hard, and let your success shine!</p>
     </div>
 
-    <div class="toppers-grid">
-
-      <!-- 1st -->
-      <div class="topper-card">
-        <div class="topper-rank top1">1st</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/Jw8CzGzQ/IMG-20250904-WA0012.jpg" alt="रिंकी कुमारी">
-        </div>
-        <div class="topper-name">रिंकी कुमारी</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>469 अंक</div>
-      </div>
-
-      <!-- 2nd -->
-      <div class="topper-card">
-        <div class="topper-rank top2">2nd</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/XxMqpmH5/IMG-20250904-WA0013.jpg" alt="साहिल कुमार">
-        </div>
-        <div class="topper-name">साहिल कुमार</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>465 अंक</div>
-      </div>
-
-      <!-- 3rd -->
-      <div class="topper-card">
-        <div class="topper-rank top3">3rd</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/G3VVPSqZ/IMG-20250904-WA0014.jpg" alt="रौनक कुमार">
-        </div>
-        <div class="topper-name">रौनक कुमार</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>453 अंक</div>
-      </div>
-
-      <!-- 4th -->
-      <div class="topper-card">
-        <div class="topper-rank">4th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/TxNS2sQ8/IMG-20250904-WA0015.jpg" alt="सत्यम कुमार सिंह">
-        </div>
-        <div class="topper-name">सत्यम कुमार सिंह</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>447 अंक</div>
-      </div>
-
-      <!-- 5th -->
-      <div class="topper-card">
-        <div class="topper-rank">5th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/991nS5Cx/IMG-20250904-WA0016.jpg" alt="अभिराज कुमार">
-        </div>
-        <div class="topper-name">अभिराज कुमार</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>446 अंक</div>
-      </div>
-
-      <!-- 6th -->
-      <div class="topper-card">
-        <div class="topper-rank">6th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/pj5mp7JF/IMG-20250904-WA0017.jpg" alt="सोनी कुमारी">
-        </div>
-        <div class="topper-name">सोनी कुमारी</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>446 अंक</div>
-      </div>
-
-      <!-- 7th -->
-      <div class="topper-card">
-        <div class="topper-rank">7th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/JwGMNwF6/IMG-20250904-WA0018.jpg" alt="रिशु कुमारी राय">
-        </div>
-        <div class="topper-name">रिशु कुमारी राय</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>445 अंक</div>
-      </div>
-
-      <!-- 8th -->
-      <div class="topper-card">
-        <div class="topper-rank">8th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/JWhkzfbG/IMG-20250904-WA0019.jpg" alt="तपेश्वरी कुमारी">
-        </div>
-        <div class="topper-name">तपेश्वरी कुमारी</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>444 अंक</div>
-      </div>
-
-      <!-- 9th -->
-      <div class="topper-card">
-        <div class="topper-rank">9th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/21DCkH7y/IMG-20250904-WA0020.jpg" alt="राजकृत कुमार">
-        </div>
-        <div class="topper-name">राजकृत कुमार</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>444 अंक</div>
-      </div>
-
-      <!-- 10th -->
-      <div class="topper-card">
-        <div class="topper-rank">10th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/4nn6YZdt/IMG-20250904-WA0021-1.jpg" alt="तरुण कुमार">
-        </div>
-        <div class="topper-name">तरुण कुमार</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>439 अंक</div>
-      </div>
-
-      <!-- 11th -->
-      <div class="topper-card">
-        <div class="topper-rank">11th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/yFDsffpF/IMG-20250904-WA0022.jpg" alt="रमिता कुमारी">
-        </div>
-        <div class="topper-name">रमिता कुमारी</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>439 अंक</div>
-      </div>
-
-      <!-- 12th -->
-      <div class="topper-card">
-        <div class="topper-rank">12th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/v6MCpZ4R/IMG-20250904-WA0023.jpg" alt="जिज्ञासा कुमारी">
-        </div>
-        <div class="topper-name">जिज्ञासा कुमारी</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>434 अंक</div>
-      </div>
-
-      <!-- 13th -->
-      <div class="topper-card">
-        <div class="topper-rank">13th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/kggFk370/IMG-20250904-WA0024.jpg" alt="खुश्बू कुमारी">
-        </div>
-        <div class="topper-name">खुश्बू कुमारी</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>431 अंक</div>
-      </div>
-
-      <!-- 14th -->
-      <div class="topper-card">
-        <div class="topper-rank">14th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/7J0J30c7/IMG-20250904-WA0025.jpg" alt="रिया कुमारी">
-        </div>
-        <div class="topper-name">रिया कुमारी</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>430 अंक</div>
-      </div>
-
-      <!-- 15th -->
-      <div class="topper-card">
-        <div class="topper-rank">15th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/7JRgb628/IMG-20250904-WA0027.jpg" alt="करण कुमार">
-        </div>
-        <div class="topper-name">करण कुमार</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>427 अंक</div>
-      </div>
-
-      <!-- 16th -->
-      <div class="topper-card">
-        <div class="topper-rank">16th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/bjSNtXPz/IMG-20250904-WA0028.jpg" alt="रिशु कुमारी">
-        </div>
-        <div class="topper-name">रिशु कुमारी</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>425 अंक</div>
-      </div>
-
-      <!-- 17th -->
-      <div class="topper-card">
-        <div class="topper-rank">17th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/ZpkDP0pF/IMG-20250904-WA0029.jpg" alt="ईशु कुमारी">
-        </div>
-        <div class="topper-name">ईशु कुमारी</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>425 अंक</div>
-      </div>
-
-      <!-- 18th -->
-      <div class="topper-card">
-        <div class="topper-rank">18th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/4Zcy07cj/IMG-20250904-WA0030.jpg" alt="लक्की कुमार">
-        </div>
-        <div class="topper-name">लक्की कुमार</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>422 अंक</div>
-      </div>
-
-      <!-- 19th -->
-      <div class="topper-card">
-        <div class="topper-rank">19th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/Y4b3gBHK/IMG-20250904-WA0031.jpg" alt="अशोक कुमार">
-        </div>
-        <div class="topper-name">अशोक कुमार</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>422 अंक</div>
-      </div>
-
-      <!-- 20th -->
-      <div class="topper-card">
-        <div class="topper-rank">20th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/nN8pWkvv/IMG-20250904-WA0032.jpg" alt="हर्षित कुमार">
-        </div>
-        <div class="topper-name">हर्षित कुमार</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>422 अंक</div>
-      </div>
-
-      <!-- 21st -->
-      <div class="topper-card">
-        <div class="topper-rank">21st</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/hhNYK2y/IMG-20250904-WA0033.jpg" alt="प्रियंका कुमारी">
-        </div>
-        <div class="topper-name">प्रियंका कुमारी</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>418 अंक</div>
-      </div>
-
-      <!-- 22nd -->
-      <div class="topper-card">
-        <div class="topper-rank">22nd</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/tp1HQ0DN/IMG-20250904-WA0034.jpg" alt="संस्कृति कुमारी">
-        </div>
-        <div class="topper-name">संस्कृति कुमारी</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>417 अंक</div>
-      </div>
-
-      <!-- 23rd -->
-      <div class="topper-card">
-        <div class="topper-rank">23rd</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/5XSrj1rh/IMG-20250904-WA0035-1.jpg" alt="नव्या कुमारी">
-        </div>
-        <div class="topper-name">नव्या कुमारी</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>414 अंक</div>
-      </div>
-
-      <!-- 24th -->
-      <div class="topper-card">
-        <div class="topper-rank">24th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/gMGvJ7Xs/IMG-20250905-WA0007.jpg" alt="अंकुश कुमार">
-        </div>
-        <div class="topper-name">अंकुश कुमार</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>409 अंक</div>
-      </div>
-
-      <!-- 25th -->
-      <div class="topper-card">
-        <div class="topper-rank">25th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/hRD1Jmcm/IMG-20250905-WA0008.jpg" alt="संजना कुमारी">
-        </div>
-        <div class="topper-name">संजना कुमारी</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>404 अंक</div>
-      </div>
-
-      <!-- 26th -->
-      <div class="topper-card">
-        <div class="topper-rank">26th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/BHJjbmjY/IMG-20250905-WA0009.jpg" alt="रोशनी गुप्ता">
-        </div>
-        <div class="topper-name">रोशनी गुप्ता</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>403 अंक</div>
-      </div>
-
-      <!-- 27th -->
-      <div class="topper-card">
-        <div class="topper-rank">27th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/60r3W27h/IMG-20250905-WA0010.jpg" alt="आदित्य कुमार">
-        </div>
-        <div class="topper-name">आदित्य कुमार</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>402 अंक</div>
-      </div>
-
-      <!-- 28th -->
-      <div class="topper-card">
-        <div class="topper-rank">28th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/WW1KTJQz/IMG-20250905-WA0011.jpg" alt="रोशनी कुमारी">
-        </div>
-        <div class="topper-name">रोशनी कुमारी</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>402 अंक</div>
-      </div>
-
-      <!-- 29th -->
-      <div class="topper-card">
-        <div class="topper-rank">29th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/gbgfm4S2/IMG-20250905-WA0012-1.jpg" alt="रुपाली कुमारी">
-        </div>
-        <div class="topper-name">रुपाली कुमारी</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>402 अंक</div>
-      </div>
-
-      <!-- 30th -->
-      <div class="topper-card">
-        <div class="topper-rank">30th</div>
-        <div class="topper-photo">
-          <img src="https://i.ibb.co/nSG3RX7/IMG-20250905-WA0013.jpg" alt="स्नेहा कुमारी">
-        </div>
-        <div class="topper-name">स्नेहा कुमारी</div>
-        <div class="topper-marks"><i class="fas fa-star"></i>401 अंक</div>
-      </div>
-
-    </div>
+    <div id="topperLoading" class="topper-state"><i class="fas fa-spinner fa-spin"></i><span>Loading toppers…</span></div>
+    <div class="toppers-grid" id="toppersGrid" hidden></div>
+    <div id="topperEmpty" class="topper-state" hidden><i class="fas fa-trophy"></i><strong>No toppers added yet</strong><span>Teacher-added toppers will appear here.</span></div>
+    <div id="topperError" class="topper-state topper-error" hidden><i class="fas fa-triangle-exclamation"></i><strong>Unable to load toppers</strong><span>Please refresh the page or contact the centre.</span></div>
   </div>
 </main>
 
@@ -549,6 +264,66 @@ main{flex:1 0 auto;padding-bottom:26px}
   <span>Director: Mr. Ravi Sir</span>
   <small>© 2026 Quest Coaching Centre</small>
 </footer>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",
+    authDomain: "quest-coaching.firebaseapp.com",
+    databaseURL: "https://quest-coaching-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "quest-coaching",
+    storageBucket: "quest-coaching.firebasestorage.app",
+    messagingSenderId: "131948734089",
+    appId: "1:131948734089:web:f4ba25110c8b1298360858"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  }[ch]));
+  const markValue = value => {
+    const firstNumber = String(value ?? '').replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
+    const parsed = firstNumber ? Number(firstNumber[0]) : NaN;
+    return Number.isFinite(parsed) ? parsed : -Infinity;
+  };
+  const ordinal = n => `रैंक ${n}`;
+
+  async function loadToppers() {
+    const loading = document.getElementById('topperLoading');
+    const grid = document.getElementById('toppersGrid');
+    try {
+      const snapshot = await db.collection('toppers').get();
+      const toppers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a, b) => markValue(b.marks) - markValue(a.marks) || String(a.name || '').localeCompare(String(b.name || '')));
+      loading.hidden = true;
+      if (!toppers.length) {
+        document.getElementById('topperEmpty').hidden = false;
+        return;
+      }
+      grid.innerHTML = toppers.map((topper, index) => {
+        const rankClass = index < 3 ? ` top${index + 1}` : '';
+        const photo = topper.photoUrl
+          ? `<img src="${escapeHtml(topper.photoUrl)}" alt="${escapeHtml(topper.name || 'Student')}" onerror="this.parentElement.innerHTML='<span class=topper-photo-placeholder><i class=fas fa-user-graduate></i></span>'">`
+          : '<span class="topper-photo-placeholder"><i class="fas fa-user-graduate"></i></span>';
+        const marks = escapeHtml(topper.marks || '');
+        const klass = [topper.class, topper.year].filter(Boolean).map(escapeHtml).join(' · ');
+        return `<article class="topper-card">
+          <div class="topper-rank${rankClass}">${ordinal(index + 1)}</div>
+          <div class="topper-photo">${photo}</div>
+          <div class="topper-name">${escapeHtml(topper.name || 'Student')}</div>
+          ${klass ? `<div class="topper-class">${klass}</div>` : ''}
+          <div class="topper-marks"><i class="fas fa-star" aria-hidden="true"></i>${marks} अंक</div>
+        </article>`;
+      }).join('');
+      grid.hidden = false;
+    } catch (error) {
+      console.error('Toppers load failed:', error);
+      loading.hidden = true;
+      document.getElementById('topperError').hidden = false;
+    }
+  }
+  loadToppers();
+</script>
 
 </body>
 </html>
