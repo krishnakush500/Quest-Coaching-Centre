@@ -619,6 +619,38 @@
             font-size: 0.85rem;
         }
 
+        .student-profile-result {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 18px;
+            margin-bottom: 16px;
+            border-radius: 14px;
+            color: #fff;
+            background: linear-gradient(120deg, #1565c0, #5e35b1);
+        }
+        .student-profile-result img, .student-avatar-fallback {
+            width: 88px; height: 88px; border-radius: 50%; object-fit: cover;
+            border: 3px solid rgba(255,255,255,.9); background: #fff;
+        }
+        .student-avatar-fallback { display:flex; align-items:center; justify-content:center; font-size:2rem; color:#1565c0; }
+        .profile-main { min-width:0; flex:1; }
+        .profile-main h2 { margin:0 0 6px; font-size:1.35rem; }
+        .profile-main p { margin:3px 0; font-size:.9rem; opacity:.95; }
+        .score-highlight { text-align:center; min-width:110px; padding:12px; border-radius:12px; background:rgba(255,255,255,.16); }
+        .score-highlight strong { display:block; font-size:1.65rem; }
+        .score-highlight span { font-size:.8rem; }
+        .student-info-result { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .student-info-item { display:block; }
+        .student-info-item strong { display:block; color:#546174; font-size:.72rem; text-transform:uppercase; letter-spacing:.04em; }
+        .student-info-item span { display:block; margin-top:3px; font-weight:600; overflow-wrap:anywhere; }
+        @media(max-width:520px) {
+            .student-profile-result { gap:12px; padding:13px; flex-wrap:wrap; }
+            .student-profile-result img, .student-avatar-fallback { width:68px; height:68px; }
+            .profile-main h2 { font-size:1.08rem; }
+            .score-highlight { margin-left:auto; min-width:88px; padding:8px; }
+        }
+
         .student-info-item {
             display: flex;
             justify-content: space-between;
@@ -1280,13 +1312,9 @@
                 
                 <form id="student-form">
                     <div class="form-group">
-                        <label for="student-name" class="form-label">Full Name *</label>
-                        <input type="text" id="student-name" class="form-control" placeholder="Enter your full name" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="roll-number" class="form-label">Roll Number *</label>
-                        <input type="text" id="roll-number" class="form-control" placeholder="Enter your roll number" required>
+                        <label for="student-aadhar" class="form-label">Aadhaar Number *</label>
+                        <input type="password" id="student-aadhar" class="form-control" placeholder="Enter your 12 digit Aadhaar number" inputmode="numeric" maxlength="12" autocomplete="off" required>
+                        <small>Admission details will be matched securely with your registered Aadhaar.</small>
                     </div>
                     
                     <div id="student-form-error" class="error-message" style="display: none;"></div>
@@ -1402,6 +1430,16 @@
                 </div>
                 
                 <!-- Student Info -->
+                <div class="student-profile-result">
+                    <img id="result-student-photo" alt="Student photo" style="display:none">
+                    <div id="result-student-avatar" class="student-avatar-fallback"><i class="fas fa-user-graduate"></i></div>
+                    <div class="profile-main">
+                        <h2 id="result-profile-name">Student Name</h2>
+                        <p id="result-profile-class">Class: -</p>
+                        <p id="result-profile-admission">Admission No: - · Roll No: -</p>
+                    </div>
+                    <div class="score-highlight"><strong id="result-score-percent">0%</strong><span>Overall Score</span></div>
+                </div>
                 <div class="student-info-result">
                     <div class="student-info-item">
                         <strong>Student Name:</strong>
@@ -1415,6 +1453,8 @@
                         <strong>Test Name:</strong>
                         <span id="result-test-name">-</span>
                     </div>
+                    <div class="student-info-item"><strong>Father's Name:</strong><span id="result-father-name">-</span></div>
+                    <div class="student-info-item"><strong>Contact:</strong><span id="result-parent-mobile">-</span></div>
                     <div class="student-info-item">
                         <strong>Date:</strong>
                         <span id="result-test-date">-</span>
@@ -1654,31 +1694,42 @@
         document.getElementById('student-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const studentName = document.getElementById('student-name').value.trim();
-            const rollNumber = document.getElementById('roll-number').value.trim();
+            const aadhar = document.getElementById('student-aadhar').value.replace(/\D/g, '');
             const errorDiv = document.getElementById('student-form-error');
             
             // Validation
-            if (!studentName || !rollNumber) {
-                errorDiv.textContent = 'Please fill in all required fields.';
+            if (!/^\d{12}$/.test(aadhar)) {
+                errorDiv.textContent = 'Please enter a valid 12 digit Aadhaar number.';
                 errorDiv.style.display = 'block';
                 return;
             }
-            
-            if (studentName.length < 2) {
-                errorDiv.textContent = 'Please enter a valid name.';
+
+            const submitButton = this.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Checking admission record...';
+            try {
+                const matches = await db.collection('admissions').where('aadhar', '==', aadhar).limit(2).get();
+                if (matches.empty) throw new Error('No admission found for this Aadhaar number. Please contact the coaching centre.');
+                if (matches.size > 1) throw new Error('More than one admission record matched. Please contact the coaching centre.');
+                const admission = matches.docs[0].data();
+                if (admission.status && admission.status !== 'active') throw new Error('This admission record is not active. Please contact the coaching centre.');
+                studentDetails = {
+                    name: admission.studentName || '', rollNumber: admission.rollNumber || '',
+                    admissionNo: admission.admissionNo || '', classApplying: admission.classApplying || '',
+                    fatherName: admission.fatherName || '', parentMobile: admission.parentMobile || '',
+                    photoUrl: admission.photoUrl || '', schoolName: admission.schoolName || '',
+                    gender: admission.gender || '', session: admission.session || ''
+                };
+                if (!studentDetails.name || !studentDetails.rollNumber) throw new Error('Admission record is missing student name or roll number. Please contact the coaching centre.');
+                errorDiv.style.display = 'none';
+                loadTestQuestions();
+            } catch (error) {
+                errorDiv.textContent = error.message || 'Unable to verify admission. Please try again.';
                 errorDiv.style.display = 'block';
-                return;
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Proceed to Test';
             }
-            
-            // Save student details
-            studentDetails = {
-                name: studentName,
-                rollNumber: rollNumber
-            };
-            
-            // Proceed to test screen
-            loadTestQuestions();
         });
 
         document.getElementById('back-to-tests').addEventListener('click', function() {
@@ -1967,6 +2018,8 @@
                 const resultToSave = {
                     studentName: studentDetails.name,
                     rollNumber: studentDetails.rollNumber,
+                    admissionNo: studentDetails.admissionNo || '',
+                    classApplying: studentDetails.classApplying || '',
                     testId: currentTest.id,
                     testName: currentTest.testName,
                     totalQuestions: resultData.totalQuestions,
@@ -2101,6 +2154,19 @@
             document.getElementById('result-student-name').textContent = studentDetails.name;
             document.getElementById('result-roll-number').textContent = studentDetails.rollNumber;
             document.getElementById('result-test-name').textContent = currentTest.testName;
+            document.getElementById('result-profile-name').textContent = studentDetails.name || 'Student';
+            document.getElementById('result-profile-class').textContent = `Class: ${studentDetails.classApplying || '-'}`;
+            document.getElementById('result-profile-admission').textContent = `Admission No: ${studentDetails.admissionNo || '-'} · Roll No: ${studentDetails.rollNumber || '-'}`;
+            document.getElementById('result-father-name').textContent = studentDetails.fatherName || '-';
+            document.getElementById('result-parent-mobile').textContent = studentDetails.parentMobile || '-';
+            document.getElementById('result-student-photo').style.display = 'none';
+            document.getElementById('result-student-avatar').style.display = 'flex';
+            if (studentDetails.photoUrl) {
+                const photo = document.getElementById('result-student-photo');
+                photo.onload = () => { photo.style.display = 'block'; document.getElementById('result-student-avatar').style.display = 'none'; };
+                photo.onerror = () => { photo.style.display = 'none'; document.getElementById('result-student-avatar').style.display = 'flex'; };
+                photo.src = studentDetails.photoUrl;
+            }
             document.getElementById('result-test-date').textContent = new Date().toLocaleDateString('en-IN', {
                 day: '2-digit',
                 month: 'short',
@@ -2116,6 +2182,7 @@
             document.getElementById('total-marks').textContent = results.totalMarks;
             document.getElementById('marks-obtained').textContent = results.marksObtained;
             document.getElementById('percentage').textContent = `${results.percentage}%`;
+            document.getElementById('result-score-percent').textContent = `${results.percentage}%`;
             
             // Set division status
             const statusElement = document.getElementById('result-status');
