@@ -109,6 +109,7 @@
         .card-7 .card-icon { background: linear-gradient(135deg, #ffd257, #f7b500); color: #0d2b6b; }
         /* 🆕 About & Toppers Card Color */
         .card-8 .card-icon { background: linear-gradient(135deg, #e0f2fe, #bae6fd); color: #0369a1; }
+        .card-9 .card-icon { background: linear-gradient(135deg, #fff4cc, #ffe08a); color: #8a5a00; }
         
         .card-title {
             font-size: 1.1rem;
@@ -146,6 +147,8 @@
         .card-7:hover .card-icon { box-shadow: 0 8px 20px rgba(247,181,0,0.4); }
         .card-8:hover .card-btn { background: #0369a1; color: #fff; }
         .card-8:hover .card-icon { box-shadow: 0 8px 20px rgba(14,165,233,0.3); }
+        .card-9:hover .card-btn { background: #9a6700; color:#fff; }
+        .card-9:hover .card-icon { box-shadow: 0 8px 20px rgba(247,181,0,0.32); }
 
         /* NEW badge for Study Material card */
         .card-new-badge {
@@ -332,6 +335,14 @@
             <p class="card-desc">Manage about page & toppers list</p>
             <button class="card-btn">Open →</button>
         </div>
+
+        <!-- Card 9: OMR Sheet Generator -->
+        <div class="admin-card card-9" id="omrSheetCard">
+            <div class="card-icon"><i class="fas fa-file-circle-check"></i></div>
+            <h3 class="card-title">OMR Sheet Generator</h3>
+            <p class="card-desc">Create and print student OMR answer sheets</p>
+            <button class="card-btn">Open →</button>
+        </div>
     </div>
 </div>
 
@@ -439,6 +450,7 @@
     const attendanceCard = document.getElementById('attendanceCard');
     const studyMaterialCard = document.getElementById('studyMaterialCard');
     const aboutToppersCard = document.getElementById('aboutToppersCard'); // 🆕
+    const omrSheetCard = document.getElementById('omrSheetCard');
 
     // Authentication & Fetch Coaching Details
     onAuthStateChanged(auth, async (user) => {
@@ -497,6 +509,10 @@
     // 🆕 About & Toppers Card Navigation
     aboutToppersCard.addEventListener('click', () => {
         window.open('admin-about.html', '_blank');
+    });
+
+    omrSheetCard.addEventListener('click', () => {
+        window.open('omr-sheet.html', '_blank');
     });
 
     // Logout
