@@ -1365,6 +1365,66 @@
         #page-test-screen .container {
             padding-bottom: 5px;
         }
+
+        /* Professional result sheet */
+        .result-container { max-width:900px; }
+        .result-top-actions { justify-content:flex-end; max-width:790px; margin:0 auto 10px; }
+        .coaching-info { border-bottom:1px solid #dce5f0; padding-bottom:15px; margin-bottom:16px; }
+        .result-brand-logo { width:58px; height:58px; border-radius:16px; }
+        .coaching-name { font-size:1.35rem; letter-spacing:.04em; margin:0; text-align:left; }
+        .coaching-location { margin:0; font-size:.82rem; }
+        .coaching-details { gap:8px 18px; margin-top:8px; }
+        .result-title { display:inline-flex; align-items:center; gap:9px; font-size:.82rem; font-weight:800; letter-spacing:.1em; padding:9px 13px; margin-bottom:14px; }
+        .student-profile-result { padding:20px 22px; margin-bottom:14px; min-height:132px; }
+        .student-profile-result img,.student-avatar-fallback { width:82px; height:82px; }
+        .profile-main h2 { font-size:1.35rem; }
+        .score-highlight { min-width:122px; padding:13px 16px; border:1px solid rgba(255,255,255,.2); }
+        .score-highlight strong { font-size:1.9rem; }
+        .student-info-result { background:#f7f9fc; border:1px solid #e8edf4; border-radius:13px; padding:13px 15px; margin-bottom:20px; gap:10px 18px; }
+        .student-info-item { padding:2px 0; border:0; }
+        .student-info-item strong { color:#718096; font-size:.65rem; letter-spacing:.08em; }
+        .student-info-item span { color:#1e293b; font-size:.85rem; }
+        .result-section-heading { display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin:0 0 10px; color:#172554; }
+        .result-section-heading span { font-size:.75rem; font-weight:800; letter-spacing:.09em; }
+        .result-section-heading small { color:#94a3b8; font-size:.72rem; }
+        .result-metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-bottom:16px; }
+        .metric-card { min-height:106px; padding:13px; border:1px solid #e5eaf2; border-radius:14px; background:#fff; position:relative; overflow:hidden; }
+        .metric-card>span { display:block; color:#64748b; font-size:.72rem; font-weight:650; }
+        .metric-card>strong { display:block; margin-top:9px; color:#172554; font-size:1.45rem; line-height:1.1; }
+        .metric-card>strong small { color:#94a3b8; font-size:.82rem; font-weight:600; }
+        .metric-card>i { position:absolute; right:12px; bottom:11px; color:#cbd5e1; font-size:1rem; }
+        .metric-primary { background:#f0fdfa; border-color:#c9eee8; }
+        .metric-primary>strong,.metric-primary>i { color:#0f766e; }
+        .metric-card .highlight { color:#0f766e; }
+        .metric-card .wrong { color:#d14b61; }
+        .result-status { min-height:48px; margin:8px 0 0; padding:10px; border-width:1px; font-size:1rem; letter-spacing:.03em; }
+        .first-division { background:#ecfdf5; border-color:#a7f3d0; color:#047857; }
+        .second-division,.third-division { background:#fffbeb; border-color:#fde68a; color:#b45309; }
+        .fail-status { background:#fff1f2; border-color:#fecdd3; color:#be123c; }
+        .result-footer { max-width:740px; margin:10px auto 0; }
+        @media(max-width:600px) {
+            .result-top-actions { justify-content:stretch; }
+            .result-brand { justify-content:flex-start; }
+            .result-brand-logo { width:46px; height:46px; }
+            .coaching-name { font-size:1.03rem; }
+            .coaching-info { text-align:left; }
+            .coaching-details { justify-content:flex-start; flex-direction:row; align-items:flex-start; }
+            .student-profile-result { min-height:unset; padding:14px; }
+            .score-highlight { min-width:84px; }
+            .result-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+            .metric-card { min-height:91px; padding:11px; }
+            .metric-card>strong { font-size:1.3rem; }
+            .student-info-result { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        }
+        @media(max-width:380px) {
+            .student-info-result { grid-template-columns:1fr 1fr; }
+            .student-profile-result { flex-wrap:nowrap; }
+            .student-profile-result img,.student-avatar-fallback { width:58px; height:58px; }
+            .profile-main h2 { font-size:.98rem; }
+            .profile-main p { font-size:.75rem; }
+            .score-highlight { min-width:72px; padding:8px; }
+            .score-highlight strong { font-size:1.4rem; }
+        }
     </style>
 </head>
 <body>
@@ -1556,14 +1616,6 @@
                 </div>
                 <div class="student-info-result">
                     <div class="student-info-item">
-                        <strong>Student Name:</strong>
-                        <span id="result-student-name">-</span>
-                    </div>
-                    <div class="student-info-item">
-                        <strong>Roll Number:</strong>
-                        <span id="result-roll-number">-</span>
-                    </div>
-                    <div class="student-info-item">
                         <strong>Test Name:</strong>
                         <span id="result-test-name">-</span>
                     </div>
@@ -1574,46 +1626,16 @@
                         <span id="result-test-date">-</span>
                     </div>
                 </div>
+                <span id="result-student-name" hidden></span><span id="result-roll-number" hidden></span>
                 
-                <!-- Result Table -->
-                <table class="result-table">
-                    <thead>
-                        <tr>
-                            <th>Parameter</th>
-                            <th>Value</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Total Questions</td>
-                            <td id="total-questions">0</td>
-                        </tr>
-                        <tr>
-                            <td>Attempted</td>
-                            <td id="attempted-questions">0</td>
-                        </tr>
-                        <tr>
-                            <td>Correct Answers</td>
-                            <td id="correct-answers" class="highlight">0</td>
-                        </tr>
-                        <tr>
-                            <td>Wrong Answers</td>
-                            <td id="wrong-answers" class="wrong">0</td>
-                        </tr>
-                        <tr>
-                            <td>Total Marks</td>
-                            <td id="total-marks">0</td>
-                        </tr>
-                        <tr>
-                            <td>Marks Obtained</td>
-                            <td id="marks-obtained" class="highlight">0</td>
-                        </tr>
-                        <tr>
-                            <td>Percentage</td>
-                            <td id="percentage" class="highlight">0%</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="result-section-heading"><span>PERFORMANCE SUMMARY</span><small>Test score breakdown</small></div>
+                <div class="result-metrics">
+                    <div class="metric-card metric-primary"><span>Marks Earned</span><strong><span id="marks-obtained">0</span></strong><small> / <span id="total-marks">0</span></small><i class="fas fa-bullseye"></i></div>
+                    <div class="metric-card"><span>Correct</span><strong id="correct-answers" class="highlight">0</strong><i class="fas fa-check-circle"></i></div>
+                    <div class="metric-card"><span>Incorrect</span><strong id="wrong-answers" class="wrong">0</strong><i class="fas fa-times-circle"></i></div>
+                    <div class="metric-card"><span>Attempted</span><strong id="attempted-questions">0</strong><small> / <span id="total-questions">0</span><i class="fas fa-list-check"></i></div>
+                </div>
+                <span id="percentage" hidden></span>
                 
                 <!-- Result Status -->
                 <div id="result-status" class="result-status">
