@@ -1476,6 +1476,22 @@
             .certificate-stat { flex-direction:column; text-align:center; gap:3px; }
         }
 
+        /* Keep the certificate heading and status visible in print/PDF too. */
+        .certificate-trophy { width:58px; height:58px; margin-left:auto; color:inherit; filter:drop-shadow(0 5px 7px rgba(0,0,0,.28)); }
+        .result-title { display:flex !important; width:auto; justify-content:space-between; align-items:center; flex:1 1 auto; color:#082b51 !important; }
+        .result-heading-label { display:flex; align-items:center; gap:12px; color:#082b51 !important; font-size:inherit; letter-spacing:inherit; white-space:nowrap; }
+        .result-heading-label i { display:grid; place-items:center; width:42px; height:42px; border-radius:11px; background:#1689eb; color:#fff; font-size:1.1rem; }
+        #result-status.result-status { display:inline-flex; flex:0 0 auto; align-items:center; justify-content:center; gap:7px; width:auto; min-width:92px; min-height:38px; margin:0; padding:8px 15px; border:0; border-radius:999px; background:#08a658; color:#fff !important; font-size:.9rem; font-weight:800; white-space:nowrap; }
+        #result-status.fail-status { background:#cf2448 !important; color:#fff !important; }
+        #result-status.first-division { background:#08a658 !important; color:#fff !important; }
+        #result-status.second-division,#result-status.third-division { background:#dd9200 !important; color:#fff !important; }
+        @media(max-width:600px) {
+            .certificate-trophy { width:42px; height:42px; }
+            .result-heading-label { gap:7px; font-size:.84rem; }
+            .result-heading-label i { width:34px; height:34px; font-size:.9rem; }
+            #result-status.result-status { min-width:70px; padding:7px 9px; font-size:.7rem; }
+        }
+
         /* Professional result sheet */
         .result-container { max-width:900px; }
         .result-top-actions { justify-content:flex-end; max-width:790px; margin:0 auto 10px; }
@@ -1694,11 +1710,18 @@
                     <div class="certificate-brand">
                         <img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" alt="Quest Coaching Centre">
                         <div><h1>QUEST COACHING CENTRE</h1><p>In Front of S.S. Girls High School, Gopalganj</p><small>ONLINE TEST • STUDENT PERFORMANCE</small></div>
-                        <i class="fas fa-trophy certificate-trophy"></i>
+                        <svg class="certificate-trophy" viewBox="0 0 96 96" role="img" aria-label="Trophy">
+                            <defs><linearGradient id="cupGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1a3"/><stop offset=".32" stop-color="#ffd43b"/><stop offset=".68" stop-color="#f5a900"/><stop offset="1" stop-color="#c87900"/></linearGradient></defs>
+                            <path fill="none" stroke="url(#cupGold)" stroke-width="9" stroke-linecap="round" d="M25 24H10v12c0 15 10 23 24 23m37-35h15v12c0 15-10 23-24 23"/>
+                            <path fill="url(#cupGold)" d="M25 13h46v23c0 19-9 31-23 35-14-4-23-16-23-35V13Zm18 58h10v10H43zM30 81h36v9H30z"/>
+                            <path fill="#fff3b0" opacity=".8" d="M32 20h8v28c0 6 2 11 5 15-8-4-13-13-13-27V20Z"/>
+                            <path fill="#b76b00" d="m48 27 4 9 10 1-7 7 2 10-9-5-9 5 2-10-7-7 10-1z"/>
+                        </svg>
                     </div>
                     <div class="certificate-gold-line"></div>
                 </div>
-                <div class="result-title"><span><i class="fas fa-file-alt"></i> ONLINE TEST RESULT</span><div id="result-status" class="result-status"></div></div>
+                <div class="result-title"><strong class="result-heading-label"><i class="fas fa-file-alt"></i> ONLINE TEST RESULT</strong></div>
+                <div id="result-status" class="result-status" style="display:none"></div>
 
                 <div class="certificate-student">
                     <img id="result-student-photo" alt="Student photo" style="display:none">
