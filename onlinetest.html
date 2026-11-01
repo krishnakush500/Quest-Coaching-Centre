@@ -1582,6 +1582,29 @@
             #page-test-list .test-detail { padding:5px 7px; font-size:.69rem; }
             #page-test-list .start-test { min-width:104px; min-height:40px; }
         }
+        #page-test-list .online-test-heading { margin:17px auto 18px; padding:8px 24px; }
+        #page-test-list .online-test-heading>span { display:none; }
+        #page-test-list .online-test-heading h2 { font-size:clamp(1.1rem,3vw,1.7rem); }
+        #page-test-list .test-card { grid-template-columns:minmax(0,1fr) auto; gap:14px; min-height:112px; padding:17px 20px; }
+        #page-test-list .test-card-content { grid-column:1; grid-row:1; padding-left:0; border-left:0; }
+        #page-test-list .start-test { grid-column:2; grid-row:1; align-self:center; }
+        @media(max-width:650px) {
+            #page-test-list .online-test-heading { margin:13px auto 15px; padding:6px 20px; }
+            #page-test-list .online-test-heading h2 { font-size:1.25rem; }
+            #page-test-list .test-card { grid-template-columns:minmax(0,1fr) auto; gap:9px; min-height:0; padding:12px 13px; }
+            #page-test-list .test-card-content { grid-column:1; grid-row:1; }
+            #page-test-list .test-title { font-size:.98rem; margin-bottom:7px; }
+            #page-test-list .test-details { gap:5px; }
+            #page-test-list .test-detail { padding:5px 7px; font-size:.7rem; }
+            #page-test-list .start-test { grid-column:2; grid-row:1; justify-self:stretch; min-width:88px; min-height:40px; padding:0 10px; font-size:.88rem; }
+            #page-test-list .start-test i { display:none; }
+        }
+        @media(max-width:370px) {
+            #page-test-list .test-card { grid-template-columns:minmax(0,1fr) 78px; gap:7px; padding:10px; }
+            #page-test-list .test-title { font-size:.9rem; }
+            #page-test-list .test-detail { padding:4px 6px; font-size:.65rem; }
+            #page-test-list .start-test { min-width:0; min-height:37px; padding:0 6px; font-size:.8rem; }
+        }
 
         /* Keep the certificate heading and status visible in print/PDF too. */
         .certificate-trophy { width:58px; height:58px; margin-left:auto; color:inherit; filter:drop-shadow(0 5px 7px rgba(0,0,0,.28)); }
@@ -2004,7 +2027,6 @@
             const safeText = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
             container.innerHTML = tests.map((test, index) => `
                 <article class="card test-card test-tone-${index % 4}" data-test-id="${safeText(test.id)}">
-                    <div class="test-book-icon"><i class="fas fa-book-open"></i></div>
                     <div class="test-card-content">
                         <h3 class="test-title">${safeText(test.testName || 'Untitled Test')}</h3>
                         <div class="test-details">
