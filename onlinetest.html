@@ -1422,7 +1422,7 @@
         .result-footer { display:none; }
         .answer-key-btn { background:#0b775d; color:#fff; }
         .answer-key-btn:hover { background:#075f4a; }
-        .answer-key-document { position:absolute; left:-100000px; top:0; width:760px; padding:34px; background:#fff; color:#172033; font:14px/1.5 Arial,sans-serif; }
+        .answer-key-document { position:fixed; left:0; top:0; z-index:-1; width:760px; padding:34px; background:#fff; color:#172033; font:14px/1.5 Arial,sans-serif; }
         .answer-key-document * { box-sizing:border-box; }
         .answer-key-header { display:flex; align-items:center; gap:15px; padding-bottom:14px; border-bottom:3px solid #e4b52f; }
         .answer-key-header img { width:62px; height:62px; border-radius:50%; object-fit:cover; border:2px solid #e4b52f; }
@@ -2554,14 +2554,21 @@
                 document.body.appendChild(documentNode);
                 await Promise.all(Array.from(documentNode.images).map(image => image.decode?.().catch(() => {}) || Promise.resolve()));
                 const safeRoll = String(studentDetails.rollNumber || 'student').replace(/[^a-z0-9_-]/gi, '_');
-                await window.html2pdf().set({
+                const pdfOptions = {
                     margin: [10, 10, 12, 10],
                     filename: `Quest_Answer_Key_${safeRoll}_${Date.now()}.pdf`,
                     image: { type: 'jpeg', quality: 0.96 },
                     html2canvas: { scale: 2, useCORS: true, allowTaint: false, backgroundColor: '#ffffff', logging: false },
                     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                     pagebreak: { mode: ['css', 'legacy', 'avoid-all'] }
-                }).from(documentNode).save();
+                };
+                try {
+                    await window.html2pdf().set(pdfOptions).from(documentNode).save();
+                } catch (renderError) {
+                    console.warn('Answer key render with student photo failed; retrying without remote photos.', renderError);
+                    documentNode.querySelectorAll('img').forEach(img => img.remove());
+                    await window.html2pdf().set(pdfOptions).from(documentNode).save();
+                }
             } catch (error) {
                 console.error('Answer key PDF generation failed:', error);
                 alert('Could not generate the answer key PDF. Please try again.');
