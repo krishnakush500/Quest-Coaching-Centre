@@ -2691,112 +2691,96 @@
         }
 
         async function downloadAnswerKeyPDF() {
-            if (!currentQuestions.length || !window.jspdf?.jsPDF || !window.html2canvas) {
-                showToast('PDF tools did not load. Check your connection and reload the page.', 'error');
+            if (!currentQuestions.length || !window.jspdf?.jsPDF) {
+                showToast('PDF download is unavailable. Reload the page and try again.', 'error');
                 return;
             }
             const button = document.getElementById('download-answer-key');
             const originalButton = button.innerHTML;
-            let documentNode;
             button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing PDF...';
-            const pdfOverlay = document.getElementById('submission-overlay');
-            const overlayTitle = pdfOverlay.querySelector('.submission-text');
-            const overlayDescription = pdfOverlay.querySelector('.submission-subtext');
-            const previousOverlayTitle = overlayTitle.textContent;
-            const previousOverlayDescription = overlayDescription.textContent;
-            overlayTitle.textContent = 'Preparing Answer Key PDF';
-            overlayDescription.textContent = 'Adding student details and question-wise answers. Please wait.';
-            pdfOverlay.style.display = 'flex';
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating PDF...';
             try {
-                const questionsHtml = currentQuestions.map((question, index) => {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const left = 14, right = 196, bottom = 282, lineHeight = 5;
+                let y = 16;
+                const addText = (text, size = 10, weight = 'normal', color = [28, 39, 56]) => {
+                    pdf.setFont('helvetica', weight);
+                    pdf.setFontSize(size);
+                    pdf.setTextColor(...color);
+                    const lines = pdf.splitTextToSize(String(text ?? ''), right - left);
+                    for (const line of lines) {
+                        if (y > bottom) { pdf.addPage(); y = 16; }
+                        pdf.text(line, left, y);
+                        y += lineHeight;
+                    }
+                };
+
+                pdf.setFillColor(9, 45, 80);
+                pdf.rect(0, 0, 210, 34, 'F');
+                pdf.setTextColor(255, 255, 255);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setFontSize(17);
+                pdf.text('QUEST COACHING CENTRE', left, 15);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setFontSize(9);
+                pdf.text('ONLINE TEST · ANSWER KEY AND STUDENT RESPONSE', left, 23);
+                pdf.text('In Front of S.S. Girls High School, Gopalganj', left, 29);
+                y = 43;
+
+                // Add the student's photo when the public photo URL permits access.
+                if (studentDetails.photoUrl) {
+                    try {
+                        const response = await fetch(studentDetails.photoUrl, { mode: 'cors' });
+                        if (!response.ok) throw new Error('Photo is unavailable');
+                        const photoBlob = await response.blob();
+                        const photoData = await new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => resolve(reader.result);
+                            reader.onerror = reject;
+                            reader.readAsDataURL(photoBlob);
+                        });
+                        const photoType = photoBlob.type.includes('png') ? 'PNG' : 'JPEG';
+                        pdf.addImage(photoData, photoType, 164, 40, 30, 36);
+                    } catch (photoError) {
+                        console.info('Student photo skipped in PDF because the image could not be fetched.');
+                    }
+                }
+
+                addText(currentTest.testName || 'Online Test - Answer Key', 14, 'bold', [9, 45, 80]);
+                addText(`Student: ${studentDetails.name || '—'}    Roll No.: ${studentDetails.rollNumber || '—'}`, 10, 'bold');
+                addText(`Admission No.: ${studentDetails.admissionNo || '—'}    Class: ${studentDetails.classApplying || '—'}`);
+                addText(`Father's Name: ${studentDetails.fatherName || '—'}    Contact: ${studentDetails.parentMobile || '—'}`);
+                addText(`School: ${studentDetails.schoolName || '—'}    Date: ${new Date().toLocaleDateString('en-IN')}`);
+                addText(`Score: ${currentResultData?.marksObtained || 0}/${currentResultData?.totalMarks || 0}    Correct: ${currentResultData?.correct || 0}    Incorrect: ${currentResultData?.wrong || 0}`, 10, 'bold');
+                y += 3;
+
+                currentQuestions.forEach((question, index) => {
                     const options = getQuestionOptions(question);
                     const correctLabel = getAnswerLabel(question.correctAnswer, options);
                     const selectedLabel = getAnswerLabel(studentAnswers[index], options);
-                    const selectedText = studentAnswers[index]
-                        ? `${selectedLabel}${options[selectedLabel.charCodeAt(0) - 65] ? ` — ${options[selectedLabel.charCodeAt(0) - 65]}` : ''}`
-                        : 'Not Attempted';
-                    const correctText = correctLabel
-                        ? `${correctLabel}${options[correctLabel.charCodeAt(0) - 65] ? ` — ${options[correctLabel.charCodeAt(0) - 65]}` : ''}`
-                        : 'Not Available';
-                    const optionsHtml = options.map((option, optionIndex) => {
+                    if (y > bottom - 24) { pdf.addPage(); y = 16; }
+                    pdf.setDrawColor(210, 220, 232);
+                    pdf.setFillColor(242, 247, 252);
+                    pdf.roundedRect(left - 2, y - 4, right - left + 4, 11, 2, 2, 'FD');
+                    addText(`Question ${index + 1}: ${question.text || question.question || ''}`, 10, 'bold', [15, 46, 82]);
+                    options.forEach((option, optionIndex) => {
                         const label = String.fromCharCode(65 + optionIndex);
-                        const isCorrect = label === correctLabel;
-                        const isSelected = label === selectedLabel;
-                        const classes = ['answer-key-option', isCorrect ? 'is-correct' : '', isSelected ? 'is-selected' : ''].filter(Boolean).join(' ');
-                        return `<div class="${classes}"><b>${label})</b> ${escapeAnswerKeyHtml(option)}${isCorrect ? ' ✓ Correct' : ''}${isSelected ? ' · Your choice' : ''}</div>`;
-                    }).join('');
-                    return `<section class="answer-key-question"><h3>Question ${index + 1}. ${escapeAnswerKeyHtml(question.text || question.question || '')}</h3><div class="answer-key-options">${optionsHtml}</div><div class="answer-key-result"><span><b>Student selected:</b> ${escapeAnswerKeyHtml(selectedText)}</span><span><b>Correct answer:</b> ${escapeAnswerKeyHtml(correctText)}</span></div></section>`;
-                }).join('');
-
-                const photoMarkup = studentDetails.photoUrl
-                    ? `<img src="${escapeAnswerKeyHtml(studentDetails.photoUrl)}" crossorigin="anonymous" alt="Student photo">`
-                    : '<div style="width:78px;height:92px;background:#edf2f7;display:grid;place-items:center;color:#718096">Student</div>';
-                documentNode = document.createElement('div');
-                documentNode.className = 'answer-key-document';
-                documentNode.style.visibility = 'visible';
-                documentNode.innerHTML = `
-                    <header class="answer-key-header"><img src="https://i.ibb.co/hF9tmnpB/20250903-202922.jpg" crossorigin="anonymous" alt="Quest Coaching Centre"><div><h1>QUEST COACHING CENTRE</h1><p>In Front of S.S. Girls High School, Gopalganj</p><p>Online Test · Answer Key and Student Response</p></div></header>
-                    <div class="answer-key-title">${escapeAnswerKeyHtml(currentTest.testName || 'Online Test')} — Answer Key</div>
-                    <section class="answer-key-student">${photoMarkup}<div><p><b>Student:</b> ${escapeAnswerKeyHtml(studentDetails.name)}</p><p><b>Roll No.:</b> ${escapeAnswerKeyHtml(studentDetails.rollNumber)}</p><p><b>Admission No.:</b> ${escapeAnswerKeyHtml(studentDetails.admissionNo || '—')}</p><p><b>Class:</b> ${escapeAnswerKeyHtml(studentDetails.classApplying || '—')}</p><p><b>Father's Name:</b> ${escapeAnswerKeyHtml(studentDetails.fatherName || '—')}</p><p><b>Contact:</b> ${escapeAnswerKeyHtml(studentDetails.parentMobile || '—')}</p><p><b>School:</b> ${escapeAnswerKeyHtml(studentDetails.schoolName || '—')}</p><p><b>Date:</b> ${escapeAnswerKeyHtml(new Date().toLocaleDateString('en-IN'))}</p></div></section>
-                    <p class="answer-key-summary"><b>Score:</b> ${escapeAnswerKeyHtml(currentResultData?.marksObtained || '0')} / ${escapeAnswerKeyHtml(currentResultData?.totalMarks || '0')} &nbsp; · &nbsp; <b>Correct:</b> ${escapeAnswerKeyHtml(currentResultData?.correct || 0)} &nbsp; · &nbsp; <b>Incorrect:</b> ${escapeAnswerKeyHtml(currentResultData?.wrong || 0)}</p>
-                    <div>${questionsHtml}</div>
-                `;
-                document.body.appendChild(documentNode);
-                await Promise.all(Array.from(documentNode.images).map(image => image.decode?.().catch(() => {}) || Promise.resolve()));
-                const safeRoll = String(studentDetails.rollNumber || 'student').replace(/[^a-z0-9_-]/gi, '_');
-                documentNode.classList.add('pdf-rendering');
-                documentNode.style.visibility = 'visible';
-                await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-                let canvas;
-                try {
-                    canvas = await html2canvas(documentNode, { scale: 1.5, useCORS: true, allowTaint: false, backgroundColor: '#ffffff', logging: false, windowWidth: 900 });
-                } catch (photoError) {
-                    console.warn('A remote image blocked PDF capture; retrying with image placeholders.', photoError);
-                    documentNode.querySelectorAll('img').forEach(img => {
-                        const placeholder = document.createElement('div');
-                        placeholder.style.cssText = 'width:78px;height:92px;background:#edf2f7;border:1px solid #d3dfec;border-radius:7px;display:grid;place-items:center;color:#718096;font:12px Arial';
-                        placeholder.textContent = img.alt || 'Photo';
-                        img.replaceWith(placeholder);
+                        const flags = [label === correctLabel ? '  [CORRECT]' : '', label === selectedLabel ? '  [STUDENT SELECTED]' : ''].join('');
+                        addText(`${label}) ${option}${flags}`, 9, label === correctLabel || label === selectedLabel ? 'bold' : 'normal');
                     });
-                    canvas = await html2canvas(documentNode, { scale: 1.5, backgroundColor: '#ffffff', logging: false, windowWidth: 900 });
-                }
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const pageWidth = 190;
-                const pageHeight = 277;
-                const pagePixelHeight = Math.floor(canvas.width * pageHeight / pageWidth);
-                const scaleFactor = canvas.width / documentNode.offsetWidth;
-                const questionStarts = Array.from(documentNode.querySelectorAll('.answer-key-question'))
-                    .map(question => Math.round((question.getBoundingClientRect().top - documentNode.getBoundingClientRect().top) * scaleFactor));
-                let offsetY = 0;
-                let page = 0;
-                while (offsetY < canvas.height) {
-                    const limit = Math.min(offsetY + pagePixelHeight, canvas.height);
-                    const safeBreak = questionStarts.filter(start => start > offsetY + pagePixelHeight * .55 && start <= limit).pop();
-                    const sliceHeight = limit < canvas.height && safeBreak ? safeBreak - offsetY : limit - offsetY;
-                    const pageCanvas = document.createElement('canvas');
-                    pageCanvas.width = canvas.width;
-                    pageCanvas.height = sliceHeight;
-                    pageCanvas.getContext('2d').drawImage(canvas, 0, offsetY, canvas.width, sliceHeight, 0, 0, canvas.width, sliceHeight);
-                    if (page > 0) pdf.addPage();
-                    const imageData = pageCanvas.toDataURL('image/jpeg', .94);
-                    const imageHeight = sliceHeight * pageWidth / canvas.width;
-                    // Avoid passing an undefined alias; jsPDF versions differ in how
-                    // they parse optional addImage arguments in browser builds.
-                    pdf.addImage(imageData, 'JPEG', 10, 10, pageWidth, imageHeight);
-                    offsetY += sliceHeight;
-                    page++;
-                }
-                pdf.save(`Quest_Answer_Key_${safeRoll}_${Date.now()}.pdf`);
+                    const correctText = correctLabel ? `${correctLabel}${options[correctLabel.charCodeAt(0) - 65] ? ` — ${options[correctLabel.charCodeAt(0) - 65]}` : ''}` : 'Not available';
+                    const selectedText = selectedLabel ? `${selectedLabel}${options[selectedLabel.charCodeAt(0) - 65] ? ` — ${options[selectedLabel.charCodeAt(0) - 65]}` : ''}` : 'Not attempted';
+                    addText(`Student selected: ${selectedText}    Correct answer: ${correctText}`, 9, 'bold', [24, 92, 71]);
+                    y += 3;
+                });
+
+                const safeRoll = String(studentDetails.rollNumber || 'student').replace(/[^a-z0-9_-]/gi, '_');
+                pdf.save(`Quest_Answer_Key_${safeRoll}.pdf`);
             } catch (error) {
                 console.error('Answer key PDF generation failed:', error);
-                showToast(`Could not generate the answer key PDF. ${error?.message || 'Please try again.'}`, 'error');
+                showToast('Could not download the answer key PDF. Please try again.', 'error');
             } finally {
-                if (documentNode?.parentNode) documentNode.remove();
-                pdfOverlay.style.display = 'none';
-                overlayTitle.textContent = previousOverlayTitle;
-                overlayDescription.textContent = previousOverlayDescription;
                 button.disabled = false;
                 button.innerHTML = originalButton;
             }
