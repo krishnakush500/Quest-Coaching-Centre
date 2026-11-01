@@ -66,7 +66,16 @@
         .bubble{width:3.2mm;height:3.2mm;border:1px solid #c44d8b;color:#be397b;font-size:5pt;font-weight:700}
         .sheet-footer{display:none}
         .sheet-bottom-signatures{margin-top:2mm}
-        @media print{.sheet,.sheet.ready{height:297mm;min-height:297mm;padding:7mm 9mm;overflow:hidden}.q-row{height:4.05mm}.sheet:before,.sheet:after{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+        @media print{
+            @page{size:A4 portrait;margin:0}
+            html,body{width:210mm!important;height:297mm!important;margin:0!important;padding:0!important;background:#fff!important}
+            .app-shell{display:block!important;width:210mm!important;max-width:none!important;margin:0!important;padding:0!important;background:#fff!important}
+            .page-head,.work-card,.preview-actions{display:none!important}
+            .sheet,.sheet.ready{display:block!important;position:relative!important;width:210mm!important;height:297mm!important;min-height:297mm!important;margin:0!important;padding:7mm 9mm!important;overflow:hidden!important;box-shadow:none!important;background:#fff!important;page-break-after:always;break-after:page}
+            .sheet:last-child{page-break-after:auto;break-after:auto}
+            .sheet,.sheet *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+            .q-row{height:4.05mm!important}
+        }
     </style>
 </head>
 <body>
