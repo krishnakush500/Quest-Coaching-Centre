@@ -2702,9 +2702,22 @@
             button.disabled = true;
             button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating PDF...';
             try {
-                if (!window.pdfMake?.createPdf) throw new Error('PDF engine unavailable');
-                // pdfmake's bundled Roboto font supports Devanagari; jsPDF's built-in Helvetica does not.
+                if (!window.pdfMake?.createPdf || !window.html2canvas) throw new Error('PDF renderer unavailable');
                 const clean = value => String(value ?? '').replace(/\s+/g, ' ').trim();
+                const renderHindiText = async html => {
+                    const node = document.createElement('div');
+                    node.setAttribute('aria-hidden', 'true');
+                    node.style.cssText = 'position:fixed;left:-12000px;top:0;width:940px;box-sizing:border-box;padding:22px 26px;font-family:Arial,"Nirmala UI","Mangal",sans-serif;color:#14243d;background:#fff;';
+                    node.innerHTML = html;
+                    document.body.appendChild(node);
+                    try {
+                        if (document.fonts?.ready) await document.fonts.ready;
+                        const canvas = await html2canvas(node, { scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false });
+                        return { data: canvas.toDataURL('image/png'), height: canvas.height * 510 / canvas.width };
+                    } finally {
+                        node.remove();
+                    }
+                };
                 const safePhoto = async url => {
                     if (!url) return null;
                     try {
@@ -2729,56 +2742,50 @@
                     [{ text: "FATHER'S NAME", style: 'label' }, { text: clean(studentDetails.fatherName) || '—', style: 'value' }],
                     [{ text: 'SCHOOL', style: 'label' }, { text: clean(studentDetails.schoolName) || '—', style: 'value' }]
                 ];
-                const questionBlocks = currentQuestions.map((question, index) => {
+                const testTitleImage = await renderHindiText(`<div style="font-size:28px;font-weight:800;line-height:1.35;color:#0b3158">${escapeAnswerKeyHtml(clean(currentTest.testName) || 'Online Test Result')}</div>`);
+                const questionBlocks = [];
+                for (let index = 0; index < currentQuestions.length; index++) {
+                    const question = currentQuestions[index];
                     const options = getQuestionOptions(question);
                     const correctLabel = getAnswerLabel(question.correctAnswer, options);
                     const selectedLabel = getAnswerLabel(studentAnswers[index], options);
                     const correctIndex = /^[A-D]$/.test(correctLabel) ? correctLabel.charCodeAt(0) - 65 : -1;
                     const selectedIndex = /^[A-D]$/.test(selectedLabel) ? selectedLabel.charCodeAt(0) - 65 : -1;
-                    const answers = options.map((option, optionIndex) => {
+                    const answerRows = options.map((option, optionIndex) => {
                         const letter = String.fromCharCode(65 + optionIndex);
                         const isCorrect = optionIndex === correctIndex;
                         const isSelected = optionIndex === selectedIndex;
-                        return {
-                            columns: [
-                                { width: 22, text: `${letter})`, bold: isCorrect || isSelected, color: isCorrect ? '#07875A' : isSelected ? '#B45309' : '#34445C' },
-                                { width: '*', text: clean(option) || ' ', bold: isCorrect || isSelected, color: isCorrect ? '#07875A' : isSelected ? '#B45309' : '#34445C' },
-                                { width: 110, text: [isCorrect ? 'CORRECT' : '', isSelected ? 'YOUR ANSWER' : ''].filter(Boolean).join('  '), bold: true, fontSize: 8, color: isCorrect ? '#07875A' : '#B45309', alignment: 'right' }
-                            ], columnGap: 4, margin: [0, 2, 0, 2]
-                        };
+                        const rowColor = isCorrect ? '#E8F8F0' : isSelected ? '#FFF3E3' : '#F6F8FC';
+                        const badge = [isCorrect ? '<span style="color:#07875a;font-weight:700">&nbsp; CORRECT</span>' : '', isSelected ? '<span style="color:#a65b00;font-weight:700">&nbsp; YOUR ANSWER</span>' : ''].join('');
+                        return `<div style="display:flex;align-items:flex-start;gap:12px;margin-top:7px;padding:10px 12px;border-radius:9px;background:${rowColor};font-size:18px;line-height:1.5"><strong style="min-width:30px;color:${isCorrect ? '#07875a' : isSelected ? '#a65b00' : '#34445c'}">${letter})</strong><span style="flex:1;overflow-wrap:anywhere">${escapeAnswerKeyHtml(clean(option)) || '&nbsp;'}</span><span style="font:700 12px Arial,sans-serif;white-space:nowrap">${badge}</span></div>`;
                     });
                     const correctText = correctIndex >= 0 ? `${correctLabel}) ${clean(options[correctIndex])}` : clean(correctLabel) || 'Not available';
                     const selectedText = selectedIndex >= 0 ? `${selectedLabel}) ${clean(options[selectedIndex])}` : clean(selectedLabel) || 'Not attempted';
-                    return {
-                        unbreakable: true,
-                        stack: [
-                            { text: [{ text: `QUESTION ${String(index + 1).padStart(2, '0')}  `, color: '#1265C5', bold: true }, { text: clean(question.text || question.question) || 'Question text unavailable', color: '#14243D', bold: true }], style: 'questionTitle', margin: [0, 0, 0, 5] },
-                            ...answers,
-                            { columns: [
-                                { text: [{ text: 'YOUR ANSWER  ', bold: true, color: '#A65B00' }, { text: selectedText, color: '#26364D' }], width: '*' },
-                                { text: [{ text: 'CORRECT ANSWER  ', bold: true, color: '#07875A' }, { text: correctText, color: '#26364D' }], width: '*' }
-                            ], columnGap: 10, margin: [0, 5, 0, 0], fontSize: 8.5 }
-                        ],
-                        margin: [0, 0, 0, 10], padding: [10, 9, 10, 9], fillColor: index % 2 ? '#F5F8FE' : '#EFF6FF',
-                        border: [true, true, true, true], borderColor: '#D8E5F5', borderWidth: 0.6
-                    };
-                });
+                    const questionHtml = `<div style="padding:17px 19px;border:1px solid #d8e5f5;border-radius:16px;background:${index % 2 ? '#f5f8fe' : '#eff6ff'}"><div style="font-family:Arial,sans-serif;font-size:13px;font-weight:800;letter-spacing:1px;color:#1265c5;margin-bottom:11px">QUESTION ${String(index + 1).padStart(2, '0')}</div><div style="font-size:21px;line-height:1.55;font-weight:700;margin-bottom:9px;overflow-wrap:anywhere">${escapeAnswerKeyHtml(clean(question.text || question.question) || 'Question text unavailable')}</div>${answerRows.join('')}<div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid #d6e2f0;font:700 13px/1.5 Arial,sans-serif"><div><span style="color:#a65b00">YOUR ANSWER</span><br><span style="font-family:Arial,'Nirmala UI','Mangal',sans-serif;color:#26364d">${escapeAnswerKeyHtml(selectedText)}</span></div><div><span style="color:#07875a">CORRECT ANSWER</span><br><span style="font-family:Arial,'Nirmala UI','Mangal',sans-serif;color:#26364d">${escapeAnswerKeyHtml(correctText)}</span></div></div></div>`;
+                    const rendered = await renderHindiText(questionHtml);
+                    questionBlocks.push({
+                        image: rendered.data,
+                        width: rendered.height > 700 ? Math.max(360, 510 * 700 / rendered.height) : 510,
+                        alignment: 'center',
+                        margin: [0, 0, 0, 10],
+                        ...(rendered.height > 700 ? { pageBreak: 'before' } : {})
+                    });
+                }
                 const docDefinition = {
                     pageSize: 'A4', pageMargins: [38, 46, 38, 48],
                     background: (currentPage, pageSize) => ({ canvas: [{ type: 'rect', x: 0, y: 0, w: pageSize.width, h: 10, color: '#F3B51B' }] }),
-                    header: () => ({
-                        table: { widths: ['*'], body: [[{ stack: [
-                            { text: 'QUEST COACHING CENTRE', fontSize: 18, bold: true, color: '#FFFFFF' },
-                            { text: 'ONLINE TEST  |  ANSWER KEY & STUDENT RESPONSE', fontSize: 9, bold: true, color: '#F9C43A', margin: [0, 4, 0, 2] },
-                            { text: 'In Front of S.S. Girls High School, Gopalganj', fontSize: 8.5, color: '#EAF2FF' }
-                        ], fillColor: '#0B3158', margin: [22, 14, 22, 13] }]] }, layout: 'noBorders', margin: [0, 10, 0, 0]
-                    }),
+                    header: () => ({ text: '', margin: [38, 12, 38, 0] }),
                     footer: (page, pages) => ({ columns: [
                         { text: `Quest Coaching Centre  |  ${clean(studentDetails.rollNumber)}`, color: '#63748A', fontSize: 8 },
                         { text: `${page} / ${pages}`, alignment: 'right', color: '#63748A', fontSize: 8 }
                     ], margin: [38, 0, 38, 18] }),
                     content: [
-                        { text: clean(currentTest.testName) || 'Online Test Result', style: 'testTitle', margin: [0, 0, 0, 11] },
+                        { table: { widths: ['*'], body: [[{ stack: [
+                            { text: 'QUEST COACHING CENTRE', fontSize: 18, bold: true, color: '#FFFFFF' },
+                            { text: 'ONLINE TEST  |  ANSWER KEY & STUDENT RESPONSE', fontSize: 9, bold: true, color: '#FFD34F', margin: [0, 5, 0, 2] },
+                            { text: 'In Front of S.S. Girls High School, Gopalganj', fontSize: 8.5, color: '#EAF2FF' }
+                        ], fillColor: '#0B3158', margin: [18, 14, 18, 13] }]] }, layout: 'noBorders', margin: [-38, -34, -38, 15] },
+                        { image: testTitleImage.data, width: 510, margin: [0, 0, 0, 11] },
                         { table: { widths: photo ? ['*', 88] : ['*'], body: [[
                             { table: { widths: [91, '*'], body: details }, layout: {
                                 hLineWidth: () => 0, vLineWidth: () => 0,
