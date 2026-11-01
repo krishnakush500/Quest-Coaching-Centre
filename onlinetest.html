@@ -2707,7 +2707,7 @@
                 const renderHindiText = async html => {
                     const node = document.createElement('div');
                     node.setAttribute('aria-hidden', 'true');
-                    node.style.cssText = 'position:fixed;left:-12000px;top:0;width:940px;box-sizing:border-box;padding:22px 26px;font-family:Arial,"Nirmala UI","Mangal",sans-serif;color:#14243d;background:#fff;';
+                    node.style.cssText = 'position:fixed;left:-12000px;top:0;width:940px;box-sizing:border-box;padding:10px 12px;font-family:Arial,"Nirmala UI","Mangal",sans-serif;color:#14243d;background:#fff;';
                     node.innerHTML = html;
                     document.body.appendChild(node);
                     try {
@@ -2733,6 +2733,7 @@
                     } catch (_) { return null; }
                 };
                 const photo = await safePhoto(studentDetails.photoUrl);
+                const coachingLogo = await safePhoto('https://i.ibb.co/hF9tmnpB/20250903-202922.jpg');
                 const score = currentResultData || {};
                 const details = [
                     [{ text: 'STUDENT', style: 'label' }, { text: clean(studentDetails.name) || '—', style: 'value' }],
@@ -2757,22 +2758,22 @@
                         const isSelected = optionIndex === selectedIndex;
                         const rowColor = isCorrect ? '#E8F8F0' : isSelected ? '#FFF3E3' : '#F6F8FC';
                         const badge = [isCorrect ? '<span style="color:#07875a;font-weight:700">&nbsp; CORRECT</span>' : '', isSelected ? '<span style="color:#a65b00;font-weight:700">&nbsp; YOUR ANSWER</span>' : ''].join('');
-                        return `<div style="display:flex;align-items:flex-start;gap:12px;margin-top:7px;padding:10px 12px;border-radius:9px;background:${rowColor};font-size:18px;line-height:1.5"><strong style="min-width:30px;color:${isCorrect ? '#07875a' : isSelected ? '#a65b00' : '#34445c'}">${letter})</strong><span style="flex:1;overflow-wrap:anywhere">${escapeAnswerKeyHtml(clean(option)) || '&nbsp;'}</span><span style="font:700 12px Arial,sans-serif;white-space:nowrap">${badge}</span></div>`;
+                        return `<div style="display:flex;align-items:flex-start;gap:10px;margin-top:4px;padding:6px 9px;border-radius:8px;background:${rowColor};font-size:16px;line-height:1.35"><strong style="min-width:27px;color:${isCorrect ? '#07875a' : isSelected ? '#a65b00' : '#34445c'}">${letter})</strong><span style="flex:1;overflow-wrap:anywhere">${escapeAnswerKeyHtml(clean(option)) || '&nbsp;'}</span><span style="font:700 11px Arial,sans-serif;white-space:nowrap">${badge}</span></div>`;
                     });
                     const correctText = correctIndex >= 0 ? `${correctLabel}) ${clean(options[correctIndex])}` : clean(correctLabel) || 'Not available';
                     const selectedText = selectedIndex >= 0 ? `${selectedLabel}) ${clean(options[selectedIndex])}` : clean(selectedLabel) || 'Not attempted';
-                    const questionHtml = `<div style="padding:17px 19px;border:1px solid #d8e5f5;border-radius:16px;background:${index % 2 ? '#f5f8fe' : '#eff6ff'}"><div style="font-family:Arial,sans-serif;font-size:13px;font-weight:800;letter-spacing:1px;color:#1265c5;margin-bottom:11px">QUESTION ${String(index + 1).padStart(2, '0')}</div><div style="font-size:21px;line-height:1.55;font-weight:700;margin-bottom:9px;overflow-wrap:anywhere">${escapeAnswerKeyHtml(clean(question.text || question.question) || 'Question text unavailable')}</div>${answerRows.join('')}<div style="display:flex;gap:24px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid #d6e2f0;font:700 13px/1.5 Arial,sans-serif"><div><span style="color:#a65b00">YOUR ANSWER</span><br><span style="font-family:Arial,'Nirmala UI','Mangal',sans-serif;color:#26364d">${escapeAnswerKeyHtml(selectedText)}</span></div><div><span style="color:#07875a">CORRECT ANSWER</span><br><span style="font-family:Arial,'Nirmala UI','Mangal',sans-serif;color:#26364d">${escapeAnswerKeyHtml(correctText)}</span></div></div></div>`;
+                    const questionHtml = `<div style="padding:10px 12px;border:1px solid #d8e5f5;border-radius:12px;background:${index % 2 ? '#f5f8fe' : '#eff6ff'}"><div style="font-family:Arial,sans-serif;font-size:11px;font-weight:800;letter-spacing:.7px;color:#1265c5;margin-bottom:5px">QUESTION ${String(index + 1).padStart(2, '0')}</div><div style="font-size:18px;line-height:1.38;font-weight:700;margin-bottom:6px;overflow-wrap:anywhere">${escapeAnswerKeyHtml(clean(question.text || question.question) || 'Question text unavailable')}</div>${answerRows.join('')}<div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:8px;padding-top:7px;border-top:1px solid #d6e2f0;font:700 11px/1.4 Arial,sans-serif"><div><span style="color:#a65b00">YOUR ANSWER</span><br><span style="font-family:Arial,'Nirmala UI','Mangal',sans-serif;color:#26364d">${escapeAnswerKeyHtml(selectedText)}</span></div><div><span style="color:#07875a">CORRECT ANSWER</span><br><span style="font-family:Arial,'Nirmala UI','Mangal',sans-serif;color:#26364d">${escapeAnswerKeyHtml(correctText)}</span></div></div></div>`;
                     const rendered = await renderHindiText(questionHtml);
                     questionBlocks.push({
                         image: rendered.data,
                         width: rendered.height > 700 ? Math.max(360, 510 * 700 / rendered.height) : 510,
                         alignment: 'center',
-                        margin: [0, 0, 0, 10],
+                        margin: [0, 0, 0, 5],
                         ...(rendered.height > 700 ? { pageBreak: 'before' } : {})
                     });
                 }
                 const docDefinition = {
-                    pageSize: 'A4', pageMargins: [38, 46, 38, 48],
+                    pageSize: 'A4', pageMargins: [32, 46, 32, 40],
                     background: (currentPage, pageSize) => ({ canvas: [{ type: 'rect', x: 0, y: 0, w: pageSize.width, h: 10, color: '#F3B51B' }] }),
                     header: () => ({ text: '', margin: [38, 12, 38, 0] }),
                     footer: (page, pages) => ({ columns: [
@@ -2781,10 +2782,11 @@
                     ], margin: [38, 0, 38, 18] }),
                     content: [
                         { table: { widths: ['*'], body: [[{ stack: [
-                            { text: 'QUEST COACHING CENTRE', fontSize: 18, bold: true, color: '#FFFFFF' },
-                            { text: 'ONLINE TEST  |  ANSWER KEY & STUDENT RESPONSE', fontSize: 9, bold: true, color: '#FFD34F', margin: [0, 5, 0, 2] },
-                            { text: 'In Front of S.S. Girls High School, Gopalganj', fontSize: 8.5, color: '#EAF2FF' }
-                        ], fillColor: '#0B3158', margin: [18, 14, 18, 13] }]] }, layout: 'noBorders', margin: [-38, -34, -38, 15] },
+                            ...(coachingLogo ? [{ image: coachingLogo, fit: [52, 52], alignment: 'center', margin: [0, 0, 0, 5] }] : []),
+                            { text: 'QUEST COACHING CENTRE', fontSize: 18, bold: true, color: '#FFFFFF', alignment: 'center' },
+                            { text: 'ONLINE TEST  |  ANSWER KEY & STUDENT RESPONSE', fontSize: 9, bold: true, color: '#FFD34F', alignment: 'center', margin: [0, 4, 0, 2] },
+                            { text: 'In Front of S.S. Girls High School, Gopalganj', fontSize: 8.5, color: '#EAF2FF', alignment: 'center' }
+                        ], fillColor: '#0B3158', margin: [18, 10, 18, 10] }]] }, layout: 'noBorders', margin: [-32, -34, -32, 12] },
                         { image: testTitleImage.data, width: 510, margin: [0, 0, 0, 11] },
                         { table: { widths: photo ? ['*', 88] : ['*'], body: [[
                             { table: { widths: [91, '*'], body: details }, layout: {
