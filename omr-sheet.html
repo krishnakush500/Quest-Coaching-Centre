@@ -68,6 +68,15 @@
         .sheet-bottom-signatures{margin-top:2mm}
         .preview-buttons{display:flex;gap:9px;flex-wrap:wrap}
         .front-btn{background:#b51d49}.front-btn:hover{background:#94163a}
+        .generator-choice{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;max-width:850px;margin:0 auto 18px}
+        .generator-choice h2{grid-column:1/-1;margin:0;color:var(--navy);font-size:1.12rem}
+        .generator-choice button{min-height:86px;border:1px solid #d6dfeb;border-radius:16px;background:#fff;color:var(--navy);padding:16px;text-align:left;box-shadow:0 8px 22px #1029440c;cursor:pointer;display:flex;align-items:center;gap:14px;font-weight:800;font-size:1rem}
+        .generator-choice button:hover,.generator-choice button:focus-visible{border-color:#b51d49;box-shadow:0 0 0 3px #b51d491c;outline:0}
+        .generator-choice i{width:48px;height:48px;border-radius:13px;background:#eef5ff;display:grid;place-items:center;font-size:21px;color:#12568a;flex:none}
+        .generator-choice .choose-front i{background:#fff0f2;color:#b51d49}
+        .generator-choice small{display:block;margin-top:5px;font-weight:500;color:#637083;font-size:.8rem}
+        .generator-workspace{display:none}.active-generator{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;color:var(--navy);font-weight:700}
+        .change-generator{border:1px solid #d7e0ea;border-radius:9px;background:#fff;color:#43536a;padding:8px 12px;cursor:pointer;font-weight:700}
         .exam-copy-sheet{display:none;width:297mm;height:210mm;margin:0 auto 25px;padding:7mm;background:#fff;color:#161616;box-shadow:0 12px 40px #14294120;grid-template-columns:repeat(3,minmax(0,1fr));font-family:Arial,"Nirmala UI",Mangal,sans-serif}
         .exam-copy-sheet.ready{display:grid}
         .copy-panel{position:relative;min-width:0;height:196mm;padding:2.5mm 3mm;border:1px solid #b91e32;overflow:hidden}
@@ -89,12 +98,12 @@
         .copy-panel:last-child .copy-photo,.copy-panel:last-child .copy-photo-fallback{width:28mm;height:34mm}
         .copy-panel:last-child .copy-barcode{height:12mm}
         .copy-panel:last-child .copy-sign{height:11mm;margin-top:1mm}
-        @media(max-width:760px){.preview-buttons{display:grid;grid-template-columns:1fr}}
+        @media(max-width:760px){.preview-buttons{display:grid;grid-template-columns:1fr}.generator-choice{grid-template-columns:1fr;padding:0 13px}.generator-choice h2{grid-column:auto}.active-generator{align-items:flex-start}}
         @media print{
             @page{size:A4 portrait;margin:0}
             html,body{width:210mm!important;height:297mm!important;margin:0!important;padding:0!important;background:#fff!important}
             .app-shell{display:block!important;width:210mm!important;max-width:none!important;margin:0!important;padding:0!important;background:#fff!important}
-            .page-head,.work-card,.preview-actions{display:none!important}
+            .page-head,.work-card,.preview-actions,.generator-choice,.active-generator{display:none!important}
             .sheet,.exam-copy-sheet{display:none!important}
             body[data-print-mode="omr"] #omr-sheet{display:block!important;position:relative!important;width:210mm!important;height:297mm!important;min-height:297mm!important;margin:0!important;padding:7mm 9mm!important;overflow:hidden!important;box-shadow:none!important;background:#fff!important;page-break-after:auto;break-after:auto}
             body[data-print-mode="front"] #exam-copy-sheet{display:grid!important;position:relative!important;width:297mm!important;height:210mm!important;margin:0!important;padding:7mm!important;overflow:hidden!important;box-shadow:none!important;background:#fff!important;page-break-after:auto;break-after:auto}
@@ -107,6 +116,13 @@
 <body>
 <main class="app-shell">
     <header class="page-head"><div class="head-icon"><i class="fas fa-file-circle-check"></i></div><div><h1>OMR Sheet Generator</h1><p>Create and print student OMR answer sheets using admission records.</p></div></header>
+    <section id="generator-choice" class="generator-choice" aria-label="Choose a document to generate">
+        <h2>Choose what you want to generate</h2>
+        <button type="button" id="choose-omr"><i class="fas fa-list-check"></i><span>OMR Answer Sheet<small>Generate the student answer sheet</small></span></button>
+        <button type="button" id="choose-front" class="choose-front"><i class="fas fa-file-lines"></i><span>Exam Copy Front Page<small>Generate the A4 landscape exam copy</small></span></button>
+    </section>
+    <div id="generator-workspace" class="generator-workspace">
+    <div class="active-generator"><span id="active-generator-label">OMR Answer Sheet</span><button type="button" class="change-generator" id="change-generator"><i class="fas fa-arrow-left"></i> Choose another format</button></div>
     <section class="work-card">
         <form id="lookup-form" class="form-row">
             <div class="field"><label for="roll-input">Student Roll Number</label><input id="roll-input" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter the roll number from the admission record" required></div>
@@ -179,13 +195,18 @@
             <div class="copy-field">पिता का नाम (Father's Name): <b id="copy-father-right"></b></div><div class="copy-sign">हस्ताक्षर (Signature of Centre Superintendent)</div>
         </section>
     </article>
+    </div>
 </main>
 <script>
     const firebaseConfig={apiKey:"AIzaSyBoAqrgPwwM7GNyURqXrJEYWPihKKR8VGg",authDomain:"quest-coaching.firebaseapp.com",databaseURL:"https://quest-coaching-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"quest-coaching",storageBucket:"quest-coaching.firebasestorage.app",messagingSenderId:"131948734089",appId:"1:131948734089:web:f4ba25110c8b1298360858"};
     firebase.initializeApp(firebaseConfig);const auth=firebase.auth();const db=firebase.firestore();
-    const form=document.getElementById('lookup-form'),rollInput=document.getElementById('roll-input'),message=document.getElementById('message'),sheet=document.getElementById('omr-sheet'),examCopySheet=document.getElementById('exam-copy-sheet'),previewActions=document.getElementById('preview-actions'),picker=document.getElementById('student-picker'),matchSelect=document.getElementById('match-select');let matchedStudents=[];
+    const form=document.getElementById('lookup-form'),rollInput=document.getElementById('roll-input'),message=document.getElementById('message'),sheet=document.getElementById('omr-sheet'),examCopySheet=document.getElementById('exam-copy-sheet'),previewActions=document.getElementById('preview-actions'),picker=document.getElementById('student-picker'),matchSelect=document.getElementById('match-select'),generatorChoice=document.getElementById('generator-choice'),generatorWorkspace=document.getElementById('generator-workspace');let matchedStudents=[],selectedGenerator='';
     auth.onAuthStateChanged(user=>{if(!user){alert('Please login from the main page first.');location.href='index.html';}});
     function showMessage(text,type='error'){message.textContent=text;message.className=`notice ${type}`;}
+    function chooseGenerator(mode){selectedGenerator=mode;generatorChoice.style.display='none';generatorWorkspace.style.display='block';document.getElementById('active-generator-label').textContent=mode==='front'?'Exam Copy Front Page · A4 Landscape':'OMR Answer Sheet · A4 Portrait';document.getElementById('print-btn').style.display=mode==='omr'?'inline-flex':'none';document.getElementById('print-front-btn').style.display=mode==='front'?'inline-flex':'none';}
+    document.getElementById('choose-omr').addEventListener('click',()=>chooseGenerator('omr'));
+    document.getElementById('choose-front').addEventListener('click',()=>chooseGenerator('front'));
+    document.getElementById('change-generator').addEventListener('click',()=>{selectedGenerator='';generatorWorkspace.style.display='none';generatorChoice.style.display='grid';previewActions.style.display='none';sheet.classList.remove('ready');examCopySheet.classList.remove('ready');});
     function buildQuestions(count){const columns=document.getElementById('question-columns');columns.replaceChildren();const columnCount=4,perColumn=Math.ceil(count/columnCount);for(let c=0;c<columnCount;c++){const col=document.createElement('div');col.className='q-col';const head=document.createElement('div');head.className='q-head';head.innerHTML='<span>Q.NO</span><span>ANSWER</span>';col.appendChild(head);const start=c*perColumn+1,end=Math.min(count,(c+1)*perColumn);for(let n=start;n<=end;n++){const row=document.createElement('div');row.className='q-row';const num=document.createElement('span');num.className='q-num';num.textContent=String(n).padStart(3,'0');const opts=document.createElement('span');opts.className='options';for(const letter of ['A','B','C','D']){const bubble=document.createElement('span');bubble.className='bubble';bubble.textContent=letter;opts.appendChild(bubble);}row.append(num,opts);col.appendChild(row);}columns.appendChild(col);}
         const sets=document.getElementById('set-options');sets.replaceChildren();for(const letter of 'ABCDEFGHIJ'){const row=document.createElement('div');row.className='set-item';row.textContent=`SET - ${letter}`;const bubble=document.createElement('span');bubble.className='empty-circle';row.appendChild(bubble);sets.appendChild(row);}const boxes=document.getElementById('booklet-boxes');boxes.replaceChildren();for(let i=0;i<12;i++){const box=document.createElement('span');box.className='digit-box';box.innerHTML='&nbsp;';boxes.appendChild(box);}}
     function setChoiceMarkup(selected='C'){return Array.from('ABCDEFG',letter=>`<span>${letter}<i class="copy-circle${letter===selected?' selected':''}"></i></span>`).join('');}
