@@ -2782,7 +2782,9 @@
                     if (page > 0) pdf.addPage();
                     const imageData = pageCanvas.toDataURL('image/jpeg', .94);
                     const imageHeight = sliceHeight * pageWidth / canvas.width;
-                    pdf.addImage(imageData, 'JPEG', 10, 10, pageWidth, imageHeight, undefined, 'FAST');
+                    // Avoid passing an undefined alias; jsPDF versions differ in how
+                    // they parse optional addImage arguments in browser builds.
+                    pdf.addImage(imageData, 'JPEG', 10, 10, pageWidth, imageHeight);
                     offsetY += sliceHeight;
                     page++;
                 }
