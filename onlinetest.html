@@ -6,6 +6,8 @@
     <title>Quest Coaching Centre - Online Test Platform</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <!-- Firebase SDK -->
@@ -2700,83 +2702,108 @@
             button.disabled = true;
             button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating PDF...';
             try {
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const left = 14, right = 196, bottom = 282, lineHeight = 5;
-                let y = 16;
-                const addText = (text, size = 10, weight = 'normal', color = [28, 39, 56]) => {
-                    pdf.setFont('helvetica', weight);
-                    pdf.setFontSize(size);
-                    pdf.setTextColor(...color);
-                    const lines = pdf.splitTextToSize(String(text ?? ''), right - left);
-                    for (const line of lines) {
-                        if (y > bottom) { pdf.addPage(); y = 16; }
-                        pdf.text(line, left, y);
-                        y += lineHeight;
-                    }
-                };
-
-                pdf.setFillColor(9, 45, 80);
-                pdf.rect(0, 0, 210, 34, 'F');
-                pdf.setTextColor(255, 255, 255);
-                pdf.setFont('helvetica', 'bold');
-                pdf.setFontSize(17);
-                pdf.text('QUEST COACHING CENTRE', left, 15);
-                pdf.setFont('helvetica', 'normal');
-                pdf.setFontSize(9);
-                pdf.text('ONLINE TEST · ANSWER KEY AND STUDENT RESPONSE', left, 23);
-                pdf.text('In Front of S.S. Girls High School, Gopalganj', left, 29);
-                y = 43;
-
-                // Add the student's photo when the public photo URL permits access.
-                if (studentDetails.photoUrl) {
+                if (!window.pdfMake?.createPdf) throw new Error('PDF engine unavailable');
+                // pdfmake's bundled Roboto font supports Devanagari; jsPDF's built-in Helvetica does not.
+                const clean = value => String(value ?? '').replace(/\s+/g, ' ').trim();
+                const safePhoto = async url => {
+                    if (!url) return null;
                     try {
-                        const response = await fetch(studentDetails.photoUrl, { mode: 'cors' });
-                        if (!response.ok) throw new Error('Photo is unavailable');
-                        const photoBlob = await response.blob();
-                        const photoData = await new Promise((resolve, reject) => {
+                        const response = await fetch(url, { mode: 'cors' });
+                        if (!response.ok) return null;
+                        const blob = await response.blob();
+                        return await new Promise(resolve => {
                             const reader = new FileReader();
                             reader.onload = () => resolve(reader.result);
-                            reader.onerror = reject;
-                            reader.readAsDataURL(photoBlob);
+                            reader.onerror = () => resolve(null);
+                            reader.readAsDataURL(blob);
                         });
-                        const photoType = photoBlob.type.includes('png') ? 'PNG' : 'JPEG';
-                        pdf.addImage(photoData, photoType, 164, 40, 30, 36);
-                    } catch (photoError) {
-                        console.info('Student photo skipped in PDF because the image could not be fetched.');
-                    }
-                }
-
-                addText(currentTest.testName || 'Online Test - Answer Key', 14, 'bold', [9, 45, 80]);
-                addText(`Student: ${studentDetails.name || '—'}    Roll No.: ${studentDetails.rollNumber || '—'}`, 10, 'bold');
-                addText(`Admission No.: ${studentDetails.admissionNo || '—'}    Class: ${studentDetails.classApplying || '—'}`);
-                addText(`Father's Name: ${studentDetails.fatherName || '—'}    Contact: ${studentDetails.parentMobile || '—'}`);
-                addText(`School: ${studentDetails.schoolName || '—'}    Date: ${new Date().toLocaleDateString('en-IN')}`);
-                addText(`Score: ${currentResultData?.marksObtained || 0}/${currentResultData?.totalMarks || 0}    Correct: ${currentResultData?.correct || 0}    Incorrect: ${currentResultData?.wrong || 0}`, 10, 'bold');
-                y += 3;
-
-                currentQuestions.forEach((question, index) => {
+                    } catch (_) { return null; }
+                };
+                const photo = await safePhoto(studentDetails.photoUrl);
+                const score = currentResultData || {};
+                const details = [
+                    [{ text: 'STUDENT', style: 'label' }, { text: clean(studentDetails.name) || '—', style: 'value' }],
+                    [{ text: 'ROLL NUMBER', style: 'label' }, { text: clean(studentDetails.rollNumber) || '—', style: 'value' }],
+                    [{ text: 'ADMISSION NO.', style: 'label' }, { text: clean(studentDetails.admissionNo) || '—', style: 'value' }],
+                    [{ text: 'CLASS', style: 'label' }, { text: clean(studentDetails.classApplying) || '—', style: 'value' }],
+                    [{ text: "FATHER'S NAME", style: 'label' }, { text: clean(studentDetails.fatherName) || '—', style: 'value' }],
+                    [{ text: 'SCHOOL', style: 'label' }, { text: clean(studentDetails.schoolName) || '—', style: 'value' }]
+                ];
+                const questionBlocks = currentQuestions.map((question, index) => {
                     const options = getQuestionOptions(question);
                     const correctLabel = getAnswerLabel(question.correctAnswer, options);
                     const selectedLabel = getAnswerLabel(studentAnswers[index], options);
-                    if (y > bottom - 24) { pdf.addPage(); y = 16; }
-                    pdf.setDrawColor(210, 220, 232);
-                    pdf.setFillColor(242, 247, 252);
-                    pdf.roundedRect(left - 2, y - 4, right - left + 4, 11, 2, 2, 'FD');
-                    addText(`Question ${index + 1}: ${question.text || question.question || ''}`, 10, 'bold', [15, 46, 82]);
-                    options.forEach((option, optionIndex) => {
-                        const label = String.fromCharCode(65 + optionIndex);
-                        const flags = [label === correctLabel ? '  [CORRECT]' : '', label === selectedLabel ? '  [STUDENT SELECTED]' : ''].join('');
-                        addText(`${label}) ${option}${flags}`, 9, label === correctLabel || label === selectedLabel ? 'bold' : 'normal');
+                    const correctIndex = /^[A-D]$/.test(correctLabel) ? correctLabel.charCodeAt(0) - 65 : -1;
+                    const selectedIndex = /^[A-D]$/.test(selectedLabel) ? selectedLabel.charCodeAt(0) - 65 : -1;
+                    const answers = options.map((option, optionIndex) => {
+                        const letter = String.fromCharCode(65 + optionIndex);
+                        const isCorrect = optionIndex === correctIndex;
+                        const isSelected = optionIndex === selectedIndex;
+                        return {
+                            columns: [
+                                { width: 22, text: `${letter})`, bold: isCorrect || isSelected, color: isCorrect ? '#07875A' : isSelected ? '#B45309' : '#34445C' },
+                                { width: '*', text: clean(option) || ' ', bold: isCorrect || isSelected, color: isCorrect ? '#07875A' : isSelected ? '#B45309' : '#34445C' },
+                                { width: 110, text: [isCorrect ? 'CORRECT' : '', isSelected ? 'YOUR ANSWER' : ''].filter(Boolean).join('  '), bold: true, fontSize: 8, color: isCorrect ? '#07875A' : '#B45309', alignment: 'right' }
+                            ], columnGap: 4, margin: [0, 2, 0, 2]
+                        };
                     });
-                    const correctText = correctLabel ? `${correctLabel}${options[correctLabel.charCodeAt(0) - 65] ? ` — ${options[correctLabel.charCodeAt(0) - 65]}` : ''}` : 'Not available';
-                    const selectedText = selectedLabel ? `${selectedLabel}${options[selectedLabel.charCodeAt(0) - 65] ? ` — ${options[selectedLabel.charCodeAt(0) - 65]}` : ''}` : 'Not attempted';
-                    addText(`Student selected: ${selectedText}    Correct answer: ${correctText}`, 9, 'bold', [24, 92, 71]);
-                    y += 3;
+                    const correctText = correctIndex >= 0 ? `${correctLabel}) ${clean(options[correctIndex])}` : clean(correctLabel) || 'Not available';
+                    const selectedText = selectedIndex >= 0 ? `${selectedLabel}) ${clean(options[selectedIndex])}` : clean(selectedLabel) || 'Not attempted';
+                    return {
+                        unbreakable: true,
+                        stack: [
+                            { text: [{ text: `QUESTION ${String(index + 1).padStart(2, '0')}  `, color: '#1265C5', bold: true }, { text: clean(question.text || question.question) || 'Question text unavailable', color: '#14243D', bold: true }], style: 'questionTitle', margin: [0, 0, 0, 5] },
+                            ...answers,
+                            { columns: [
+                                { text: [{ text: 'YOUR ANSWER  ', bold: true, color: '#A65B00' }, { text: selectedText, color: '#26364D' }], width: '*' },
+                                { text: [{ text: 'CORRECT ANSWER  ', bold: true, color: '#07875A' }, { text: correctText, color: '#26364D' }], width: '*' }
+                            ], columnGap: 10, margin: [0, 5, 0, 0], fontSize: 8.5 }
+                        ],
+                        margin: [0, 0, 0, 10], padding: [10, 9, 10, 9], fillColor: index % 2 ? '#F5F8FE' : '#EFF6FF',
+                        border: [true, true, true, true], borderColor: '#D8E5F5', borderWidth: 0.6
+                    };
                 });
-
+                const docDefinition = {
+                    pageSize: 'A4', pageMargins: [38, 46, 38, 48],
+                    background: (currentPage, pageSize) => ({ canvas: [{ type: 'rect', x: 0, y: 0, w: pageSize.width, h: 10, color: '#F3B51B' }] }),
+                    header: () => ({
+                        table: { widths: ['*'], body: [[{ stack: [
+                            { text: 'QUEST COACHING CENTRE', fontSize: 18, bold: true, color: '#FFFFFF' },
+                            { text: 'ONLINE TEST  |  ANSWER KEY & STUDENT RESPONSE', fontSize: 9, bold: true, color: '#F9C43A', margin: [0, 4, 0, 2] },
+                            { text: 'In Front of S.S. Girls High School, Gopalganj', fontSize: 8.5, color: '#EAF2FF' }
+                        ], fillColor: '#0B3158', margin: [22, 14, 22, 13] }]] }, layout: 'noBorders', margin: [0, 10, 0, 0]
+                    }),
+                    footer: (page, pages) => ({ columns: [
+                        { text: `Quest Coaching Centre  |  ${clean(studentDetails.rollNumber)}`, color: '#63748A', fontSize: 8 },
+                        { text: `${page} / ${pages}`, alignment: 'right', color: '#63748A', fontSize: 8 }
+                    ], margin: [38, 0, 38, 18] }),
+                    content: [
+                        { text: clean(currentTest.testName) || 'Online Test Result', style: 'testTitle', margin: [0, 0, 0, 11] },
+                        { table: { widths: photo ? ['*', 88] : ['*'], body: [[
+                            { table: { widths: [91, '*'], body: details }, layout: {
+                                hLineWidth: () => 0, vLineWidth: () => 0,
+                                paddingLeft: () => 0, paddingRight: () => 8, paddingTop: () => 3, paddingBottom: () => 3
+                            } },
+                            ...(photo ? [{ image: photo, fit: [76, 92], alignment: 'right', margin: [0, 2, 0, 0] }] : [])
+                        ]] }, layout: { fillColor: () => '#F2F7FD', hLineColor: () => '#D8E5F5', vLineColor: () => '#D8E5F5', paddingLeft: () => 12, paddingRight: () => 12, paddingTop: () => 9, paddingBottom: () => 9 }, margin: [0, 0, 0, 10] },
+                        { columns: [
+                            { text: [{ text: 'SCORE  ', bold: true, color: '#FFFFFF' }, { text: `${score.marksObtained ?? 0} / ${score.totalMarks ?? 0}`, bold: true, fontSize: 15, color: '#FFFFFF' }], fillColor: '#1265C5', margin: [12, 10, 8, 10], width: '*' },
+                            { text: [{ text: 'CORRECT  ', bold: true, color: '#FFFFFF' }, { text: String(score.correct ?? 0), bold: true, fontSize: 15, color: '#FFFFFF' }], fillColor: '#07875A', margin: [12, 10, 8, 10], width: '*' },
+                            { text: [{ text: 'INCORRECT  ', bold: true, color: '#FFFFFF' }, { text: String(score.wrong ?? 0), bold: true, fontSize: 15, color: '#FFFFFF' }], fillColor: '#E34B5F', margin: [12, 10, 8, 10], width: '*' }
+                        ], columnGap: 7, margin: [0, 0, 0, 16] },
+                        { text: 'QUESTION-WISE ANSWERS', fontSize: 11, bold: true, color: '#0B3158', margin: [0, 0, 0, 8] },
+                        ...questionBlocks
+                    ],
+                    defaultStyle: { font: 'Roboto', fontSize: 9, color: '#26364D', lineHeight: 1.18 },
+                    styles: {
+                        testTitle: { fontSize: 14, bold: true, color: '#0B3158' },
+                        label: { fontSize: 7.5, bold: true, color: '#63748A' },
+                        value: { fontSize: 9, bold: true, color: '#14243D' },
+                        questionTitle: { fontSize: 10, lineHeight: 1.2 }
+                    }
+                };
                 const safeRoll = String(studentDetails.rollNumber || 'student').replace(/[^a-z0-9_-]/gi, '_');
-                pdf.save(`Quest_Answer_Key_${safeRoll}.pdf`);
+                window.pdfMake.createPdf(docDefinition).download(`Quest_Answer_Key_${safeRoll}.pdf`);
             } catch (error) {
                 console.error('Answer key PDF generation failed:', error);
                 showToast('Could not download the answer key PDF. Please try again.', 'error');
