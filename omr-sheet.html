@@ -48,7 +48,7 @@
         .identity-field{font-size:7.2pt;line-height:1.2;gap:1mm}
         .identity-field span{color:#c91f36;white-space:normal;font-weight:700}
         .identity-field b{color:#111}
-        .identity{grid-template-columns:minmax(0,1fr) 39mm}.photo-stack{display:grid;grid-template-columns:12mm 37mm;grid-template-rows:40mm;align-items:center;gap:1mm}.photo-stack .student-photo,.photo-stack .photo-fallback{grid-column:2;grid-row:1;width:37mm;height:40mm;border:1px solid #222}.photo-barcode{grid-column:1;grid-row:1;width:12mm;height:40mm;transform:none}.photo-stack .student-photo{grid-column:2}
+        .identity{grid-template-columns:minmax(0,1fr) 43mm;gap:1.5mm}.photo-stack{display:grid;grid-template-columns:16mm 26mm;grid-template-rows:30mm;align-items:center;gap:1mm;width:43mm;overflow:hidden}.photo-stack .student-photo,.photo-stack .photo-fallback{grid-column:2;grid-row:1;width:26mm;height:30mm;min-width:0;border:1px solid #222;object-fit:cover}.photo-barcode{grid-column:1;grid-row:1;width:16mm;height:30mm;min-width:0;display:block}.photo-stack .student-photo{grid-column:2}
         .candidate-row{grid-template-columns:1fr 1fr;gap:2mm;margin-bottom:2mm}.set-selected-box{border:1px solid #333;padding:1.2mm 2mm;margin:0 0 2mm;font-size:8pt;color:#c91f36;font-weight:700}.set-selected-box b{color:#111;margin-left:2mm}
         .write-field{min-height:10mm;border:1px solid #333;padding:1.2mm;font-size:7.5pt;color:#c91f36;font-weight:700}
         .write-field b{color:#111;font-size:8pt}
@@ -253,7 +253,7 @@
         updateCopySetCode();
         fillDigitBoxes('copy-last-digits',roll.slice(-3),3);fillDigitBoxes('copy-roll-boxes',roll,Math.min(10,Math.max(6,roll.length)));
         const copyPhoto=document.getElementById('copy-photo'),copyFallback=document.getElementById('copy-photo-fallback');copyPhoto.style.display='none';copyFallback.style.display='grid';copyPhoto.onload=()=>{copyPhoto.style.display='block';copyFallback.style.display='none';};copyPhoto.onerror=()=>{copyPhoto.style.display='none';copyFallback.style.display='grid';};if(student.photoUrl)copyPhoto.src=student.photoUrl;
-        if(window.JsBarcode){try{JsBarcode(document.getElementById('student-barcode'),roll,{format:'CODE128',displayValue:true,fontSize:10,height:30,margin:2,lineColor:'#111'});JsBarcode(document.getElementById('photo-barcode'),roll,{format:'CODE128',displayValue:true,fontSize:7,textPosition:'right',textMargin:1,height:110,width:1,margin:0,lineColor:'#111'});JsBarcode(document.getElementById('copy-barcode'),roll,{format:'CODE128',displayValue:true,fontSize:9,height:34,margin:2,lineColor:'#111'});}catch(e){console.warn('Could not create student barcodes.',e);}}
+        if(window.JsBarcode){try{JsBarcode(document.getElementById('student-barcode'),roll,{format:'CODE128',displayValue:true,fontSize:10,height:30,margin:2,lineColor:'#111'});JsBarcode(document.getElementById('photo-barcode'),roll,{format:'CODE128',displayValue:true,fontSize:7,textPosition:'right',textMargin:1,height:105,width:1.15,margin:1,lineColor:'#111'});JsBarcode(document.getElementById('copy-barcode'),roll,{format:'CODE128',displayValue:true,fontSize:9,height:34,margin:2,lineColor:'#111'});}catch(e){console.warn('Could not create student barcodes.',e);}}
         if(selectedGenerator==='front'){sheet.classList.remove('ready');examCopySheet.classList.add('ready');}
         else{buildQuestions(Number(document.getElementById('question-count').value));sheet.classList.add('ready');examCopySheet.classList.remove('ready');}
         previewActions.style.display='flex';
