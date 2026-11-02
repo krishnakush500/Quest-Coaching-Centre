@@ -132,13 +132,13 @@
         <form id="lookup-form" class="form-row">
             <div class="field" id="roll-field"><label for="roll-input">Student Roll Number</label><input id="roll-input" type="text" inputmode="numeric" autocomplete="off" placeholder="Enter the roll number from the admission record" required></div>
             <div class="field"><label for="roll-code-input">Roll Code</label><input id="roll-code-input" type="text" placeholder="Enter roll code"></div>
-            <div class="field"><label for="subject-code-input">Subject Code (3 letters)</label><input id="subject-code-input" type="text" maxlength="3" placeholder="e.g. HIN"></div>
+            <div class="field"><label for="subject-code-input">Subject Code (numbers)</label><input id="subject-code-input" type="text" inputmode="numeric" maxlength="3" placeholder="e.g. 101"></div>
             
-            <div class="field"><label for="shift-input">पाली</label><input id="shift-input" type="text" placeholder="e.g. 1st / 2nd"></div>
+            <div class="field"><label for="shift-input">पाली</label><select id="shift-input"><option value="">Select shift</option><option>1st Shift</option><option>2nd Shift</option><option>3rd Shift</option><option>4th Shift</option></select></div>
             <div class="field"><label for="exam-date-input">परीक्षा तिथि</label><input id="exam-date-input" type="date"></div>
-            <div class="field"><label for="booklet-code-input">प्रश्न पत्र क्रमांक (10 letters; first 3 from subject code)</label><input id="booklet-code-input" type="text" maxlength="10" placeholder="Generated from subject code"></div>
+            <div class="field"><label for="booklet-code-input">प्रश्न पत्र क्रमांक (10 letters; first 3 from subject code)</label><input id="booklet-code-input" type="text" inputmode="text" maxlength="10" placeholder="Generated booklet serial letters"></div>
             <div class="field"><label for="centre-name-input">परीक्षा केंद्र का नाम</label><input id="centre-name-input" type="text" placeholder="Enter examination centre"></div>
-            <div class="field" id="exam-field"><label for="exam-input">Exam / Test Name</label><input id="exam-input" type="text" value="QUEST COACHING CENTRE EXAMINATION"></div>
+            <div class="field" id="exam-field"><label for="exam-input">Subject Name</label><input id="exam-input" type="text" value="QUEST COACHING CENTRE EXAMINATION"></div>
             <div class="field"><label for="question-count">Total Questions</label><input id="question-count" type="number" min="1" max="100" value="100"></div>
             <div class="field"><label for="copy-set-code">Question Paper Set</label><select id="copy-set-code"><option>A</option><option>B</option><option selected>C</option><option>D</option><option>E</option><option>F</option><option>G</option></select></div>
             <button id="generate-btn" class="primary-btn" type="submit"><i class="fas fa-magnifying-glass"></i> Find Student</button>
@@ -227,7 +227,7 @@
     function fillDigitBoxes(containerId,value,count){const container=document.getElementById(containerId);container.replaceChildren();const digits=String(value||'').replace(/\D/g,'').slice(-count).padStart(count,' ');for(const digit of digits){const box=document.createElement('span');box.className='copy-digit';box.textContent=digit.trim();container.appendChild(box);}}
     function randomLetters(length){const alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZ';const bytes=new Uint8Array(length);if(window.crypto?.getRandomValues)crypto.getRandomValues(bytes);else for(let i=0;i<length;i++)bytes[i]=Math.floor(Math.random()*256);return Array.from(bytes,b=>alphabet[b%alphabet.length]).join('');}
     function makeUniqueOmrCode(){const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";const bytes=new Uint8Array(10);crypto.getRandomValues(bytes);return Array.from(bytes,b=>chars[b%chars.length]).join("");}
-    function updateBookletCode(){const subject=document.getElementById('subject-code-input').value.trim().toUpperCase();document.getElementById('booklet-code-input').value=subject.length===3?subject+randomLetters(7):'';}
+    function updateBookletCode(){const input=document.getElementById('booklet-code-input');if(!input.value)input.value=randomLetters(10);}
     document.getElementById('subject-code-input').addEventListener('input',updateBookletCode);
     document.getElementById('booklet-code-input').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z]/g,'').slice(0,10);});
     function showStudent(student){
@@ -241,7 +241,7 @@
         document.getElementById('sheet-subject-code').textContent=subjectCode||'—';document.getElementById('sheet-admission').textContent=get('admissionNo');document.getElementById('sheet-name').textContent=get('studentName');document.getElementById('sheet-class').textContent=studentClass;
         document.getElementById('sheet-subject').textContent=exam;document.getElementById('sheet-school').textContent=get('schoolName');document.getElementById('sheet-mother').textContent=get('motherName');document.getElementById('sheet-date').textContent=date;
         const photo=document.getElementById('sheet-photo'),fallback=document.getElementById('photo-fallback');photo.style.display='none';fallback.style.display='grid';photo.onload=()=>{photo.style.display='block';fallback.style.display='none';};photo.onerror=()=>{photo.style.display='none';fallback.style.display='grid';};if(student.photoUrl)photo.src=student.photoUrl;
-        document.getElementById('print-exam-title').textContent=exam;document.getElementById('sheet-coaching').textContent=centreName;
+        document.getElementById('print-exam-title').textContent='Subject: '+exam;document.getElementById('sheet-coaching').textContent=centreName;
         document.getElementById('preview-caption').textContent=selectedGenerator==='front'?`Exam copy front page ready · ${student.studentName} · Roll No. ${roll}`:`${student.studentName} · Roll No. ${roll} · ${document.getElementById('question-count').value} questions`;
         const copyValues={
             'copy-subject-left':exam,'copy-date-left':date,'copy-class-left':studentClass,'copy-subject-name-left':exam,'copy-roll-left':roll,
